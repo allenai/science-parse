@@ -1,0 +1,12 @@
+# gradle
+.gradle/**
+build/**
+out/**
+
+# intellij
+*.ipr
+*.iws
+*.iml
+
+# emacs
+.*~

@@ -1,0 +1,3 @@
+[submodule "ext/ml"]
+	path = ext/ml
+	url = git@github.com:allenai/ml.git
