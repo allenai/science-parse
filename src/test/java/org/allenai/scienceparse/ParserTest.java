@@ -7,7 +7,11 @@ import static org.testng.Assert.*;
 @Test
 public class ParserTest {
 
+  public String filePathOfResource(String path) {
+    return this.getClass().getResource(path).getFile();
+  }
+	
   public void testMath() throws Exception {
-    assertEquals(2 + 2 == 4, "Math is broken!");
+    assertEquals(2 + 2, 4);
   }
 }

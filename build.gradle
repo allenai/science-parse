@@ -5,11 +5,18 @@ repositories {
   mavenCentral()
 }
 
+test {
+  useTestNG()
+}
+
 dependencies {
   compile project(':ext:ml')
 
   compile 'org.projectlombok:lombok:1.16.6'
 
+  compile 'org.apache.pdfbox:pdfbox:1.8.10'
+
   testCompile 'org.testng:testng:6.8.1'
+
 
 }

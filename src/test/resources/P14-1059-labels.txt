@@ -1,0 +1,4 @@
+TITLE	How to make words with vectors: Phrase generation in distributional semantics
+AUTHOR	Georgiana Dinu
+AUTHOR	Marco Baroni
+ABSTRACT	We introduce the problem of generation in distributional semantics: Given a distributional vector representing some meaning, how can we generate the phrase that best expresses that meaning? We motivate this novel challenge on theoretical and practical grounds and propose a simple data-driven approach to the estimation of generation functions. We test this in a monolingual scenario (paraphrase generation) as well as in a cross-lingual setting(translation by synthesizing adjective-noun phrase vectors in English and generating the equivalent expressions in Italian). 
