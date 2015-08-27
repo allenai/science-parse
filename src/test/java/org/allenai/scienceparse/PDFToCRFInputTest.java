@@ -3,7 +3,6 @@ package org.allenai.scienceparse;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
