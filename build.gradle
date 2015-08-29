@@ -14,4 +14,7 @@ dependencies {
   compile 'org.projectlombok:lombok:1.16.6'
   compile 'org.apache.pdfbox:pdfbox:1.8.10'
   compile 'org.testng:testng:6.8.1'
+
+  testCompile 'com.fasterxml.jackson.core:jackson-core:2.6.1'
+  testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.1'
 }

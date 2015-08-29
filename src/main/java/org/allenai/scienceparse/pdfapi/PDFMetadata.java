@@ -15,8 +15,9 @@ import java.util.List;
 @Builder
 @Data
 public class PDFMetadata {
-    public final Option<String> title;
-    public final Option<List<String>> authors;
-    public final Option<List<String>> keywords;
-    public final Option<Date> createDate;
+    public final String title;
+    public final List<String> authors;
+    public final List<String> keywords;
+    public final Date createDate;
+    public final Date lastModifiedDate;
 }
