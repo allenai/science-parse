@@ -5,19 +5,17 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.ToDoubleFunction;
-import java.util.regex.Pattern;
+
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -88,13 +86,16 @@ public class PDFExtractor {
         protected void writeString(String text, List<TextPosition> textPositions) throws IOException {
             // Build current token and decide if on the same line as previous token or starts a new line
             PDFToken token = RawChunk.of(text, textPositions).toPDFToken();
+            if (token.token.trim().isEmpty()) {
+                return;
+            }
             if (curLineTokens.isEmpty()) {
                 curLineTokens.add(token);
             } else {
                 double curYBottom = token.bounds.get(3);
                 boolean yOffsetOverlap = curYBottom <= lastToken.bounds.get(3)
                     || curYBottom >= lastToken.bounds.get(1);
-                float spaceWidth = token.getFontMetrics().ptSize;
+                float spaceWidth = Math.max(token.getFontMetrics().getSpaceWidth(), token.getFontMetrics().ptSize);
                 float observedWidth = token.bounds.get(0) - lastToken.bounds.get(2);
                 boolean withinSpace = observedWidth > 0 && observedWidth < 4 * spaceWidth;
                 if (yOffsetOverlap && withinSpace) {
@@ -147,15 +148,22 @@ public class PDFExtractor {
             : Collections.emptyList();
     }
 
-    private boolean badPDFTitle(String title) {
-        return
-            // Ending with file extension is what Microsoft Word tends to do
+    private boolean badPDFTitle(PDFPage firstPage, String title) {
+        if (// Ending with file extension is what Microsoft Word tends to do
             title.endsWith(".pdf") ||
             title.endsWith(".doc") ||
             // Ellipsis are bad
             title.endsWith("...") ||
             // Some conferences embed this in start of title
-            title.toLowerCase().startsWith("Proceedings of");
+            title.toLowerCase().startsWith("Proceedings of"))
+        {
+            return true;
+        }
+        Optional<PDFLine> matchLine = firstPage.lines.stream().filter(l -> {
+            String lineText = l.lineText();
+            return lineText.startsWith(title) || title.startsWith(lineText);
+        }).findFirst();
+        return !matchLine.isPresent();
     }
 
 
@@ -166,7 +174,7 @@ public class PDFExtractor {
         List<String> keywords = guessKeywordList(info.getKeywords());
         List<String> authors = guessAuthorList(info.getAuthor());
         val meta = PDFMetadata.builder()
-            .title(info.getTitle())
+            .title(info.getTitle() != null ? info.getTitle().trim() : null)
             .keywords(keywords)
             .authors(authors);
         val createDate = info.getCreationDate();
@@ -194,9 +202,11 @@ public class PDFExtractor {
         // SIDE-EFFECT pages ivar in stripper is populated
         stripper.getText(pdfBoxDoc);
         // Title heuristic
-        if (info.getTitle() == null || badPDFTitle(info.getTitle())) {
+        if (info.getTitle() == null || badPDFTitle(stripper.pages.get(0), info.getTitle())) {
             String guessTitle = getHeuristicTitle(stripper);
-            meta.title(guessTitle.trim());
+            if (guessTitle != null) {
+                meta.title(guessTitle.trim());
+            }
         }
         pdfBoxDoc.close();
         return PDFDoc.builder()
@@ -207,18 +217,21 @@ public class PDFExtractor {
 
     private static String getHeuristicTitle(PDFCaptureTextStripper stripper) {
         PDFPage firstPage = stripper.pages.get(0);
-        double largestPtSize = firstPage.getLines().stream()
+        ToDoubleFunction<PDFLine> lineFontSize = line -> line.getTokens().get(0).getFontMetrics().getPtSize();
+        double largestSize = firstPage.getLines().stream()
             .filter(l -> !l.getTokens().isEmpty())
-            .mapToDouble(l -> l.getTokens().get(0).fontMetrics.getPtSize())
+            .mapToDouble(lineFontSize::applyAsDouble)
             .max().getAsDouble();
-        ToDoubleFunction<PDFLine> linePtSize = line -> line.getTokens().get(0).getFontMetrics().getPtSize();
         int startIdx = IntStream.range(0, firstPage.lines.size())
-            .filter(idx -> linePtSize.applyAsDouble(firstPage.lines.get(idx)) == largestPtSize)
+            .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) == largestSize)
             .findFirst().getAsInt();
         int stopIdx = IntStream.range(startIdx+1, firstPage.lines.size())
-            .filter(idx -> linePtSize.applyAsDouble(firstPage.lines.get(idx)) < largestPtSize)
+            .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) < largestSize)
             .findFirst()
             .orElse(firstPage.lines.size() - 1);
+        if (startIdx == stopIdx) {
+            return null;
+        }
         List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);
         for (int idx=0; idx+1 < titleLines.size(); ++idx) {
             PDFLine line = titleLines.get(idx);
@@ -231,4 +244,5 @@ public class PDFExtractor {
         }
         return titleLines.stream().map(PDFLine::lineText).collect(Collectors.joining(" "));
     }
+
 }

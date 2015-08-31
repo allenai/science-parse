@@ -6,6 +6,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,9 @@ public class PDFExtractorTest {
             if (type.equalsIgnoreCase("line")) {
                 List<PDFLine> lines = doc.getPages().stream().flatMap(x -> x.getLines().stream()).collect(Collectors.toList());
                 boolean matchedLine = lines.stream().anyMatch(l -> l.lineText().equals(expectedValue));
+                if (!matchedLine) {
+                    System.out.println("HERE");
+                }
                 Assert.assertTrue(matchedLine, String.format("Line-match error on %s for line: %s", id, expectedValue));
             }
             if (type.equalsIgnoreCase("year")) {
@@ -42,10 +46,37 @@ public class PDFExtractorTest {
         }
     }
 
+    private final static List<String> pdfKeys = Arrays.asList("/bagnell11", "/seung08", "/ding11", "/mooney05",
+        "/roark13", "/dyer12", "/bohnet09", "/P14-1059", "/map-reduce", "/fader11", "/proto06", "/mono04",
+        "/agarwal11", "/smola10", "/senellart10", "/zolotov04","/pedersen04", "/smith07");
+
     @Test
     public void testPDFExtraction() throws Exception {
-        Stream.of("/seung08", "/ding11", "/mooney05", "/roark13", "/dyer12","/bohnet09",
-                  "/P14-1059","/map-reduce","/fader11", "/proto06","/mono04")
-            .forEach(this::testPDF);
+        pdfKeys.forEach(this::testPDF);
+    }
+
+    public static void main(String[] args) {
+        long numTitleBytes = 0L;
+        for (int idx=0; idx < 20; ++idx) {
+            for (String pdfKey : pdfKeys) {
+                InputStream pdfInputStream = PDFExtractorTest.class.getResourceAsStream(pdfKey + ".pdf");
+                PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
+                numTitleBytes += doc.getMeta().hashCode();
+            }
+        }
+        long start = System.currentTimeMillis();
+        long testNum = 0L;
+        for (int idx=0; idx < 20; ++idx) {
+            for (String pdfKey : pdfKeys) {
+                InputStream pdfInputStream = PDFExtractorTest.class.getResourceAsStream(pdfKey + ".pdf");
+                PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
+                numTitleBytes += doc.getMeta().hashCode();
+                testNum++;
+            }
+        }
+        long stop = System.currentTimeMillis();
+        int numPasses = pdfKeys.size() * 20;
+        System.out.printf("Time %d on %d, avg: %dms\n", stop - start, numPasses, (stop - start) / testNum);
+        System.out.println("Just to ensure no compiler tricks: " + numTitleBytes);
     }
 }

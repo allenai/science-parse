@@ -23,7 +23,6 @@ import java.util.stream.IntStream;
 public class PDFLine {
     public List<PDFToken> tokens;
 
-
     private DoubleStream projectCoord(int dim) {
         return tokens.stream().mapToDouble(t -> t.bounds.get(dim));
     }
