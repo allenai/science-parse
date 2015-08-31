@@ -15,6 +15,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PDFExtractor {
 
@@ -159,10 +162,42 @@ public class PDFExtractor {
         val stripper = new PDFCaptureTextStripper();
         // SIDE-EFFECT pages ivar in stripper is populated
         stripper.getText(pdfBoxDoc);
+        // Title heuristic
+        if (info.getTitle() == null) {
+            String guessTitle = getHeuristicTitle(stripper);
+            meta.title(guessTitle);
+        }
         pdfBoxDoc.close();
         return PDFDoc.builder()
             .pages(stripper.pages)
             .meta(meta.build())
             .build();
+    }
+
+    private static String getHeuristicTitle(PDFCaptureTextStripper stripper) {
+        PDFPage firstPage = stripper.pages.get(0);
+        double largestPtSize = firstPage.getLines().stream()
+            .filter(l -> !l.getTokens().isEmpty())
+            .mapToDouble(l -> l.getTokens().get(0).fontMetrics.getPtSize())
+            .max().getAsDouble();
+        ToDoubleFunction<PDFLine> linePtSize = line -> line.getTokens().get(0).getFontMetrics().getPtSize();
+        int startIdx = IntStream.range(0, firstPage.lines.size())
+            .filter(idx -> linePtSize.applyAsDouble(firstPage.lines.get(idx)) == largestPtSize)
+            .findFirst().getAsInt();
+        int stopIdx = IntStream.range(startIdx+1, firstPage.lines.size())
+            .filter(idx -> linePtSize.applyAsDouble(firstPage.lines.get(idx)) < largestPtSize)
+            .findFirst()
+            .orElse(firstPage.lines.size() - 1);
+        List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);
+        for (int idx=0; idx+1 < titleLines.size(); ++idx) {
+            PDFLine line = titleLines.get(idx);
+            PDFLine nextLine = titleLines.get(idx+1);
+            double yDiff = nextLine.bounds().get(1) - line.bounds().get(3);
+            if (yDiff > line.height()) {
+                titleLines = titleLines.subList(0, idx+1);
+                break;
+            }
+        }
+        return titleLines.stream().map(PDFLine::lineText).collect(Collectors.joining(" "));
     }
 }

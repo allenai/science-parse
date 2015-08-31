@@ -6,6 +6,7 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import lombok.Builder;
 import lombok.Data;
+import lombok.val;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +38,11 @@ public class PDFLine {
         float x1 = (float)projectCoord(2).max().getAsDouble();
         float y1 = (float)projectCoord(3).max().getAsDouble();
         return FloatArrayList.newListWith(x0, y0, x1, y1);
+    }
+
+    public float height() {
+        val bs = bounds();
+        return bs.get(3) - bs.get(0);
     }
 
     public String lineText() {
