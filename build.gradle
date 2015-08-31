@@ -11,7 +11,10 @@ test {
 
 dependencies {
   compile project(':ext:ml')
-  compile 'org.projectlombok:lombok:1.16.6'
   compile 'org.apache.pdfbox:pdfbox:1.8.10'
-  compile 'org.testng:testng:6.8.1'
+  compile 'org.projectlombok:lombok:1.16.6'
+  compile 'com.fasterxml.jackson.core:jackson-core:2.6.1'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.6.1'
+
+  testCompile 'org.testng:testng:6.8.1'
 }

@@ -1,0 +1,8 @@
+[
+  ["title", "An Architecture for Parallel Topic Models"],
+  ["line", "ABSTRACT"],
+  ["line", "from PubMed abstracts, which is equivalent to a processing"],
+  ["line", "Instead, we use it here to design a sampler for inference of"],
+  ["line", "ods. Likewise, the same architecture could be used to per-"],
+  ["year", 2010]
+]

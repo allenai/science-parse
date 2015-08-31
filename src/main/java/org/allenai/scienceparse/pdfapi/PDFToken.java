@@ -1,6 +1,6 @@
 package org.allenai.scienceparse.pdfapi;
 
-import com.gs.collections.api.list.primitive.IntList;
+import com.gs.collections.api.list.primitive.FloatList;
 import lombok.Builder;
 import lombok.Value;
 
@@ -15,5 +15,5 @@ public class PDFToken {
     /**
      * List of ints [x0, y0, x1, y1] where [0,0] is upper left
      */
-    public final IntList bounds;
+    public final FloatList bounds;
 }
