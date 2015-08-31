@@ -20,7 +20,7 @@ public class PDFToCRFInputTest {
   	  PDFToCRFInput pdfts = new PDFToCRFInput();
   	  PDDocument pdd = PDDocument.load(inFile);
   	  val seq = pdfts.getSequence(pdd, target);
-  	  assert(seq.size() > 200);
+  	  assert(seq.size() > 50);
   	  boolean seenPhrase = false;
   	  boolean seenHow = false;
   	  for(val i : seq) {
@@ -44,7 +44,7 @@ public class PDFToCRFInputTest {
     	  PDFToCRFInput pdfts = new PDFToCRFInput();
     	  PDDocument pdd = PDDocument.load(inFile);
     	  val seq = pdfts.getSequence(pdd, target);
-    	  assert(seq.size() > 200);
+    	  assert(seq.size() > 50);
     	  for(val i : seq) {
     		  if(i.getOne().word.equals("Phrase")) {
     			  assertEquals(i.getOne().font, 14.0f);

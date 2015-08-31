@@ -1,0 +1,3 @@
+TITLE = Learning to Extract Relations from the Web using Minimal Supervision
+AUTHOR = Razvan C. Bunescu
+AUTHOR = Raymond J. Mooney
