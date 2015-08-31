@@ -2,6 +2,7 @@ package org.allenai.scienceparse.pdfapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,8 +11,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+@Slf4j
 public class PDFExtractorTest {
 
     @SneakyThrows
@@ -55,9 +56,10 @@ public class PDFExtractorTest {
         pdfKeys.forEach(this::testPDF);
     }
 
-    public static void main(String[] args) {
+    @Test
+    public void testPDFBenchmark() throws Exception {
         long numTitleBytes = 0L;
-        for (int idx=0; idx < 20; ++idx) {
+        for (int idx = 0; idx < 10; ++idx) {
             for (String pdfKey : pdfKeys) {
                 InputStream pdfInputStream = PDFExtractorTest.class.getResourceAsStream(pdfKey + ".pdf");
                 PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
@@ -66,7 +68,7 @@ public class PDFExtractorTest {
         }
         long start = System.currentTimeMillis();
         long testNum = 0L;
-        for (int idx=0; idx < 20; ++idx) {
+        for (int idx = 0; idx < 10; ++idx) {
             for (String pdfKey : pdfKeys) {
                 InputStream pdfInputStream = PDFExtractorTest.class.getResourceAsStream(pdfKey + ".pdf");
                 PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
@@ -76,7 +78,7 @@ public class PDFExtractorTest {
         }
         long stop = System.currentTimeMillis();
         int numPasses = pdfKeys.size() * 20;
-        System.out.printf("Time %d on %d, avg: %dms\n", stop - start, numPasses, (stop - start) / testNum);
-        System.out.println("Just to ensure no compiler tricks: " + numTitleBytes);
+        log.info("Time {} on {}, avg: {}ms\n", stop - start, numPasses, (stop - start) / testNum);
+        log.info("Just to ensure no compiler tricks: " + numTitleBytes);
     }
 }
