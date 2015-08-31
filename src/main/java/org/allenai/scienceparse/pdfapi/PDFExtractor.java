@@ -29,11 +29,14 @@ public class PDFExtractor {
 
         public PDFToken toPDFToken() {
             val builder = PDFToken.builder();
-            builder.token(text);
+            builder.token(text.trim());
             // HACK(aria42) assumes left-to-right text
             TextPosition firstTP = textPositions.get(0);
             PDFont pdFont = firstTP.getFont();
             String fontFamily = pdFont.getBaseFont();
+            if (fontFamily == null) {
+                fontFamily = PDFFontMetrics.UNKNWON_FONT_FAMILY;
+            }
             float ptSize = firstTP.getFontSize();
             val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
             builder.fontMetrics(fontMetrics);
@@ -163,9 +166,9 @@ public class PDFExtractor {
         // SIDE-EFFECT pages ivar in stripper is populated
         stripper.getText(pdfBoxDoc);
         // Title heuristic
-        if (info.getTitle() == null) {
+        if (info.getTitle() == null || info.getTitle().contains(".doc")) {
             String guessTitle = getHeuristicTitle(stripper);
-            meta.title(guessTitle);
+            meta.title(guessTitle.trim());
         }
         pdfBoxDoc.close();
         return PDFDoc.builder()

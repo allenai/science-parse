@@ -11,6 +11,12 @@ public class PDFFontMetrics {
     public final float ptSize;
     public final float spaceWidth;
 
+    /**
+     * The special value for when the underlying font didn't have
+     * an extractable family name.
+     */
+    public static String UNKNWON_FONT_FAMILY = "*UNKNOWN*";
+
     private static final ConcurrentHashMap<String, PDFFontMetrics> canonical
         = new ConcurrentHashMap<>();
 
@@ -23,6 +29,9 @@ public class PDFFontMetrics {
      */
     public static PDFFontMetrics of(String name, float ptSize, float spaceWidth) {
         val fontMetrics = new PDFFontMetrics(name, ptSize, spaceWidth);
+        if (name == null) {
+            System.out.println("HERE");
+        }
         val curValue = canonical.putIfAbsent(name, fontMetrics);
         return curValue != null ? curValue : fontMetrics;
     }
