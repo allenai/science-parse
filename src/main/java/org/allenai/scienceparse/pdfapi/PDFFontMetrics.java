@@ -29,9 +29,6 @@ public class PDFFontMetrics {
      */
     public static PDFFontMetrics of(String name, float ptSize, float spaceWidth) {
         val fontMetrics = new PDFFontMetrics(name, ptSize, spaceWidth);
-        if (name == null) {
-            System.out.println("HERE");
-        }
         val curValue = canonical.putIfAbsent(name, fontMetrics);
         return curValue != null ? curValue : fontMetrics;
     }

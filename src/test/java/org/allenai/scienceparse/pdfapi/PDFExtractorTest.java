@@ -31,9 +31,6 @@ public class PDFExtractorTest {
             if (type.equalsIgnoreCase("line")) {
                 List<PDFLine> lines = doc.getPages().stream().flatMap(x -> x.getLines().stream()).collect(Collectors.toList());
                 boolean matchedLine = lines.stream().anyMatch(l -> l.lineText().equals(expectedValue));
-                if (!matchedLine) {
-                    System.out.println("HERE");
-                }
                 Assert.assertTrue(matchedLine, String.format("Line-match error on %s for line: %s", id, expectedValue));
             }
             if (type.equalsIgnoreCase("year")) {
