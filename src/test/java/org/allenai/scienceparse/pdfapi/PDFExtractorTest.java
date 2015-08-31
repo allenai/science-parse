@@ -44,7 +44,8 @@ public class PDFExtractorTest {
 
     @Test
     public void testPDFExtraction() throws Exception {
-        Stream.of("/roark13", "/dyer12","/bohnet09", "/P14-1059","/map-reduce","/fader11", "/proto06","/mono04")
+        Stream.of("/seung08", "/ding11", "/mooney05", "/roark13", "/dyer12","/bohnet09",
+                  "/P14-1059","/map-reduce","/fader11", "/proto06","/mono04")
             .forEach(this::testPDF);
     }
 }

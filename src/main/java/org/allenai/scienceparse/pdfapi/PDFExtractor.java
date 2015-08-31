@@ -5,19 +5,22 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.ToDoubleFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class PDFExtractor {
 
@@ -144,6 +147,18 @@ public class PDFExtractor {
             : Collections.emptyList();
     }
 
+    private boolean badPDFTitle(String title) {
+        return
+            // Ending with file extension is what Microsoft Word tends to do
+            title.endsWith(".pdf") ||
+            title.endsWith(".doc") ||
+            // Ellipsis are bad
+            title.endsWith("...") ||
+            // Some conferences embed this in start of title
+            title.toLowerCase().startsWith("Proceedings of");
+    }
+
+
     @SneakyThrows
     public PDFDoc extractFromInputStream(InputStream is) {
         PDDocument pdfBoxDoc = PDDocument.load(is);
@@ -157,6 +172,19 @@ public class PDFExtractor {
         val createDate = info.getCreationDate();
         if (createDate != null) {
             meta.createDate(createDate.getTime());
+        } else {
+            // last ditch attempt to read date from non-standard meta
+            OptionalInt guessYear = Stream.of("Date", "Created")
+                .map(k -> info.getCustomMetadataValue(k))
+                .filter(d -> d != null && d.matches("\\d\\d\\d\\d"))
+                .mapToInt(Integer::parseInt)
+                .findFirst();
+            if (guessYear.isPresent()) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.clear();
+                calendar.set(Calendar.YEAR, guessYear.getAsInt());
+                meta.createDate(calendar.getTime());
+            }
         }
         val lastModDate = info.getModificationDate();
         if (lastModDate != null) {
@@ -166,7 +194,7 @@ public class PDFExtractor {
         // SIDE-EFFECT pages ivar in stripper is populated
         stripper.getText(pdfBoxDoc);
         // Title heuristic
-        if (info.getTitle() == null || info.getTitle().contains(".doc")) {
+        if (info.getTitle() == null || badPDFTitle(info.getTitle())) {
             String guessTitle = getHeuristicTitle(stripper);
             meta.title(guessTitle.trim());
         }
