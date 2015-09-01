@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
@@ -126,11 +127,14 @@ public class PDFExtractor {
             if (!curLineTokens.isEmpty()) {
                 curLines.add(toLine(curLineTokens));
             }
+            PDRectangle pageRect = pdfboxPage.getMediaBox() == null ?
+                pdfboxPage.getArtBox()  :
+                pdfboxPage.getMediaBox();
             val page = PDFPage.builder()
                 .lines(new ArrayList<>(curLines))
                 .pageNumber(pages.size())
-                .pageWidth((int) pdfboxPage.getMediaBox().getWidth())
-                .pageHeight((int) pdfboxPage.getMediaBox().getHeight())
+                .pageWidth((int) pageRect.getWidth())
+                .pageHeight((int) pageRect.getHeight())
                 .build();
             pages.add(page);
         }
