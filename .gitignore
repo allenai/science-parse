@@ -1,7 +1,10 @@
 # gradle
 .gradle/**
 build/**
+gradle/**
 out/**
+gradlew.*
+gradlew
 
 # intellij
 *.ipr
