@@ -5,10 +5,12 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.util.DateConverter;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.pdfbox.util.TextPosition;
 
@@ -152,15 +154,31 @@ public class PDFExtractor {
             : Collections.emptyList();
     }
 
-    private boolean badPDFTitle(PDFPage firstPage, String title) {
-        if (// Ending with file extension is what Microsoft Word tends to do
+    private boolean badPDFTitleFast(String title) {
+        // Ending with file extension is what Microsoft Word tends to do
+        if (
             title.endsWith(".pdf") ||
-            title.endsWith(".doc") ||
-            // Ellipsis are bad
-            title.endsWith("...") ||
-            // Some conferences embed this in start of title
-            title.toLowerCase().startsWith("Proceedings of"))
+                title.endsWith(".doc") ||
+                // Ellipsis are bad
+                title.endsWith("...") ||
+                // Some conferences embed this in start of title
+                title.toLowerCase().startsWith("Proceedings of"))
         {
+            return true;
+        }
+        // Check words are capitalized
+        String[] words = title.split("\\s+");
+        boolean hasCapitalWord = Stream.of(words)
+            .filter(w -> !w.isEmpty())
+            .anyMatch(w -> Character.isUpperCase(w.charAt(0)));
+        if (!hasCapitalWord) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean badPDFTitle(PDFPage firstPage, String title) {
+        if (badPDFTitleFast(title)) {
             return true;
         }
         Optional<PDFLine> matchLine = firstPage.lines.stream().filter(l -> {
@@ -170,6 +188,13 @@ public class PDFExtractor {
         return !matchLine.isPresent();
     }
 
+    private Date toDate(String cosVal) {
+        if (cosVal == null) {
+            return null;
+        }
+        String strippedDate = cosVal.replace("^D:", "");
+        return DateConverter.toCalendar(strippedDate, null).getTime();
+    }
 
     @SneakyThrows
     public PDFDoc extractFromInputStream(InputStream is) {
@@ -181,9 +206,9 @@ public class PDFExtractor {
             .title(info.getTitle() != null ? info.getTitle().trim() : null)
             .keywords(keywords)
             .authors(authors);
-        val createDate = info.getCreationDate();
+        String createDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
         if (createDate != null) {
-            meta.createDate(createDate.getTime());
+            meta.createDate(toDate(createDate));
         } else {
             // last ditch attempt to read date from non-standard meta
             OptionalInt guessYear = Stream.of("Date", "Created")
@@ -198,9 +223,9 @@ public class PDFExtractor {
                 meta.createDate(calendar.getTime());
             }
         }
-        val lastModDate = info.getModificationDate();
+        String lastModDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
         if (lastModDate != null) {
-            meta.lastModifiedDate(lastModDate.getTime());
+            meta.lastModifiedDate(toDate(lastModDate));
         }
         val stripper = new PDFCaptureTextStripper();
         // SIDE-EFFECT pages ivar in stripper is populated
@@ -208,7 +233,7 @@ public class PDFExtractor {
         // Title heuristic
         if (info.getTitle() == null || badPDFTitle(stripper.pages.get(0), info.getTitle())) {
             String guessTitle = getHeuristicTitle(stripper);
-            if (guessTitle != null) {
+            if (guessTitle != null && !badPDFTitleFast(guessTitle)) {
                 meta.title(guessTitle.trim());
             }
         }

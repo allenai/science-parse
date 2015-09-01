@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -81,5 +83,16 @@ public class PDFExtractorTest {
         int numPasses = pdfKeys.size() * 20;
         log.info("Time {} on {}, avg: {}ms\n", stop - start, numPasses, (stop - start) / testNum);
         log.info("Just to ensure no compiler tricks: " + numTitleBytes);
+    }
+
+    @SneakyThrows
+    public static void main(String[] args) {
+        File dir = new File(args[0]);
+        for (File pdfFile: dir.listFiles(f -> f.getName().endsWith(".pdf"))) {
+            PDFDoc doc = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
+            System.out.println("pdf: " + pdfFile.getName());
+            System.out.println("title: " + doc.getMeta().getTitle());
+            System.out.println("");
+        }
     }
 }
