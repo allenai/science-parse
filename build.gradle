@@ -1,5 +1,17 @@
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'eu.appsatori:gradle-fatjar-plugin:0.3'
+  }
+}
+
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'eu.appsatori.fatjar'
 
 repositories {
   mavenCentral()
