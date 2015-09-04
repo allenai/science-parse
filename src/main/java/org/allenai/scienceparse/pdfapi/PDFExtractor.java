@@ -182,7 +182,7 @@ public class PDFExtractor {
             title.endsWith("...") ||
             // Some conferences embed this in start of title
             // HACK(aria42) English- and conference-structure specific
-            title.toLowerCase().startsWith("proceedings of"))
+            title.trim().toLowerCase().startsWith("proceedings of"))
         {
             return true;
         }
@@ -265,7 +265,7 @@ public class PDFExtractor {
     }
 
     private static double relDiff(double a, double b) {
-        return Math.abs(a-b)/Math.min(a, b);
+        return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
     }
 
     private static String getHeuristicTitle(PDFCaptureTextStripper stripper) {
