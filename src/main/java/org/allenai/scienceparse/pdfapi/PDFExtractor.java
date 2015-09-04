@@ -177,12 +177,12 @@ public class PDFExtractor {
     private boolean badPDFTitleFast(String title) {
         // Ending with file extension is what Microsoft Word tends to do
         if (
-            title.endsWith(".pdf") ||
-                title.endsWith(".doc") ||
-                // Ellipsis are bad
-                title.endsWith("...") ||
-                // Some conferences embed this in start of title
-                title.toLowerCase().startsWith("Proceedings of"))
+            title.endsWith(".pdf") || title.endsWith(".doc") ||
+            // Ellipsis are bad, since title is abbreviated
+            title.endsWith("...") ||
+            // Some conferences embed this in start of title
+            // HACK(aria42) English- and conference-structure specific
+            title.toLowerCase().startsWith("proceedings of"))
         {
             return true;
         }
@@ -295,6 +295,11 @@ public class PDFExtractor {
             return titleLines.get(0).lineText();
         }
         PDFLine firstLine = titleLines.get(0);
+        // If the line is to far down the first page, unlikely to be title
+        float fractionDownPage = firstLine.bounds().get(1) / firstPage.getPageHeight();
+        if (fractionDownPage > 0.66) {
+            return null;
+        }
         PDFLine secondLine = titleLines.get(1);
         double heightDiff = relDiff(firstLine.height(), secondLine.height());
         if (heightDiff > 0.1) {

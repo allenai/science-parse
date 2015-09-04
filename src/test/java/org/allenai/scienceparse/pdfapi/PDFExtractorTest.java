@@ -81,6 +81,16 @@ public class PDFExtractorTest {
         log.info("Just to ensure no compiler tricks: " + numTitleBytes);
     }
 
+    private static String processTitle(String t) {
+        // kill XML entities, then non-letter punct. characters, canonical space
+        return t
+         .toLowerCase()
+         .replaceAll("\\&.*?\\;"," ")
+         .replaceAll("\\p{Punct}", "")
+         .replaceAll("\\W", "")
+         .replaceAll("\\s+","");
+    }
+
     @SneakyThrows
     public static void main(String[] args) {
         File dir = new File(args[0]);
@@ -104,8 +114,8 @@ public class PDFExtractorTest {
                 fn ++;
                 continue;
             }
-            String guessTitleCollapsed = guessTitle.replaceAll("\\p{Punct}", "").replaceAll("\\s+","").toLowerCase();
-            String expectedTitleCollapsed = expectedTitle.replaceAll("\\p{Punct}","").replaceAll("\\s+","").toLowerCase();
+            String guessTitleCollapsed = processTitle(guessTitle);
+            String expectedTitleCollapsed = processTitle(expectedTitle);
             boolean equiv = expectedTitleCollapsed.equals(guessTitleCollapsed);
             if (equiv) {
                 tp++;
@@ -115,16 +125,15 @@ public class PDFExtractorTest {
             if (!equiv) {
                 System.out.println("pdf: " + pdfFile.getName());
                 System.out.println("expectedTitle: " + expectedTitle);
-                System.out.println("expectedTitle: " + expectedTitleCollapsed);
                 System.out.println("guessTitle: " + guessTitle);
-                System.out.println("guessTitle: " + guessTitleCollapsed);
                 System.out.println("");
-                PDFDoc doc2 = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
             }
         }
         double precision = tp / ((double)(tp + fp));
         double recall = tp / ((double)(tp + fn));
         System.out.println("Precision: " + precision);
         System.out.println("Recall: " + recall);
+        double f1 = 2 * precision * recall / (precision + recall);
+        System.out.println("F1: " + f1);
     }
 }
