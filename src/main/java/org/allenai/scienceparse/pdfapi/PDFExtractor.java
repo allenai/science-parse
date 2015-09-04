@@ -272,7 +272,7 @@ public class PDFExtractor {
         PDFPage firstPage = stripper.pages.get(0);
         ToDoubleFunction<PDFLine> lineFontSize =
             //line -> line.height();
-            line -> line.getTokens().get(0).getFontMetrics().getPtSize();
+            line -> line.getTokens().stream().mapToDouble(t -> t.getFontMetrics().getPtSize()).average().getAsDouble();
         double largestSize = firstPage.getLines().stream()
             .filter(l -> !l.getTokens().isEmpty())
             .mapToDouble(lineFontSize::applyAsDouble)
