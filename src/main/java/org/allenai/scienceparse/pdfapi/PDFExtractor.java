@@ -27,13 +27,13 @@ public class PDFExtractor {
 
     @Data(staticConstructor = "of")
     private final static class RawChunk {
-        public final String text;
         // The PDFBox class doesn't get exposed outside of this class
         public final List<TextPosition> textPositions;
 
         public PDFToken toPDFToken() {
             val builder = PDFToken.builder();
-            builder.token(text.trim());
+            String tokenText = textPositions.stream().map(TextPosition::getCharacter).collect(Collectors.joining(""));
+            builder.token(tokenText);
             // HACK(aria42) assumes left-to-right text
             TextPosition firstTP = textPositions.get(0);
             PDFont pdFont = firstTP.getFont();
@@ -88,10 +88,30 @@ public class PDFExtractor {
         @Override
         protected void writeString(String text, List<TextPosition> textPositions) throws IOException {
             // Build current token and decide if on the same line as previous token or starts a new line
-            PDFToken token = RawChunk.of(text, textPositions).toPDFToken();
-            if (token.token.trim().isEmpty()) {
-                return;
+            List<TextPosition> curPositions = new ArrayList<>();
+            List<PDFToken> tokens = new ArrayList<>();
+            for (int idx = 0; idx < textPositions.size(); idx++) {
+                TextPosition tp = textPositions.get(idx);
+                if (tp.getCharacter().trim().isEmpty()) {
+                    List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
+                    if (tokenPositions.size() > 0) {
+                        tokens.add(RawChunk.of(tokenPositions).toPDFToken());
+                    }
+                    curPositions.clear();
+                } else {
+                    curPositions.add(tp);
+                }
             }
+            if (!curPositions.isEmpty()) {
+                tokens.add(RawChunk.of(new ArrayList<>(curPositions)).toPDFToken());
+            }
+            for (PDFToken token : tokens) {
+                updateFromToken(token);
+            }
+
+        }
+
+        private void updateFromToken(PDFToken token) {
             if (curLineTokens.isEmpty()) {
                 curLineTokens.add(token);
             } else {
@@ -212,7 +232,7 @@ public class PDFExtractor {
         } else {
             // last ditch attempt to read date from non-standard meta
             OptionalInt guessYear = Stream.of("Date", "Created")
-                .map(k -> info.getCustomMetadataValue(k))
+                .map(info::getCustomMetadataValue)
                 .filter(d -> d != null && d.matches("\\d\\d\\d\\d"))
                 .mapToInt(Integer::parseInt)
                 .findFirst();
@@ -244,32 +264,51 @@ public class PDFExtractor {
             .build();
     }
 
+    private static double relDiff(double a, double b) {
+        return Math.abs(a-b)/Math.min(a, b);
+    }
+
     private static String getHeuristicTitle(PDFCaptureTextStripper stripper) {
         PDFPage firstPage = stripper.pages.get(0);
-        ToDoubleFunction<PDFLine> lineFontSize = line -> line.getTokens().get(0).getFontMetrics().getPtSize();
+        ToDoubleFunction<PDFLine> lineFontSize =
+            //line -> line.height();
+            line -> line.getTokens().get(0).getFontMetrics().getPtSize();
         double largestSize = firstPage.getLines().stream()
             .filter(l -> !l.getTokens().isEmpty())
             .mapToDouble(lineFontSize::applyAsDouble)
             .max().getAsDouble();
         int startIdx = IntStream.range(0, firstPage.lines.size())
+            //.filter(idx -> relDiff(lineFontSize.applyAsDouble(firstPage.lines.get(idx)), largestSize) < 0.01)
             .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) == largestSize)
             .findFirst().getAsInt();
         int stopIdx = IntStream.range(startIdx+1, firstPage.lines.size())
+            //.filter(idx -> relDiff(lineFontSize.applyAsDouble(firstPage.lines.get(idx)),largestSize) >= 0.05)
             .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) < largestSize)
             .findFirst()
             .orElse(firstPage.lines.size() - 1);
         if (startIdx == stopIdx) {
             return null;
         }
+        double lastYDiff = Double.NaN;
         List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);
+        if (titleLines.size() == 1) {
+            return titleLines.get(0).lineText();
+        }
+        PDFLine firstLine = titleLines.get(0);
+        PDFLine secondLine = titleLines.get(1);
+        double heightDiff = relDiff(firstLine.height(), secondLine.height());
+        if (heightDiff > 0.1) {
+            return firstLine.lineText();
+        }
         for (int idx=0; idx+1 < titleLines.size(); ++idx) {
             PDFLine line = titleLines.get(idx);
             PDFLine nextLine = titleLines.get(idx+1);
             double yDiff = nextLine.bounds().get(1) - line.bounds().get(3);
-            if (yDiff > line.height()) {
+            if (!Double.isNaN(lastYDiff) && relDiff(yDiff, lastYDiff) > 0.1) {
                 titleLines = titleLines.subList(0, idx+1);
                 break;
             }
+            lastYDiff = yDiff;
         }
         return titleLines.stream().map(PDFLine::lineText).collect(Collectors.joining(" "));
     }

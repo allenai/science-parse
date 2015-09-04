@@ -41,7 +41,7 @@ public class PDFLine {
 
     public float height() {
         val bs = bounds();
-        return bs.get(3) - bs.get(0);
+        return bs.get(3) - bs.get(1);
     }
 
     public String lineText() {

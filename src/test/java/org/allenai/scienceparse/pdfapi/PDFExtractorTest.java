@@ -6,11 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class PDFExtractorTest {
         InputStream pdfInputStream = getClass().getResourceAsStream(pdfPath);
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
         List<List<?>> arr =  new ObjectMapper().readValue(jsonInputStream, List.class);
-            for (List<?> elems : arr) {
+        for (List<?> elems : arr) {
             String type = (String) elems.get(0);
             Object expectedValue = elems.get(1);
             if (type.equalsIgnoreCase("title")) {
@@ -35,9 +34,6 @@ public class PDFExtractorTest {
             if (type.equalsIgnoreCase("line")) {
                 List<PDFLine> lines = doc.getPages().stream().flatMap(x -> x.getLines().stream()).collect(Collectors.toList());
                 boolean matchedLine = lines.stream().anyMatch(l -> l.lineText().equals(expectedValue));
-                if (!matchedLine) {
-                    System.out.println("HERE");
-                }
                 Assert.assertTrue(matchedLine, String.format("Line-match error on %s for line: %s", id, expectedValue));
             }
             if (type.equalsIgnoreCase("year")) {
@@ -88,11 +84,47 @@ public class PDFExtractorTest {
     @SneakyThrows
     public static void main(String[] args) {
         File dir = new File(args[0]);
-        for (File pdfFile: dir.listFiles(f -> f.getName().endsWith(".pdf"))) {
+        BufferedReader keyReader = new BufferedReader(new FileReader(args[1]));
+        Iterator<String> keyIt = keyReader.lines().iterator();
+        int tp = 0;
+        int fp = 0;
+        int fn = 0;
+        while (keyIt.hasNext()) {
+            String line = keyIt.next();
+            String[] fields = line.split("\\t");
+            String key = fields[0];
+            String expectedTitle = fields[1];
+            File pdfFile = new File(dir, key + ".pdf");
+            if (!pdfFile.exists()) {
+                continue;
+            }
             PDFDoc doc = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
-            System.out.println("pdf: " + pdfFile.getName());
-            System.out.println("title: " + doc.getMeta().getTitle());
-            System.out.println("");
+            String guessTitle = doc.getMeta().getTitle();
+            if (guessTitle == null) {
+                fn ++;
+                continue;
+            }
+            String guessTitleCollapsed = guessTitle.replaceAll("\\p{Punct}", "").replaceAll("\\s+","").toLowerCase();
+            String expectedTitleCollapsed = expectedTitle.replaceAll("\\p{Punct}","").replaceAll("\\s+","").toLowerCase();
+            boolean equiv = expectedTitleCollapsed.equals(guessTitleCollapsed);
+            if (equiv) {
+                tp++;
+            } else {
+                fp++;
+            }
+            if (!equiv) {
+                System.out.println("pdf: " + pdfFile.getName());
+                System.out.println("expectedTitle: " + expectedTitle);
+                System.out.println("expectedTitle: " + expectedTitleCollapsed);
+                System.out.println("guessTitle: " + guessTitle);
+                System.out.println("guessTitle: " + guessTitleCollapsed);
+                System.out.println("");
+                PDFDoc doc2 = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
+            }
         }
+        double precision = tp / ((double)(tp + fp));
+        double recall = tp / ((double)(tp + fn));
+        System.out.println("Precision: " + precision);
+        System.out.println("Recall: " + recall);
     }
 }
