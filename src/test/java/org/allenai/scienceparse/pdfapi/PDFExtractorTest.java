@@ -46,7 +46,7 @@ public class PDFExtractorTest {
     }
 
     private final static List<String> pdfKeys = Arrays.asList("/bagnell11", "/seung08", "/ding11", "/mooney05",
-        "/roark13", "/dyer12", "/bohnet09", "/P14-1059", "/map-reduce", "/fader11", "/proto06", "/mono04",
+        "/roark13", "/dyer12", "/bohnet09", "/P14-1059", "/map-reduce", "/fader11", "/proto06", 
         "/agarwal11", "/smola10", "/senellart10", "/zolotov04","/pedersen04", "/smith07",
         "/aimag10");
 
