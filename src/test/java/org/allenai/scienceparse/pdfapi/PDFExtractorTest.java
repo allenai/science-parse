@@ -127,6 +127,9 @@ public class PDFExtractorTest {
                 System.out.println("expectedTitle: " + expectedTitle);
                 System.out.println("guessTitle: " + guessTitle);
                 System.out.println("");
+                PDFExtractor extractor = new PDFExtractor();
+                extractor.DEBUG = true;
+                extractor.extractFromInputStream(new FileInputStream(pdfFile));
             }
         }
         double precision = tp / ((double)(tp + fp));

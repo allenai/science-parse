@@ -17,6 +17,7 @@ import org.apache.pdfbox.util.TextPosition;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 import java.util.stream.Collectors;
@@ -181,7 +182,7 @@ public class PDFExtractor {
             // Ellipsis are bad, since title is abbreviated
             title.endsWith("...") ||
             // Some conferences embed this in start of title
-            // HACK(aria42) English- and conference-structure specific
+            // HACK(aria42) English-specific and conference-structure specific
             title.trim().toLowerCase().startsWith("proceedings of"))
         {
             return true;
@@ -268,7 +269,9 @@ public class PDFExtractor {
         return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
     }
 
-    private static String getHeuristicTitle(PDFCaptureTextStripper stripper) {
+    public boolean DEBUG = false;
+
+    private String getHeuristicTitle(PDFCaptureTextStripper stripper) {
         PDFPage firstPage = stripper.pages.get(0);
         ToDoubleFunction<PDFLine> lineFontSize =
             //line -> line.height();
@@ -297,19 +300,15 @@ public class PDFExtractor {
         PDFLine firstLine = titleLines.get(0);
         // If the line is to far down the first page, unlikely to be title
         float fractionDownPage = firstLine.bounds().get(1) / firstPage.getPageHeight();
-        if (fractionDownPage > 0.66) {
+        if (fractionDownPage > 0.66 || startIdx > 5) {
             return null;
-        }
-        PDFLine secondLine = titleLines.get(1);
-        double heightDiff = relDiff(firstLine.height(), secondLine.height());
-        if (heightDiff > 0.1) {
-            return firstLine.lineText();
         }
         for (int idx=0; idx+1 < titleLines.size(); ++idx) {
             PDFLine line = titleLines.get(idx);
             PDFLine nextLine = titleLines.get(idx+1);
             double yDiff = nextLine.bounds().get(1) - line.bounds().get(3);
-            if (!Double.isNaN(lastYDiff) && relDiff(yDiff, lastYDiff) > 0.1) {
+            double yDiffNormed = yDiff / line.height();
+            if (yDiffNormed > 1.5 || (idx > 0 && relDiff(yDiff, lastYDiff) > 0.1)) {
                 titleLines = titleLines.subList(0, idx+1);
                 break;
             }
