@@ -42,7 +42,7 @@ public class PDFExtractor {
             if (fontFamily == null) {
                 fontFamily = PDFFontMetrics.UNKNWON_FONT_FAMILY;
             }
-            float ptSize = firstTP.getFontSize();
+            float ptSize = firstTP.getFontSizeInPt();
             val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
             builder.fontMetrics(fontMetrics);
             float minX = Float.POSITIVE_INFINITY;
