@@ -7,6 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.*;
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -82,12 +83,16 @@ public class PDFExtractorTest {
     }
 
     private static String processTitle(String t) {
-        // kill XML entities, replace non-letter characters, lower-case
-        return t
-         .toLowerCase()
-         .replaceAll("\\&.*?\\;","")
-         .replaceAll("\\W", "")
-         .toLowerCase();
+        // case fold and remove lead/trail space
+        t = t.trim().toLowerCase();
+        // strip accents and unicode changes
+        t = Normalizer.normalize(t, Normalizer.Form.NFKD);
+        // kill non-character letters
+        // kill xml
+        t = t.replaceAll("\\&.*?\\;","");
+        // kill non-letter chars
+        //t = t.replaceAll("\\W","");
+        return t.replaceAll("\\s+"," ");
     }
 
     @SneakyThrows

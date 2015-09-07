@@ -16,6 +16,7 @@ import org.apache.pdfbox.util.TextPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.util.*;
 import java.util.function.ToDoubleFunction;
 
@@ -33,6 +34,8 @@ public class PDFExtractor {
         public PDFToken toPDFToken() {
             val builder = PDFToken.builder();
             String tokenText = textPositions.stream().map(TextPosition::getCharacter).collect(Collectors.joining(""));
+            // separate ligands
+            tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
             builder.token(tokenText);
             // HACK(aria42) assumes left-to-right text
             TextPosition firstTP = textPositions.get(0);
