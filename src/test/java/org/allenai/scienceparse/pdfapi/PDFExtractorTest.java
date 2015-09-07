@@ -114,6 +114,7 @@ public class PDFExtractorTest {
             PDFDoc doc = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
             String guessTitle = doc.getMeta().getTitle();
             if (guessTitle == null) {
+                // Didn't guess but there is an answer
                 fn ++;
                 continue;
             }
@@ -121,8 +122,10 @@ public class PDFExtractorTest {
             String expectedTitleCollapsed = processTitle(expectedTitle);
             boolean equiv = expectedTitleCollapsed.equals(guessTitleCollapsed);
             if (equiv) {
+                // we guessed and guess correctly
                 tp++;
             } else {
+                // we guessed and guess incorrectly
                 fp++;
             }
             if (!equiv) {
@@ -137,7 +140,9 @@ public class PDFExtractorTest {
         }
         double precision = tp / ((double)(tp + fp));
         double recall = tp / ((double)(tp + fn));
-        System.out.println("Num events: " + numEvents);
+        int guessNumEvents = tp + fp + fn;
+        System.out.println("");
+        System.out.println("Num events known, guessed: " + numEvents + ", " + guessNumEvents);
         System.out.println("Precision: " + precision);
         System.out.println("Recall: " + recall);
         double f1 = 2 * precision * recall / (precision + recall);
