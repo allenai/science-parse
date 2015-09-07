@@ -82,13 +82,12 @@ public class PDFExtractorTest {
     }
 
     private static String processTitle(String t) {
-        // kill XML entities, then non-letter punct. characters, canonical space
+        // kill XML entities, replace non-letter characters, lower-case
         return t
          .toLowerCase()
-         .replaceAll("\\&.*?\\;"," ")
-         .replaceAll("\\p{Punct}", "")
+         .replaceAll("\\&.*?\\;","")
          .replaceAll("\\W", "")
-         .replaceAll("\\s+","");
+         .toLowerCase();
     }
 
     @SneakyThrows
@@ -99,6 +98,7 @@ public class PDFExtractorTest {
         int tp = 0;
         int fp = 0;
         int fn = 0;
+        int numEvents = 0;
         while (keyIt.hasNext()) {
             String line = keyIt.next();
             String[] fields = line.split("\\t");
@@ -108,6 +108,7 @@ public class PDFExtractorTest {
             if (!pdfFile.exists()) {
                 continue;
             }
+            numEvents ++;
             PDFDoc doc = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
             String guessTitle = doc.getMeta().getTitle();
             if (guessTitle == null) {
@@ -134,6 +135,7 @@ public class PDFExtractorTest {
         }
         double precision = tp / ((double)(tp + fp));
         double recall = tp / ((double)(tp + fn));
+        System.out.println("Num events: " + numEvents);
         System.out.println("Precision: " + precision);
         System.out.println("Recall: " + recall);
         double f1 = 2 * precision * recall / (precision + recall);

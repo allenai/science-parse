@@ -17,7 +17,6 @@ import org.apache.pdfbox.util.TextPosition;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 import java.util.stream.Collectors;
@@ -291,6 +290,9 @@ public class PDFExtractor {
             .orElse(firstPage.lines.size() - 1);
         if (startIdx == stopIdx) {
             return null;
+        }
+        if (DEBUG) {
+            System.out.println("HERE");
         }
         double lastYDiff = Double.NaN;
         List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);
