@@ -92,7 +92,10 @@ public class PDFExtractorTest {
 
     @SneakyThrows
     public static void main(String[] args) {
+        // args[0] should be directory with eval PDFs
         File dir = new File(args[0]);
+        // args[1] should be src/test/resources/id-titles.txt
+        // tab-separared: content-sha, expected title
         BufferedReader keyReader = new BufferedReader(new FileReader(args[1]));
         Iterator<String> keyIt = keyReader.lines().iterator();
         int tp = 0;
