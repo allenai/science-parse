@@ -23,14 +23,15 @@ public class PDFExtractorTest {
         String pdfPath = id + ".pdf";
         InputStream jsonInputStream = getClass().getResourceAsStream(jsonPath);
         InputStream pdfInputStream = getClass().getResourceAsStream(pdfPath);
-        PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
+        PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(true).build();
+        PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(pdfInputStream);
         List<List<?>> arr =  new ObjectMapper().readValue(jsonInputStream, List.class);
         for (List<?> elems : arr) {
             String type = (String) elems.get(0);
             Object expectedValue = elems.get(1);
             if (type.equalsIgnoreCase("title")) {
                 String guessValue = doc.getMeta().getTitle();
-                Assert.assertEquals(guessValue, expectedValue, String.format("Title error on %s", id));
+                Assert.assertEquals(guessValue.trim(), expectedValue, String.format("Title error on %s", id));
             }
             if (type.equalsIgnoreCase("line")) {
                 List<PDFLine> lines = doc.getPages().stream().flatMap(x -> x.getLines().stream()).collect(Collectors.toList());
@@ -119,7 +120,8 @@ public class PDFExtractorTest {
             }
             // We know we need to evaluate on this
             numEvents ++;
-            PDFDoc doc = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
+            PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(false).build();
+            PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(new FileInputStream(pdfFile));
             String guessTitle = doc.getMeta().getTitle();
             if (guessTitle == null) {
                 // Didn't guess but there is an answer
@@ -141,7 +143,7 @@ public class PDFExtractorTest {
                 System.out.println("expectedTitle: " + expectedTitle);
                 System.out.println("guessTitle: " + guessTitle);
                 System.out.println("");
-                PDFExtractor extractor = new PDFExtractor();
+                PDFExtractor extractor = new PDFExtractor(opts);
                 extractor.DEBUG = true;
                 extractor.extractFromInputStream(new FileInputStream(pdfFile));
             }

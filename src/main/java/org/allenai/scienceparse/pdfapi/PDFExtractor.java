@@ -2,6 +2,7 @@ package org.allenai.scienceparse.pdfapi;
 
 import com.gs.collections.api.list.primitive.FloatList;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
+import lombok.Builder;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -25,6 +26,21 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class PDFExtractor {
+
+    @Builder
+    public static class Options {
+        public boolean useHeuristicTitle = false;
+    }
+
+    private final Options opts;
+
+    public PDFExtractor(Options opts) {
+        this.opts = opts;
+    }
+
+    public PDFExtractor() {
+        this.opts = Options.builder().build();
+    }
 
     @Data(staticConstructor = "of")
     private final static class RawChunk {
@@ -178,6 +194,9 @@ public class PDFExtractor {
     }
 
     private boolean badPDFTitleFast(String title) {
+        if (title == null) {
+            return true;
+        }
         // Ending with file extension is what Microsoft Word tends to do
         if (
             title.endsWith(".pdf") || title.endsWith(".doc") ||
@@ -253,13 +272,19 @@ public class PDFExtractor {
         val stripper = new PDFCaptureTextStripper();
         // SIDE-EFFECT pages ivar in stripper is populated
         stripper.getText(pdfBoxDoc);
+        String title = info.getTitle();
+        // kill bad title
+        if (badPDFTitle(stripper.pages.get(0), title)) {
+            title = null;
+        }
         // Title heuristic
-        if (info.getTitle() == null || badPDFTitle(stripper.pages.get(0), info.getTitle())) {
+        if (opts.useHeuristicTitle && title == null) {
             String guessTitle = getHeuristicTitle(stripper);
-            if (guessTitle != null && !badPDFTitleFast(guessTitle)) {
-                meta.title(guessTitle.trim());
+            if (!badPDFTitleFast(guessTitle)) {
+                title = guessTitle;
             }
         }
+        meta.title(title);
         pdfBoxDoc.close();
         return PDFDoc.builder()
             .pages(stripper.pages)
