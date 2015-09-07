@@ -105,9 +105,11 @@ public class PDFExtractorTest {
             String key = fields[0];
             String expectedTitle = fields[1];
             File pdfFile = new File(dir, key + ".pdf");
+            // This PDF isn't part of evaluation PDFs
             if (!pdfFile.exists()) {
                 continue;
             }
+            // We know we need to evaluate on this
             numEvents ++;
             PDFDoc doc = new PDFExtractor().extractFromInputStream(new FileInputStream(pdfFile));
             String guessTitle = doc.getMeta().getTitle();
