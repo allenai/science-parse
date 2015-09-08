@@ -56,8 +56,7 @@ public class PDFExtractorTest {
     public void testPDFExtraction() throws Exception {
         pdfKeys.forEach(this::testPDF);
     }
-
-    @Test
+    
     public void testPDFBenchmark() throws Exception {
         long numTitleBytes = 0L;
         for (int idx = 0; idx < 10; ++idx) {
