@@ -8,14 +8,12 @@ import org.testng.annotations.Test;
 
 import java.io.*;
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class PDFExtractorTest {
+public class
+        PDFExtractorTest {
 
     @SneakyThrows
     private void testPDF(String id) {

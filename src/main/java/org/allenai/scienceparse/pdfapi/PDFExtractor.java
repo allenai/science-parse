@@ -12,8 +12,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.util.DateConverter;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,17 +49,15 @@ public class PDFExtractor {
 
         public PDFToken toPDFToken() {
             val builder = PDFToken.builder();
-            String tokenText = textPositions.stream().map(TextPosition::getCharacter).collect(Collectors.joining(""));
+            String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));
             // separate ligands
             tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
             builder.token(tokenText);
             // HACK(aria42) assumes left-to-right text
             TextPosition firstTP = textPositions.get(0);
             PDFont pdFont = firstTP.getFont();
-            String fontFamily = pdFont.getBaseFont();
-            if (fontFamily == null) {
-                fontFamily = PDFFontMetrics.UNKNWON_FONT_FAMILY;
-            }
+            val desc = pdFont.getFontDescriptor();
+            String fontFamily = desc == null ? PDFFontMetrics.UNKNWON_FONT_FAMILY : desc.getFontName();
             float ptSize = firstTP.getFontSizeInPt();
             val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
             builder.fontMetrics(fontMetrics);
@@ -111,7 +109,7 @@ public class PDFExtractor {
             List<PDFToken> tokens = new ArrayList<>();
             for (int idx = 0; idx < textPositions.size(); idx++) {
                 TextPosition tp = textPositions.get(idx);
-                if (tp.getCharacter().trim().isEmpty()) {
+                if (tp.getUnicode().trim().isEmpty()) {
                     List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
                     if (tokenPositions.size() > 0) {
                         tokens.add(RawChunk.of(tokenPositions).toPDFToken());
@@ -235,7 +233,8 @@ public class PDFExtractor {
             return null;
         }
         String strippedDate = cosVal.replace("^D:", "");
-        return DateConverter.toCalendar(strippedDate, null).getTime();
+        val cal = DateConverter.toCalendar(strippedDate);
+        return cal == null ? null : cal.getTime();
     }
 
     @SneakyThrows
