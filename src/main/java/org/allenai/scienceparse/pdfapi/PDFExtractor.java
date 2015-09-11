@@ -186,9 +186,13 @@ public class PDFExtractor {
     }
 
     private static List<String> guessAuthorList(String listStr) {
-        return listStr != null && listStr.length() > 0
-            ? Arrays.asList(listStr.split(","))
-            : Collections.emptyList();
+        if (listStr != null && listStr.length() > 0) {
+            String[] authorArray = listStr.indexOf(';') >= 0 ? listStr.split(";") : listStr.split(",");
+            return Arrays.asList(authorArray);
+        }
+        else {
+            return Collections.emptyList();
+        }
     }
 
     private boolean badPDFTitleFast(String title) {
@@ -238,7 +242,7 @@ public class PDFExtractor {
     }
 
     @SneakyThrows
-    public PDFDoc extractFromInputStream(InputStream is) {
+    public PdfDocExtractionResult extractResultFromInputStream(InputStream is) {
         PDDocument pdfBoxDoc = PDDocument.load(is);
         val info = pdfBoxDoc.getDocumentInformation();
         List<String> keywords = guessKeywordList(info.getKeywords());
@@ -276,6 +280,7 @@ public class PDFExtractor {
         if (badPDFTitle(stripper.pages.get(0), title)) {
             title = null;
         }
+        boolean highPrecision = title != null;
         // Title heuristic
         if (opts.useHeuristicTitle && title == null) {
             String guessTitle = getHeuristicTitle(stripper);
@@ -285,10 +290,18 @@ public class PDFExtractor {
         }
         meta.title(title);
         pdfBoxDoc.close();
-        return PDFDoc.builder()
+        PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
             .meta(meta.build())
             .build();
+        PdfDocExtractionResult result =
+                PdfDocExtractionResult.builder().document(doc).highPrecision(highPrecision).build();
+        return result;
+    }
+
+    @SneakyThrows
+    public PDFDoc extractFromInputStream(InputStream is) {
+        return extractResultFromInputStream(is).document;
     }
 
     private static double relDiff(double a, double b) {
