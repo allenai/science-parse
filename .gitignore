@@ -13,3 +13,8 @@ gradlew
 
 # emacs
 .*~
+
+# sbt
+target/**
+test-output/**
+

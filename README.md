@@ -1,14 +1,8 @@
+This is a fork of the [science-parse](https://github.com/allenai/science-parse) project. It uses our local build of [pdfbox](http://utility.allenai.org:8081/nexus/content/repositories/thirdparty/org/apache/pdfbox-local/). It also uses sbt to build instead of gradle.
+
 # Science Parse
 
 Parsing PDF meta-data.
-
-## Getting Started
-
-This project is currently Java 8 built with `gradle`. To install `gradle` simply install via `brew install gradle` via [Homebrew](http://brew.sh). Then if you can do:
-```bash
-> gradle test # Run unit tests
-> gradle idea # Generate IntelliJ project
-```
 
 ### Lombok
 

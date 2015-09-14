@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Test runner" parallel="classes" thread-count="10">
+    <test name="Science-Parse">
+        <packages>
+            <package name="org.allenai.scienceparse.*"/>
+        </packages>
+    </test>
+</suite>

@@ -18,7 +18,7 @@ public class PDFToCRFInputTest {
       String inFile = filePathOfResource("/P14-1059.pdf");
       String target = "How to make words with vectors: Phrase generation in distributional semantics";
   	  PDFToCRFInput pdfts = new PDFToCRFInput();
-  	  PDDocument pdd = PDDocument.load(inFile);
+  	  PDDocument pdd = PDDocument.load(new java.io.File(inFile));
   	  val seq = pdfts.getSequence(pdd, target);
   	  assert(seq.size() > 50);
   	  boolean seenPhrase = false;
@@ -42,12 +42,12 @@ public class PDFToCRFInputTest {
         String inFile = filePathOfResource("/P14-1059.pdf");
         String target = null;
     	  PDFToCRFInput pdfts = new PDFToCRFInput();
-    	  PDDocument pdd = PDDocument.load(inFile);
+    	  PDDocument pdd = PDDocument.load(new java.io.File(inFile));
     	  val seq = pdfts.getSequence(pdd, target);
     	  assert(seq.size() > 50);
     	  for(val i : seq) {
     		  if(i.getOne().word.equals("Phrase")) {
-    			  assertEquals(i.getOne().font, 14.0f);
+    			  assertEquals(i.getOne().font, 205.0f);
     		  }
     		  else
     			  assertEquals(i.getTwo(), null);
