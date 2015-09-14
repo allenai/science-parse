@@ -206,7 +206,8 @@ public class PDFExtractor {
             title.endsWith("...") ||
             // Some conferences embed this in start of title
             // HACK(aria42) English-specific and conference-structure specific
-            title.trim().toLowerCase().startsWith("proceedings of"))
+            title.trim().toLowerCase().startsWith("proceedings of") ||
+            title.trim().startsWith("arXiv:"))
         {
             return true;
         }
@@ -283,10 +284,13 @@ public class PDFExtractor {
         boolean highPrecision = title != null;
         // Title heuristic
         if (opts.useHeuristicTitle && title == null) {
-            String guessTitle = getHeuristicTitle(stripper);
-            if (!badPDFTitleFast(guessTitle)) {
-                title = guessTitle;
+            try {
+                String guessTitle = getHeuristicTitle(stripper);
+                if (!badPDFTitleFast(guessTitle)) {
+                    title = guessTitle;
+                }
             }
+            catch (Exception ex) {}
         }
         meta.title(title);
         pdfBoxDoc.close();
