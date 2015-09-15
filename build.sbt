@@ -4,6 +4,8 @@ javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf
 
 PublishTo.ai2Public
 
+disableBintray()
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
