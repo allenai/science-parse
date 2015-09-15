@@ -2,6 +2,8 @@ name := "science-parse"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
+PublishTo.ai2Public
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
