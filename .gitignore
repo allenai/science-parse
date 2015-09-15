@@ -17,4 +17,5 @@ gradlew
 # sbt
 target/**
 test-output/**
+project/target/**
 
