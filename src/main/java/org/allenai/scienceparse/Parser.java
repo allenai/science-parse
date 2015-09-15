@@ -25,7 +25,6 @@ import org.allenai.ml.sequences.crf.CRFTrainer;
 //import org.allenai.ml.sequences.crf.conll.Evaluator;
 //import org.allenai.ml.sequences.crf.conll.Trainer;
 import org.allenai.ml.util.Parallel;
-import org.allenai.scienceparse.PDFToCRFInput.WordFont;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.slf4j.Logger;
@@ -55,8 +54,8 @@ public class Parser {
   }
   
   //borrowing heavily from conll.Trainer
-  public static void trainParser(String [] pdf, String [] truth) throws IOException {
-      val predExtractor = new PDFToCRFInput.PDFPredicateExtractor();
+//  public static void trainParser(String [] pdf, String [] truth) throws IOException {
+/*      val predExtractor = new PDFToCRFInput.PDFPredicateExtractor();
       List<List<Pair<WordFont, String>>> labeledData = new ArrayList<>();
       
       PDFToCRFInput pdtcrf = new PDFToCRFInput();
@@ -134,7 +133,7 @@ public class Parser {
 		  System.out.println(i.getOne().word + "\t" + i.getOne().font);
 	  }
   }
-	  
+*/	  
   public static void main(String[] args) throws Exception {
     // TODO Actually do PDF parsing
 //    logger.info("Hello {}", "world");
@@ -154,7 +153,7 @@ public class Parser {
     		"Sparse Information Extraction: Unsupervised Language Models to the Rescue",
     		"Learning to Extract Relations from the Web using Minimal Supervision"
     };
-    trainParser(files,  titles);
+    //trainParser(files,  titles);
 //    ConllCRFEndToEndTest ct = new ConllCRFEndToEndTest();
 //    ct.testEndToEnd();
     //invokeBox("c:\\git\\science-parse\\src\\test\\resources\\P14-1059.pdf", null);

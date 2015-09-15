@@ -22,11 +22,15 @@ repositories {
       password = ai2SonatypePassword
     }
   }
-
 }
 
 test {
   useTestNG()
+}
+
+task testlocal(type: Test) {
+    useTestNG()
+    include 'org/allenai/scienceparse/**'
 }
 
 dependencies {
