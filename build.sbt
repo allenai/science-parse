@@ -6,6 +6,8 @@ PublishTo.ai2Public
 
 disableBintray()
 
+sources in (Compile,doc) := Seq.empty
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
