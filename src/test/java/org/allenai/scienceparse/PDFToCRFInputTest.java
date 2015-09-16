@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import com.gs.collections.api.tuple.Pair;
 
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Test
@@ -39,6 +40,23 @@ public class PDFToCRFInputTest {
         Assert.assertTrue(pos != null && pos.getOne()>0 && (pos.getTwo() - pos.getOne() == 11));
         log.info("found title at " + pos.getOne() + ", " + pos.getTwo());
         Assert.assertTrue(posNot == null);
+    }
+    
+    public void testLabelMetadata() throws IOException {
+    	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+        PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
+        ExtractedMetadata em = new ExtractedMetadata();
+        em.authors = "Georgiana Dinu and Marco Baroni";
+        em.title = "How to make words with vectors: Phrase generation in distributional semantics";
+        val labeledData = PDFToCRFInput.labelMetadata(pts, em);
+        Assert.assertEquals(labeledData.get(24).getTwo(), "O");
+        Assert.assertEquals(labeledData.get(25).getTwo(), "T_B");
+        Assert.assertEquals(labeledData.get(32).getTwo(), "T_I");
+        Assert.assertEquals(labeledData.get(35).getTwo(), "T_E");
+        Assert.assertEquals(labeledData.get(36).getTwo(), "A_B");
+        Assert.assertEquals(labeledData.get(60).getTwo(), "O");
+        Assert.assertEquals(labeledData.get(60).getOne(), pts.get(60));
     }
     
 /*    public void testLabeledDocument() throws IOException {

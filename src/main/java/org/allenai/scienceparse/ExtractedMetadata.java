@@ -8,8 +8,12 @@ import com.gs.collections.api.tuple.Pair;
  *
  */
 public class ExtractedMetadata {
+	public static final String titleTag = "T"; //label used in labeled data
+	public static final String authorTag = "A"; //label used in labeled data
+	
 	public String title;
 	public Pair<Integer, Integer> titleOffset; //reference to some PDFDoc unknown to this object
 	public String authors;
 	public Pair<Integer, Integer> authorOffset; //reference to some PDFDoc unknown to this object
+	int year;
 }

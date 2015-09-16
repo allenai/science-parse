@@ -25,11 +25,7 @@ import com.gs.collections.impl.tuple.Tuples;
 
 @Slf4j
 public class PDFToCRFInput {
-		
-	public PDFToCRFInput() throws IOException {
-		super();
-	}	
-	
+
 	/**
 	 * Returns the index of start (inclusive) and end (exclusive)
 	 * of first occurrence of string in seq, or null if not found
@@ -72,6 +68,56 @@ public class PDFToCRFInput {
 						);
 			}
 		}
+		return out;
+	}
+	
+	/**
+	 * Labels the (first occurrence of) given target in seq with given label
+	 * @param seq	The sequence
+	 * @param seqWLabel	The same sequence with labels
+	 * @param target	
+	 * @param labelStem
+	 * @return	True if target was found in seq, false otherwise
+	 */
+	public static boolean findAndLabelWith(List<PaperToken> seq, List<Pair<PaperToken, String>> seqLabeled, String target, String labelStem) {
+		Pair<Integer, Integer> loc = findString(seq, target);
+		if(loc == null)
+			return false;
+		else {
+			if(loc.getOne() == loc.getTwo() - 1) {
+				Pair<PaperToken, String> t = seqLabeled.get(loc.getOne());
+				seqLabeled.set(loc.getOne(), Tuples.pair(t.getOne(), labelStem + "_W"));
+			}
+			else {
+				for(int i=loc.getOne(); i<loc.getTwo();i++) {
+					Pair<PaperToken, String> t = seqLabeled.get(i);
+					seqLabeled.set(i, Tuples.pair(t.getOne(), 
+							(i==loc.getOne()?labelStem + "_B":(i==loc.getTwo()-1?labelStem + "_E":labelStem+"_I"))));
+				}
+			}
+		return true;
+		}
+		
+	}
+	
+	/**
+	 * Returns the given tokens in a new list with labeled ground truth attached
+	 * according to the given reference metadata.
+	 * Only labels positive the first occurrence of each ground-truth string.
+	 * <br>
+	 * Labels defined in ExtractedMetadata
+	 * @param toks
+	 * @param truth
+	 * @return
+	 */
+	public static List<Pair<PaperToken, String>> labelMetadata(List<PaperToken> toks, ExtractedMetadata truth) {
+		val out = new ArrayList<Pair<PaperToken, String>>();
+		for(PaperToken t : toks) {
+			out.add(Tuples.pair(t, "O"));
+		}
+		findAndLabelWith(toks, out, truth.authors, ExtractedMetadata.authorTag);
+		findAndLabelWith(toks, out, truth.title, ExtractedMetadata.titleTag);
+		
 		return out;
 	}
 }

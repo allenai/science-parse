@@ -52,16 +52,15 @@ public class Parser {
       }
       return Tuples.pair(first, second);
   }
-  
+  /*
   //borrowing heavily from conll.Trainer
-//  public static void trainParser(String [] pdf, String [] truth) throws IOException {
-/*      val predExtractor = new PDFToCRFInput.PDFPredicateExtractor();
-      List<List<Pair<WordFont, String>>> labeledData = new ArrayList<>();
+  public static void trainParser(String [] pdf, String [] truth) throws IOException {
+      val predExtractor = new PDFPredicateExtractor();
+      List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
       
-      PDFToCRFInput pdtcrf = new PDFToCRFInput();
       for(int i=0; i<pdf.length; i++) {
           PDDocument pdd = PDDocument.load(pdf[i]);
-          val seq = pdtcrf.getSequence(pdd, truth[i]);
+          val seq = PDFToCRFInput.getSequence(pdf);
           labeledData.add(seq);
           pdd.close();
       }

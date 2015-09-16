@@ -54,8 +54,8 @@ public class PDFPredicateExtractorTest {
     	is.close();
 	}
 	
-	public static void main(String [] args) throws Exception {
-		(new PDFPredicateExtractorTest()).titleFontForExplicitFilePath("src\\test\\resources\\P14-1059.pdf");
-	}
+//	public static void main(String [] args) throws Exception {
+//		(new PDFPredicateExtractorTest()).titleFontForExplicitFilePath("src\\test\\resources\\P14-1059.pdf");
+//	}
 	
 }
