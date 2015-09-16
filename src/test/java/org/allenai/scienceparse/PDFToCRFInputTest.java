@@ -6,17 +6,11 @@ import java.util.List;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
-import org.allenai.scienceparse.pdfapi.PDFExtractorTest;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.gs.collections.api.tuple.Pair;
-import com.sun.media.jfxmedia.logging.Logger;
 
-import static org.testng.Assert.*;
-
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Test
