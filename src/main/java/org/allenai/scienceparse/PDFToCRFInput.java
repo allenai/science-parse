@@ -31,6 +31,30 @@ public class PDFToCRFInput {
 	}	
 	
 	/**
+	 * Returns the index of start (inclusive) and end (exclusive)
+	 * of first occurrence of string in seq, or null if not found
+	 * @param seq	String to find, assumes tokens are space-delimited 
+	 * @return
+	 */
+	public static Pair<Integer, Integer> findString(List<PaperToken> seq, String toFind) {
+		String [] toks = toFind.split(" ");
+		int nextToMatch = 0;
+		int idx = 0;
+		for(PaperToken pt : seq) {
+			if(toks[nextToMatch].equals(pt.getPdfToken().token)) {
+				nextToMatch++;
+			}
+			else {
+				nextToMatch = 0;
+			}
+			idx++;
+			if(nextToMatch==toks.length)
+				return Tuples.pair(idx-toks.length, idx);
+		}
+		return null;
+	}
+	
+	/**
 	 * Returns the PaperToken sequence form of a given PDF document<br>
 	 * @param pdd	The PDF Document to convert into instances  
 	 * @return	The data sequence

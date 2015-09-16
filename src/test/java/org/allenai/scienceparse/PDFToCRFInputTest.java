@@ -8,8 +8,10 @@ import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.allenai.scienceparse.pdfapi.PDFExtractorTest;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.gs.collections.api.tuple.Pair;
 import com.sun.media.jfxmedia.logging.Logger;
 
 import static org.testng.Assert.*;
@@ -24,13 +26,25 @@ public class PDFToCRFInputTest {
       return this.getClass().getResource(path).getFile();
     }
     
-    public void testGetPapertokens() throws IOException {
-        String target = "How to make words with vectors: Phrase generation in distributional semantics";
-        InputStream pdfInputStream = PDFExtractorTest.class.getResourceAsStream("/p14-1059.pdf");
+    public void testGetPaperTokens() throws IOException {
+        InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
         List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
         log.info("got " + pts.size() + " things.");
         assert(pts.size() > 50);
+    }
+    
+    public void testFindString() throws IOException {
+    	String target = "How to make words with vectors: Phrase generation in distributional semantics";
+    	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+        PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
+        Pair<Integer, Integer> pos = PDFToCRFInput.findString(pts, target);
+        Pair<Integer, Integer> posNot = PDFToCRFInput.findString(pts, "this string won't be found");
+        
+        Assert.assertTrue(pos != null && pos.getOne()>0 && (pos.getTwo() - pos.getOne() == 11));
+        log.info("found title at " + pos.getOne() + ", " + pos.getTwo());
+        Assert.assertTrue(posNot == null);
     }
     
 /*    public void testLabeledDocument() throws IOException {
