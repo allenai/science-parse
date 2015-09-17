@@ -12,8 +12,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.util.DateConverter;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.TextPosition;
+import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.util.TextPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,7 @@ public class PDFExtractor {
 
         public PDFToken toPDFToken() {
             val builder = PDFToken.builder();
-            String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));
+            String tokenText = textPositions.stream().map(TextPosition::getCharacter).collect(Collectors.joining(""));
             // separate ligands
             tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
             builder.token(tokenText);
@@ -109,7 +109,7 @@ public class PDFExtractor {
             List<PDFToken> tokens = new ArrayList<>();
             for (int idx = 0; idx < textPositions.size(); idx++) {
                 TextPosition tp = textPositions.get(idx);
-                if (tp.getUnicode().trim().isEmpty()) {
+                if (tp.getCharacter().trim().isEmpty()) {
                     List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
                     if (tokenPositions.size() > 0) {
                         tokens.add(RawChunk.of(tokenPositions).toPDFToken());
@@ -233,6 +233,7 @@ public class PDFExtractor {
         return !matchLine.isPresent();
     }
 
+    @SneakyThrows
     private Date toDate(String cosVal) {
         if (cosVal == null) {
             return null;

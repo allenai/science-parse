@@ -14,8 +14,8 @@ libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
-  "org.apache.pdfbox-local" % "pdfbox" % "2.0.0-local",
-  "org.apache.pdfbox-local" % "fontbox" % "2.0.0-local",
+  "org.apache.pdfbox" % "pdfbox" % "1.8.10",
+  "org.apache.pdfbox" % "fontbox" % "1.8.10",
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
   "org.allenai" % "ml" % "0.9" excludeAll (ExclusionRule(organization = "args4j")),
   "org.projectlombok" % "lombok" % "1.16.6",

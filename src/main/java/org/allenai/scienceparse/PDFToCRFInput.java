@@ -10,9 +10,8 @@ import java.util.List;
 
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.TextPosition;
-//TODO: upgrade to pdfbox 2.0 when released
+import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.util.TextPosition;
 
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
