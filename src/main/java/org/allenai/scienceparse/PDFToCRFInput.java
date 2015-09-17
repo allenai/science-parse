@@ -111,13 +111,16 @@ public class PDFToCRFInput {
 	 * @return
 	 */
 	public static List<Pair<PaperToken, String>> labelMetadata(List<PaperToken> toks, ExtractedMetadata truth) {
-		val out = new ArrayList<Pair<PaperToken, String>>();
+		val outTmp = new ArrayList<Pair<PaperToken, String>>();
 		for(PaperToken t : toks) {
-			out.add(Tuples.pair(t, "O"));
+			outTmp.add(Tuples.pair(t, "O"));
 		}
-		findAndLabelWith(toks, out, truth.authors, ExtractedMetadata.authorTag);
-		findAndLabelWith(toks, out, truth.title, ExtractedMetadata.titleTag);
-		
+		truth.authors.forEach((String s) -> findAndLabelWith(toks, outTmp, s, ExtractedMetadata.authorTag));
+		findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag);
+		val out = new ArrayList<Pair<PaperToken, String>>();
+		out.add(Tuples.pair(null,  "<S>"));
+		out.addAll(outTmp); //yuck
+		out.add(Tuples.pair(null, "</S>"));
 		return out;
 	}
 }

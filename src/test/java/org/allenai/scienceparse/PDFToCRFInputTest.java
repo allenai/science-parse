@@ -2,6 +2,7 @@ package org.allenai.scienceparse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -47,16 +48,18 @@ public class PDFToCRFInputTest {
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
         List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
         ExtractedMetadata em = new ExtractedMetadata();
-        em.authors = "Georgiana Dinu and Marco Baroni";
+        em.authors = Arrays.asList("Georgiana Dinu", "Marco Baroni");
         em.title = "How to make words with vectors: Phrase generation in distributional semantics";
         val labeledData = PDFToCRFInput.labelMetadata(pts, em);
-        Assert.assertEquals(labeledData.get(24).getTwo(), "O");
-        Assert.assertEquals(labeledData.get(25).getTwo(), "T_B");
-        Assert.assertEquals(labeledData.get(32).getTwo(), "T_I");
-        Assert.assertEquals(labeledData.get(35).getTwo(), "T_E");
-        Assert.assertEquals(labeledData.get(36).getTwo(), "A_B");
-        Assert.assertEquals(labeledData.get(60).getTwo(), "O");
-        Assert.assertEquals(labeledData.get(60).getOne(), pts.get(60));
+        Assert.assertEquals(labeledData.get(24+1).getTwo(), "O");
+        Assert.assertEquals(labeledData.get(25+1).getTwo(), "T_B");
+        Assert.assertEquals(labeledData.get(32+1).getTwo(), "T_I");
+        Assert.assertEquals(labeledData.get(35+1).getTwo(), "T_E");
+        Assert.assertEquals(labeledData.get(36+1).getTwo(), "A_B");
+        Assert.assertEquals(labeledData.get(60+1).getTwo(), "O");
+        Assert.assertEquals(labeledData.get(60+1).getOne(), pts.get(60)); //off by one due to start/stop
+        Assert.assertEquals(labeledData.get(0).getTwo(), "<S>");
+        Assert.assertEquals(labeledData.get(labeledData.size()-1).getTwo(), "</S>");
     }
     
 /*    public void testLabeledDocument() throws IOException {

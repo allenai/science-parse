@@ -12,6 +12,7 @@ import lombok.val;
 
 public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, String> {
 	
+	//assumes start/stop padded
 	@Override
 	public List<ObjectDoubleMap<String>> nodePredicates(List<PaperToken> elems) {
 		List<ObjectDoubleMap<String>> out = new ArrayList<>();
@@ -20,22 +21,28 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 			ObjectDoubleHashMap<String> m = new ObjectDoubleHashMap<String>();
 			float prevFont = -10.0f;
 			float nextFont = -10.0f;
-			if(i!=0) {
-				prevFont = elems.get(i-1).getPdfToken().fontMetrics.ptSize;
+			if(i==0)
+				m.put("<S>", 1.0);
+			else if(i==elems.size()-1)
+				m.put("</S>", 1.0);
+			else {
+				if(i!=1) {
+					prevFont = elems.get(i-1).getPdfToken().fontMetrics.ptSize;
+				}
+				if(i!=elems.size() - 2) {
+					nextFont = elems.get(i+1).getPdfToken().fontMetrics.ptSize;
+				}
+				float font = elems.get(i).getPdfToken().fontMetrics.ptSize;
+				//font-change forward (fcf) or backward (fcb):
+				if(font!=prevFont)
+					m.put("%fcb", 1.0);
+				if(font!=nextFont)
+					m.put("%fcf", 1.0);
+				//font value:
+				m.put("%font", font);
+				//word features:
+				m.put(elems.get(i).getPdfToken().token, 1.0);
 			}
-			if(i!=elems.size() - 1) {
-				nextFont = elems.get(i+1).getPdfToken().fontMetrics.ptSize;
-			}
-			float font = elems.get(i).getPdfToken().fontMetrics.ptSize;
-			//font-change forward (fcf) or backward (fcb):
-			if(font!=prevFont)
-				m.put("%fcb", 1.0);
-			if(font!=nextFont)
-				m.put("%fcf", 1.0);
-			//font value:
-			m.put("%font", font);
-			//word features:
-			m.put(elems.get(i).getPdfToken().token, 1.0);
 			out.add(m);
 		}
 		return out;

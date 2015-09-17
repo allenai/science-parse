@@ -8,6 +8,8 @@ public class PaperToken {
 	private int page; //page number in pdf doc
 	private int line; //line number in pdf doc
 	
+	
+	
 	public PaperToken(PDFToken pt, int ln, int pg) {
 		setPdfToken(pt);
 		setLine(ln);
