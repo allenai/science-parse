@@ -47,7 +47,7 @@ public class PDFToCRFInputTest {
     	  assert(seq.size() > 50);
     	  for(val i : seq) {
     		  if(i.getOne().word.equals("Phrase")) {
-    			  assertEquals(i.getOne().font, 205.0f);
+    			  assertEquals(i.getOne().font, 14.0f);
     		  }
     		  else
     			  assertEquals(i.getTwo(), null);
