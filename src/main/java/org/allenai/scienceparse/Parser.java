@@ -1,28 +1,22 @@
 package org.allenai.scienceparse;
 
 import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.toList;
-import static org.allenai.ml.util.IOUtils.linesFromPath;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.util.*;
 
+import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
+import org.allenai.ml.sequences.StateSpace;
+import org.allenai.ml.sequences.crf.CRFFeatureEncoder;
 import org.allenai.ml.sequences.crf.CRFModel;
 import org.allenai.ml.sequences.crf.CRFTrainer;
+import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
+import org.allenai.ml.util.IOUtils;
+import org.allenai.ml.util.Indexer;
 //import org.allenai.ml.sequences.crf.conll.ConllCRFEndToEndTest;
 //import org.allenai.ml.sequences.crf.conll.ConllFormat;
 //import org.allenai.ml.sequences.crf.conll.Evaluator;
@@ -40,16 +34,35 @@ public class Parser {
 
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
 	
+  private CRFModel<String, PaperToken, String> model;
   
-  	public Parser(String modelFile) {
-  		
+  	public Parser(String modelFile) throws IOException {
+  		DataInputStream dis = new DataInputStream(new FileInputStream(modelFile));
+  		model = loadModel(dis);
   	}
-  
+   
   public static class ParseOpts {
 	  public String modelFile;
 	  public int iterations;
 	  public int threads;
+	  public int headerMax;
   }
+  
+  public ExtractedMetadata doParse(InputStream is) throws IOException {
+	  PDFExtractor ext = new PDFExtractor(); 	  
+	  PDFDoc doc = ext.extractFromInputStream(is);
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
+      ExtractedMetadata em = null;
+      if(doc.meta.title == null) { //use the model
+    	  val outSeq = model.bestGuess(seq);
+    	  em = new ExtractedMetadata(seq, outSeq);
+      }
+      else {
+          em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+      }
+      return em;
+  }
+ 
   
   //from conll.Trainer:
   private static <T> Pair<List<T>, List<T>> splitData(List<T> original, double splitForSecond) {
@@ -68,23 +81,27 @@ public class Parser {
   }
  
   public static List<List<Pair<PaperToken, String>>> 
-  				bootstrapLabels(List<String> files) throws IOException {
+  				bootstrapLabels(List<String> files, int headerMax) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
       PDFExtractor ext = new PDFExtractor(); 	  
      	  
       for(String f : files) {
     	  FileInputStream fis = new FileInputStream(f);
     	  PDFDoc doc = ext.extractFromInputStream(fis);
+    	  fis.close();
           List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
-          ExtractedMetadata em = new ExtractedMetadata();
-          em.title = doc.meta.title;
-          em.authors = doc.meta.authors;
+          seq = seq.subList(0, headerMax);
+          ExtractedMetadata em = new ExtractedMetadata(doc.meta.title, doc.meta.authors,
+        		  doc.meta.createDate);
           if(em.title == null) {
         	  logger.info("skipping " + f);
         	  continue;
           }
-          if(doc.meta.createDate != null)
-        	  em.year = doc.meta.createDate.getYear() + 1900;
+          if(doc.meta.createDate != null) {
+        	  Calendar cal = Calendar.getInstance();
+              cal.setTime(doc.getMeta().getCreateDate());
+              em.year = cal.get(Calendar.YEAR);
+          }
           fis.close();
           logger.info("finding " + em.toString());
           List<Pair<PaperToken, String>> labeledPaper = 
@@ -101,7 +118,7 @@ public class Parser {
   public static void trainParser(List<String> files, ParseOpts opts) 
 		  throws IOException {
       val predExtractor = new PDFPredicateExtractor();
-      val labeledData = bootstrapLabels(files);
+      val labeledData = bootstrapLabels(files, opts.headerMax);
       // Split train/test data
       logger.info("CRF training with {} threads and {} labeled examples", 1, labeledData.size());
       val trainTestPair =
@@ -145,12 +162,38 @@ public class Parser {
       CRFModel<String, PaperToken, String> crfModel = trainer.train(trainLabeledData);
       Vector weights = crfModel.weights();
       Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
-//      val oos = new ObjectOutputStream(new FileOutputStream(opts.modelFile));
-//      logger.info("Writing model to {}", opts.modelFile);
-//      oos.writeObject(crfModel); //TODO: make more lean
-//      oos.close();
+      
+      val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
+      logger.info("Writing model to {}", opts.modelFile);
+      saveModel(dos, crfModel.featureEncoder, weights);
+      dos.close();
   }
-	
+  
+  public static final String DATA_VERSION = "0.1";
+  
+  public static void saveModel(DataOutputStream dos,
+		  CRFFeatureEncoder<String, PaperToken, String> fe,
+		  Vector weights) throws IOException {
+	  dos.writeUTF(DATA_VERSION);
+	  fe.stateSpace.save(dos);
+	  fe.nodeFeatures.save(dos);
+	  fe.edgeFeatures.save(dos);
+	  IOUtils.saveDoubles(dos, weights.toDoubles());
+  }
+  
+  public static CRFModel<String, PaperToken, String> loadModel(
+		  DataInputStream dis) throws IOException {
+	  IOUtils.ensureVersionMatch(dis, DATA_VERSION);
+	  val predExtractor = new PDFPredicateExtractor();
+	  val stateSpace = StateSpace.load(dis);
+	  Indexer<String> nodeFeatures = Indexer.load(dis);
+	  Indexer<String> edgeFeatures = Indexer.load(dis);
+	  Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
+	  val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
+	  (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
+	  val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
+	  return new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
+  }
   
 //  public static void endToEnd() {
 //      Trainer.trainAndSaveModel(trainOpts);

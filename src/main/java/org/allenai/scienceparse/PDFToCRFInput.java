@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -123,4 +125,16 @@ public class PDFToCRFInput {
 		out.add(Tuples.pair(null, "</S>"));
 		return out;
 	}
+	
+	public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
+		List<PaperToken> pts = toks.subList(span.getOne(), span.getTwo());
+		List<String> words = pts.stream().map(pt -> pt.getPdfToken().token).collect(Collectors.toList());
+		StringBuffer sb = new StringBuffer();
+		for(String s : words) {
+			sb.append(s);
+			sb.append(" ");
+		}
+		return sb.toString().trim();
+	}
+	
 }

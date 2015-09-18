@@ -8,13 +8,11 @@ import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.gs.collections.api.map.primitive.DoubleObjectMap;
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 
 import lombok.extern.slf4j.Slf4j;
 import java.io.*;
-import java.net.URL;
 
 @Slf4j
 public class PDFPredicateExtractorTest { 

@@ -2,6 +2,7 @@ package org.allenai.scienceparse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,9 +48,8 @@ public class PDFToCRFInputTest {
     	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
         List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
-        ExtractedMetadata em = new ExtractedMetadata();
-        em.authors = Arrays.asList("Georgiana Dinu", "Marco Baroni");
-        em.title = "How to make words with vectors: Phrase generation in distributional semantics";
+        ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
+        		Arrays.asList("Georgiana Dinu", "Marco Baroni"), new Date(1388556000000L));
         val labeledData = PDFToCRFInput.labelMetadata(pts, em);
         Assert.assertEquals(labeledData.get(24+1).getTwo(), "O");
         Assert.assertEquals(labeledData.get(25+1).getTwo(), "T_B");
