@@ -53,13 +53,14 @@ public class Parser {
 	  PDFDoc doc = ext.extractFromInputStream(is);
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
       ExtractedMetadata em = null;
-      if(doc.meta.title == null) { //use the model
+//      if(doc.meta.title == null) { //use the model
     	  val outSeq = model.bestGuess(seq);
     	  em = new ExtractedMetadata(seq, outSeq);
-      }
-      else {
-          em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-      }
+          logger.info("CRF extracted title: " + em.title);
+//      }
+//      else {
+//          em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+//      }
       return em;
   }
  
@@ -120,9 +121,9 @@ public class Parser {
       val predExtractor = new PDFPredicateExtractor();
       val labeledData = bootstrapLabels(files, opts.headerMax);
       // Split train/test data
-      logger.info("CRF training with {} threads and {} labeled examples", 1, labeledData.size());
+      logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
       val trainTestPair =
-          splitData(labeledData, 0.5);
+          splitData(labeledData, 0.1);
       val trainLabeledData = trainTestPair.getOne();
       val testLabeledData = trainTestPair.getTwo();
 
