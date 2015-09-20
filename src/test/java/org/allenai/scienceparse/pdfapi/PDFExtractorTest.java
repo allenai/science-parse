@@ -12,8 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class
-        PDFExtractorTest {
+public class PDFExtractorTest {
 
     @SneakyThrows
     private void testPDF(String id) {
@@ -119,6 +118,10 @@ public class
             numEvents ++;
             PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(false).build();
             PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(new FileInputStream(pdfFile));
+            if (doc == null) {
+                fn++;
+                continue;
+            }
             String guessTitle = doc.getMeta().getTitle();
             if (guessTitle == null) {
                 // Didn't guess but there is an answer

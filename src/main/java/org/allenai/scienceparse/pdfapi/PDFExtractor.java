@@ -274,7 +274,12 @@ public class PDFExtractor {
         }
         val stripper = new PDFCaptureTextStripper();
         // SIDE-EFFECT pages ivar in stripper is populated
-        stripper.getText(pdfBoxDoc);
+        try {
+            stripper.getText(pdfBoxDoc);
+        } catch (Exception e) {
+            return null;
+        }
+
         String title = info.getTitle();
         // kill bad title
         if (badPDFTitle(stripper.pages.get(0), title)) {
@@ -290,18 +295,23 @@ public class PDFExtractor {
         }
         meta.title(title);
         pdfBoxDoc.close();
+
+        PDFPage firstPage = stripper.pages.get(0);
         PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
+            .headerStopLinePosition(getHeuristicHeaderStopIndex(firstPage))
             .meta(meta.build())
             .build();
-        PdfDocExtractionResult result =
-                PdfDocExtractionResult.builder().document(doc).highPrecision(highPrecision).build();
-        return result;
+
+        return PdfDocExtractionResult.builder()
+            .document(doc)
+            .highPrecision(highPrecision).build();
     }
 
     @SneakyThrows
     public PDFDoc extractFromInputStream(InputStream is) {
-        return extractResultFromInputStream(is).document;
+        PdfDocExtractionResult result = extractResultFromInputStream(is);
+        return result != null ?  result.document : null;
     }
 
     private static double relDiff(double a, double b) {
@@ -310,29 +320,45 @@ public class PDFExtractor {
 
     public boolean DEBUG = false;
 
+
+    private int getHeuristicHeaderStopIndex(PDFPage firstPage) {
+        // Find first abstract line
+        OptionalInt abstractIdx = IntStream.range(0, firstPage.lines.size())
+            .filter(idx -> firstPage.lines.get(idx).lineText().trim().toLowerCase().startsWith("abstract"))
+            .findFirst();
+        if (abstractIdx.isPresent()) {
+            return abstractIdx.getAsInt();
+        }
+        // Find smallest line on page and if it appears in acceptable range, take it
+        double smallestSize = firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min().getAsDouble();
+        OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
+            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
+            .findFirst();
+        if (smallIdx.isPresent()) {
+            if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
+                return smallIdx.getAsInt();
+            }
+        }
+        return -1;
+    }
+
     private String getHeuristicTitle(PDFCaptureTextStripper stripper) {
         PDFPage firstPage = stripper.pages.get(0);
-        ToDoubleFunction<PDFLine> lineFontSize =
-            //line -> line.height();
-            line -> line.getTokens().stream().mapToDouble(t -> t.getFontMetrics().getPtSize()).average().getAsDouble();
         double largestSize = firstPage.getLines().stream()
             .filter(l -> !l.getTokens().isEmpty())
-            .mapToDouble(lineFontSize::applyAsDouble)
+            .mapToDouble(PDFLine::avgFontSize)
             .max().getAsDouble();
         int startIdx = IntStream.range(0, firstPage.lines.size())
             //.filter(idx -> relDiff(lineFontSize.applyAsDouble(firstPage.lines.get(idx)), largestSize) < 0.01)
-            .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) == largestSize)
+            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == largestSize)
             .findFirst().getAsInt();
         int stopIdx = IntStream.range(startIdx+1, firstPage.lines.size())
             //.filter(idx -> relDiff(lineFontSize.applyAsDouble(firstPage.lines.get(idx)),largestSize) >= 0.05)
-            .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) < largestSize)
+            .filter(idx -> firstPage.lines.get(idx).avgFontSize() < largestSize)
             .findFirst()
             .orElse(firstPage.lines.size() - 1);
         if (startIdx == stopIdx) {
             return null;
-        }
-        if (DEBUG) {
-            System.out.println("HERE");
         }
         double lastYDiff = Double.NaN;
         List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);

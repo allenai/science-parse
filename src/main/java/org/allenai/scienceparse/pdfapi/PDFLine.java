@@ -47,4 +47,8 @@ public class PDFLine {
     public String lineText() {
         return tokens.stream().map(PDFToken::getToken).collect(Collectors.joining(" "));
     }
+
+    public double avgFontSize() {
+        return tokens.stream().mapToDouble(t -> t.getFontMetrics().getPtSize()).average().orElse(0.0);
+    }
 }
