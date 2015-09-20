@@ -52,10 +52,10 @@ public class PDFToCRFInputTest {
         		Arrays.asList("Georgiana Dinu", "Marco Baroni"), new Date(1388556000000L));
         val labeledData = PDFToCRFInput.labelMetadata(pts, em);
         Assert.assertEquals(labeledData.get(24+1).getTwo(), "O");
-        Assert.assertEquals(labeledData.get(25+1).getTwo(), "T_B");
-        Assert.assertEquals(labeledData.get(32+1).getTwo(), "T_I");
-        Assert.assertEquals(labeledData.get(35+1).getTwo(), "T_E");
-        Assert.assertEquals(labeledData.get(36+1).getTwo(), "A_B");
+        Assert.assertEquals(labeledData.get(25+1).getTwo(), "B_T");
+        Assert.assertEquals(labeledData.get(32+1).getTwo(), "I_T");
+        Assert.assertEquals(labeledData.get(35+1).getTwo(), "E_T");
+        Assert.assertEquals(labeledData.get(36+1).getTwo(), "B_A");
         Assert.assertEquals(labeledData.get(60+1).getTwo(), "O");
         Assert.assertEquals(labeledData.get(60+1).getOne(), pts.get(60)); //off by one due to start/stop
         Assert.assertEquals(labeledData.get(0).getTwo(), "<S>");

@@ -40,4 +40,11 @@ public class PaperToken {
 		this.pdfToken = pdfToken;
 	}
 	
+	public String toStringShort() {
+		if(pdfToken==null)
+			return "";
+		else
+			return pdfToken.token;
+	}
+	
 }

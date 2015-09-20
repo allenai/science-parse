@@ -22,8 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Test
+@Slf4j
 public class ParserTest {
 
   public String filePathOfResource(String path) {
@@ -34,7 +34,6 @@ public class ParserTest {
 	        "/roark13", "/dyer12", "/bohnet09", "/P14-1059", "/map-reduce", "/fader11", "/proto06",
 	        "/agarwal11", "/smola10", "/senellart10", "/zolotov04","/pedersen04", "/smith07",
 	        "/aimag10");
-  
   public void testBootstrap() throws IOException {
 	  val labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100);
 	   PDFPredicateExtractor ppe = new PDFPredicateExtractor();
@@ -93,8 +92,9 @@ public class ParserTest {
     }
   
   public void testParser() throws Exception {
-  	Parser.ParseOpts opts = new Parser.ParseOpts();
-  	opts.iterations = 300;
+	  
+	Parser.ParseOpts opts = new Parser.ParseOpts();
+  	opts.iterations = 80;
   	opts.threads = 4;
   	opts.modelFile = "src/test/resources/test.model";
   	opts.headerMax = 100;

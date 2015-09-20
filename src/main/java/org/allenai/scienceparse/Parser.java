@@ -53,17 +53,17 @@ public class Parser {
 	  PDFDoc doc = ext.extractFromInputStream(is);
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
       ExtractedMetadata em = null;
-//      if(doc.meta.title == null) { //use the model
+      if(doc.meta.title == null) { //use the model
     	  val outSeq = model.bestGuess(seq);
+    	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
-          logger.info("CRF extracted title: " + em.title);
-//      }
-//      else {
-//          em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-//      }
+          logger.info("CRF extracted title: " + em.title);          
+      }
+      else {
+          em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+      }
       return em;
   }
- 
   
   //from conll.Trainer:
   private static <T> Pair<List<T>, List<T>> splitData(List<T> original, double splitForSecond) {

@@ -88,13 +88,13 @@ public class PDFToCRFInput {
 		else {
 			if(loc.getOne() == loc.getTwo() - 1) {
 				Pair<PaperToken, String> t = seqLabeled.get(loc.getOne());
-				seqLabeled.set(loc.getOne(), Tuples.pair(t.getOne(), labelStem + "_W"));
+				seqLabeled.set(loc.getOne(), Tuples.pair(t.getOne(), "W_" + labelStem));
 			}
 			else {
 				for(int i=loc.getOne(); i<loc.getTwo();i++) {
 					Pair<PaperToken, String> t = seqLabeled.get(i);
 					seqLabeled.set(i, Tuples.pair(t.getOne(), 
-							(i==loc.getOne()?labelStem + "_B":(i==loc.getTwo()-1?labelStem + "_E":labelStem+"_I"))));
+							(i==loc.getOne()?"B_" + labelStem:(i==loc.getTwo()-1?"E_" + labelStem:"I_" + labelStem))));
 				}
 			}
 		return true;
@@ -135,6 +135,10 @@ public class PDFToCRFInput {
 			sb.append(" ");
 		}
 		return sb.toString().trim();
+	}
+	
+	public static String labelString(List<Pair<PaperToken, String>> seq) {
+		return seq.stream().map((Pair<PaperToken, String> a) -> a.getTwo()).collect(Collectors.toList()).toString(); 
 	}
 	
 }

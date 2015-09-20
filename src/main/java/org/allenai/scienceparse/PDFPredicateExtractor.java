@@ -1,16 +1,37 @@
 package org.allenai.scienceparse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import com.sun.javafx.runtime.async.AsyncOperationListener;
 
 import lombok.val;
 
 public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, String> {
+	
+	public static List<String> getCaseMasks(String tok) {
+		Pattern Xxx = Pattern.compile("^[A-Z][a-z]*$");
+		Pattern xxx = Pattern.compile("^[a-z]+$");
+		Pattern dig = Pattern.compile("^[0-9]+$");
+		Pattern hasNum = Pattern.compile("[0-9]+");
+		
+		List<Pattern> pats = Arrays.asList(Xxx, xxx, dig, hasNum);
+		List<String> feats = Arrays.asList("%Xxx", "%xxx", "%dig", "%hasNum");
+		ArrayList<String> out = new ArrayList<String>();
+		for(int i=0; i<pats.size(); i++) {
+			Pattern p = pats.get(i);
+			if(p.matcher(tok).matches()) {
+				out.add(feats.get(i));
+			}
+		}
+		return out;
+	}
 	
 	//assumes start/stop padded
 	@Override
@@ -49,7 +70,11 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 					m.put("lcf", 1.0);
 				//font value:
 				m.put("%font", font);
+				
 				//word features:
+				getCaseMasks(elems.get(i).getPdfToken().token).forEach(
+						(String s) -> m.put(s, 1.0));
+				
 				//m.put(elems.get(i).getPdfToken().token, 1.0);
 			}
 			out.add(m);

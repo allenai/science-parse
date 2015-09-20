@@ -52,6 +52,14 @@ public class PDFPredicateExtractorTest {
     	is.close();
 	}
 	
+	@Test
+	public void testCaseMasks() {
+		String cap = "Exploring";
+		List<String> ls = PDFPredicateExtractor.getCaseMasks(cap);
+		Assert.assertEquals(ls.size(), 1);
+		Assert.assertTrue(ls.contains("%Xxx"));
+	}
+	
 //	public static void main(String [] args) throws Exception {
 //		(new PDFPredicateExtractorTest()).titleFontForExplicitFilePath("src\\test\\resources\\P14-1059.pdf");
 //	}
