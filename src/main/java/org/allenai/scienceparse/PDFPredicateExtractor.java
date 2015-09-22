@@ -2,6 +2,7 @@ package org.allenai.scienceparse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -10,10 +11,16 @@ import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.sun.javafx.runtime.async.AsyncOperationListener;
+import com.sun.media.jfxmedia.logging.Logger;
 
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, String> {
+	
+	public static final List<String> stopWords = Arrays.asList("a", "an", "the", "in", "of", "for", "from");
+	public static final HashSet<String> stopHash = new HashSet<String>(stopWords);
 	
 	public static List<String> getCaseMasks(String tok) {
 		Pattern Xxx = Pattern.compile("^[A-Z][a-z]*$");
@@ -31,6 +38,10 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 			}
 		}
 		return out;
+	}
+	
+	public static boolean isStopWord(String tok) {
+		return stopHash.contains(tok);
 	}
 	
 	//assumes start/stop padded
@@ -72,9 +83,20 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 				m.put("%font", font);
 				
 				//word features:
-				getCaseMasks(elems.get(i).getPdfToken().token).forEach(
-						(String s) -> m.put(s, 1.0));
+				String tok = elems.get(i).getPdfToken().token;
 				
+				getCaseMasks(tok).forEach(
+						(String s) -> m.put(s, 1.0));
+				if(isStopWord(tok)) {
+					m.put("%stop", 1.0);
+				}
+				else {
+					if(m.containsKey("%xxx")) {
+						m.put("%uncapns", 1.0);
+					}
+				}
+				log.info("features for " + tok);
+				log.info(m.toString());
 				//m.put(elems.get(i).getPdfToken().token, 1.0);
 			}
 			out.add(m);
