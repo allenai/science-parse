@@ -61,7 +61,7 @@ public class Parser {
       
       PDFToCRFInput pdtcrf = new PDFToCRFInput();
       for(int i=0; i<pdf.length; i++) {
-          PDDocument pdd = PDDocument.load(pdf[i]);
+          PDDocument pdd = PDDocument.load(new java.io.File(pdf[i]));
           val seq = pdtcrf.getSequence(pdd, truth[i]);
           labeledData.add(seq);
           pdd.close();
@@ -124,7 +124,7 @@ public class Parser {
 	
   public static void invokeBox(String inFile, String outFile) throws Exception {
 	  PDFToCRFInput pdfts = new PDFToCRFInput();
-	  PDDocument pdd = PDDocument.load(inFile);
+	  PDDocument pdd = PDDocument.load(new java.io.File(inFile));
 	  PDDocumentCatalog cat = pdd.getDocumentCatalog();
 	  //String t = pdfts.getText(pdd);
 	  val seq = pdfts.getSequence(pdd, "TITLE");

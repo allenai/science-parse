@@ -56,10 +56,8 @@ public class PDFExtractor {
             // HACK(aria42) assumes left-to-right text
             TextPosition firstTP = textPositions.get(0);
             PDFont pdFont = firstTP.getFont();
-            String fontFamily = pdFont.getBaseFont();
-            if (fontFamily == null) {
-                fontFamily = PDFFontMetrics.UNKNWON_FONT_FAMILY;
-            }
+            val desc = pdFont.getFontDescriptor();
+            String fontFamily = desc == null ? PDFFontMetrics.UNKNWON_FONT_FAMILY : desc.getFontName();
             float ptSize = firstTP.getFontSizeInPt();
             val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
             builder.fontMetrics(fontMetrics);
@@ -188,9 +186,13 @@ public class PDFExtractor {
     }
 
     private static List<String> guessAuthorList(String listStr) {
-        return listStr != null && listStr.length() > 0
-            ? Arrays.asList(listStr.split(","))
-            : Collections.emptyList();
+        if (listStr != null && listStr.length() > 0) {
+            String[] authorArray = listStr.indexOf(';') >= 0 ? listStr.split(";") : listStr.split(",");
+            return Arrays.asList(authorArray);
+        }
+        else {
+            return Collections.emptyList();
+        }
     }
 
     private boolean badPDFTitleFast(String title) {
@@ -204,7 +206,8 @@ public class PDFExtractor {
             title.endsWith("...") ||
             // Some conferences embed this in start of title
             // HACK(aria42) English-specific and conference-structure specific
-            title.trim().toLowerCase().startsWith("proceedings of"))
+            title.trim().toLowerCase().startsWith("proceedings of") ||
+            title.trim().startsWith("arXiv:"))
         {
             return true;
         }
@@ -230,16 +233,18 @@ public class PDFExtractor {
         return !matchLine.isPresent();
     }
 
+    @SneakyThrows
     private Date toDate(String cosVal) {
         if (cosVal == null) {
             return null;
         }
         String strippedDate = cosVal.replace("^D:", "");
-        return DateConverter.toCalendar(strippedDate, null).getTime();
+        val cal = DateConverter.toCalendar(strippedDate);
+        return cal == null ? null : cal.getTime();
     }
 
     @SneakyThrows
-    public PDFDoc extractFromInputStream(InputStream is) {
+    public PdfDocExtractionResult extractResultFromInputStream(InputStream is) {
         PDDocument pdfBoxDoc = PDDocument.load(is);
         val info = pdfBoxDoc.getDocumentInformation();
         List<String> keywords = guessKeywordList(info.getKeywords());
@@ -277,19 +282,31 @@ public class PDFExtractor {
         if (badPDFTitle(stripper.pages.get(0), title)) {
             title = null;
         }
+        boolean highPrecision = title != null;
         // Title heuristic
         if (opts.useHeuristicTitle && title == null) {
-            String guessTitle = getHeuristicTitle(stripper);
-            if (!badPDFTitleFast(guessTitle)) {
-                title = guessTitle;
+            try {
+                String guessTitle = getHeuristicTitle(stripper);
+                if (!badPDFTitleFast(guessTitle)) {
+                    title = guessTitle;
+                }
             }
+            catch (Exception ex) {}
         }
         meta.title(title);
         pdfBoxDoc.close();
-        return PDFDoc.builder()
+        PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
             .meta(meta.build())
             .build();
+        PdfDocExtractionResult result =
+                PdfDocExtractionResult.builder().document(doc).highPrecision(highPrecision).build();
+        return result;
+    }
+
+    @SneakyThrows
+    public PDFDoc extractFromInputStream(InputStream is) {
+        return extractResultFromInputStream(is).document;
     }
 
     private static double relDiff(double a, double b) {
