@@ -95,8 +95,8 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 						m.put("%uncapns", 1.0);
 					}
 				}
-				log.info("features for " + tok);
-				log.info(m.toString());
+//				log.info("features for " + tok);
+//				log.info(m.toString());
 				//m.put(elems.get(i).getPdfToken().token, 1.0);
 			}
 			out.add(m);

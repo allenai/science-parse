@@ -12,8 +12,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.util.DateConverter;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.TextPosition;
+import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.util.TextPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,7 @@ public class PDFExtractor {
 
         public PDFToken toPDFToken() {
             val builder = PDFToken.builder();
-            String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));
+            String tokenText = textPositions.stream().map(TextPosition::getCharacter).collect(Collectors.joining(""));
             // separate ligands
             tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
             builder.token(tokenText);
@@ -109,7 +109,7 @@ public class PDFExtractor {
             List<PDFToken> tokens = new ArrayList<>();
             for (int idx = 0; idx < textPositions.size(); idx++) {
                 TextPosition tp = textPositions.get(idx);
-                if (tp.getUnicode().trim().isEmpty()) {
+                if (tp.getCharacter().trim().isEmpty()) {
                     List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
                     if (tokenPositions.size() > 0) {
                         tokens.add(RawChunk.of(tokenPositions).toPDFToken());
@@ -276,12 +276,7 @@ public class PDFExtractor {
         }
         val stripper = new PDFCaptureTextStripper();
         // SIDE-EFFECT pages ivar in stripper is populated
-        try {
-            stripper.getText(pdfBoxDoc);
-        } catch (Exception e) {
-            return null;
-        }
-
+        stripper.getText(pdfBoxDoc);
         String title = info.getTitle();
         // kill bad title
         if (badPDFTitle(stripper.pages.get(0), title)) {
@@ -310,22 +305,18 @@ public class PDFExtractor {
         return PdfDocExtractionResult.builder()
             .document(doc)
             .highPrecision(highPrecision).build();
-        
     }
 
     @SneakyThrows
     public PDFDoc extractFromInputStream(InputStream is) {
-        PdfDocExtractionResult result = extractResultFromInputStream(is);
-        return result != null ?  result.document : null;
+        return extractResultFromInputStream(is).document;
     }
-    
 
     private static double relDiff(double a, double b) {
         return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
     }
 
     public boolean DEBUG = false;
-
 
     private int getHeuristicHeaderStopIndex(PDFPage firstPage) {
         // Find first abstract line
@@ -347,24 +338,30 @@ public class PDFExtractor {
         }
         return -1;
     }
-
+    
     private String getHeuristicTitle(PDFCaptureTextStripper stripper) {
         PDFPage firstPage = stripper.pages.get(0);
+        ToDoubleFunction<PDFLine> lineFontSize =
+            //line -> line.height();
+            line -> line.getTokens().stream().mapToDouble(t -> t.getFontMetrics().getPtSize()).average().getAsDouble();
         double largestSize = firstPage.getLines().stream()
             .filter(l -> !l.getTokens().isEmpty())
-            .mapToDouble(PDFLine::avgFontSize)
+            .mapToDouble(lineFontSize::applyAsDouble)
             .max().getAsDouble();
         int startIdx = IntStream.range(0, firstPage.lines.size())
             //.filter(idx -> relDiff(lineFontSize.applyAsDouble(firstPage.lines.get(idx)), largestSize) < 0.01)
-            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == largestSize)
+            .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) == largestSize)
             .findFirst().getAsInt();
         int stopIdx = IntStream.range(startIdx+1, firstPage.lines.size())
             //.filter(idx -> relDiff(lineFontSize.applyAsDouble(firstPage.lines.get(idx)),largestSize) >= 0.05)
-            .filter(idx -> firstPage.lines.get(idx).avgFontSize() < largestSize)
+            .filter(idx -> lineFontSize.applyAsDouble(firstPage.lines.get(idx)) < largestSize)
             .findFirst()
             .orElse(firstPage.lines.size() - 1);
         if (startIdx == stopIdx) {
             return null;
+        }
+        if (DEBUG) {
+            System.out.println("HERE");
         }
         double lastYDiff = Double.NaN;
         List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);
