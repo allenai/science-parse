@@ -85,8 +85,4 @@ public class PDFToCRFInputTest {
   		  }
   	  }
     }
-    
-    public void testUnlabeledDocument() throws IOException {
-
-    }
 */}

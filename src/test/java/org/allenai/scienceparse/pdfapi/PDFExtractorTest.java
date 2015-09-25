@@ -12,7 +12,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class PDFExtractorTest {
+public class
+        PDFExtractorTest {
 
     @SneakyThrows
     private void testPDF(String id) {

@@ -12,5 +12,5 @@ This project uses [Lombok](https://projectlombok.org) which requires you to enab
 Lombok has a lot of useful annotations that give you some of the nice things in Scala:
 
 * `val` is equivalent to `final` and the right-hand-side class. It gives you type-inference via some tricks
-* Checkout [`@Data`](https://projectlombok.org/features/Data.html)
+* Check out [`@Data`](https://projectlombok.org/features/Data.html)
 

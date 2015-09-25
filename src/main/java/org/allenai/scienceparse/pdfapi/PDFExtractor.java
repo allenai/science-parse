@@ -206,7 +206,8 @@ public class PDFExtractor {
             title.endsWith("...") ||
             // Some conferences embed this in start of title
             // HACK(aria42) English-specific and conference-structure specific
-            title.trim().toLowerCase().startsWith("proceedings of"))
+            title.trim().toLowerCase().startsWith("proceedings of") ||
+            title.trim().startsWith("arXiv:"))
         {
             return true;
         }
@@ -232,6 +233,7 @@ public class PDFExtractor {
         return !matchLine.isPresent();
     }
 
+    @SneakyThrows
     private Date toDate(String cosVal) {
         if (cosVal == null) {
             return null;
@@ -288,14 +290,16 @@ public class PDFExtractor {
         boolean highPrecision = title != null;
         // Title heuristic
         if (opts.useHeuristicTitle && title == null) {
-            String guessTitle = getHeuristicTitle(stripper);
-            if (!badPDFTitleFast(guessTitle)) {
-                title = guessTitle;
+            try {
+                String guessTitle = getHeuristicTitle(stripper);
+                if (!badPDFTitleFast(guessTitle)) {
+                    title = guessTitle;
+                }
             }
+            catch (Exception ex) {}
         }
         meta.title(title);
         pdfBoxDoc.close();
-
         PDFPage firstPage = stripper.pages.get(0);
         PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
@@ -306,6 +310,7 @@ public class PDFExtractor {
         return PdfDocExtractionResult.builder()
             .document(doc)
             .highPrecision(highPrecision).build();
+        
     }
 
     @SneakyThrows
@@ -313,6 +318,7 @@ public class PDFExtractor {
         PdfDocExtractionResult result = extractResultFromInputStream(is);
         return result != null ?  result.document : null;
     }
+    
 
     private static double relDiff(double a, double b) {
         return Math.abs(a-b)/Math.min(Math.abs(a), Math.abs(b));
