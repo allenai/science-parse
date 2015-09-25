@@ -8,10 +8,7 @@ import org.testng.annotations.Test;
 
 import java.io.*;
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -121,6 +118,10 @@ public class PDFExtractorTest {
             numEvents ++;
             PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(false).build();
             PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(new FileInputStream(pdfFile));
+            if (doc == null) {
+                fn++;
+                continue;
+            }
             String guessTitle = doc.getMeta().getTitle();
             if (guessTitle == null) {
                 // Didn't guess but there is an answer

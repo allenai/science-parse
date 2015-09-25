@@ -116,10 +116,24 @@ public class Parser {
   }
   
   //borrowing heavily from conll.Trainer
+<<<<<<< HEAD
   public static void trainParser(List<String> files, ParseOpts opts) 
 		  throws IOException {
       val predExtractor = new PDFPredicateExtractor();
       val labeledData = bootstrapLabels(files, opts.headerMax);
+=======
+  public static void trainParser(String [] pdf, String [] truth) throws IOException {
+      val predExtractor = new PDFToCRFInput.PDFPredicateExtractor();
+      List<List<Pair<WordFont, String>>> labeledData = new ArrayList<>();
+      
+      PDFToCRFInput pdtcrf = new PDFToCRFInput();
+      for(int i=0; i<pdf.length; i++) {
+          PDDocument pdd = PDDocument.load(new java.io.File(pdf[i]));
+          val seq = pdtcrf.getSequence(pdd, truth[i]);
+          labeledData.add(seq);
+          pdd.close();
+      }
+>>>>>>> pdfbox-2.0
       // Split train/test data
       logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
       val trainTestPair =
@@ -203,6 +217,7 @@ public class Parser {
 //      evalOpts.dataPath = filePathOfResource("/crf/test.data");
 //      val accPerfPair = Evaluator.evaluateModel(evalOpts);
 //  }
+
 	  
   public static void main(String[] args) throws Exception {
     // TODO Actually do PDF parsing
