@@ -7,6 +7,8 @@ import static java.util.stream.Collectors.toList;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -51,9 +53,9 @@ public class Parser {
   public ExtractedMetadata doParse(InputStream is) throws IOException {
 	  PDFExtractor ext = new PDFExtractor(); 	  
 	  PDFDoc doc = ext.extractFromInputStream(is);
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
       ExtractedMetadata em = null;
-      if(doc.meta.title == null) { //use the model
+      if(doc.meta == null || doc.meta.title == null) { //use the model
     	  val outSeq = model.bestGuess(seq);
     	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
@@ -82,7 +84,7 @@ public class Parser {
   }
  
   public static List<List<Pair<PaperToken, String>>> 
-  				bootstrapLabels(List<String> files, int headerMax) throws IOException {
+  				bootstrapLabels(List<String> files, int headerMax, boolean heuristicHeader) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
       PDFExtractor ext = new PDFExtractor(); 	  
      	  
@@ -90,8 +92,8 @@ public class Parser {
     	  FileInputStream fis = new FileInputStream(f);
     	  PDFDoc doc = ext.extractFromInputStream(fis);
     	  fis.close();
-          List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
-          seq = seq.subList(0, headerMax);
+          List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
+          seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
           ExtractedMetadata em = new ExtractedMetadata(doc.meta.title, doc.meta.authors,
         		  doc.meta.createDate);
           if(em.title == null) {
@@ -119,7 +121,7 @@ public class Parser {
   public static void trainParser(List<String> files, ParseOpts opts) 
 		  throws IOException {
       val predExtractor = new PDFPredicateExtractor();
-      val labeledData = bootstrapLabels(files, opts.headerMax);
+      List<List<Pair<PaperToken, String>>> labeledData = bootstrapLabels(files, opts.headerMax, true);
 
       // Split train/test data
       logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
@@ -206,6 +208,16 @@ public class Parser {
 //  }
 	  
   public static void main(String[] args) throws Exception {
+	  if(args.length!=2) {
+		  System.err.println("Usage: Parser <input dir> <output dir>");
+	  }
+	  File inDir = new File(args[0]);
+	  File outDir = new File(args[1]);
+	  List<String> inFiles = Arrays.asList(inDir.list()); 
+	  ParseOpts opts = new ParseOpts();
+	  trainParser(inFiles, opts);
+	  
+	  
     // TODO Actually do PDF parsing
 //    logger.info("Hello {}", "world");
     String [] files = new String [] {

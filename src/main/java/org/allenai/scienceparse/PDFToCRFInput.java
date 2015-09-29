@@ -51,22 +51,33 @@ public class PDFToCRFInput {
 		return null;
 	}
 	
+	private static void addLineTokens(List<PaperToken> accumulator, List<PDFLine> lines, final int pg) {
+		int ln =0;
+		for(PDFLine l : lines) {
+			final int lnF = ln++; //ugh (to get around compile error)
+			l.tokens.forEach((PDFToken t) -> accumulator.add(
+					new PaperToken(t, lnF, pg))
+					);
+		}
+	}
+	
 	/**
 	 * Returns the PaperToken sequence form of a given PDF document<br>
 	 * @param pdd	The PDF Document to convert into instances  
+	 * @param heuristicHeader	If true, tries to use heuristic header if found
 	 * @return	The data sequence
 	 * @throws IOException 
 	 */
-	public static List<PaperToken> getSequence(PDFDoc pdf) throws IOException {
+	public static List<PaperToken> getSequence(PDFDoc pdf, boolean heuristicHeader) throws IOException {
 		
 		ArrayList<PaperToken> out = new ArrayList<>();
-		int pg = 0;
-		for(PDFPage p : pdf.getPages()) {
-			int ln = 0;
-			for(PDFLine l : p.getLines()) {
-				l.tokens.forEach((PDFToken t) -> out.add(
-						new PaperToken(t, ln, pg))
-						);
+		if(heuristicHeader && pdf.heuristicHeader() != null) {
+			addLineTokens(out, pdf.heuristicHeader(), 0);
+		}
+		else {
+			int pg = 0;
+			for(PDFPage p : pdf.getPages()) {
+				addLineTokens(out, p.getLines(), pg);
 			}
 		}
 		return out;

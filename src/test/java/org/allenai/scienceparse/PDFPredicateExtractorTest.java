@@ -20,7 +20,7 @@ public class PDFPredicateExtractorTest {
 	private void titleFontFeatureCheckForStream(InputStream pdfInputStream) throws IOException {
 		String target = "How to make words with vectors: Phrase generation in distributional semantics";
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-        List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
         Pair<Integer, Integer> pos = PDFToCRFInput.findString(pts, target);
         PDFPredicateExtractor ppe = new PDFPredicateExtractor();
         List<ObjectDoubleMap<String>> preds = ppe.nodePredicates(pts);

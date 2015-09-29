@@ -26,7 +26,7 @@ public class PDFToCRFInputTest {
     public void testGetPaperTokens() throws IOException {
         InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-        List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc, false);
         log.info("got " + pts.size() + " things.");
         assert(pts.size() > 50);
     }
@@ -35,7 +35,7 @@ public class PDFToCRFInputTest {
     	String target = "How to make words with vectors: Phrase generation in distributional semantics";
     	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-        List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
         Pair<Integer, Integer> pos = PDFToCRFInput.findString(pts, target);
         Pair<Integer, Integer> posNot = PDFToCRFInput.findString(pts, "this string won't be found");
         
@@ -47,7 +47,7 @@ public class PDFToCRFInputTest {
     public void testLabelMetadata() throws IOException {
     	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-        List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
         ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
         		Arrays.asList("Georgiana Dinu", "Marco Baroni"), new Date(1388556000000L));
         val labeledData = PDFToCRFInput.labelMetadata(pts, em);
@@ -56,8 +56,8 @@ public class PDFToCRFInputTest {
         Assert.assertEquals(labeledData.get(32+1).getTwo(), "I_T");
         Assert.assertEquals(labeledData.get(35+1).getTwo(), "E_T");
         Assert.assertEquals(labeledData.get(36+1).getTwo(), "B_A");
-        Assert.assertEquals(labeledData.get(60+1).getTwo(), "O");
-        Assert.assertEquals(labeledData.get(60+1).getOne(), pts.get(60)); //off by one due to start/stop
+        Assert.assertEquals(labeledData.get(45+1).getTwo(), "O");
+        Assert.assertEquals(labeledData.get(45+1).getOne(), pts.get(45)); //off by one due to start/stop
         Assert.assertEquals(labeledData.get(0).getTwo(), "<S>");
         Assert.assertEquals(labeledData.get(labeledData.size()-1).getTwo(), "</S>");
     }
