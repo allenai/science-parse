@@ -4,6 +4,8 @@ organization := "org.allenai"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
+javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
+
 PublishTo.ai2Public
 
 disableBintray()

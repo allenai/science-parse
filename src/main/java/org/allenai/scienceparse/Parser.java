@@ -59,7 +59,7 @@ public class Parser {
     	  val outSeq = model.bestGuess(seq);
     	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
-          logger.info("CRF extracted title: " + em.title);          
+          logger.info("CRF extracted title: " + em.title);
       }
       else {
           em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
@@ -84,14 +84,22 @@ public class Parser {
   }
  
   public static List<List<Pair<PaperToken, String>>> 
-  				bootstrapLabels(List<String> files, int headerMax, boolean heuristicHeader) throws IOException {
+  				bootstrapLabels(List<File> files, int headerMax, boolean heuristicHeader) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
       PDFExtractor ext = new PDFExtractor(); 	  
      	  
-      for(String f : files) {
+      for(File f : files) {
     	  FileInputStream fis = new FileInputStream(f);
-    	  PDFDoc doc = ext.extractFromInputStream(fis);
+    	  PDFDoc doc = null;
+    	  try {
+    		  doc = ext.extractFromInputStream(fis);
+    	  }
+    	  catch(Exception e) {};
     	  fis.close();
+    	  if(doc == null) {
+    		  logger.info("unable to extract from " + f);
+    		  continue;
+    	  }
           List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
           seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
           ExtractedMetadata em = new ExtractedMetadata(doc.meta.title, doc.meta.authors,
@@ -105,7 +113,6 @@ public class Parser {
               cal.setTime(doc.getMeta().getCreateDate());
               em.year = cal.get(Calendar.YEAR);
           }
-          fis.close();
           logger.info("finding " + em.toString());
           List<Pair<PaperToken, String>> labeledPaper = 
         		  PDFToCRFInput.labelMetadata(seq, em);
@@ -118,7 +125,7 @@ public class Parser {
   }
   
   //borrowing heavily from conll.Trainer
-  public static void trainParser(List<String> files, ParseOpts opts) 
+  public static void trainParser(List<File> files, ParseOpts opts) 
 		  throws IOException {
       val predExtractor = new PDFPredicateExtractor();
       List<List<Pair<PaperToken, String>>> labeledData = bootstrapLabels(files, opts.headerMax, true);
@@ -208,37 +215,26 @@ public class Parser {
 //  }
 	  
   public static void main(String[] args) throws Exception {
-	  if(args.length!=2) {
-		  System.err.println("Usage: Parser <input dir> <output dir>");
+	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
+			  (args.length==4 && args[0].equalsIgnoreCase("parse")))) {
+		  System.err.println("Usage: bootstrap <input dir> <model output file>");
+		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
 	  }
-	  File inDir = new File(args[0]);
-	  File outDir = new File(args[1]);
-	  List<String> inFiles = Arrays.asList(inDir.list()); 
-	  ParseOpts opts = new ParseOpts();
-	  trainParser(inFiles, opts);
-	  
-	  
-    // TODO Actually do PDF parsing
-//    logger.info("Hello {}", "world");
-    String [] files = new String [] {
-    		"c:\\git\\science-parse\\src\\test\\resources\\P14-1059.pdf",
-    		"c:\\git\\science-parse\\src\\test\\resources\\P07-1088.pdf",
-    		"c:\\git\\science-parse\\src\\test\\resources\\bunescu-acl07.pdf",
-    		"c:\\git\\science-parse\\src\\test\\resources\\P14-1059.pdf",
-    		"c:\\git\\science-parse\\src\\test\\resources\\P07-1088.pdf",
-    		"c:\\git\\science-parse\\src\\test\\resources\\bunescu-acl07.pdf"
-    };
-    String [] titles = new String [] {
-    		"How to make words with vectors: Phrase generation in distributional semantics",
-    		"Sparse Information Extraction: Unsupervised Language Models to the Rescue",
-    		"Learning to Extract Relations from the Web using Minimal Supervision",
-    		"How to make words with vectors: Phrase generation in distributional semantics",
-    		"Sparse Information Extraction: Unsupervised Language Models to the Rescue",
-    		"Learning to Extract Relations from the Web using Minimal Supervision"
-    };
-    //trainParser(files,  titles);
-//    ConllCRFEndToEndTest ct = new ConllCRFEndToEndTest();
-//    ct.testEndToEnd();
-    //invokeBox("c:\\git\\science-parse\\src\\test\\resources\\P14-1059.pdf", null);
+	  else if(args[0].equalsIgnoreCase("bootstrap")) {
+		  File inDir = new File(args[1]);
+		  List<File> inFiles = Arrays.asList(inDir.listFiles()); 
+		  //HACK: limit to 100 for development
+		  inFiles = inFiles.subList(0,  1000);
+		  ParseOpts opts = new ParseOpts();
+		  opts.modelFile = args[2];
+		  //TODO: use config file
+		  opts.headerMax = 100;
+		  opts.iterations = 50;
+		  opts.threads = 4;
+		  trainParser(inFiles, opts);		  
+	  }
+	  else if(args[0].equalsIgnoreCase("parse")) {
+		  throw new Exception("not implemented.");
+	  }
   }
 }

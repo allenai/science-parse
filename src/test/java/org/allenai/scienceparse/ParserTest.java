@@ -35,7 +35,7 @@ public class ParserTest {
 	        "/agarwal11", "/smola10", "/senellart10", "/zolotov04","/pedersen04", "/smith07",
 	        "/aimag10");
   public void testBootstrap() throws IOException {
-	  val labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100, true);
+	  List<List<Pair<PaperToken, String>>>  labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100, true);
 	   PDFPredicateExtractor ppe = new PDFPredicateExtractor();
 	   //NOTE 6 should be index of P14-1059, because only mooney gets skipped
 	   List<PaperToken> justTokens = labeledData.get(6).stream().map(p -> 
@@ -44,8 +44,8 @@ public class ParserTest {
       Assert.assertTrue((preds.get(26).containsKey("%fcb")));
   }
   
-  private List<String> resolveKeys(List<String> keys) {
-	  return keys.stream().map((String s) -> filePathOfResource(s + ".pdf")).collect(Collectors.toList());
+  private List<File> resolveKeys(List<String> keys) {
+	  return keys.stream().map((String s) -> new File(filePathOfResource(s + ".pdf"))).collect(Collectors.toList());
   }
   
   private Pair<Double, Double> testModel(String id, Parser p) throws Exception {

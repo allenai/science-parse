@@ -239,7 +239,11 @@ public class PDFExtractor {
             return null;
         }
         String strippedDate = cosVal.replace("^D:", "");
-        val cal = DateConverter.toCalendar(strippedDate);
+        Calendar cal = null;
+        try {
+        	cal = DateConverter.toCalendar(strippedDate);
+        }
+        catch(IOException e) {} //proceed with null
         return cal == null ? null : cal.getTime();
     }
 

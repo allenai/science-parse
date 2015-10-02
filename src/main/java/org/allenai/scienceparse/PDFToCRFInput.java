@@ -34,7 +34,12 @@ public class PDFToCRFInput {
 	 * @return
 	 */
 	public static Pair<Integer, Integer> findString(List<PaperToken> seq, String toFind) {
+		if(seq.size()==0 || toFind.length()==0)
+			return null;
 		String [] toks = toFind.split(" ");
+		if(toks.length==0) { //can happen if toFind is just spaces
+			return null;
+		}
 		int nextToMatch = 0;
 		int idx = 0;
 		for(PaperToken pt : seq) {
