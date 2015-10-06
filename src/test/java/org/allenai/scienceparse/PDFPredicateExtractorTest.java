@@ -58,6 +58,11 @@ public class PDFPredicateExtractorTest {
 		List<String> ls = PDFPredicateExtractor.getCaseMasks(cap);
 		Assert.assertEquals(ls.size(), 1);
 		Assert.assertTrue(ls.contains("%Xxx"));
+		
+		String nonSimple = "Dharmaratnå";
+		ls = PDFPredicateExtractor.getCaseMasks(nonSimple);
+		Assert.assertTrue(ls.contains("%hasNonAscii"));
+		
 	}
 	
 //	public static void main(String [] args) throws Exception {

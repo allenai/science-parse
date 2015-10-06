@@ -23,6 +23,7 @@ import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.tuple.Tuples;
+import com.sun.media.jfxmedia.logging.Logger;
 
 @Slf4j
 public class PDFToCRFInput {
@@ -77,7 +78,14 @@ public class PDFToCRFInput {
 		
 		ArrayList<PaperToken> out = new ArrayList<>();
 		if(heuristicHeader && pdf.heuristicHeader() != null) {
-			addLineTokens(out, pdf.heuristicHeader(), 0);
+			List<PDFLine> header = pdf.heuristicHeader();
+//			log.info("header lines " + header.size());
+//			if(header.size() > 0) {
+//				PDFLine last = header.get(header.size()-1);
+//				log.info("header last " + last.tokens.get(last.tokens.size()-1).token);
+//			}
+//			
+			addLineTokens(out, header, 0);
 		}
 		else {
 			int pg = 0;
@@ -152,7 +160,7 @@ public class PDFToCRFInput {
 		return sb.toString().trim();
 	}
 	
-	public static String labelString(List<Pair<PaperToken, String>> seq) {
+	public static String getLabelString(List<Pair<PaperToken, String>> seq) {
 		return seq.stream().map((Pair<PaperToken, String> a) -> a.getTwo()).collect(Collectors.toList()).toString(); 
 	}
 	

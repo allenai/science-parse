@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
@@ -12,6 +13,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +41,10 @@ public class PDFToCRFInputTest {
         Pair<Integer, Integer> pos = PDFToCRFInput.findString(pts, target);
         Pair<Integer, Integer> posNot = PDFToCRFInput.findString(pts, "this string won't be found");
         
-        Assert.assertTrue(pos != null && pos.getOne()>0 && (pos.getTwo() - pos.getOne() == 11));
+        Assert.assertTrue(pos != null);
+        Assert.assertTrue(pos.getOne()>0 && (pos.getTwo() - pos.getOne() == 11));
         log.info("found title at " + pos.getOne() + ", " + pos.getTwo());
+        log.info("title is " + PDFToCRFInput.stringAt(pts, pos));
         Assert.assertTrue(posNot == null);
     }
     
@@ -51,6 +55,8 @@ public class PDFToCRFInputTest {
         ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
         		Arrays.asList("Georgiana Dinu", "Marco Baroni"), new Date(1388556000000L));
         val labeledData = PDFToCRFInput.labelMetadata(pts, em);
+        log.info(PDFToCRFInput.getLabelString(labeledData));
+        log.info(pts.stream().map((PaperToken p) -> p.getPdfToken().token).collect(Collectors.toList()).toString());
         Assert.assertEquals(labeledData.get(24+1).getTwo(), "O");
         Assert.assertEquals(labeledData.get(25+1).getTwo(), "B_T");
         Assert.assertEquals(labeledData.get(32+1).getTwo(), "I_T");
@@ -60,6 +66,14 @@ public class PDFToCRFInputTest {
         Assert.assertEquals(labeledData.get(45+1).getOne(), pts.get(45)); //off by one due to start/stop
         Assert.assertEquals(labeledData.get(0).getTwo(), "<S>");
         Assert.assertEquals(labeledData.get(labeledData.size()-1).getTwo(), "</S>");
+    }
+    
+    public void testGetSpans() {
+    	List<String> ls = Arrays.asList("O", "O", "B_A", "I_A", "E_A");
+    	val spans = ExtractedMetadata.getSpans(ls);
+    	Assert.assertEquals(spans.size(), 1);
+    	Assert.assertEquals(spans.get(0).tag, "A");
+    	Assert.assertEquals(spans.get(0).loc, Tuples.pair(2, 5));
     }
     
 /*    public void testLabeledDocument() throws IOException {

@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -57,7 +58,9 @@ public class Parser {
       ExtractedMetadata em = null;
       if(doc.meta == null || doc.meta.title == null) { //use the model
     	  val outSeq = model.bestGuess(seq);
-    	  //logger.info(outSeq.toString());
+    	  
+//    	  logger.info(seq.stream().map((PaperToken p) -> p.getPdfToken().token).collect(Collectors.toList()).toString());
+//    	  logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
           logger.info("CRF extracted title: " + em.title);
       }
@@ -100,10 +103,15 @@ public class Parser {
     		  logger.info("unable to extract from " + f);
     		  continue;
     	  }
+    	  logger.info("header size: " + (doc.heuristicHeader()==null?0:doc.heuristicHeader().size()));
           List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
+          logger.info("sequence length: " + seq.size());
+          if(seq.size()==0)
+        	  continue;
           seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
-          ExtractedMetadata em = new ExtractedMetadata(doc.meta.title, doc.meta.authors,
-        		  doc.meta.createDate);
+          logger.info("extracted title: " + doc.getMeta().getTitle());
+          ExtractedMetadata em = new ExtractedMetadata(doc.getMeta().getTitle(), doc.getMeta().getAuthors(),
+        		  doc.getMeta().getCreateDate());
           if(em.title == null) {
         	  logger.info("skipping " + f);
         	  continue;
@@ -170,7 +178,9 @@ public class Parser {
           }
       };
 
-      CRFModel<String, PaperToken, String> crfModel = trainer.train(trainLabeledData);
+      CRFModel<String, PaperToken, String> crfModel = null;
+    	  crfModel = trainer.train(trainLabeledData);
+      
       Vector weights = crfModel.weights();
       Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
       
@@ -223,18 +233,32 @@ public class Parser {
 	  else if(args[0].equalsIgnoreCase("bootstrap")) {
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles()); 
-		  //HACK: limit to 100 for development
-		  inFiles = inFiles.subList(0,  1000);
+		  //HACK: limit to 5000 for development
+		  //inFiles = inFiles.subList(0,  Math.min(inFiles.size(), 2000));
 		  ParseOpts opts = new ParseOpts();
 		  opts.modelFile = args[2];
 		  //TODO: use config file
 		  opts.headerMax = 100;
-		  opts.iterations = 50;
+		  opts.iterations = inFiles.size()/10; //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  trainParser(inFiles, opts);		  
 	  }
 	  else if(args[0].equalsIgnoreCase("parse")) {
-		  throw new Exception("not implemented.");
+		  Parser p = new Parser(args[2]);
+		  File inDir = new File(args[1]);
+		  List<File> inFiles = Arrays.asList(inDir.listFiles());
+		  for(File f : inFiles) {
+			  //logger.info("parsing " + f);
+			  val fis = new FileInputStream(f);
+			  try {
+				  p.doParse(fis);
+			  }
+			  catch(Exception e) {
+				  logger.info("Parse error: " + f);
+			  }
+			  fis.close();
+		  }
+		  //TODO: write output
 	  }
   }
 }

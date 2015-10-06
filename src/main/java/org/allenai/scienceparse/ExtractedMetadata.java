@@ -91,6 +91,8 @@ public class ExtractedMetadata {
 			else if(lab.startsWith("W_")) {
 				String t = lab.substring(2);
 				LabelSpan ls = new LabelSpan(t, (Pair<Integer, Integer>)Tuples.pair(i, i+1));
+				out.add(ls);
+				st = -1;
 			}
 		}
 		return out;

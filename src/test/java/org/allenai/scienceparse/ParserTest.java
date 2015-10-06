@@ -117,4 +117,8 @@ public class ParserTest {
 	log.info("Author recall = " + avgAuthorRec);
   }
   
+  public void testParserGroundTruth() throws Exception {
+	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
+  }
+  
 }
