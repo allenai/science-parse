@@ -60,7 +60,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 	@Override
 	public List<ObjectDoubleMap<String>> nodePredicates(List<PaperToken> elems) {
 		List<ObjectDoubleMap<String>> out = new ArrayList<>();
-		
+		//log.info("called with " + elems.size() + " tokens.");
 		for(int i=0; i<elems.size(); i++) {
 			ObjectDoubleHashMap<String> m = new ObjectDoubleHashMap<String>();
 			float prevFont = -10.0f;

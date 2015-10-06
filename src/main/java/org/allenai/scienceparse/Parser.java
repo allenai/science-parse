@@ -8,8 +8,6 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -25,6 +23,7 @@ import org.allenai.ml.util.Indexer;
 //import org.allenai.ml.sequences.crf.conll.Evaluator;
 //import org.allenai.ml.sequences.crf.conll.Trainer;
 import org.allenai.ml.util.Parallel;
+import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.slf4j.Logger;
@@ -55,14 +54,17 @@ public class Parser {
 	  PDFExtractor ext = new PDFExtractor(); 	  
 	  PDFDoc doc = ext.extractFromInputStream(is);
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+      seq = PDFToCRFInput.padSequence(seq);
       ExtractedMetadata em = null;
       if(doc.meta == null || doc.meta.title == null) { //use the model
-    	  val outSeq = model.bestGuess(seq);
+    	  List<String> outSeq = model.bestGuess(seq);
+    	  //the output tag sequence will not include the start/stop states!
+    	  outSeq = PDFToCRFInput.padTagSequence(outSeq);
     	  
-//    	  logger.info(seq.stream().map((PaperToken p) -> p.getPdfToken().token).collect(Collectors.toList()).toString());
-//    	  logger.info(outSeq.toString());
+    	  //logger.info(seq.stream().map((PaperToken p) -> (p.getLine()==-1)?"<S>":p.getPdfToken().token).collect(Collectors.toList()).toString());
+    	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
-          logger.info("CRF extracted title: " + em.title);
+          logger.info("CRF extracted title:\r\n" + em.title);
       }
       else {
           em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
@@ -86,57 +88,81 @@ public class Parser {
       return Tuples.pair(first, second);
   }
  
+  public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
+		  int headerMax) throws IOException {
+	  FileInputStream fis = new FileInputStream(pdf);
+	  PDFDoc doc = null;
+	  try {
+		  doc = ext.extractFromInputStream(fis);
+	  }
+	  catch(Exception e) {};
+	  fis.close();
+	  if(doc == null) {
+		  return null;
+	  }
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
+      if(seq.size()==0)
+    	  return null;
+      seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
+      ExtractedMetadata em = null;
+      if(p==null) { //bootstrap:
+	      em = new ExtractedMetadata(doc.getMeta().getTitle(), doc.getMeta().getAuthors(),
+	    		  doc.getMeta().getCreateDate());
+	      if(em.title == null) {
+	    	  logger.info("skipping " + pdf);
+	    	  return null;
+	      }
+      }
+      else {
+    	  em = new ExtractedMetadata(p);
+      }
+      logger.info("finding " + em.toString());
+      List<Pair<PaperToken, String>> labeledPaper = 
+    		  PDFToCRFInput.labelMetadata(seq, em);
+      logger.info("first: " + labeledPaper.get(0).getTwo());
+      logger.info("last: " + labeledPaper.get(labeledPaper.size()-1).getTwo());
+      
+      return labeledPaper;
+  }
+  
+  public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
+		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader) throws IOException {
+	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
+	  File dir = new File(paperDir);
+	  PDFExtractor ext = new PDFExtractor();
+	  for(Paper p : pgt.papers) {
+		  File f = new File(dir, p.id.substring(4) + ".pdf"); //first four are directory, rest is file name
+		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax);
+		  if(res != null)
+			  labeledData.add(res);
+	  }
+	  return labeledData;
+  }
+  
   public static List<List<Pair<PaperToken, String>>> 
   				bootstrapLabels(List<File> files, int headerMax, boolean heuristicHeader) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
       PDFExtractor ext = new PDFExtractor(); 	  
      	  
       for(File f : files) {
-    	  FileInputStream fis = new FileInputStream(f);
-    	  PDFDoc doc = null;
-    	  try {
-    		  doc = ext.extractFromInputStream(fis);
-    	  }
-    	  catch(Exception e) {};
-    	  fis.close();
-    	  if(doc == null) {
-    		  logger.info("unable to extract from " + f);
-    		  continue;
-    	  }
-    	  logger.info("header size: " + (doc.heuristicHeader()==null?0:doc.heuristicHeader().size()));
-          List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
-          logger.info("sequence length: " + seq.size());
-          if(seq.size()==0)
-        	  continue;
-          seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
-          logger.info("extracted title: " + doc.getMeta().getTitle());
-          ExtractedMetadata em = new ExtractedMetadata(doc.getMeta().getTitle(), doc.getMeta().getAuthors(),
-        		  doc.getMeta().getCreateDate());
-          if(em.title == null) {
-        	  logger.info("skipping " + f);
-        	  continue;
-          }
-          if(doc.meta.createDate != null) {
-        	  Calendar cal = Calendar.getInstance();
-              cal.setTime(doc.getMeta().getCreateDate());
-              em.year = cal.get(Calendar.YEAR);
-          }
-          logger.info("finding " + em.toString());
-          List<Pair<PaperToken, String>> labeledPaper = 
-        		  PDFToCRFInput.labelMetadata(seq, em);
-          logger.info("first: " + labeledPaper.get(0).getTwo());
-          logger.info("last: " + labeledPaper.get(labeledPaper.size()-1).getTwo());
-          
-          labeledData.add(labeledPaper);
+    	 val labeledPaper = getPaperLabels(f, null, ext, heuristicHeader, headerMax);
+    	 if(labeledPaper != null)
+           labeledData.add(labeledPaper);
       }
       return labeledData;
   }
   
   //borrowing heavily from conll.Trainer
-  public static void trainParser(List<File> files, ParseOpts opts) 
+  public static void trainParser(List<File> files, ParserGroundTruth pgt, String paperDir, ParseOpts opts) 
 		  throws IOException {
       val predExtractor = new PDFPredicateExtractor();
-      List<List<Pair<PaperToken, String>>> labeledData = bootstrapLabels(files, opts.headerMax, true);
+      List<List<Pair<PaperToken, String>>> labeledData;
+      if(files!= null) {
+    	  labeledData = bootstrapLabels(files, opts.headerMax, true);
+      }
+      else {
+    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true);
+      }
 
       // Split train/test data
       logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
@@ -226,8 +252,10 @@ public class Parser {
 	  
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
-			  (args.length==4 && args[0].equalsIgnoreCase("parse")))) {
+			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
+			  (args.length==4 && args[0].equalsIgnoreCase("learn")))) {
 		  System.err.println("Usage: bootstrap <input dir> <model output file>");
+		  System.err.println("OR:    learn <ground truth file> <input dir> <model output file>");
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
 	  }
 	  else if(args[0].equalsIgnoreCase("bootstrap")) {
@@ -241,7 +269,17 @@ public class Parser {
 		  opts.headerMax = 100;
 		  opts.iterations = inFiles.size()/10; //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
-		  trainParser(inFiles, opts);		  
+		  trainParser(inFiles, null, null, opts);		  
+	  }
+	  else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
+		  ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
+		  ParseOpts opts = new ParseOpts();
+		  opts.modelFile = args[3];
+		  //TODO: use config file
+		  opts.headerMax = 100;
+		  opts.iterations = pgt.papers.size()/10; //HACK because training throws exceptions if you iterate too much
+		  opts.threads = 4;
+		  trainParser(null, pgt, args[2], opts);
 	  }
 	  else if(args[0].equalsIgnoreCase("parse")) {
 		  Parser p = new Parser(args[2]);
@@ -255,6 +293,7 @@ public class Parser {
 			  }
 			  catch(Exception e) {
 				  logger.info("Parse error: " + f);
+				  //e.printStackTrace();
 			  }
 			  fis.close();
 		  }

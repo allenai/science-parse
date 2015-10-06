@@ -1,9 +1,12 @@
 package org.allenai.scienceparse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import org.allenai.scienceparse.ParserGroundTruth.Paper;
 
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
@@ -59,6 +62,12 @@ public class ExtractedMetadata {
 			cal.setTime(cDate);
 			year = cal.get(Calendar.YEAR);
 		}
+	}
+	
+	public ExtractedMetadata(Paper p) {
+		title = p.title;
+		authors = Arrays.asList(p.authors);
+		year = p.year;
 	}
 	
 	public static List<LabelSpan> getSpans(List<String> labels) {

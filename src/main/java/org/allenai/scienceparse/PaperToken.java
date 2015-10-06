@@ -8,7 +8,9 @@ public class PaperToken {
 	private int page; //page number in pdf doc
 	private int line; //line number in pdf doc
 	
-	
+	public static PaperToken generateStartStopToken() {
+		return new PaperToken(null, -1, -1);
+	}
 	
 	public PaperToken(PDFToken pt, int ln, int pg) {
 		setPdfToken(pt);

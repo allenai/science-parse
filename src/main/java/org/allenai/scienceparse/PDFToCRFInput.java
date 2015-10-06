@@ -96,6 +96,22 @@ public class PDFToCRFInput {
 		return out;
 	}
 	
+	public static List<PaperToken> padSequence(List<PaperToken> seq) {
+		ArrayList<PaperToken> out = new ArrayList<>();
+		out.add(PaperToken.generateStartStopToken());
+		out.addAll(seq);
+		out.add(PaperToken.generateStartStopToken());
+		return out;
+	}
+	
+	public static List<String> padTagSequence(List<String> seq) {
+		ArrayList<String> out = new ArrayList<>();
+		out.add("<S>");
+		out.addAll(seq);
+		out.add("</S>");
+		return out;
+	}
+	
 	/**
 	 * Labels the (first occurrence of) given target in seq with given label
 	 * @param seq	The sequence
@@ -143,15 +159,15 @@ public class PDFToCRFInput {
 		truth.authors.forEach((String s) -> findAndLabelWith(toks, outTmp, s, ExtractedMetadata.authorTag));
 		findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag);
 		val out = new ArrayList<Pair<PaperToken, String>>();
-		out.add(Tuples.pair(null,  "<S>"));
-		out.addAll(outTmp); //yuck
-		out.add(Tuples.pair(null, "</S>"));
+		out.add(Tuples.pair(PaperToken.generateStartStopToken(),  "<S>"));
+		out.addAll(outTmp);
+		out.add(Tuples.pair(PaperToken.generateStartStopToken(), "</S>"));
 		return out;
 	}
 	
 	public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
 		List<PaperToken> pts = toks.subList(span.getOne(), span.getTwo());
-		List<String> words = pts.stream().map(pt -> pt.getPdfToken().token).collect(Collectors.toList());
+		List<String> words = pts.stream().map(pt -> (pt.getLine()==-1)?"<S>":pt.getPdfToken().token).collect(Collectors.toList());
 		StringBuffer sb = new StringBuffer();
 		for(String s : words) {
 			sb.append(s);

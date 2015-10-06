@@ -75,28 +75,5 @@ public class PDFToCRFInputTest {
     	Assert.assertEquals(spans.get(0).tag, "A");
     	Assert.assertEquals(spans.get(0).loc, Tuples.pair(2, 5));
     }
-    
-/*    public void testLabeledDocument() throws IOException {
-      String inFile = filePathOfResource("/P14-1059.pdf");
-      String target = "How to make words with vectors: Phrase generation in distributional semantics";
-  	  PDFToCRFInput pdfts = new PDFToCRFInput();
-  	  PDDocument pdd = PDDocument.load(new java.io.File(inFile));
-  	  val seq = pdfts.getSequence(pdd, target);
-  	  assert(seq.size() > 50);
-  	  boolean seenPhrase = false;
-  	  boolean seenHow = false;
-  	  for(val i : seq) {
-  		  if(!seenHow && i.getOne().word.equals("How")) {
-  			  seenHow = true;
-  			  assertEquals(i.getTwo(), "B");
-  		  }
-  		  if(!seenPhrase && i.getOne().word.equals("Phrase")) {
-  			  seenPhrase = true;
-  			  assertEquals(i.getTwo(), "I");
-  		  }
-  		  if(i.getOne().word.equals("Computational")) {
-  			  assertEquals(i.getTwo(), "O");
-  		  }
-  	  }
-    }
-*/}
+
+}
