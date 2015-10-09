@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
+import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 import org.allenai.scienceparse.pdfapi.PDFToken;
@@ -66,7 +67,7 @@ public class PDFToCRFInput {
 					);
 		}
 	}
-	
+		
 	/**
 	 * Returns the PaperToken sequence form of a given PDF document<br>
 	 * @param pdd	The PDF Document to convert into instances  

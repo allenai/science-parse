@@ -48,6 +48,9 @@ public class Parser {
 	  public int iterations;
 	  public int threads;
 	  public int headerMax;
+	  public double trainFraction;
+	  public double gazetteerFraction;
+	  public int backgroundSamples;
   }
   
   public ExtractedMetadata doParse(InputStream is) throws IOException {
@@ -65,12 +68,23 @@ public class Parser {
     	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
           logger.info("CRF extracted title:\r\n" + em.title);
+          //logger.info("author:\r\n" + em.authors);
       }
       else {
           em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
       }
       return em;
   }
+  
+  //slow
+	public static String paperToString(File f) throws IOException {
+		FileInputStream fis = new FileInputStream(f);
+		PDFDoc doc = (new PDFExtractor()).extractFromInputStream(fis);
+		fis.close();
+		val seq = PDFToCRFInput.getSequence(doc, false);
+		return PDFToCRFInput.stringAt(seq, Tuples.pair(0, seq.size()));
+	}
+
   
   //from conll.Trainer:
   private static <T> Pair<List<T>, List<T>> splitData(List<T> original, double splitForSecond) {
@@ -90,13 +104,14 @@ public class Parser {
  
   public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
 		  int headerMax) throws IOException {
-	  FileInputStream fis = new FileInputStream(pdf);
+	  
 	  PDFDoc doc = null;
 	  try {
+		  FileInputStream fis = new FileInputStream(pdf);
 		  doc = ext.extractFromInputStream(fis);
+		  fis.close();
 	  }
 	  catch(Exception e) {};
-	  fis.close();
 	  if(doc == null) {
 		  return null;
 	  }
@@ -119,14 +134,19 @@ public class Parser {
       logger.info("finding " + em.toString());
       List<Pair<PaperToken, String>> labeledPaper = 
     		  PDFToCRFInput.labelMetadata(seq, em);
-      logger.info("first: " + labeledPaper.get(0).getTwo());
-      logger.info("last: " + labeledPaper.get(labeledPaper.size()-1).getTwo());
+//      logger.info("first: " + labeledPaper.get(0).getTwo());
+//      logger.info("last: " + labeledPaper.get(labeledPaper.size()-1).getTwo());
       
       return labeledPaper;
   }
   
   public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
 		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader) throws IOException {
+	  return labelFromGroundTruth(pgt, paperDir, headerMax, heuristicHeader, pgt.papers.size());
+  }
+  
+  public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
+		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader, int maxFiles) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
 	  File dir = new File(paperDir);
 	  PDFExtractor ext = new PDFExtractor();
@@ -135,6 +155,8 @@ public class Parser {
 		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax);
 		  if(res != null)
 			  labeledData.add(res);
+		  if(labeledData.size() >= maxFiles)
+			  break;
 	  }
 	  return labeledData;
   }
@@ -155,22 +177,28 @@ public class Parser {
   //borrowing heavily from conll.Trainer
   public static void trainParser(List<File> files, ParserGroundTruth pgt, String paperDir, ParseOpts opts) 
 		  throws IOException {
-      val predExtractor = new PDFPredicateExtractor();
+	  
       List<List<Pair<PaperToken, String>>> labeledData;
+      PDFPredicateExtractor predExtractor;
       if(files!= null) {
     	  labeledData = bootstrapLabels(files, opts.headerMax, true);
+    	  predExtractor = new PDFPredicateExtractor();
       }
       else {
-    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true);
+    	  int stIdx = (int)Math.round(pgt.papers.size()*(1.0 - opts.gazetteerFraction));
+    	  int endIdx = pgt.papers.size();
+          ParserLMFeatures plf = new ParserLMFeatures(pgt.papers, stIdx, endIdx, new File(paperDir), opts.backgroundSamples); 		  
+    	  predExtractor = new PDFPredicateExtractor(plf);
+    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, stIdx); //limit stIdx to reduce overlap w/gazetteeer
       }
-
+      
       // Split train/test data
       logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
       val trainTestPair =
-          splitData(labeledData, 0.1);
+          splitData(labeledData, 1.0 - opts.trainFraction);
       val trainLabeledData = trainTestPair.getOne();
       val testLabeledData = trainTestPair.getTwo();
-
+      
       // Set up Train options
       CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
       trainOpts.optimizerOpts.maxIters = opts.iterations;
@@ -277,8 +305,11 @@ public class Parser {
 		  opts.modelFile = args[3];
 		  //TODO: use config file
 		  opts.headerMax = 100;
-		  opts.iterations = pgt.papers.size()/10; //HACK because training throws exceptions if you iterate too much
+		  opts.iterations = Math.min(800, pgt.papers.size()/2); //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
+		  opts.backgroundSamples = 100;
+		  opts.gazetteerFraction = 0.99;
+		  opts.trainFraction = 0.9;
 		  trainParser(null, pgt, args[2], opts);
 	  }
 	  else if(args[0].equalsIgnoreCase("parse")) {

@@ -11,8 +11,6 @@ import org.allenai.scienceparse.pdfapi.PDFToken;
 
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
-import com.sun.javafx.runtime.async.AsyncOperationListener;
-import com.sun.media.jfxmedia.logging.Logger;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +21,16 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 	public static final List<String> stopWords = Arrays.asList("a", "an", "the", "in", "of", "for", "from", "and", "as", "but",
 			"to");
 	public static final HashSet<String> stopHash = new HashSet<String>(stopWords);
+	
+	private ParserLMFeatures lmFeats;
+	
+	public PDFPredicateExtractor() {
+		
+	}
+	
+	public PDFPredicateExtractor(ParserLMFeatures plf) {
+		lmFeats = plf;
+	}
 	
 	public static List<String> getCaseMasks(String tok) {
 		Pattern Xxx = Pattern.compile("[A-Z][a-z]*");
@@ -126,13 +134,25 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 				}
 				if(line <= 2)
 					m.put("%first3lines", 1.0);
+				if(lmFeats != null) {
+					m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
+					m.put("%afreq", smoothFreq(tok, this.lmFeats.authorBow));
+					m.put("%bfreq", smoothFreq(tok, this.lmFeats.backgroundBow));
+//					log.info("features for " + tok);
+//					log.info(m.toString());
+				}
 //				m.put("%t=" + elems.get(i).getPdfToken().token.toLowerCase(), 1.0);
-//				log.info("features for " + tok);
-//				log.info(m.toString());
 			}
 			out.add(m);
 		}
 		return out;
+	}
+	
+	public static double smoothFreq(String tok, ObjectDoubleHashMap<String> hm) {
+		double freq = hm.get(tok);
+		if(freq > 0.0)
+			freq -= 0.5;
+		return freq;
 	}
 
 	@Override

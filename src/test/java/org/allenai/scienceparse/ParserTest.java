@@ -102,6 +102,7 @@ public class ParserTest {
   	opts.threads = 4;
   	opts.modelFile = "src/test/resources/test.model";
   	opts.headerMax = 100;
+  	opts.trainFraction = 0.9;
   	File f = new File(opts.modelFile);
   	f.deleteOnExit();
 	Parser.trainParser(resolveKeys(pdfKeys), null, null, opts);
@@ -127,6 +128,9 @@ public class ParserTest {
 	  	opts.threads = 4;
 	  	opts.modelFile = "src/test/resources/test.model";
 	  	opts.headerMax = 100;
+	  	opts.backgroundSamples = 3;
+	  	opts.gazetteerFraction = 0.5;
+	  	opts.trainFraction = 0.9;
 	  	File f = new File(opts.modelFile);
 	  	f.deleteOnExit();
 	  	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
@@ -149,7 +153,7 @@ public class ParserTest {
   
   public void testParserGroundTruth() throws Exception {
 	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
-	Assert.assertEquals(pgt.papers.size(), 2);
+	Assert.assertEquals(pgt.papers.size(), 4);
   }
   
 }
