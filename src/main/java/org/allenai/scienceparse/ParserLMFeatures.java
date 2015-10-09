@@ -11,7 +11,12 @@ import com.gs.collections.impl.set.mutable.UnifiedSet;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ParserLMFeatures {
+public class ParserLMFeatures implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	ObjectDoubleHashMap<String> titleBow = new ObjectDoubleHashMap<String>();
 	ObjectDoubleHashMap<String> authorBow = new ObjectDoubleHashMap<String>();

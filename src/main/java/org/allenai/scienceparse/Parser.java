@@ -39,7 +39,7 @@ public class Parser {
 	
   private CRFModel<String, PaperToken, String> model;
   
-  	public Parser(String modelFile) throws IOException {
+  	public Parser(String modelFile) throws Exception {
   		DataInputStream dis = new DataInputStream(new FileInputStream(modelFile));
   		model = loadModel(dis);
   	}
@@ -193,13 +193,14 @@ public class Parser {
       else {
     	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true);
       }
+      ParserLMFeatures plf = null;
       if(opts.gazetteerFile != null) {
     	  ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
     	  int stIdx = 0;
     	  int endIdx = gaz.papers.size();
     	  UnifiedSet<String> trainIds = new UnifiedSet<String>();
     	  pgt.papers.forEach((Paper p) -> trainIds.add(p.id));
-          ParserLMFeatures plf = new ParserLMFeatures(gaz.papers, trainIds, stIdx, endIdx, new File(opts.backgroundDirectory), opts.backgroundSamples);
+          plf = new ParserLMFeatures(gaz.papers, trainIds, stIdx, endIdx, new File(opts.backgroundDirectory), opts.backgroundSamples);
     	  predExtractor = new PDFPredicateExtractor(plf);
       }
       else {
@@ -254,7 +255,7 @@ public class Parser {
       
       val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
       logger.info("Writing model to {}", opts.modelFile);
-      saveModel(dos, crfModel.featureEncoder, weights);
+      saveModel(dos, crfModel.featureEncoder, weights, plf);
       dos.close();
   }
   
@@ -262,25 +263,30 @@ public class Parser {
   
   public static void saveModel(DataOutputStream dos,
 		  CRFFeatureEncoder<String, PaperToken, String> fe,
-		  Vector weights) throws IOException {
+		  Vector weights, ParserLMFeatures plf) throws IOException {
 	  dos.writeUTF(DATA_VERSION);
 	  fe.stateSpace.save(dos);
 	  fe.nodeFeatures.save(dos);
 	  fe.edgeFeatures.save(dos);
 	  IOUtils.saveDoubles(dos, weights.toDoubles());
+	  ObjectOutputStream oos = new ObjectOutputStream(dos);
+	  oos.writeObject(plf);
   }
   
   public static CRFModel<String, PaperToken, String> loadModel(
-		  DataInputStream dis) throws IOException {
+		  DataInputStream dis) throws Exception {
 	  IOUtils.ensureVersionMatch(dis, DATA_VERSION);
-	  val predExtractor = new PDFPredicateExtractor();
 	  val stateSpace = StateSpace.load(dis);
 	  Indexer<String> nodeFeatures = Indexer.load(dis);
 	  Indexer<String> edgeFeatures = Indexer.load(dis);
 	  Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
+	  ObjectInputStream ois = new ObjectInputStream(dis);
+	  ParserLMFeatures plf  = (ParserLMFeatures)ois.readObject();
+	  val predExtractor = new PDFPredicateExtractor(plf);
 	  val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
 	  (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
 	  val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
+	  
 	  return new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
   }
   
@@ -320,8 +326,8 @@ public class Parser {
 		  //TODO: use config file
 		  opts.headerMax = 100;
 		  opts.iterations =  pgt.papers.size(); //HACK because training throws exceptions if you iterate too much
-		  opts.threads = 4;
-		  opts.backgroundSamples = 100;
+		  opts.threads = 15;
+		  opts.backgroundSamples = 200;
 		  opts.backgroundDirectory = args[5];
 		  opts.gazetteerFile = args[2];
 		  opts.trainFraction = 0.9;
