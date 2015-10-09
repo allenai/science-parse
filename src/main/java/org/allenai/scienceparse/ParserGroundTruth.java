@@ -1,6 +1,7 @@
 package org.allenai.scienceparse;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ParserGroundTruth {
 		}
 	}
 	
-	public ParserGroundTruth(String jsonFile) throws Exception {
+	public ParserGroundTruth(String jsonFile) throws IOException {
 		ObjectMapper om = new ObjectMapper();
 		ObjectReader r = om.reader(new TypeReference<List<Paper>>() {});
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(jsonFile), "UTF-8");

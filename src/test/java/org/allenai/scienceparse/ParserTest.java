@@ -129,8 +129,9 @@ public class ParserTest {
 	  	opts.modelFile = "src/test/resources/test.model";
 	  	opts.headerMax = 100;
 	  	opts.backgroundSamples = 3;
-	  	opts.gazetteerFraction = 0.5;
+	  	opts.gazetteerFile = null;
 	  	opts.trainFraction = 0.9;
+	  	opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
 	  	File f = new File(opts.modelFile);
 	  	f.deleteOnExit();
 	  	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));

@@ -151,8 +151,8 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 	public static double smoothFreq(String tok, ObjectDoubleHashMap<String> hm) {
 		double freq = hm.get(tok);
 		if(freq > 0.0)
-			freq -= 0.5;
-		return freq;
+			freq -= 0.6;
+		return Math.log10(freq + 0.1);
 	}
 
 	@Override

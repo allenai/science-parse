@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
 
 public class Parser {
@@ -49,8 +50,9 @@ public class Parser {
 	  public int threads;
 	  public int headerMax;
 	  public double trainFraction;
-	  public double gazetteerFraction;
+	  public String gazetteerFile;
 	  public int backgroundSamples;
+	  public String backgroundDirectory;
   }
   
   public ExtractedMetadata doParse(InputStream is) throws IOException {
@@ -77,12 +79,17 @@ public class Parser {
   }
   
   //slow
-	public static String paperToString(File f) throws IOException {
-		FileInputStream fis = new FileInputStream(f);
-		PDFDoc doc = (new PDFExtractor()).extractFromInputStream(fis);
-		fis.close();
-		val seq = PDFToCRFInput.getSequence(doc, false);
-		return PDFToCRFInput.stringAt(seq, Tuples.pair(0, seq.size()));
+	public static String paperToString(File f) {
+		try {
+			FileInputStream fis = new FileInputStream(f);
+			PDFDoc doc = (new PDFExtractor()).extractFromInputStream(fis);
+			fis.close();
+			val seq = PDFToCRFInput.getSequence(doc, false);
+			return PDFToCRFInput.stringAt(seq, Tuples.pair(0, seq.size()));
+		}
+		catch(IOException e) {
+			return null;
+		}
 	}
 
   
@@ -182,14 +189,21 @@ public class Parser {
       PDFPredicateExtractor predExtractor;
       if(files!= null) {
     	  labeledData = bootstrapLabels(files, opts.headerMax, true);
-    	  predExtractor = new PDFPredicateExtractor();
       }
       else {
-    	  int stIdx = (int)Math.round(pgt.papers.size()*(1.0 - opts.gazetteerFraction));
-    	  int endIdx = pgt.papers.size();
-          ParserLMFeatures plf = new ParserLMFeatures(pgt.papers, stIdx, endIdx, new File(paperDir), opts.backgroundSamples); 		  
+    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true);
+      }
+      if(opts.gazetteerFile != null) {
+    	  ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
+    	  int stIdx = 0;
+    	  int endIdx = gaz.papers.size();
+    	  UnifiedSet<String> trainIds = new UnifiedSet<String>();
+    	  pgt.papers.forEach((Paper p) -> trainIds.add(p.id));
+          ParserLMFeatures plf = new ParserLMFeatures(gaz.papers, trainIds, stIdx, endIdx, new File(opts.backgroundDirectory), opts.backgroundSamples);
     	  predExtractor = new PDFPredicateExtractor(plf);
-    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, stIdx); //limit stIdx to reduce overlap w/gazetteeer
+      }
+      else {
+    	  predExtractor = new PDFPredicateExtractor();
       }
       
       // Split train/test data
@@ -281,9 +295,9 @@ public class Parser {
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
 			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
-			  (args.length==4 && args[0].equalsIgnoreCase("learn")))) {
+			  (args.length==6 && args[0].equalsIgnoreCase("learn")))) {
 		  System.err.println("Usage: bootstrap <input dir> <model output file>");
-		  System.err.println("OR:    learn <ground truth file> <input dir> <model output file>");
+		  System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir>");
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
 	  }
 	  else if(args[0].equalsIgnoreCase("bootstrap")) {
@@ -302,15 +316,16 @@ public class Parser {
 	  else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
 		  ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
 		  ParseOpts opts = new ParseOpts();
-		  opts.modelFile = args[3];
+		  opts.modelFile = args[4];
 		  //TODO: use config file
 		  opts.headerMax = 100;
-		  opts.iterations = Math.min(800, pgt.papers.size()/2); //HACK because training throws exceptions if you iterate too much
+		  opts.iterations =  pgt.papers.size(); //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  opts.backgroundSamples = 100;
-		  opts.gazetteerFraction = 0.99;
+		  opts.backgroundDirectory = args[5];
+		  opts.gazetteerFile = args[2];
 		  opts.trainFraction = 0.9;
-		  trainParser(null, pgt, args[2], opts);
+		  trainParser(null, pgt, args[3], opts);
 	  }
 	  else if(args[0].equalsIgnoreCase("parse")) {
 		  Parser p = new Parser(args[2]);

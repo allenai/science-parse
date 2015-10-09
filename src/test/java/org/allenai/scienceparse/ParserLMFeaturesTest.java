@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.testng.annotations.Test;
 
+import com.gs.collections.impl.set.mutable.UnifiedSet;
+
 import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +21,7 @@ public class ParserLMFeaturesTest {
 		File f = new File(filePathOfResource("/groundTruth.json"));
 		ParserGroundTruth pgt = new ParserGroundTruth(f.getPath());
 		log.info("pgt 0: " + pgt.papers.get(0));
-		ParserLMFeatures plf = new ParserLMFeatures(pgt.papers, 0, pgt.papers.size(), f.getParentFile(), 3);
+		ParserLMFeatures plf = new ParserLMFeatures(pgt.papers, new UnifiedSet<String>(), 0, pgt.papers.size(), f.getParentFile(), 3);
 		log.info("of count in background: " + plf.backgroundBow.get("of"));
 		Assert.assertEquals(1.0, plf.authorBow.get("Seebode"));
 		Assert.assertEquals(1.0, plf.titleBow.get("Disk-based"));
