@@ -5,8 +5,8 @@ import lombok.val;
 import static java.util.stream.Collectors.toList;
 
 import java.io.*;
+import java.text.Normalizer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
@@ -69,11 +69,16 @@ public class Parser {
     	  //logger.info(seq.stream().map((PaperToken p) -> (p.getLine()==-1)?"<S>":p.getPdfToken().token).collect(Collectors.toList()).toString());
     	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
-          logger.info("CRF extracted title:\r\n" + em.title);
+//    	  if(em.title != null && em.title.length() > 300)
+//    		  System.out.println("CUT title: " + em.title);
+//    	  else
+//    		  logger.info("CRF extracted title:\r\n" + em.title);
           //logger.info("author:\r\n" + em.authors);
+    	  em.source = "CRF";
       }
       else {
           em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+          em.source = "META";
       }
       return em;
   }
@@ -87,7 +92,7 @@ public class Parser {
 			val seq = PDFToCRFInput.getSequence(doc, false);
 			return PDFToCRFInput.stringAt(seq, Tuples.pair(0, seq.size()));
 		}
-		catch(IOException e) {
+		catch(Exception e) {
 			return null;
 		}
 	}
@@ -160,8 +165,10 @@ public class Parser {
 	  for(Paper p : pgt.papers) {
 		  File f = new File(dir, p.id.substring(4) + ".pdf"); //first four are directory, rest is file name
 		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax);
+		  
 		  if(res != null)
 			  labeledData.add(res);
+		  
 		  if(labeledData.size() >= maxFiles)
 			  break;
 	  }
@@ -226,7 +233,7 @@ public class Parser {
       // Setup iteration callback, weird trick here where you require
       // the trainer to make a model for each iteration but then need
       // to modify the iteration-callback to use it
-      Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", 1);
+      Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
       trainOpts.optimizerOpts.iterCallback = (weights) -> {
           CRFModel<String, PaperToken, String> crfModel = trainer.modelForWeights(weights);
           long start = System.currentTimeMillis();
@@ -290,21 +297,37 @@ public class Parser {
 	  return new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
   }
   
-//  public static void endToEnd() {
-//      Trainer.trainAndSaveModel(trainOpts);
-//      val evalOpts = new Evaluator.Opts();
-//      evalOpts.modelPath = modelFile.getAbsolutePath();
-//      evalOpts.dataPath = filePathOfResource("/crf/test.data");
-//      val accPerfPair = Evaluator.evaluateModel(evalOpts);
-//  }
+  public static String processTitle(String t) {
+      // case fold and remove lead/trail space
+      t = t.trim().toLowerCase();
+      // strip accents and unicode changes
+      t = Normalizer.normalize(t, Normalizer.Form.NFKD);
+      // kill non-character letters
+      // kill xml
+      t = t.replaceAll("\\&.*?\\;","");
+      // kill non-letter chars
+      t = t.replaceAll("\\W","");
+      return t.replaceAll("\\s+"," ");
+  }
+
+  //changes extraction to remove common failure modes
+  public static String processExtractedTitle(String t) {
+	  String out = t.replaceAll("(?<=[a-z])\\- ", ""); //continuation dash
+	  out = out.replaceAll(" \\?", ""); //special char
+	  if(!out.endsWith("?")&&!out.endsWith("\""))
+		out = out.replaceFirst("\\W$", ""); //end of title punctuation if not ?
+	  return out;
+  }
 	  
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
 			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
-			  (args.length==6 && args[0].equalsIgnoreCase("learn")))) {
+			  (args.length==6 && args[0].equalsIgnoreCase("learn"))||
+			  (args.length==5 && args[0].equalsIgnoreCase("parseAndScore")))) {
 		  System.err.println("Usage: bootstrap <input dir> <model output file>");
 		  System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir>");
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
+		  System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
 	  }
 	  else if(args[0].equalsIgnoreCase("bootstrap")) {
 		  File inDir = new File(args[1]);
@@ -325,9 +348,9 @@ public class Parser {
 		  opts.modelFile = args[4];
 		  //TODO: use config file
 		  opts.headerMax = 100;
-		  opts.iterations =  pgt.papers.size(); //HACK because training throws exceptions if you iterate too much
-		  opts.threads = 15;
-		  opts.backgroundSamples = 200;
+		  opts.iterations =  pgt.papers.size()/4; //HACK because training throws exceptions if you iterate too much
+		  opts.threads = 4;
+		  opts.backgroundSamples = 400;
 		  opts.backgroundDirectory = args[5];
 		  opts.gazetteerFile = args[2];
 		  opts.trainFraction = 0.9;
@@ -349,6 +372,61 @@ public class Parser {
 			  }
 			  fis.close();
 		  }
+		  //TODO: write output
+	  }
+	  else if(args[0].equalsIgnoreCase("parseAndScore")) {
+		  Parser p = new Parser(args[2]);
+		  File inDir = new File(args[1]);
+		  List<File> inFiles = Arrays.asList(inDir.listFiles());
+		  ParserGroundTruth pgt = new ParserGroundTruth(args[4]);
+		  int total = 0;
+		  int crfTruePos = 0;
+		  int crfFalsePos = 0;
+		  int metaTruePos = 0;
+		  int metaFalsePos = 0;
+		  for(File f : inFiles) {
+			  //logger.info("parsing " + f);
+			  val fis = new FileInputStream(f);
+			  String key = f.getName().substring(0, f.getName().length()-4);
+			  Paper pap = pgt.forKey(key);
+			  ExtractedMetadata em = null;
+			  try {
+				  em = p.doParse(fis);
+				  total++;
+			  }
+			  catch(Exception e) {
+				  logger.info("Parse error: " + f);
+				  //e.printStackTrace();
+			  }
+			  
+			  if(em != null && em.title != null) {
+				  String expected = pap.title;
+				  String guessed = em.title;
+				  String procExpected = processTitle(expected);
+				  String procGuessed =  processExtractedTitle(processTitle(guessed));
+				  //logger.info("authors: " + em.authors);
+				  if(procExpected.equals(procGuessed))
+					  if(em.source=="CRF")
+						  crfTruePos++;
+					  else 
+						  metaTruePos++;
+				  else {
+					  if(em.source=="CRF")
+						  crfFalsePos++;
+					  else
+						  metaFalsePos++;
+					  logger.info(em.source + " error, expected:\r\n" + procExpected + "\r\ngot\r\n" + procGuessed);
+				  }
+			  }
+
+			  fis.close();
+		  }
+		  logger.info("total: " + total);
+		  logger.info("crf correct: " + crfTruePos);
+		  logger.info("crf false positive " + crfFalsePos);
+		  logger.info("meta correct: " + metaTruePos);
+		  logger.info("meta false positive " + metaFalsePos);
+
 		  //TODO: write output
 	  }
   }

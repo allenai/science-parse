@@ -4,11 +4,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.util.ObjectIdMap;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ParserGroundTruth {
 	
 	public List<Paper> papers;
+	
+	public HashMap<String, Integer> lookup;
 	
 	@Data
 	public static class Paper {
@@ -37,6 +41,22 @@ public class ParserGroundTruth {
 		}
 	}
 	
+	public Paper forKey(String key) {
+		if(!lookup.containsKey(key)) {
+			log.info("key not found: " + key);
+			return null;
+		}
+		return papers.get(lookup.get(key));
+	}
+	
+	private String invertAroundComma(String in) {
+		String [] fields = in.split(",");
+		if(fields.length==2)
+			return (fields[1] + " " + fields[0]).trim();
+		else
+			return in;
+	}
+	
 	public ParserGroundTruth(String jsonFile) throws IOException {
 		ObjectMapper om = new ObjectMapper();
 		ObjectReader r = om.reader(new TypeReference<List<Paper>>() {});
@@ -50,6 +70,12 @@ public class ParserGroundTruth {
 		papers = r.readValue(isr);
 		log.info("Read " + papers.size() + " papers.");
 		isr.close();
+		lookup = new HashMap<>();
+		for(int i=0; i<papers.size(); i++) {
+			lookup.put(papers.get(i).id.substring(4), i);
+		}
+		papers.forEach((Paper p) -> {for(int i=0; i<p.authors.length;i++) p.authors[i] = invertAroundComma(p.authors[i]);});
+		
 	}
 	
 	

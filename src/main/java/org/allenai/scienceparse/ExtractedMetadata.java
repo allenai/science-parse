@@ -24,6 +24,7 @@ public class ExtractedMetadata {
 	public static final String titleTag = "T"; //label used in labeled data
 	public static final String authorTag = "A"; //label used in labeled data
 	
+	public String source;
 	public String title;
 	public Pair<Integer, Integer> titleOffset; //reference to some PDFDoc unknown to this object
 	public List<String> authors;
@@ -110,7 +111,6 @@ public class ExtractedMetadata {
 	public String toString() {
 		StringBuffer out = new StringBuffer("T: " + title + "\r\n");
 		authors.forEach((String a) -> out.append("A: " + a + "r\n"));
-		out.append("\r\n");
 		return out.toString();
 	}
 	

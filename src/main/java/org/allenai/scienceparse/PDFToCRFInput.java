@@ -158,7 +158,8 @@ public class PDFToCRFInput {
 			outTmp.add(Tuples.pair(t, "O"));
 		}
 		truth.authors.forEach((String s) -> findAndLabelWith(toks, outTmp, s, ExtractedMetadata.authorTag));
-		findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag);
+		if(!findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag)) //must have title to be valid
+			return null;
 		val out = new ArrayList<Pair<PaperToken, String>>();
 		out.add(Tuples.pair(PaperToken.generateStartStopToken(),  "<S>"));
 		out.addAll(outTmp);

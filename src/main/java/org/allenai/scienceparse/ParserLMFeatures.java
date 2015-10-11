@@ -34,6 +34,10 @@ public class ParserLMFeatures implements Serializable {
 		return ct;
 	}
 	
+	public ParserLMFeatures() {
+		
+	}
+	
 	//paperDirectory must contain pdf docs to use as background language model
 	public ParserLMFeatures(List<Paper> ps, UnifiedSet<String> idsToExclude, int stIdx, int endIdx, File paperDirectory, int approxNumBackgroundDocs) throws IOException {
 		for(int i=stIdx; i<endIdx; i++) {
