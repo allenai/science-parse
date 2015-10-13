@@ -10,7 +10,9 @@ import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFToken;
 
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
+import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import com.gs.collections.impl.tuple.Tuples;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -35,13 +37,15 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 	public static List<String> getCaseMasks(String tok) {
 		Pattern Xxx = Pattern.compile("[A-Z][a-z]*");
 		Pattern xxx = Pattern.compile("[a-z]+");
+		Pattern letters = Pattern.compile("[a-zA-Z]+");
 		Pattern dig = Pattern.compile("[0-9]+");
 		Pattern hasNum = Pattern.compile(".*[0-9]+.*");
 		Pattern letterDot = Pattern.compile("[A-Z]\\.");
 		Pattern hasNonAscii = Pattern.compile(".*[^\\p{ASCII}]+.*");
+		Pattern wordColon = Pattern.compile("[a-zA-Z]+:");
 		
-		List<Pattern> pats = Arrays.asList(Xxx, xxx, dig, hasNum, letterDot, hasNonAscii);
-		List<String> feats = Arrays.asList("%Xxx", "%xxx", "%dig", "%hasNum", "%letDot", "%hasNonAscii");
+		List<Pattern> pats = Arrays.asList(Xxx, xxx, letters, dig, hasNum, letterDot, hasNonAscii, wordColon);
+		List<String> feats = Arrays.asList("%Xxx", "%xxx", "%letters", "%dig", "%hasNum", "%letDot", "%hasNonAscii", "%capWordColon");
 		ArrayList<String> out = new ArrayList<String>();
 		for(int i=0; i<pats.size(); i++) {
 			Pattern p = pats.get(i);
@@ -57,17 +61,87 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 	}
 	
 	private float height(PDFToken t) {
-		return t.bounds.get(1) - t.bounds.get(3);
+		return t.bounds.get(3) - t.bounds.get(1);
 	}
 	
 	private float width(PDFToken t) {
 		return t.bounds.get(0) - t.bounds.get(2);
 	}
 	
+	private interface TokenPropertySelector {
+		float getProp(PaperToken t);
+	}
+	
+	public float getExtreme(List<PaperToken> toks, TokenPropertySelector s, boolean max) {
+		float adj = -1.0f;
+		float extremeSoFar = Float.NEGATIVE_INFINITY;
+		if(max) {
+			adj = 1.0f;
+		}
+		for(PaperToken pt : toks) {
+			float propAdj = s.getProp(pt)*adj;
+			if(propAdj > extremeSoFar) {
+				extremeSoFar = propAdj;
+			}
+		}
+		return extremeSoFar*adj;
+	}
+	
+	public float linearNormalize(float f, Pair<Float, Float> rng) {
+		if(Math.abs(rng.getTwo() - rng.getOne())<0.00000001)
+			return 0.0f;
+		else
+			return (f - rng.getOne())/(rng.getTwo() - rng.getOne());
+	}
+	
+	public Pair<Float, Float> getExtrema(List<PaperToken> toks, TokenPropertySelector s) {
+		Pair<Float, Float> out = Tuples.pair(getExtreme(toks, s, false), getExtreme(toks, s, true));
+		return out;
+	}
+	
+	public float getFixedFont(PaperToken t) {
+		float s = t.getPdfToken().fontMetrics.ptSize;
+		if(s > 30.0f) //assume it's an error
+			return 11.0f;
+		else
+			return s;
+	}
+	
+	private float getY(PaperToken t, boolean upper) {
+		if(upper)
+			return t.getPdfToken().bounds.get(1);
+		else
+			return t.getPdfToken().bounds.get(3);
+	}
+	
+	public double logYDelt(float y1, float y2) {
+		return Math.log(Math.max(y1 - y2, 0.00001f));
+	}
+	
+	//assumes start-stop padded
+//	private float prevYGap(List<PaperToken> toks, int i) {
+//		if(i==1) {
+//			return getY(toks.get(i));
+//		}
+//	}
+//	
+//	private List<Float> getYGaps(List<PaperToken> toks) {
+//		List<Float> out = new ArrayList<Float>();
+//		for(int i=1; i<toks.size()-2; i++) {
+//			nextY = getY(elems.get(i), false) + height(elems.get(i).getPdfToken())
+//		}
+//		
+//		return out;
+//	}
+	
 	//assumes start/stop padded
 	@Override
 	public List<ObjectDoubleMap<String>> nodePredicates(List<PaperToken> elems) {
 		List<ObjectDoubleMap<String>> out = new ArrayList<>();
+		Pair<Float, Float> hBounds = getExtrema(elems.subList(1, elems.size()-1), (PaperToken t) -> {return height(t.getPdfToken());});
+		Pair<Float, Float> fBounds = getExtrema(elems.subList(1, elems.size()-1), (PaperToken t) -> {return getFixedFont(t);});
+//		log.info("h bounds: " + hBounds);
+//		log.info("f bounds: " + fBounds);
 		//log.info("called with " + elems.size() + " tokens.");
 		for(int i=0; i<elems.size(); i++) {
 			ObjectDoubleHashMap<String> m = new ObjectDoubleHashMap<String>();
@@ -75,6 +149,8 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 			float nextFont = -10.0f;
 			float prevHeight = -10.0f;
 			float nextHeight = -10.0f;
+			float prevY = 0.0f;
+			float nextY = -1000000.0f;
 			
 			int prevLine = -1;
 			int nextLine = -1;
@@ -85,15 +161,20 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 			else {
 				if(i!=1) {
 					prevLine = elems.get(i-1).getLine();
-					prevFont = elems.get(i-1).getPdfToken().fontMetrics.ptSize;
+					prevFont = getFixedFont(elems.get(i-1));
 					prevHeight = height(elems.get(i-1).getPdfToken());
+					prevY = getY(elems.get(i-1), false);
 				}
 				if(i!=elems.size() - 2) {
 					nextLine = elems.get(i+1).getLine();
-					nextFont = elems.get(i+1).getPdfToken().fontMetrics.ptSize;
+					nextFont = getFixedFont(elems.get(i+1));
 					nextHeight = height(elems.get(i+1).getPdfToken());
+					nextY = getY(elems.get(i+1), true);
 				}
-				float font = elems.get(i).getPdfToken().fontMetrics.ptSize;
+				else {
+					nextY = getY(elems.get(i), false) + height(elems.get(i).getPdfToken()); //guess that next line is height units below
+				}
+				float font = getFixedFont(elems.get(i));
 				float h = height(elems.get(i).getPdfToken());
 				int line = elems.get(i).getLine();
 				//font-change forward (fcf) or backward (fcb):
@@ -101,10 +182,14 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 					m.put("%fcb", 1.0);
 				if(font!=nextFont)
 					m.put("%fcf", 1.0);
-				if(line!=prevLine)
+				if(line!=prevLine) {
 					m.put("%lcb", 1.0);
-				if(line!=nextLine)
+					m.put("%hGapB", logYDelt(getY(elems.get(i), true), prevY));
+				}
+				if(line!=nextLine) {
 					m.put("%lcf", 1.0);
+					m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false)));
+				}
 				if(Math.abs(Math.abs(nextHeight - h)/Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% change
 					m.put("%hcf", 1.0);
 				}
@@ -113,9 +198,13 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 				}
 				
 				//font value:
-				m.put("%font", font);
-				m.put("%line", line);
-				m.put("%h", h);
+				float relativeF = linearNormalize(font, fBounds);
+				m.put("%font", relativeF);
+				
+				m.put("%line", Math.min(line, 10.0)); //cap to max 10 lines
+				float relativeH = linearNormalize(h, hBounds);
+				m.put("%h", relativeH);
+//				m.put("%h", h);
 				
 				//word features:
 				String tok = elems.get(i).getPdfToken().token;
@@ -132,11 +221,19 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 						m.put("%uncapns", 1.0);
 					}
 				}
+				double adjLen = Math.min(tok.length(), 10.0)/10.0;
+				double adjLenSq = (adjLen - 0.5)*(adjLen - 0.5);
+				m.put("%adjLen",  adjLen);
+				m.put("%adjLenSq",  adjLenSq);
 				if(line <= 2)
 					m.put("%first3lines", 1.0);
 				if(lmFeats != null) {
 					m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
+					m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleFirstBow));
+					m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleLastBow));
 					m.put("%afreq", smoothFreq(tok, this.lmFeats.authorBow));
+					m.put("%affreq", smoothFreq(tok, this.lmFeats.authorFirstBow));
+					m.put("%affreq", smoothFreq(tok, this.lmFeats.authorLastBow));
 					m.put("%bfreq", smoothFreq(tok, this.lmFeats.backgroundBow));
 //					log.info("features for " + tok);
 //					log.info(m.toString());

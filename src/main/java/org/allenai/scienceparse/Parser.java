@@ -163,6 +163,8 @@ public class Parser {
 	  File dir = new File(paperDir);
 	  PDFExtractor ext = new PDFExtractor();
 	  for(Paper p : pgt.papers) {
+		  if(p.year < 2010)
+			  continue;
 		  File f = new File(dir, p.id.substring(4) + ".pdf"); //first four are directory, rest is file name
 		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax);
 		  
@@ -234,6 +236,7 @@ public class Parser {
       // the trainer to make a model for each iteration but then need
       // to modify the iteration-callback to use it
       Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
+      CRFModel<String, PaperToken, String> cacheModel = null;
       trainOpts.optimizerOpts.iterCallback = (weights) -> {
           CRFModel<String, PaperToken, String> crfModel = trainer.modelForWeights(weights);
           long start = System.currentTimeMillis();
@@ -306,17 +309,17 @@ public class Parser {
       // kill xml
       t = t.replaceAll("\\&.*?\\;","");
       // kill non-letter chars
-      t = t.replaceAll("\\W","");
+      //t = t.replaceAll("\\W","");
       return t.replaceAll("\\s+"," ");
   }
 
   //changes extraction to remove common failure modes
   public static String processExtractedTitle(String t) {
 	  String out = t.replaceAll("(?<=[a-z])\\- ", ""); //continuation dash
-	  out = out.replaceAll(" \\?", ""); //special char
-	  if(!out.endsWith("?")&&!out.endsWith("\""))
-		out = out.replaceFirst("\\W$", ""); //end of title punctuation if not ?
-	  return out;
+//	  out = out.replaceAll(" \\?", ""); //special char
+	  if(!out.endsWith("?")&&!out.endsWith("\"")&&!out.endsWith(")"))
+		out = out.replaceFirst("\\W$", ""); //end of title punctuation if not ?, ", or )
+	  return out.trim();
   }
 	  
   public static void main(String[] args) throws Exception {
@@ -348,7 +351,7 @@ public class Parser {
 		  opts.modelFile = args[4];
 		  //TODO: use config file
 		  opts.headerMax = 100;
-		  opts.iterations =  pgt.papers.size()/4; //HACK because training throws exceptions if you iterate too much
+		  opts.iterations =  Math.min(1200, pgt.papers.size()*2); //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  opts.backgroundSamples = 400;
 		  opts.backgroundDirectory = args[5];
@@ -379,7 +382,8 @@ public class Parser {
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
 		  ParserGroundTruth pgt = new ParserGroundTruth(args[4]);
-		  int total = 0;
+		  int totalFiles = 0;
+		  int totalProcessed = 0;
 		  int crfTruePos = 0;
 		  int crfFalsePos = 0;
 		  int metaTruePos = 0;
@@ -389,10 +393,13 @@ public class Parser {
 			  val fis = new FileInputStream(f);
 			  String key = f.getName().substring(0, f.getName().length()-4);
 			  Paper pap = pgt.forKey(key);
+			  if(pap.year < 2010)
+				  continue;
+			  totalFiles++;
 			  ExtractedMetadata em = null;
 			  try {
 				  em = p.doParse(fis);
-				  total++;
+				  totalProcessed++;
 			  }
 			  catch(Exception e) {
 				  logger.info("Parse error: " + f);
@@ -403,7 +410,7 @@ public class Parser {
 				  String expected = pap.title;
 				  String guessed = em.title;
 				  String procExpected = processTitle(expected);
-				  String procGuessed =  processExtractedTitle(processTitle(guessed));
+				  String procGuessed =  processTitle(processExtractedTitle(guessed));
 				  //logger.info("authors: " + em.authors);
 				  if(procExpected.equals(procGuessed))
 					  if(em.source=="CRF")
@@ -421,7 +428,8 @@ public class Parser {
 
 			  fis.close();
 		  }
-		  logger.info("total: " + total);
+		  logger.info("total files: " + totalFiles);
+		  logger.info("total processed: " + totalProcessed);
 		  logger.info("crf correct: " + crfTruePos);
 		  logger.info("crf false positive " + crfFalsePos);
 		  logger.info("meta correct: " + metaTruePos);

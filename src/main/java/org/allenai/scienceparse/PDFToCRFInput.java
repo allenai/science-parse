@@ -45,7 +45,7 @@ public class PDFToCRFInput {
 		int nextToMatch = 0;
 		int idx = 0;
 		for(PaperToken pt : seq) {
-			if(toks[nextToMatch].equals(pt.getPdfToken().token)) {
+			if(toks[nextToMatch].equalsIgnoreCase(pt.getPdfToken().token)) {
 				nextToMatch++;
 			}
 			else {
