@@ -89,7 +89,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 	
 	public float linearNormalize(float f, Pair<Float, Float> rng) {
 		if(Math.abs(rng.getTwo() - rng.getOne())<0.00000001)
-			return 0.0f;
+			return 0.5f;
 		else
 			return (f - rng.getOne())/(rng.getTwo() - rng.getOne());
 	}

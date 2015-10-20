@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,59 @@ import com.sun.media.jfxmedia.logging.Logger;
 @Slf4j
 public class PDFToCRFInput {
 
+	
+	/**
+	 * Returns the index start (inclusive) and end (exclusive) 
+	 * of end of pattern sequence in token seq, starting from startposes.  Returns -1 if not found
+	 * @param seq
+	 * @param patOptional
+	 * @param seqStartPos
+	 * @param patStartPos
+	 * @return
+	 */
+	public static int findPatternEnd(List<PaperToken> seq, List<Pair<Pattern, Boolean>> patOptional,
+			int seqStartPos, int patStartPos) {
+		
+		if(patOptional.size()==patStartPos) { //treated as completion
+			return patStartPos;
+		}
+		if(patOptional.size()==0) { //treated as error rather than completion
+			return -1;
+		}
+		if(seq.size()==0 || seqStartPos == seq.size())
+			return -1;
+		
+		PaperToken pt = seq.get(seqStartPos);
+		if(patOptional.get(patStartPos).getOne().matcher(pt.getPdfToken().token).matches()) {
+			//look forward:
+			return findPatternEnd(seq, patOptional, seqStartPos+1, patStartPos+1);
+		}
+		if(patOptional.get(patStartPos).getTwo()) {
+			//try skipping this pattern:
+			return findPatternEnd(seq, patOptional, seqStartPos, patStartPos+1);
+		}
+		//no matches from this token
+		return -1;
+		
+	}
+	
+	/**
+	 * Returns the index start (inclusive) and end (exclusive) 
+	 * of first occurrence of pattern sequence in token seq, or null if not found
+	 * @param seq	Token sequence
+	 * @param patOptional	(Pattern, optional) pair indicating pattern to match and whether it can be skipped
+	 * @return
+	 */
+	public static Pair<Integer, Integer> findPatternSequence(List<PaperToken> seq, List<Pair<Pattern, Boolean>> patOptional) {
+		for(int i=0; i<seq.size();i++) {
+			int end = -1;
+			if((end = findPatternEnd(seq, patOptional, i, 0)) >= 0) {
+				return Tuples.pair(i, end);
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Returns the index of start (inclusive) and end (exclusive)
 	 * of first occurrence of string in seq, or null if not found
@@ -44,11 +98,13 @@ public class PDFToCRFInput {
 		}
 		int nextToMatch = 0;
 		int idx = 0;
-		for(PaperToken pt : seq) {
+		for(int i=0;i<seq.size();i++) {
+			PaperToken pt = seq.get(i);
 			if(toks[nextToMatch].equalsIgnoreCase(pt.getPdfToken().token)) {
 				nextToMatch++;
-			}
+			} 
 			else {
+				i -= nextToMatch; //start back at char after start of match
 				nextToMatch = 0;
 			}
 			idx++;
@@ -56,6 +112,32 @@ public class PDFToCRFInput {
 				return Tuples.pair(idx-toks.length, idx);
 		}
 		return null;
+	}
+	
+	public static List<Pair<Pattern, Boolean>> authorToPatternOptPair(String author) {
+		List<Pair<Pattern, Boolean>> out = new ArrayList<>();
+		String [] toks = author.split(" ");
+		for(int i=0; i<toks.length; i++) {
+			boolean optional = true;
+			if(i==0||i==toks.length-1)
+				optional = false;
+			String pat = "";
+			if(i<toks.length-1) {
+				pat = toks[i].substring(0, 1) + "\\.\\|(" + toks[i].substring(1); 
+				//allow single-initial abbreviations for non-last-name
+			}
+			else {
+				pat = toks[i];
+				pat += "\\W\\|[0-9]"; //allow some non-alpha or number (typically, footnote marker) at end of author
+			}
+			out.add(Tuples.pair(Pattern.compile(pat), optional));
+		}
+		return out;
+	}
+	
+	public static Pair<Integer, Integer> findAuthor(List<PaperToken> seq, String toFind) {
+		List<Pair<Pattern, Boolean>> pats = authorToPatternOptPair(toFind);
+		return findPatternSequence(seq, pats);
 	}
 	
 	private static void addLineTokens(List<PaperToken> accumulator, List<PDFLine> lines, final int pg) {
@@ -121,7 +203,8 @@ public class PDFToCRFInput {
 	 * @param labelStem
 	 * @return	True if target was found in seq, false otherwise
 	 */
-	public static boolean findAndLabelWith(List<PaperToken> seq, List<Pair<PaperToken, String>> seqLabeled, String target, String labelStem) {
+	public static boolean findAndLabelWith(List<PaperToken> seq, List<Pair<PaperToken, String>> seqLabeled,
+			String target, String labelStem) {
 		Pair<Integer, Integer> loc = findString(seq, target);
 		if(loc == null)
 			return false;

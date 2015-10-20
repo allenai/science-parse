@@ -98,7 +98,7 @@ public class ParserTest {
   public void testParser() throws Exception {
 	  
 	Parser.ParseOpts opts = new Parser.ParseOpts();
-  	opts.iterations = 80;
+  	opts.iterations = 10;
   	opts.threads = 4;
   	opts.modelFile = "src/test/resources/test.model";
   	opts.headerMax = 100;
@@ -124,7 +124,7 @@ public class ParserTest {
   
   public void testParserWithGroundTruth() throws Exception {
 	  Parser.ParseOpts opts = new Parser.ParseOpts();
-	  	opts.iterations = 80;
+	  	opts.iterations = 10;
 	  	opts.threads = 4;
 	  	opts.modelFile = "src/test/resources/test.model";
 	  	opts.headerMax = 100;
@@ -132,6 +132,8 @@ public class ParserTest {
 	  	opts.gazetteerFile = null;
 	  	opts.trainFraction = 0.9;
 	  	opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
+	  	opts.recentOnly = false;
+	  	opts.checkAuthors = false;
 	  	File f = new File(opts.modelFile);
 	  	f.deleteOnExit();
 	  	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));

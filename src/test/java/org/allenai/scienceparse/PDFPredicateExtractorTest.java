@@ -56,8 +56,9 @@ public class PDFPredicateExtractorTest {
 	public void testCaseMasks() {
 		String cap = "Exploring";
 		List<String> ls = PDFPredicateExtractor.getCaseMasks(cap);
-		Assert.assertEquals(ls.size(), 1);
+		Assert.assertEquals(ls.size(), 2);
 		Assert.assertTrue(ls.contains("%Xxx"));
+		Assert.assertTrue(ls.contains("%letters"));
 		
 		String nonSimple = "Dharmaratnå";
 		ls = PDFPredicateExtractor.getCaseMasks(nonSimple);

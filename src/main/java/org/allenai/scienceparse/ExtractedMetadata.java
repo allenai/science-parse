@@ -110,7 +110,7 @@ public class ExtractedMetadata {
 	
 	public String toString() {
 		StringBuffer out = new StringBuffer("T: " + title + "\r\n");
-		authors.forEach((String a) -> out.append("A: " + a + "r\n"));
+		authors.forEach((String a) -> out.append("A: " + a + "\r\n"));
 		return out.toString();
 	}
 	

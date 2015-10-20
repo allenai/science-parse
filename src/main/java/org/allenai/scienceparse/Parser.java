@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toList;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
@@ -53,6 +54,8 @@ public class Parser {
 	  public String gazetteerFile;
 	  public int backgroundSamples;
 	  public String backgroundDirectory;
+	  public boolean recentOnly; //only process papers ~2010 or later
+	  public boolean checkAuthors; //only bootstraps papers if all authors are found
   }
   
   public ExtractedMetadata doParse(InputStream is) throws IOException {
@@ -61,19 +64,12 @@ public class Parser {
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
       seq = PDFToCRFInput.padSequence(seq);
       ExtractedMetadata em = null;
+      
       if(doc.meta == null || doc.meta.title == null) { //use the model
     	  List<String> outSeq = model.bestGuess(seq);
     	  //the output tag sequence will not include the start/stop states!
     	  outSeq = PDFToCRFInput.padTagSequence(outSeq);
-    	  
-    	  //logger.info(seq.stream().map((PaperToken p) -> (p.getLine()==-1)?"<S>":p.getPdfToken().token).collect(Collectors.toList()).toString());
-    	  //logger.info(outSeq.toString());
     	  em = new ExtractedMetadata(seq, outSeq);
-//    	  if(em.title != null && em.title.length() > 300)
-//    		  System.out.println("CUT title: " + em.title);
-//    	  else
-//    		  logger.info("CRF extracted title:\r\n" + em.title);
-          //logger.info("author:\r\n" + em.authors);
     	  em.source = "CRF";
       }
       else {
@@ -113,9 +109,14 @@ public class Parser {
       }
       return Tuples.pair(first, second);
   }
- 
+  
   public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
 		  int headerMax) throws IOException {
+	  return getPaperLabels(pdf, p, ext, heuristicHeader, headerMax, false);
+  }
+ 
+  public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
+		  int headerMax, boolean checkAuthors) throws IOException {
 	  
 	  PDFDoc doc = null;
 	  try {
@@ -146,6 +147,17 @@ public class Parser {
       logger.info("finding " + em.toString());
       List<Pair<PaperToken, String>> labeledPaper = 
     		  PDFToCRFInput.labelMetadata(seq, em);
+      if(labeledPaper != null && checkAuthors) {
+	      ExtractedMetadata checkEM = new ExtractedMetadata(labeledPaper.stream().map(pr -> pr.getOne()).collect(Collectors.toList()),
+	    		  labeledPaper.stream().map(pr -> pr.getTwo()).collect(Collectors.toList()));
+	      if(checkEM.authors.size() != em.authors.size()) {
+	    	  logger.info("author mismatch, discarding.  exp " + em.authors + " got " + checkEM.authors);
+	    	  labeledPaper = null;
+	      }
+	      else {
+	    	  logger.info("author match");
+	      }
+      }
 //      logger.info("first: " + labeledPaper.get(0).getTwo());
 //      logger.info("last: " + labeledPaper.get(labeledPaper.size()-1).getTwo());
       
@@ -153,20 +165,16 @@ public class Parser {
   }
   
   public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
-		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader) throws IOException {
-	  return labelFromGroundTruth(pgt, paperDir, headerMax, heuristicHeader, pgt.papers.size());
-  }
-  
-  public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
-		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader, int maxFiles) throws IOException {
+		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader, int maxFiles,
+		  boolean recentOnly, boolean checkAuthors) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
 	  File dir = new File(paperDir);
 	  PDFExtractor ext = new PDFExtractor();
 	  for(Paper p : pgt.papers) {
-		  if(p.year < 2010)
+		  if(recentOnly && p.year < 2010)
 			  continue;
 		  File f = new File(dir, p.id.substring(4) + ".pdf"); //first four are directory, rest is file name
-		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax);
+		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax, checkAuthors);
 		  
 		  if(res != null)
 			  labeledData.add(res);
@@ -200,7 +208,7 @@ public class Parser {
     	  labeledData = bootstrapLabels(files, opts.headerMax, true);
       }
       else {
-    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true);
+    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.recentOnly, opts.checkAuthors);
       }
       ParserLMFeatures plf = null;
       if(opts.gazetteerFile != null) {
@@ -309,7 +317,7 @@ public class Parser {
       // kill xml
       t = t.replaceAll("\\&.*?\\;","");
       // kill non-letter chars
-      //t = t.replaceAll("\\W","");
+      t = t.replaceAll("\\W","");
       return t.replaceAll("\\s+"," ");
   }
 
@@ -321,7 +329,32 @@ public class Parser {
 		out = out.replaceFirst("\\W$", ""); //end of title punctuation if not ?, ", or )
 	  return out.trim();
   }
-	  
+  
+  //lowercases
+  public static String lastName(String s) {
+	  String [] words = s.split(" ");
+	  if(words.length > 0)
+		  return processTitle(words[words.length-1]);
+	  else
+		  return "";
+  }
+  
+  public static List<String> lastNames(List<String> ss) {
+	  return ss.stream().map(s -> lastName(s)).collect(Collectors.toList());
+  }
+  
+  public static int scoreAuthors(String [] expected, List<String> guessed) {
+	  List<String> guessLastName = lastNames(guessed);
+	  List<String> expectedLastName = lastNames(Arrays.asList(expected));
+	  //slow:
+	  int truePos = 0;
+	  for(String s : guessLastName) {
+		  if(expectedLastName.contains(s))
+			  truePos++;
+	  }
+	  return truePos;
+  }
+  
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
 			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
@@ -335,8 +368,6 @@ public class Parser {
 	  else if(args[0].equalsIgnoreCase("bootstrap")) {
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles()); 
-		  //HACK: limit to 5000 for development
-		  //inFiles = inFiles.subList(0,  Math.min(inFiles.size(), 2000));
 		  ParseOpts opts = new ParseOpts();
 		  opts.modelFile = args[2];
 		  //TODO: use config file
@@ -351,7 +382,7 @@ public class Parser {
 		  opts.modelFile = args[4];
 		  //TODO: use config file
 		  opts.headerMax = 100;
-		  opts.iterations =  Math.min(1200, pgt.papers.size()*2); //HACK because training throws exceptions if you iterate too much
+		  opts.iterations =  Math.min(500, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  opts.backgroundSamples = 400;
 		  opts.backgroundDirectory = args[5];
@@ -388,6 +419,14 @@ public class Parser {
 		  int crfFalsePos = 0;
 		  int metaTruePos = 0;
 		  int metaFalsePos = 0;
+		  int crfAuthTruePos = 0;
+		  int crfAuthFalsePos = 0;
+		  int crfAuthFalseNeg = 0;
+		  int metaAuthTruePos = 0;
+		  int metaAuthFalsePos = 0;
+		  int metaAuthFalseNeg = 0;
+
+		  
 		  for(File f : inFiles) {
 			  //logger.info("parsing " + f);
 			  val fis = new FileInputStream(f);
@@ -411,6 +450,22 @@ public class Parser {
 				  String guessed = em.title;
 				  String procExpected = processTitle(expected);
 				  String procGuessed =  processTitle(processExtractedTitle(guessed));
+				  String [] authExpected = pap.authors;
+				  List<String> authGuessed = em.authors;
+				  int tempTP = scoreAuthors(authExpected, authGuessed);
+				  if(em.source=="CRF") {
+					  crfAuthTruePos += tempTP;
+					  crfAuthFalsePos += authGuessed.size() - tempTP;
+					  crfAuthFalseNeg += authExpected.length - tempTP;
+				  }
+				  else {
+					  metaAuthTruePos += tempTP;
+					  metaAuthFalsePos += authGuessed.size() - tempTP;
+					  metaAuthFalseNeg += authExpected.length - tempTP;					  
+				  }
+					  
+				  if(tempTP != authGuessed.size() || tempTP != authExpected.length)
+					  logger.info("auth error: " + tempTP + " right, exp " + Arrays.toString(authExpected) + " got " + authGuessed);
 				  //logger.info("authors: " + em.authors);
 				  if(procExpected.equals(procGuessed))
 					  if(em.source=="CRF")
@@ -434,6 +489,12 @@ public class Parser {
 		  logger.info("crf false positive " + crfFalsePos);
 		  logger.info("meta correct: " + metaTruePos);
 		  logger.info("meta false positive " + metaFalsePos);
+		  logger.info("crf author correct: " + crfAuthTruePos);
+		  logger.info("crf author false positive: " + crfAuthFalsePos);
+		  logger.info("crf author false negative: " + crfAuthFalseNeg);
+		  logger.info("meta author correct: " + metaAuthTruePos);
+		  logger.info("meta author false positive: " + metaAuthFalsePos);
+		  logger.info("meta author false negative: " + metaAuthFalseNeg);
 
 		  //TODO: write output
 	  }
