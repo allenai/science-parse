@@ -21,7 +21,7 @@ public class PDFPredicateExtractorTest {
 		String target = "How to make words with vectors: Phrase generation in distributional semantics";
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
         List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
-        Pair<Integer, Integer> pos = PDFToCRFInput.findString(pts, target);
+        Pair<Integer, Integer> pos = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), target);
         PDFPredicateExtractor ppe = new PDFPredicateExtractor();
         List<ObjectDoubleMap<String>> preds = ppe.nodePredicates(pts);
         int [] idxes = new int [] {pos.getOne() - 1, pos.getOne(),

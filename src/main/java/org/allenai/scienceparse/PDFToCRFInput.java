@@ -40,11 +40,11 @@ public class PDFToCRFInput {
 	 * @param patStartPos
 	 * @return
 	 */
-	public static int findPatternEnd(List<PaperToken> seq, List<Pair<Pattern, Boolean>> patOptional,
+	public static int findPatternEnd(List<String> seq, List<Pair<Pattern, Boolean>> patOptional,
 			int seqStartPos, int patStartPos) {
 		
 		if(patOptional.size()==patStartPos) { //treated as completion
-			return patStartPos;
+			return seqStartPos;
 		}
 		if(patOptional.size()==0) { //treated as error rather than completion
 			return -1;
@@ -52,8 +52,8 @@ public class PDFToCRFInput {
 		if(seq.size()==0 || seqStartPos == seq.size())
 			return -1;
 		
-		PaperToken pt = seq.get(seqStartPos);
-		if(patOptional.get(patStartPos).getOne().matcher(pt.getPdfToken().token).matches()) {
+		String pt = seq.get(seqStartPos);
+		if(patOptional.get(patStartPos).getOne().matcher(pt).matches()) {
 			//look forward:
 			return findPatternEnd(seq, patOptional, seqStartPos+1, patStartPos+1);
 		}
@@ -73,7 +73,7 @@ public class PDFToCRFInput {
 	 * @param patOptional	(Pattern, optional) pair indicating pattern to match and whether it can be skipped
 	 * @return
 	 */
-	public static Pair<Integer, Integer> findPatternSequence(List<PaperToken> seq, List<Pair<Pattern, Boolean>> patOptional) {
+	public static Pair<Integer, Integer> findPatternSequence(List<String> seq, List<Pair<Pattern, Boolean>> patOptional) {
 		for(int i=0; i<seq.size();i++) {
 			int end = -1;
 			if((end = findPatternEnd(seq, patOptional, i, 0)) >= 0) {
@@ -89,7 +89,7 @@ public class PDFToCRFInput {
 	 * @param seq	String to find, assumes tokens are space-delimited 
 	 * @return
 	 */
-	public static Pair<Integer, Integer> findString(List<PaperToken> seq, String toFind) {
+	public static Pair<Integer, Integer> findString(List<String> seq, String toFind) {
 		if(seq.size()==0 || toFind.length()==0)
 			return null;
 		String [] toks = toFind.split(" ");
@@ -99,8 +99,8 @@ public class PDFToCRFInput {
 		int nextToMatch = 0;
 		int idx = 0;
 		for(int i=0;i<seq.size();i++) {
-			PaperToken pt = seq.get(i);
-			if(toks[nextToMatch].equalsIgnoreCase(pt.getPdfToken().token)) {
+			String s = seq.get(i);
+			if(toks[nextToMatch].equalsIgnoreCase(s)) {
 				nextToMatch++;
 			} 
 			else {
@@ -116,6 +116,14 @@ public class PDFToCRFInput {
 	
 	public static List<Pair<Pattern, Boolean>> authorToPatternOptPair(String author) {
 		List<Pair<Pattern, Boolean>> out = new ArrayList<>();
+		//get rid of stuff that can break regexs:
+		author = author.replace(")", "");
+		author = author.replace("(", "");
+		author = author.replace("?", "");
+		author = author.replace("*", "");
+		author = author.replace("+", "");
+		author = author.replace("^", "");
+		
 		String [] toks = author.split(" ");
 		for(int i=0; i<toks.length; i++) {
 			boolean optional = true;
@@ -123,19 +131,32 @@ public class PDFToCRFInput {
 				optional = false;
 			String pat = "";
 			if(i<toks.length-1) {
-				pat = toks[i].substring(0, 1) + "\\.\\|(" + toks[i].substring(1); 
-				//allow single-initial abbreviations for non-last-name
+				if(toks[i].matches("[A-Z](\\.)?")) { //it's a single-letter abbreviation
+					pat = toks[i].substring(0, 1) + "(((\\.)?)|([a-z]+))"; //allow arbitrary expansion
+				}
+				else {
+					if(toks[i].length() > 1) 					//allow single-initial abbreviations
+						pat = toks[i].substring(0, 1) + "(((\\.)?)|(" + toks[i].substring(1) + "))";
+					else
+						pat = toks[i];//catch-all for edge cases
+				}
 			}
 			else {
 				pat = toks[i];
-				pat += "\\W\\|[0-9]"; //allow some non-alpha or number (typically, footnote marker) at end of author
+				pat += "((\\W)|[0-9])*"; //allow some non-alpha or number (typically, footnote marker) at end of author
 			}
-			out.add(Tuples.pair(Pattern.compile(pat), optional));
+			try {
+				log.info("trying pattern " + pat);
+				out.add(Tuples.pair(Pattern.compile(pat), optional));
+			}
+			catch (Exception e) {
+				log.info("error in author pattern " + pat);
+			}
 		}
 		return out;
 	}
 	
-	public static Pair<Integer, Integer> findAuthor(List<PaperToken> seq, String toFind) {
+	public static Pair<Integer, Integer> findAuthor(List<String> seq, String toFind) {
 		List<Pair<Pattern, Boolean>> pats = authorToPatternOptPair(toFind);
 		return findPatternSequence(seq, pats);
 	}
@@ -204,8 +225,12 @@ public class PDFToCRFInput {
 	 * @return	True if target was found in seq, false otherwise
 	 */
 	public static boolean findAndLabelWith(List<PaperToken> seq, List<Pair<PaperToken, String>> seqLabeled,
-			String target, String labelStem) {
-		Pair<Integer, Integer> loc = findString(seq, target);
+			String target, String labelStem, boolean isAuthor) {
+		Pair<Integer, Integer> loc = null;
+		if(isAuthor)
+			loc = findAuthor(asStringList(seq), target);
+		else
+			loc = findString(asStringList(seq), target);
 		if(loc == null)
 			return false;
 		else {
@@ -240,14 +265,18 @@ public class PDFToCRFInput {
 		for(PaperToken t : toks) {
 			outTmp.add(Tuples.pair(t, "O"));
 		}
-		truth.authors.forEach((String s) -> findAndLabelWith(toks, outTmp, s, ExtractedMetadata.authorTag));
-		if(!findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag)) //must have title to be valid
+		truth.authors.forEach((String s) -> findAndLabelWith(toks, outTmp, s, ExtractedMetadata.authorTag, true));
+		if(!findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag, false)) //must have title to be valid
 			return null;
 		val out = new ArrayList<Pair<PaperToken, String>>();
 		out.add(Tuples.pair(PaperToken.generateStartStopToken(),  "<S>"));
 		out.addAll(outTmp);
 		out.add(Tuples.pair(PaperToken.generateStartStopToken(), "</S>"));
 		return out;
+	}
+	
+	public static List<String> asStringList(List<PaperToken> toks) {
+		return toks.stream().map(pt -> pt.getPdfToken().token).collect(Collectors.toList());
 	}
 	
 	public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
@@ -260,6 +289,7 @@ public class PDFToCRFInput {
 		}
 		return sb.toString().trim();
 	}
+	
 	
 	public static String getLabelString(List<Pair<PaperToken, String>> seq) {
 		return seq.stream().map((Pair<PaperToken, String> a) -> a.getTwo()).collect(Collectors.toList()).toString(); 

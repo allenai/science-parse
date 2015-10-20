@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -38,8 +39,8 @@ public class PDFToCRFInputTest {
     	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
         PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
         List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
-        Pair<Integer, Integer> pos = PDFToCRFInput.findString(pts, target);
-        Pair<Integer, Integer> posNot = PDFToCRFInput.findString(pts, "this string won't be found");
+        Pair<Integer, Integer> pos = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), target);
+        Pair<Integer, Integer> posNot = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), "this string won't be found");
         
         Assert.assertTrue(pos != null);
         Assert.assertTrue(pos.getOne()>0 && (pos.getTwo() - pos.getOne() == 11));
@@ -74,6 +75,30 @@ public class PDFToCRFInputTest {
     	Assert.assertEquals(spans.size(), 1);
     	Assert.assertEquals(spans.get(0).tag, "A");
     	Assert.assertEquals(spans.get(0).loc, Tuples.pair(2, 5));
+    }
+    
+    public void testAuthorPatterns() {
+    	List<Pair<Pattern, Boolean>> authOpt = PDFToCRFInput.authorToPatternOptPair("Marco C. Baroni");
+    	Assert.assertTrue(authOpt.get(0).getOne().matcher("Marco").matches());
+    	Assert.assertTrue(authOpt.get(1).getOne().matcher("C").matches());
+    	Assert.assertTrue(authOpt.get(2).getOne().matcher("Baroni").matches());
+    	Pair<Integer, Integer> span = PDFToCRFInput.findPatternSequence(Arrays.asList("Marco", "C", "Baroni"), authOpt);
+    	Assert.assertEquals(span, Tuples.pair(0, 3));
+    	span = PDFToCRFInput.findPatternSequence(Arrays.asList("Marco", "Baroni"), authOpt);
+    	Assert.assertEquals(span, Tuples.pair(0, 2));
+    }
+    
+    public void testAuthor() throws IOException {
+    	InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+        PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
+        List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
+        ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
+        		Arrays.asList("Georgiana Dinu", "Marco C. Baroni"), new Date(1388556000000L));
+        val labeledData = PDFToCRFInput.labelMetadata(pts, em);
+        Assert.assertEquals(labeledData.get(36+1).getTwo(), "B_A");
+        Assert.assertEquals(labeledData.get(37+1).getTwo(), "E_A");
+        Assert.assertEquals(labeledData.get(39+1).getTwo(), "B_A");
+        Assert.assertEquals(labeledData.get(40+1).getTwo(), "E_A");
     }
 
 }
