@@ -28,26 +28,27 @@ public class ParserLMFeatures implements Serializable {
 	ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
 	
 	
-	public int fillBow(ObjectDoubleHashMap<String> hm, String s, ObjectDoubleHashMap<String> firstHM, ObjectDoubleHashMap<String> lastHM) {
+	public int fillBow(ObjectDoubleHashMap<String> hm, String s, ObjectDoubleHashMap<String> firstHM, ObjectDoubleHashMap<String> lastHM,
+			boolean doTrim) {
 		int ct = 0;
 		if(s != null) {
-			String [] toks = s.split(" |(?=,)");  //not great
+			String [] toks = s.split("( |,)");  //not great
 			if(toks.length > 0) {
 				if(firstHM != null)
-					firstHM.addToValue(toks[0], 1.0);
+					firstHM.addToValue(doTrim?Parser.trimAuthor(toks[0]):toks[0], 1.0);
 				if(lastHM != null)
-					lastHM.addToValue(toks[toks.length-1], 1.0);
+					lastHM.addToValue(doTrim?Parser.trimAuthor(toks[toks.length-1]):toks[toks.length-1], 1.0);
 			}
 			for(String t : toks) {
-				hm.addToValue(t, 1.0);
+				hm.addToValue(doTrim?Parser.trimAuthor(t):t, 1.0);
 				ct++;
 			}
 		}
 		return ct;
 	}
 	
-	public int fillBow(ObjectDoubleHashMap<String> hm, String s) {
-		return fillBow(hm, s, null, null);
+	public int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
+		return fillBow(hm, s, null, null, doTrim);
 	}
 	
 	public ParserLMFeatures() {
@@ -60,9 +61,9 @@ public class ParserLMFeatures implements Serializable {
 		for(int i=stIdx; i<endIdx; i++) {
 			Paper p = ps.get(i); 
 			if(!idsToExclude.contains(p.id)) {
-				fillBow(titleBow, p.title, titleFirstBow, titleLastBow);
+				fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
 				for(String a : p.authors)
-					fillBow(authorBow, a, authorFirstBow, authorLastBow);
+					fillBow(authorBow, a, authorFirstBow, authorLastBow, true);
 			}
 		}
 		File [] pdfs = paperDirectory.listFiles(new FilenameFilter() {
@@ -73,7 +74,7 @@ public class ParserLMFeatures implements Serializable {
 		int ct = 0;
 		for(int i=0; i<pdfs.length;i++) {
 			if(Math.random() < samp) {
-				ct += fillBow(backgroundBow, Parser.paperToString(pdfs[i]));
+				ct += fillBow(backgroundBow, Parser.paperToString(pdfs[i]), false);
 			}
 		}
 		log.info("Gazetteer loaded with " + ct + " tokens.");

@@ -86,6 +86,11 @@ public class PDFToCRFInputTest {
     	Assert.assertEquals(span, Tuples.pair(0, 3));
     	span = PDFToCRFInput.findPatternSequence(Arrays.asList("Marco", "Baroni"), authOpt);
     	Assert.assertEquals(span, Tuples.pair(0, 2));
+    	authOpt = PDFToCRFInput.authorToPatternOptPair("Marco Baroni");
+    	span = PDFToCRFInput.findPatternSequence(Arrays.asList("M.", "G.", "Baroni"), authOpt);
+    	Assert.assertEquals(span, Tuples.pair(0, 3));
+    	span = PDFToCRFInput.findPatternSequence(Arrays.asList("M.", "G.", "B."), authOpt);
+    	Assert.assertEquals(span, null);
     }
     
     public void testAuthor() throws IOException {

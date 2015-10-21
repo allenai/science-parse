@@ -38,6 +38,8 @@ public class Parser {
 
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
 	
+  public static final int MAXHEADERWORDS = 1000; //set to something high for author/title parsing
+  
   private CRFModel<String, PaperToken, String> model;
   
   	public Parser(String modelFile) throws Exception {
@@ -54,14 +56,15 @@ public class Parser {
 	  public String gazetteerFile;
 	  public int backgroundSamples;
 	  public String backgroundDirectory;
-	  public boolean recentOnly; //only process papers ~2010 or later
+	  public int minYear; //only process papers this year or later
 	  public boolean checkAuthors; //only bootstraps papers if all authors are found
   }
   
-  public ExtractedMetadata doParse(InputStream is) throws IOException {
+  public ExtractedMetadata doParse(InputStream is, int headerMax) throws IOException {
 	  PDFExtractor ext = new PDFExtractor(); 	  
 	  PDFDoc doc = ext.extractFromInputStream(is);
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+      seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
       seq = PDFToCRFInput.padSequence(seq);
       ExtractedMetadata em = null;
       
@@ -166,12 +169,12 @@ public class Parser {
   
   public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
 		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader, int maxFiles,
-		  boolean recentOnly, boolean checkAuthors) throws IOException {
+		  int minYear, boolean checkAuthors) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
 	  File dir = new File(paperDir);
 	  PDFExtractor ext = new PDFExtractor();
 	  for(Paper p : pgt.papers) {
-		  if(recentOnly && p.year < 2010)
+		  if(minYear > 0 && p.year < minYear)
 			  continue;
 		  File f = new File(dir, p.id.substring(4) + ".pdf"); //first four are directory, rest is file name
 		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax, checkAuthors);
@@ -208,7 +211,7 @@ public class Parser {
     	  labeledData = bootstrapLabels(files, opts.headerMax, true);
       }
       else {
-    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.recentOnly, opts.checkAuthors);
+    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.minYear, opts.checkAuthors);
       }
       ParserLMFeatures plf = null;
       if(opts.gazetteerFile != null) {
@@ -348,11 +351,24 @@ public class Parser {
 	  List<String> expectedLastName = lastNames(Arrays.asList(expected));
 	  //slow:
 	  int truePos = 0;
-	  for(String s : guessLastName) {
-		  if(expectedLastName.contains(s))
+	  for(String s : expectedLastName) {
+		  if(guessLastName.contains(s))
 			  truePos++;
 	  }
 	  return truePos;
+  }
+  
+  public static String trimAuthor(String s) {
+	  String sFix = s.replaceAll("(\\W|[0-9])+$", "");
+	  if(sFix.contains(","))
+		  sFix = sFix.substring(0, sFix.indexOf(","));
+	  return sFix;
+  }
+  
+  public static List<String> trimAuthors(List<String> auth) {
+	  List<String> out = new ArrayList<String>();
+	  auth.forEach(s -> {s = trimAuthor(s); if(!out.contains(s)) out.add(s);});
+	return out;  
   }
   
   public static void main(String[] args) throws Exception {
@@ -381,32 +397,38 @@ public class Parser {
 		  ParseOpts opts = new ParseOpts();
 		  opts.modelFile = args[4];
 		  //TODO: use config file
-		  opts.headerMax = 100;
-		  opts.iterations =  Math.min(500, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
+		  opts.headerMax = MAXHEADERWORDS;
+		  opts.iterations =  Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  opts.backgroundSamples = 400;
 		  opts.backgroundDirectory = args[5];
 		  opts.gazetteerFile = args[2];
 		  opts.trainFraction = 0.9;
+		  opts.checkAuthors = true;
+		  opts.minYear = 2008;
 		  trainParser(null, pgt, args[3], opts);
 	  }
 	  else if(args[0].equalsIgnoreCase("parse")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
+		  File outDir = new File(args[3]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
 		  for(File f : inFiles) {
-			  //logger.info("parsing " + f);
 			  val fis = new FileInputStream(f);
+			  ExtractedMetadata em = null;
 			  try {
-				  p.doParse(fis);
+				  em = p.doParse(fis, MAXHEADERWORDS);
 			  }
 			  catch(Exception e) {
 				  logger.info("Parse error: " + f);
 				  //e.printStackTrace();
 			  }
 			  fis.close();
+			  
+			  val oos = new ObjectOutputStream(new FileOutputStream(new File(outDir, f.getName() + ".dat")));
+			  oos.writeObject(em);
+			  oos.close();
 		  }
-		  //TODO: write output
 	  }
 	  else if(args[0].equalsIgnoreCase("parseAndScore")) {
 		  Parser p = new Parser(args[2]);
@@ -419,12 +441,12 @@ public class Parser {
 		  int crfFalsePos = 0;
 		  int metaTruePos = 0;
 		  int metaFalsePos = 0;
-		  int crfAuthTruePos = 0;
-		  int crfAuthFalsePos = 0;
-		  int crfAuthFalseNeg = 0;
-		  int metaAuthTruePos = 0;
-		  int metaAuthFalsePos = 0;
-		  int metaAuthFalseNeg = 0;
+		  double crfPrecision = 0;
+		  double crfRecall = 0;
+		  double crfTotal = 0;
+		  double metaPrecision = 0;
+		  double metaRecall = 0;
+		  double metaTotal = 0;
 
 		  
 		  for(File f : inFiles) {
@@ -437,7 +459,7 @@ public class Parser {
 			  totalFiles++;
 			  ExtractedMetadata em = null;
 			  try {
-				  em = p.doParse(fis);
+				  em = p.doParse(fis, MAXHEADERWORDS);
 				  totalProcessed++;
 			  }
 			  catch(Exception e) {
@@ -451,17 +473,20 @@ public class Parser {
 				  String procExpected = processTitle(expected);
 				  String procGuessed =  processTitle(processExtractedTitle(guessed));
 				  String [] authExpected = pap.authors;
-				  List<String> authGuessed = em.authors;
+				  List<String> authGuessed = trimAuthors(em.authors);
+				  
 				  int tempTP = scoreAuthors(authExpected, authGuessed);
+				  double prec = ((double)tempTP)/((double)authGuessed.size() + 0.000000001);
+				  double rec = ((double)tempTP)/((double)authExpected.length);
 				  if(em.source=="CRF") {
-					  crfAuthTruePos += tempTP;
-					  crfAuthFalsePos += authGuessed.size() - tempTP;
-					  crfAuthFalseNeg += authExpected.length - tempTP;
+					  crfPrecision += prec;
+					  crfRecall += rec;
+					  crfTotal += 1.0;
 				  }
 				  else {
-					  metaAuthTruePos += tempTP;
-					  metaAuthFalsePos += authGuessed.size() - tempTP;
-					  metaAuthFalseNeg += authExpected.length - tempTP;					  
+					  metaPrecision += prec;
+					  metaRecall += rec;
+					  metaTotal += 1.0;
 				  }
 					  
 				  if(tempTP != authGuessed.size() || tempTP != authExpected.length)
@@ -489,13 +514,14 @@ public class Parser {
 		  logger.info("crf false positive " + crfFalsePos);
 		  logger.info("meta correct: " + metaTruePos);
 		  logger.info("meta false positive " + metaFalsePos);
-		  logger.info("crf author correct: " + crfAuthTruePos);
-		  logger.info("crf author false positive: " + crfAuthFalsePos);
-		  logger.info("crf author false negative: " + crfAuthFalseNeg);
-		  logger.info("meta author correct: " + metaAuthTruePos);
-		  logger.info("meta author false positive: " + metaAuthFalsePos);
-		  logger.info("meta author false negative: " + metaAuthFalseNeg);
-
+		  logger.info("crf micro-average prec: " + crfPrecision);
+		  logger.info("crf micro-average rec: " + crfRecall);
+		  logger.info("crf total: " + crfTotal);
+		  logger.info("meta micro-average prec: " + metaPrecision);
+		  logger.info("meta micro-average rec: " + metaRecall);
+		  logger.info("meta total: " + metaTotal);
+		  logger.info("overall author precision: " + (crfPrecision + metaPrecision)/(crfTotal + metaTotal) );
+		  logger.info("overall author recall: " + (crfRecall + metaRecall)/((double) totalFiles) );
 		  //TODO: write output
 	  }
   }

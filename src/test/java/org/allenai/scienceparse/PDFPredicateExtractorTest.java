@@ -63,7 +63,11 @@ public class PDFPredicateExtractorTest {
 		String nonSimple = "Dharmaratnå";
 		ls = PDFPredicateExtractor.getCaseMasks(nonSimple);
 		Assert.assertTrue(ls.contains("%hasNonAscii"));
-		
+		Assert.assertTrue(!ls.contains("%hasAt"));
+
+		String email = "bob@joe.com";
+		ls = PDFPredicateExtractor.getCaseMasks(email);
+		Assert.assertTrue(ls.contains("%hasAt"));
 	}
 	
 //	public static void main(String [] args) throws Exception {

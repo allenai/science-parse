@@ -43,9 +43,10 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 		Pattern letterDot = Pattern.compile("[A-Z]\\.");
 		Pattern hasNonAscii = Pattern.compile(".*[^\\p{ASCII}]+.*");
 		Pattern wordColon = Pattern.compile("[a-zA-Z]+:");
+		Pattern hasAt = Pattern.compile(".*@.*");
 		
-		List<Pattern> pats = Arrays.asList(Xxx, xxx, letters, dig, hasNum, letterDot, hasNonAscii, wordColon);
-		List<String> feats = Arrays.asList("%Xxx", "%xxx", "%letters", "%dig", "%hasNum", "%letDot", "%hasNonAscii", "%capWordColon");
+		List<Pattern> pats = Arrays.asList(Xxx, xxx, letters, dig, hasNum, letterDot, hasNonAscii, wordColon, hasAt);
+		List<String> feats = Arrays.asList("%Xxx", "%xxx", "%letters", "%dig", "%hasNum", "%letDot", "%hasNonAscii", "%capWordColon", "%hasAt");
 		ArrayList<String> out = new ArrayList<String>();
 		for(int i=0; i<pats.size(); i++) {
 			Pattern p = pats.get(i);
@@ -231,10 +232,11 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 					m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
 					m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleFirstBow));
 					m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleLastBow));
-					m.put("%afreq", smoothFreq(tok, this.lmFeats.authorBow));
-					m.put("%affreq", smoothFreq(tok, this.lmFeats.authorFirstBow));
-					m.put("%affreq", smoothFreq(tok, this.lmFeats.authorLastBow));
+					m.put("%afreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorBow));
+					m.put("%affreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorFirstBow));
+					m.put("%affreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorLastBow));
 					m.put("%bfreq", smoothFreq(tok, this.lmFeats.backgroundBow));
+					m.put("%bafreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.backgroundBow));
 //					log.info("features for " + tok);
 //					log.info(m.toString());
 				}

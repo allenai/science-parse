@@ -97,7 +97,6 @@ public class PDFToCRFInput {
 			return null;
 		}
 		int nextToMatch = 0;
-		int idx = 0;
 		for(int i=0;i<seq.size();i++) {
 			String s = seq.get(i);
 			if(toks[nextToMatch].equalsIgnoreCase(s)) {
@@ -107,9 +106,8 @@ public class PDFToCRFInput {
 				i -= nextToMatch; //start back at char after start of match
 				nextToMatch = 0;
 			}
-			idx++;
 			if(nextToMatch==toks.length)
-				return Tuples.pair(idx-toks.length, idx);
+				return Tuples.pair(i+1-toks.length, i+1);
 		}
 		return null;
 	}
@@ -146,12 +144,22 @@ public class PDFToCRFInput {
 				pat += "((\\W)|[0-9])*"; //allow some non-alpha or number (typically, footnote marker) at end of author
 			}
 			try {
-				log.info("trying pattern " + pat);
+				//log.info("trying pattern " + pat);
 				out.add(Tuples.pair(Pattern.compile(pat), optional));
 			}
 			catch (Exception e) {
 				log.info("error in author pattern " + pat);
 			}
+		}
+		if(toks.length==2) { //special case, add optional middle initial
+			Pair<Pattern, Boolean> temp = out.get(1);
+			for(int i=2; i<out.size(); i++) {
+				val temp2 = out.get(i);
+				out.set(i, temp);
+				temp = temp2;
+			}
+			out.add(temp);
+			out.set(1, Tuples.pair(Pattern.compile("[A-Z](\\.)?"), true));
 		}
 		return out;
 	}

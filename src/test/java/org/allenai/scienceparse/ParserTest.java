@@ -62,7 +62,7 @@ public class ParserTest {
         InputStream pdfInputStream = getClass().getResourceAsStream(pdfPath);
         List<List<?>> arr =  new ObjectMapper().readValue(jsonInputStream, List.class);
         jsonInputStream.close();
-        ExtractedMetadata em = p.doParse(pdfInputStream);
+        ExtractedMetadata em = p.doParse(pdfInputStream, Parser.MAXHEADERWORDS);
         pdfInputStream.close();
         
         double titleTP = 0.0;
@@ -127,13 +127,14 @@ public class ParserTest {
 	  	opts.iterations = 10;
 	  	opts.threads = 4;
 	  	opts.modelFile = "src/test/resources/test.model";
-	  	opts.headerMax = 100;
+	  	opts.headerMax = Parser.MAXHEADERWORDS;
 	  	opts.backgroundSamples = 3;
 	  	opts.gazetteerFile = null;
 	  	opts.trainFraction = 0.9;
 	  	opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
-	  	opts.recentOnly = false;
+	  	opts.minYear = -1;
 	  	opts.checkAuthors = false;
+
 	  	File f = new File(opts.modelFile);
 	  	f.deleteOnExit();
 	  	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
@@ -157,6 +158,11 @@ public class ParserTest {
   public void testParserGroundTruth() throws Exception {
 	ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
 	Assert.assertEquals(pgt.papers.size(), 4);
+  }
+  
+  public void testParserRobustness() throws Exception {
+	  ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/papers-parseBugs.json"));
+	  Assert.assertEquals(false, true);
   }
   
 }

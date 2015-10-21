@@ -1,5 +1,6 @@
 package org.allenai.scienceparse;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -20,7 +21,12 @@ import lombok.Setter;
  * @author dcdowney
  *
  */
-public class ExtractedMetadata {
+public class ExtractedMetadata implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static final String titleTag = "T"; //label used in labeled data
 	public static final String authorTag = "A"; //label used in labeled data
 	
