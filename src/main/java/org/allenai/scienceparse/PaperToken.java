@@ -4,11 +4,10 @@ import org.allenai.scienceparse.pdfapi.PDFToken;
 
 public class PaperToken {
 	private PDFToken pdfToken; //the underlying pdf token
-								//TODO: perhaps this class should inherit from PDFToken
 	private int page; //page number in pdf doc
 	private int line; //line number in pdf doc
 	
-	public static PaperToken generateStartStopToken() {
+	public static PaperToken generateStartStopToken() { //needed to use CRF
 		return new PaperToken(null, -1, -1);
 	}
 	

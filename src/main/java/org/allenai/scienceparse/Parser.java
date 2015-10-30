@@ -30,6 +30,7 @@ import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
@@ -79,6 +80,9 @@ public class Parser {
           em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
           em.source = "META";
       }
+      if(doc.meta.createDate != null)
+    	  em.setYearFromDate(doc.meta.createDate);
+      clean(em);
       return em;
   }
   
@@ -311,14 +315,27 @@ public class Parser {
 	  return new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
   }
   
-  public static String processTitle(String t) {
-      // case fold and remove lead/trail space
-      t = t.trim().toLowerCase();
-      // strip accents and unicode changes
+  public static void clean(ExtractedMetadata em) {
+	  em.title = cleanTitle(em.title);
+	  em.authors = trimAuthors(em.authors);
+  }
+  
+  public static String cleanTitle(String t) {
+	  if(t==null || t.length()==0)
+		  return t;
+	// strip accents and unicode changes
       t = Normalizer.normalize(t, Normalizer.Form.NFKD);
       // kill non-character letters
       // kill xml
       t = t.replaceAll("\\&.*?\\;","");
+      return t;
+  }
+  
+  
+  public static String processTitle(String t) {
+      // case fold and remove lead/trail space
+      t = t.trim().toLowerCase();
+      t = cleanTitle(t);
       // kill non-letter chars
       t = t.replaceAll("\\W","");
       return t.replaceAll("\\s+"," ");
@@ -425,9 +442,10 @@ public class Parser {
 			  }
 			  fis.close();
 			  
-			  val oos = new ObjectOutputStream(new FileOutputStream(new File(outDir, f.getName() + ".dat")));
-			  oos.writeObject(em);
-			  oos.close();
+			  ObjectMapper mapper = new ObjectMapper();
+
+			  //Object to JSON in file
+			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
 		  }
 	  }
 	  else if(args[0].equalsIgnoreCase("parseAndScore")) {

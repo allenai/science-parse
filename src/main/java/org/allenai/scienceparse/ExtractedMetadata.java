@@ -1,19 +1,21 @@
 package org.allenai.scienceparse;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
 
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -21,20 +23,22 @@ import lombok.Setter;
  * @author dcdowney
  *
  */
-public class ExtractedMetadata implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+@Data
+@Slf4j
+public class ExtractedMetadata {
+
 	
 	public static final String titleTag = "T"; //label used in labeled data
 	public static final String authorTag = "A"; //label used in labeled data
 	
+	transient private static Pattern emailDelimitersRegex = Pattern.compile(",|\\||;");
+	
 	public String source;
 	public String title;
-	public Pair<Integer, Integer> titleOffset; //reference to some PDFDoc unknown to this object
+	public Pair<Integer, Integer> titleOffset; //these reference a PDFDoc unknown to this object
 	public List<String> authors;
-	public List<Pair<Integer, Integer>> authorOffset; //reference to some PDFDoc unknown to this object
+	public List<Pair<Integer, Integer>> authorOffset;
+	public List<String> emails; //extracted by special (non-CRF) heuristic process
 	int year;
 	
 	@RequiredArgsConstructor
@@ -59,6 +63,57 @@ public class ExtractedMetadata implements Serializable {
 				authors.add(PDFToCRFInput.stringAt(toks, ls.loc));
 			}
 		}
+		emails = getEmails(toks);
+	}
+	
+	//assumes token contains @
+	 public static List<String> tokToMail(String tok) {
+		 ArrayList<String> out = new ArrayList<>();
+            if (!tok.contains("@")) {
+                return null;
+            }
+            tok = tok.replaceAll("\\P{Print}", "");
+            if (tok.contains(":")) {
+            	tok = tok.split(":")[1];
+            }
+
+            String[] parts = tok.split("@");
+
+            if (parts.length == 2) {
+                String domain = parts[1];
+                String emailStrings = parts[0];
+                String[] emails = new String[1];
+                if ((emailStrings.startsWith("{") && emailStrings.endsWith("}"))
+                        || (emailStrings.startsWith("[") && emailStrings.endsWith
+                        ("]")) || emailStrings.contains(",") || emailStrings.contains("|")) {
+                    emailStrings = emailStrings.replaceAll("\\{|\\}|\\[|\\]", "");
+                    emails = emailStrings.split(emailDelimitersRegex.pattern());
+                } else {
+                    emails[0] = emailStrings;
+                }
+//	                System.out.println(line + "\t" + domain);
+                for (String email : emails) {
+                    out.add(email.trim() + "@" + domain);
+                }
+            }
+            else {
+            	log.debug("e-mail parts not 2");
+            }
+            //log.info("outputting " + out.size() + " addresses");
+        return out;
+    }
+
+	
+	public static List<String> getEmails(List<PaperToken> toks) {
+		ArrayList<String> out = new ArrayList<>();
+		for(PaperToken t : toks) {
+			if(t.getPdfToken() != null) {
+				String stT = t.getPdfToken().token;
+				if(stT != null && stT.contains("@"))
+					out.addAll(tokToMail(stT));
+			}
+		}
+		return out;
 	}
 	
 	public ExtractedMetadata(String sTitle, List<String> sAuthors, Date cDate) {
@@ -69,12 +124,20 @@ public class ExtractedMetadata implements Serializable {
 			cal.setTime(cDate);
 			year = cal.get(Calendar.YEAR);
 		}
+		emails = new ArrayList<String>();
 	}
 	
 	public ExtractedMetadata(Paper p) {
 		title = p.title;
 		authors = Arrays.asList(p.authors);
 		year = p.year;
+		emails = new ArrayList<String>();
+	}
+	
+	public void setYearFromDate(Date cDate) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(cDate);
+		year = cal.get(Calendar.YEAR);		
 	}
 	
 	public static List<LabelSpan> getSpans(List<String> labels) {
@@ -117,6 +180,7 @@ public class ExtractedMetadata implements Serializable {
 	public String toString() {
 		StringBuffer out = new StringBuffer("T: " + title + "\r\n");
 		authors.forEach((String a) -> out.append("A: " + a + "\r\n"));
+		emails.forEach((String a) -> out.append("E: " + a + "\r\n"));
 		return out.toString();
 	}
 	
