@@ -239,7 +239,11 @@ public class PDFExtractor {
             return null;
         }
         String strippedDate = cosVal.replace("^D:", "");
-        val cal = DateConverter.toCalendar(strippedDate);
+        Calendar cal = null;
+        try {
+        	cal = DateConverter.toCalendar(strippedDate);
+        }
+        catch(IOException e) {} //proceed with null
         return cal == null ? null : cal.getTime();
     }
 
@@ -295,13 +299,16 @@ public class PDFExtractor {
         }
         meta.title(title);
         pdfBoxDoc.close();
+        PDFPage firstPage = stripper.pages.get(0);
         PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
+            .headerStopLinePosition(getHeuristicHeaderStopIndex(firstPage))
             .meta(meta.build())
             .build();
-        PdfDocExtractionResult result =
-                PdfDocExtractionResult.builder().document(doc).highPrecision(highPrecision).build();
-        return result;
+
+        return PdfDocExtractionResult.builder()
+            .document(doc)
+            .highPrecision(highPrecision).build();
     }
 
     @SneakyThrows
@@ -315,6 +322,27 @@ public class PDFExtractor {
 
     public boolean DEBUG = false;
 
+    private int getHeuristicHeaderStopIndex(PDFPage firstPage) {
+        // Find first abstract line
+        OptionalInt abstractIdx = IntStream.range(0, firstPage.lines.size())
+            .filter(idx -> firstPage.lines.get(idx).lineText().trim().toLowerCase().startsWith("abstract"))
+            .findFirst();
+        if (abstractIdx.isPresent()) {
+            return abstractIdx.getAsInt();
+        }
+        // Find smallest line on page and if it appears in acceptable range, take it
+        double smallestSize = firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min().getAsDouble();
+        OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
+            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
+            .findFirst();
+        if (smallIdx.isPresent()) {
+            if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
+                return smallIdx.getAsInt();
+            }
+        }
+        return -1;
+    }
+    
     private String getHeuristicTitle(PDFCaptureTextStripper stripper) {
         PDFPage firstPage = stripper.pages.get(0);
         ToDoubleFunction<PDFLine> lineFontSize =
