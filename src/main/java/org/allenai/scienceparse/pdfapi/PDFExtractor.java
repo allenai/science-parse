@@ -256,7 +256,8 @@ public class PDFExtractor {
         val meta = PDFMetadata.builder()
             .title(info.getTitle() != null ? info.getTitle().trim() : null)
             .keywords(keywords)
-            .authors(authors);
+            .authors(authors)
+            .creator(info.getCreator());
         String createDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
         if (createDate != null) {
             meta.createDate(toDate(createDate));

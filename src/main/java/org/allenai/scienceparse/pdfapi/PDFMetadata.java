@@ -26,6 +26,7 @@ public class PDFMetadata {
     public final List<String> keywords;
     public final Date createDate;
     public final Date lastModifiedDate;
+    public final String creator;
 
     // HACK(aria42) For external testing purpose
     @SneakyThrows
