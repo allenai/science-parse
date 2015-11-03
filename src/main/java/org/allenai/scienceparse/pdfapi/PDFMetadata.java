@@ -31,11 +31,14 @@ public class PDFMetadata {
     // HACK(aria42) For external testing purpose
     @SneakyThrows
     public static void main(String[] args) {
-        InputStream pdfInputStream = new FileInputStream(args[0]);
         val extractor = new PDFExtractor();
-        PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = ow.writeValueAsString(meta);
-        System.out.println(json);
+        for(final String arg : args) {
+            try(InputStream pdfInputStream = new FileInputStream(arg)) {
+                PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
+                ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+                String json = ow.writeValueAsString(meta);
+                System.out.println(json);
+            }
+        }
     }
 }
