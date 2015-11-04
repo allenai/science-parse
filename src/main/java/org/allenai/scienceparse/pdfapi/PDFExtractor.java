@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+@Slf4j
 public class PDFExtractor {
 
     @Builder
@@ -59,8 +62,11 @@ public class PDFExtractor {
             val desc = pdFont.getFontDescriptor();
             String fontFamily = desc == null ? PDFFontMetrics.UNKNWON_FONT_FAMILY : desc.getFontName();
             float ptSize = firstTP.getFontSizeInPt();
+            //HACK(ddowney): ensure unique sizes get unique names/objects:
+            fontFamily += "_" + ptSize + "_" + firstTP.getWidthOfSpace();
             val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
             builder.fontMetrics(fontMetrics);
+
             float minX = Float.POSITIVE_INFINITY;
             float maxX = Float.NEGATIVE_INFINITY;
             float minY = Float.POSITIVE_INFINITY;
@@ -85,7 +91,8 @@ public class PDFExtractor {
             }
             FloatList bounds = FloatArrayList.newListWith(minX, minY, maxX, maxY);
             builder.bounds(bounds);
-            return builder.build();
+        	PDFToken out = builder.build();
+            return out;
         }
     }
 

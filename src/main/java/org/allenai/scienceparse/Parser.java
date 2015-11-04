@@ -65,7 +65,7 @@ public class Parser {
 	  PDFExtractor ext = new PDFExtractor(); 	  
 	  PDFDoc doc = ext.extractFromInputStream(is);
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
-      seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
+      seq = seq.subList(0, Math.min(seq.size(), headerMax));
       seq = PDFToCRFInput.padSequence(seq);
       ExtractedMetadata em = null;
       
@@ -431,6 +431,8 @@ public class Parser {
 		  File outDir = new File(args[3]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
 		  for(File f : inFiles) {
+			  if(!f.getName().endsWith(".pdf"))
+				  continue;
 			  val fis = new FileInputStream(f);
 			  ExtractedMetadata em = null;
 			  try {
@@ -507,8 +509,10 @@ public class Parser {
 					  metaTotal += 1.0;
 				  }
 					  
-				  if(tempTP != authGuessed.size() || tempTP != authExpected.length)
+				  if(tempTP != authGuessed.size() || tempTP != authExpected.length) {
 					  logger.info("auth error: " + tempTP + " right, exp " + Arrays.toString(authExpected) + " got " + authGuessed);
+					  logger.info(f.getName());
+				  }
 				  //logger.info("authors: " + em.authors);
 				  if(procExpected.equals(procGuessed))
 					  if(em.source=="CRF")
