@@ -33,7 +33,7 @@ public class PDFPredicateExtractorTest {
         
         
         Assert.assertEquals(preds.get(pos.getOne()).get("%fcb"), 1.0);    
-        Assert.assertTrue(!preds.get(pos.getTwo()).containsKey("%fcb"));
+        Assert.assertTrue(!preds.get(pos.getTwo() - 1).containsKey("%fcb"));
 //        Assert.assertEquals(preds.get(pos.getTwo()).get("%fcf"), 1.0);    
 //        Assert.assertTrue(!preds.get(pos.getOne()).containsKey("%fcf"));
         log.info("Title font change features correct.");

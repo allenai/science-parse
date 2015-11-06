@@ -61,6 +61,14 @@ public class Parser {
 	  public boolean checkAuthors; //only bootstraps papers if all authors are found
   }
   
+
+  
+  public Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw) throws IOException {
+      List<BibRecord> brs = ExtractReferences.findReferences(raw);
+      List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs);
+      return Tuples.pair(brs, crs);
+  }
+  
   public ExtractedMetadata doParse(InputStream is, int headerMax) throws IOException {
 	  PDFExtractor ext = new PDFExtractor(); 	  
 	  PDFDoc doc = ext.extractFromInputStream(is);
@@ -83,6 +91,7 @@ public class Parser {
       if(doc.meta.createDate != null)
     	  em.setYearFromDate(doc.meta.createDate);
       clean(em);
+      em.raw = PDFToCRFInput.getRaw(doc);
       return em;
   }
   
@@ -138,7 +147,7 @@ public class Parser {
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
       if(seq.size()==0)
     	  return null;
-      seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
+      seq = seq.subList(0, Math.min(seq.size(), headerMax));
       ExtractedMetadata em = null;
       if(p==null) { //bootstrap:
 	      em = new ExtractedMetadata(doc.getMeta().getTitle(), doc.getMeta().getAuthors(),

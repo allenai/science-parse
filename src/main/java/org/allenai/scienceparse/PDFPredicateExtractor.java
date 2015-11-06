@@ -108,13 +108,13 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 			return s;
 	}
 	
-	private float getY(PaperToken t, boolean upper) {
+	public static float getY(PaperToken t, boolean upper) {
 		if(upper)
 			return t.getPdfToken().bounds.get(1);
 		else
 			return t.getPdfToken().bounds.get(3);
 	}
-	
+		
 	public double logYDelt(float y1, float y2) {
 		return Math.log(Math.max(y1 - y2, 0.00001f));
 	}

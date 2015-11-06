@@ -145,7 +145,7 @@ public class PDFToCRFInput {
 			}
 			try {
 				//log.info("trying pattern " + pat);
-				out.add(Tuples.pair(Pattern.compile(pat), optional));
+				out.add(Tuples.pair(Pattern.compile(pat, Pattern.CASE_INSENSITIVE), optional));
 			}
 			catch (Exception e) {
 				log.info("error in author pattern " + pat);
@@ -179,6 +179,68 @@ public class PDFToCRFInput {
 		}
 	}
 		
+	public static double breakSize(PDFLine l2, PDFLine l1) {
+		if(l2==null || l1==null)
+			return 0.0;
+		return getY(l2, true) - getY(l1, false);
+	}
+	
+	public static float getY(PDFLine l, boolean upper) {
+		if(upper)
+			return l.bounds().get(1);
+		else
+			return l.bounds().get(3);
+	}
+	
+	public static double getTopQuartileLineBreak(PDFDoc pdf) {
+		ArrayList<Double> breaks = new ArrayList<>();
+		for(PDFPage p : pdf.getPages()) {
+			PDFLine prevLine = null;
+			for(PDFLine l : p.getLines()) {
+				double bs = breakSize(l, prevLine);
+				if(bs > 0) //assume <= 0 is error
+					breaks.add(bs);
+				prevLine = l;
+			}
+		}
+		breaks.sort((d1, d2) -> Double.compare(d1, d2));
+		log.info("breaks: ");
+		log.info(breaks.toString());
+		int idx = (3 * breaks.size())/4;
+		return breaks.get(idx);
+	}
+	
+	public static String lineToString(PDFLine l) {
+		StringBuffer sb = new StringBuffer();
+		l.tokens.forEach(t -> sb.append(t.token + " "));
+		return sb.toString().trim();
+	}
+	
+	/**
+	 * Returns list of strings representation of this file.  Breaks new lines when pdf line break larger than median line break.
+	 * @param pdf
+	 * @return
+	 */
+	public static List<String> getRaw(PDFDoc pdf) {
+		ArrayList<String> out = new ArrayList<>();
+		int pg = 0;
+		double qLineBreak = getTopQuartileLineBreak(pdf);
+		log.info("median line break: " + qLineBreak);
+		StringBuffer s = new StringBuffer();
+		PDFLine prevLine = null;
+		for(PDFPage p : pdf.getPages()) {
+			for(PDFLine l : p.getLines()) {
+				if(breakSize(l, prevLine) > qLineBreak) {
+					out.add(s.toString());
+					s = new StringBuffer();
+				}
+				s.append(lineToString(l));
+				prevLine = l;
+			}
+		}
+		return out;
+	}
+	
 	/**
 	 * Returns the PaperToken sequence form of a given PDF document<br>
 	 * @param pdd	The PDF Document to convert into instances  
