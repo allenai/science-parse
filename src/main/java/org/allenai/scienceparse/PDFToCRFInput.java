@@ -231,10 +231,10 @@ public class PDFToCRFInput {
 		for(PDFPage p : pdf.getPages()) {
 			for(PDFLine l : p.getLines()) {
 				if(breakSize(l, prevLine) > qLineBreak) {
-					out.add(s.toString());
+					out.add(s.toString().trim());
 					s = new StringBuffer();
 				}
-				s.append(lineToString(l));
+				s.append(lineToString(l) + " ");
 				prevLine = l;
 			}
 		}
