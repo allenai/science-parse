@@ -61,11 +61,19 @@ public class Parser {
 	  public boolean checkAuthors; //only bootstraps papers if all authors are found
   }
   
+
+  
+  public Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw) throws IOException {
+      List<BibRecord> brs = ExtractReferences.findReferences(raw);
+      List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs);
+      return Tuples.pair(brs, crs);
+  }
+  
   public ExtractedMetadata doParse(InputStream is, int headerMax) throws IOException {
 	  PDFExtractor ext = new PDFExtractor(); 	  
 	  PDFDoc doc = ext.extractFromInputStream(is);
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
-      seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
+      seq = seq.subList(0, Math.min(seq.size(), headerMax));
       seq = PDFToCRFInput.padSequence(seq);
       ExtractedMetadata em = null;
       
@@ -83,6 +91,7 @@ public class Parser {
       if(doc.meta.createDate != null)
     	  em.setYearFromDate(doc.meta.createDate);
       clean(em);
+      //em.raw = PDFToCRFInput.getRaw(doc);
       return em;
   }
   
@@ -138,7 +147,7 @@ public class Parser {
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
       if(seq.size()==0)
     	  return null;
-      seq = seq.subList(0, Math.min(seq.size()-1, headerMax));
+      seq = seq.subList(0, Math.min(seq.size(), headerMax));
       ExtractedMetadata em = null;
       if(p==null) { //bootstrap:
 	      em = new ExtractedMetadata(doc.getMeta().getTitle(), doc.getMeta().getAuthors(),
@@ -173,12 +182,14 @@ public class Parser {
   
   public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
 		  ParserGroundTruth pgt, String paperDir, int headerMax, boolean heuristicHeader, int maxFiles,
-		  int minYear, boolean checkAuthors) throws IOException {
+		  int minYear, boolean checkAuthors, UnifiedSet<String> excludeIDs) throws IOException {
 	  List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
 	  File dir = new File(paperDir);
 	  PDFExtractor ext = new PDFExtractor();
 	  for(Paper p : pgt.papers) {
 		  if(minYear > 0 && p.year < minYear)
+			  continue;
+		  if(excludeIDs.contains(p.id))
 			  continue;
 		  File f = new File(dir, p.id.substring(4) + ".pdf"); //first four are directory, rest is file name
 		  val res = getPaperLabels(f, p, ext, heuristicHeader, headerMax, checkAuthors);
@@ -205,17 +216,30 @@ public class Parser {
       return labeledData;
   }
   
+  private static UnifiedSet<String> readSet(String inFile) throws IOException {
+	  val out = new UnifiedSet<String>();
+	  BufferedReader brIn = new BufferedReader(new FileReader(inFile));
+	  String sLine;
+	  while((sLine = brIn.readLine()) != null) {
+		  out.add(sLine);
+	  }
+	  brIn.close();
+	  return out;
+  }
+  
   //borrowing heavily from conll.Trainer
-  public static void trainParser(List<File> files, ParserGroundTruth pgt, String paperDir, ParseOpts opts) 
+  public static void trainParser(List<File> files, ParserGroundTruth pgt, String paperDir, ParseOpts opts,
+		  String excludeIDsFile) 
 		  throws IOException {
-	  
+	  UnifiedSet<String> excludeIDs = readSet(excludeIDsFile);
       List<List<Pair<PaperToken, String>>> labeledData;
       PDFPredicateExtractor predExtractor;
       if(files!= null) {
-    	  labeledData = bootstrapLabels(files, opts.headerMax, true);
+    	  labeledData = bootstrapLabels(files, opts.headerMax, true); //don't exclude for pdf meta bootstrap
       }
       else {
-    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.minYear, opts.checkAuthors);
+    	  labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.minYear, opts.checkAuthors,
+    			  excludeIDs);
       }
       ParserLMFeatures plf = null;
       if(opts.gazetteerFile != null) {
@@ -224,6 +248,7 @@ public class Parser {
     	  int endIdx = gaz.papers.size();
     	  UnifiedSet<String> trainIds = new UnifiedSet<String>();
     	  pgt.papers.forEach((Paper p) -> trainIds.add(p.id));
+    	  trainIds.addAll(excludeIDs);
           plf = new ParserLMFeatures(gaz.papers, trainIds, stIdx, endIdx, new File(opts.backgroundDirectory), opts.backgroundSamples);
     	  predExtractor = new PDFPredicateExtractor(plf);
       }
@@ -391,10 +416,10 @@ public class Parser {
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
 			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
-			  (args.length==6 && args[0].equalsIgnoreCase("learn"))||
+			  (args.length==7 && args[0].equalsIgnoreCase("learn"))||
 			  (args.length==5 && args[0].equalsIgnoreCase("parseAndScore")))) {
 		  System.err.println("Usage: bootstrap <input dir> <model output file>");
-		  System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir>");
+		  System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
 		  System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
 	  }
@@ -407,7 +432,7 @@ public class Parser {
 		  opts.headerMax = 100;
 		  opts.iterations = inFiles.size()/10; //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
-		  trainParser(inFiles, null, null, opts);		  
+		  trainParser(inFiles, null, null, opts, null);		  
 	  }
 	  else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
 		  ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
@@ -423,7 +448,7 @@ public class Parser {
 		  opts.trainFraction = 0.9;
 		  opts.checkAuthors = true;
 		  opts.minYear = 2008;
-		  trainParser(null, pgt, args[3], opts);
+		  trainParser(null, pgt, args[3], opts, args[6]);
 	  }
 	  else if(args[0].equalsIgnoreCase("parse")) {
 		  Parser p = new Parser(args[2]);
@@ -431,6 +456,8 @@ public class Parser {
 		  File outDir = new File(args[3]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
 		  for(File f : inFiles) {
+			  if(!f.getName().endsWith(".pdf"))
+				  continue;
 			  val fis = new FileInputStream(f);
 			  ExtractedMetadata em = null;
 			  try {
@@ -507,8 +534,10 @@ public class Parser {
 					  metaTotal += 1.0;
 				  }
 					  
-				  if(tempTP != authGuessed.size() || tempTP != authExpected.length)
+				  if(tempTP != authGuessed.size() || tempTP != authExpected.length) {
 					  logger.info("auth error: " + tempTP + " right, exp " + Arrays.toString(authExpected) + " got " + authGuessed);
+					  logger.info(f.getName());
+				  }
 				  //logger.info("authors: " + em.authors);
 				  if(procExpected.equals(procGuessed))
 					  if(em.source=="CRF")

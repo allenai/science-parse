@@ -37,9 +37,11 @@ public class ExtractedMetadata {
 	public String title;
 	public Pair<Integer, Integer> titleOffset; //these reference a PDFDoc unknown to this object
 	public List<String> authors;
-	public List<Pair<Integer, Integer>> authorOffset;
+	public List<Pair<Integer, Integer>> authorOffset; //these reference a PDFDoc unknown to this object
 	public List<String> emails; //extracted by special (non-CRF) heuristic process
 	int year;
+	public List<String> raw; //the full paper text
+	public Pair<List<BibRecord>, List<CitationRecord>> references; //references, with char offsets relative to raw
 	
 	@RequiredArgsConstructor
 	public static class LabelSpan {
@@ -74,7 +76,8 @@ public class ExtractedMetadata {
             }
             tok = tok.replaceAll("\\P{Print}", "");
             if (tok.contains(":")) {
-            	tok = tok.split(":")[1];
+            	if(tok.split(":").length > 1)
+            		tok = tok.split(":")[1];
             }
 
             String[] parts = tok.split("@");
