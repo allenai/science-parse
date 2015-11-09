@@ -231,7 +231,9 @@ public class Parser {
   public static void trainParser(List<File> files, ParserGroundTruth pgt, String paperDir, ParseOpts opts,
 		  String excludeIDsFile) 
 		  throws IOException {
-	  UnifiedSet<String> excludeIDs = readSet(excludeIDsFile);
+	  UnifiedSet<String> excludeIDs = new UnifiedSet<String>();
+	  if(excludeIDsFile!= null)
+		  excludeIDs = readSet(excludeIDsFile);
       List<List<Pair<PaperToken, String>>> labeledData;
       PDFPredicateExtractor predExtractor;
       if(files!= null) {
