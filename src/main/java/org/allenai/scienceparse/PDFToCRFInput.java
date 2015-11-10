@@ -204,8 +204,8 @@ public class PDFToCRFInput {
 			}
 		}
 		breaks.sort((d1, d2) -> Double.compare(d1, d2));
-		log.info("breaks: ");
-		log.info(breaks.toString());
+//		log.info("breaks: ");
+//		log.info(breaks.toString());
 		int idx = (3 * breaks.size())/4;
 		return breaks.get(idx);
 	}
@@ -225,7 +225,7 @@ public class PDFToCRFInput {
 		ArrayList<String> out = new ArrayList<>();
 		int pg = 0;
 		double qLineBreak = getTopQuartileLineBreak(pdf);
-		log.info("median line break: " + qLineBreak);
+		//log.info("median line break: " + qLineBreak);
 		StringBuffer s = new StringBuffer();
 		PDFLine prevLine = null;
 		for(PDFPage p : pdf.getPages()) {

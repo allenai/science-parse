@@ -91,7 +91,7 @@ public class Parser {
       if(doc.meta.createDate != null)
     	  em.setYearFromDate(doc.meta.createDate);
       clean(em);
-      //em.raw = PDFToCRFInput.getRaw(doc);
+      em.raw = PDFToCRFInput.getRaw(doc);
       return em;
   }
   
