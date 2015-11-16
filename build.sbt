@@ -12,6 +12,8 @@ disableBintray()
 
 sources in (Compile,doc) := Seq.empty
 
+mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
