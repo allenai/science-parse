@@ -40,9 +40,13 @@ public class PDFMetadata {
             if(args.length > 1)
                 prefix = arg + "\t";
             try(InputStream pdfInputStream = new FileInputStream(arg)) {
-                PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
-                String json = ow.writeValueAsString(meta);
-                System.out.println(prefix + json);
+                try {
+                    PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
+                    String json = ow.writeValueAsString(meta);
+                    System.out.println(prefix + json);
+                } catch (final Exception e) {
+                    System.out.println(prefix + "ERROR: " + e);
+                }
             }
         }
     }
