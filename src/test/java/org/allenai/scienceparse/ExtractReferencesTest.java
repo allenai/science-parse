@@ -26,10 +26,11 @@ public class ExtractReferencesTest {
 	  }
 	
 	public void testFindReferences() throws Exception {
-		String ans = "[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
+		String ans1 = "[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
 				+ "arrays,” in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
-				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.";		
-		File paper = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));
+				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.";
+		File paper1 = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));
+		File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
 		//File paper = new File("e:\\data\\science-parse\\qtest\\aaai04.pdf");
 
 		Parser.ParseOpts opts = new Parser.ParseOpts();
@@ -50,7 +51,8 @@ public class ExtractReferencesTest {
 		Parser.trainParser(null, pgt, resourceDirectory("/groundTruth.json"), opts, null); //assumes pdfs in same dir as groundTruth
 		Parser p = new Parser(opts.modelFile);
 		
-		val fis = new FileInputStream(paper);
+		//paper 1:
+		FileInputStream fis = new FileInputStream(paper1);
 		ExtractedMetadata em = null;
 		try {
 			em = p.doParse(fis, Parser.MAXHEADERWORDS);
@@ -76,6 +78,34 @@ public class ExtractReferencesTest {
 		//can't use below because dash is special:
 //		Assert.assertEquals("IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.", br.get(0).venue.trim());
+		
+		//paper2:
+		fis = new FileInputStream(paper2);
+		em = null;
+		try {
+			em = p.doParse(fis, Parser.MAXHEADERWORDS);
+		}
+		catch(Exception e) {
+			log.info("Parse error: " + f);
+			//e.printStackTrace();
+		}
+		fis.close();
+		br = ExtractReferences.findReferences(em.raw);
+		j=0;
+		for(BibRecord b : br)
+			log.info("reference " + (j++) + " " + (b==null?"null":b.toString()));
+		for(BibRecord b : br)
+			Assert.assertNotNull(b);
+		Assert.assertEquals(16, br.size());
+		BibRecord tbr = br.get(15);
+		Assert.assertEquals("DASD dancing: A disk load balancing optimization scheme for video-on-demand computer systems", tbr.title);
+		Assert.assertEquals("Wolf et al., 1995", tbr.citeStr);
+		Assert.assertEquals("J. Wolf", tbr.author.get(0));
+		Assert.assertEquals("P. Yu", tbr.author.get(1));
+		Assert.assertEquals("H. Shachnai", tbr.author.get(2));
+		Assert.assertEquals(1995, tbr.year);
+		log.info(br.get(0).venue.trim());
+		Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
 		
 	}
 	

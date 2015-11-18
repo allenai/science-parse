@@ -206,7 +206,7 @@ public class PDFToCRFInput {
 		breaks.sort((d1, d2) -> Double.compare(d1, d2));
 //		log.info("breaks: ");
 //		log.info(breaks.toString());
-		int idx = (3 * breaks.size())/4;
+		int idx = (1 * breaks.size())/3;
 		return breaks.get(idx);
 	}
 	
