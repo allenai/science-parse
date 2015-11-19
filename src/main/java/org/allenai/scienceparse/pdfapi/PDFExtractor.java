@@ -339,13 +339,18 @@ public class PDFExtractor {
             return abstractIdx.getAsInt();
         }
         // Find smallest line on page and if it appears in acceptable range, take it
-        double smallestSize = firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min().getAsDouble();
-        OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
-            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
-            .findFirst();
-        if (smallIdx.isPresent()) {
-            if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
-                return smallIdx.getAsInt();
+        final OptionalDouble smallestSizeOption =
+            firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min();
+        if(smallestSizeOption.isPresent()) {
+            final double smallestSize = smallestSizeOption.getAsDouble();
+
+            OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
+                    .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
+                    .findFirst();
+            if (smallIdx.isPresent()) {
+                if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
+                    return smallIdx.getAsInt();
+                }
             }
         }
         return -1;
