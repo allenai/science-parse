@@ -291,7 +291,7 @@ public class PDFExtractor {
         stripper.getText(pdfBoxDoc);
         String title = info.getTitle();
         // kill bad title
-        if (badPDFTitle(stripper.pages.get(0), title)) {
+            if (stripper.pages.isEmpty() || badPDFTitle(stripper.pages.get(0), title)) {
             title = null;
         }
         boolean highPrecision = title != null;
