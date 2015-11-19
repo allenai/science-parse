@@ -14,7 +14,7 @@ public class PDFDoc {
      * Index in the lines of the first page which is the stop (one beyond the last)
      * line that makes the header of the document (the title, authors, etc.)
      *
-     * This is < 0 if we can't find an approriate header/main cut.
+     * This is < 0 if we can't find an appropriate header/main cut.
      */
     private final int headerStopLinePosition;
 
