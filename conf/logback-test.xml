@@ -16,4 +16,5 @@
   <logger name="org.apache.spark" level="${logback_s2Level:-WARN}" />
   <logger name="org.spark-project.jetty" level="${logback_s2Level:-WARN}" />
   <logger name="org.apache.pdfbox" level="OFF" />
+  <logger name="org.apache.fontbox" level="OFF" />
 </configuration>
