@@ -307,10 +307,19 @@ public class PDFExtractor {
         }
         meta.title(title);
         pdfBoxDoc.close();
-        PDFPage firstPage = stripper.pages.get(0);
+
+            int headerStopIndex = -1;
+            if(!stripper.pages.isEmpty()) {
+                final PDFPage firstPage = stripper.pages.get(0);
+                headerStopIndex = getHeuristicHeaderStopIndex(firstPage);
+            } else {
+                // Anecdotally, when we have no pages, the output is such garbage that we might be
+                // better off throwing an exception. TBD
+            }
+
         PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
-            .headerStopLinePosition(getHeuristicHeaderStopIndex(firstPage))
+                .headerStopLinePosition(headerStopIndex)
             .meta(meta.build())
             .build();
 
