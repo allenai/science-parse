@@ -24,8 +24,11 @@ public class ExtractReferencesTest {
 	  public String resourceDirectory(String path) {
 		  return (new File(this.getClass().getResource(path).getFile())).getParent();
 	  }
-	
+	  
 	public void testFindReferences() throws Exception {
+		
+		ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
+		
 		String ans1 = "[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
 				+ "arrays,” in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.";
@@ -51,6 +54,7 @@ public class ExtractReferencesTest {
 		Parser.trainParser(null, pgt, resourceDirectory("/groundTruth.json"), opts, null); //assumes pdfs in same dir as groundTruth
 		Parser p = new Parser(opts.modelFile);
 		
+		
 		//paper 1:
 		FileInputStream fis = new FileInputStream(paper1);
 		ExtractedMetadata em = null;
@@ -62,7 +66,7 @@ public class ExtractReferencesTest {
 			//e.printStackTrace();
 		}
 		fis.close();
-		List<BibRecord> br = ExtractReferences.findReferences(em.raw);
+		List<BibRecord> br = er.findReferences(em.raw);
 		int j=0;
 		for(BibRecord b : br)
 			log.info("reference " + (j++) + " " + (b==null?"null":b.toString()));
@@ -90,7 +94,7 @@ public class ExtractReferencesTest {
 			//e.printStackTrace();
 		}
 		fis.close();
-		br = ExtractReferences.findReferences(em.raw);
+		br = er.findReferences(em.raw);
 		j=0;
 		for(BibRecord b : br)
 			log.info("reference " + (j++) + " " + (b==null?"null":b.toString()));

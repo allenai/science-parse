@@ -1,8 +1,5 @@
 package org.allenai.scienceparse;
 
-import org.allenai.scienceparse.pdfapi.PDFDoc;
-import org.allenai.scienceparse.pdfapi.PDFExtractor;
-import org.allenai.scienceparse.pdfapi.PDFExtractorTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
-import com.sun.media.jfxmedia.logging.Logger;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +22,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ParserTest {
 
-  public String filePathOfResource(String path) {
-    return this.getClass().getResource(path).getFile();
+  public static String filePathOfResource(String path) {
+    return ParserTest.class.getResource(path).getFile();
   }
   
-  public String resourceDirectory(String path) {
-	  return (new File(this.getClass().getResource(path).getFile())).getParent();
+  public static String resourceDirectory(String path) {
+	  return (new File(ParserTest.class.getResource(path).getFile())).getParent();
   }
   
   private final static List<String> pdfKeys = Arrays.asList("/bagnell11", "/seung08", "/ding11", "/mooney05",

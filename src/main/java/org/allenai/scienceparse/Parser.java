@@ -63,9 +63,9 @@ public class Parser {
   
 
   
-  public Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw) throws IOException {
-      List<BibRecord> brs = ExtractReferences.findReferences(raw);
-      List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs);
+  public Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw, ExtractReferences er) throws IOException {
+      List<BibRecord> brs = er.findReferences(raw);
+      List<CitationRecord> crs = er.findCitations(raw, brs);
       return Tuples.pair(brs, crs);
   }
   
@@ -419,11 +419,13 @@ public class Parser {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
 			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
 			  (args.length==7 && args[0].equalsIgnoreCase("learn"))||
-			  (args.length==5 && args[0].equalsIgnoreCase("parseAndScore")))) {
+			  (args.length==5 && args[0].equalsIgnoreCase("parseAndScore"))||
+			  (args.length==5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
 		  System.err.println("Usage: bootstrap <input dir> <model output file>");
 		  System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
 		  System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
+		  System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file>");
 	  }
 	  else if(args[0].equalsIgnoreCase("bootstrap")) {
 		  File inDir = new File(args[1]);
@@ -457,6 +459,8 @@ public class Parser {
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
+		  ObjectMapper mapper = new ObjectMapper();
+
 		  for(File f : inFiles) {
 			  if(!f.getName().endsWith(".pdf"))
 				  continue;
@@ -471,8 +475,6 @@ public class Parser {
 			  }
 			  fis.close();
 			  
-			  ObjectMapper mapper = new ObjectMapper();
-
 			  //Object to JSON in file
 			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
 		  }
@@ -572,6 +574,47 @@ public class Parser {
 		  logger.info("overall author precision: " + (crfPrecision + metaPrecision)/(crfTotal + metaTotal) );
 		  logger.info("overall author recall: " + (crfRecall + metaRecall)/((double) totalFiles) );
 		  //TODO: write output
+	  }
+	  else if(args[0].equalsIgnoreCase("scoreRefExtraction")) {
+		  Parser p = new Parser(args[2]);
+		  File inDir = new File(args[1]);
+		  File outDir = new File(args[3]);
+		  ExtractReferences er = new ExtractReferences(args[4]);
+		  List<File> inFiles = Arrays.asList(inDir.listFiles());
+		  HashSet<String> foundRefs = new HashSet<String>();
+		  HashSet<String> unfoundRefs = new HashSet<String>();
+
+		  ObjectMapper mapper = new ObjectMapper();
+		  
+		  for(File f : inFiles) {
+			  if(!f.getName().endsWith(".pdf"))
+				  continue;
+			  val fis = new FileInputStream(f);
+			  ExtractedMetadata em = null;
+			  try {
+				  em = p.doParse(fis, MAXHEADERWORDS);
+				  List<BibRecord> br = er.findReferences(em.raw);
+				  if(br.size() > 3) {  //HACK: assume > 3 refs means valid ref list
+					  foundRefs.add(f.getAbsolutePath());
+					  mapper.writeValue(new File(outDir, f.getName() + ".dat"), br);
+				  }
+				  else {
+					  unfoundRefs.add(f.getAbsolutePath());
+				  }
+			  }
+			  catch(Exception e) {
+				  logger.info("Parse error: " + f);
+				  //e.printStackTrace();
+			  }
+			  fis.close();
+			  
+		  }		  
+
+		  //Object to JSON in file
+		  mapper.writeValue(new File(outDir, "unfoundReferences.dat"), unfoundRefs);
+		  mapper.writeValue(new File(outDir, "foundReferences.dat"), foundRefs);
+		  logger.info("found refs for " + foundRefs.size() + " papers.");;
+		  logger.info("failed to find refs for " + unfoundRefs.size() + " papers.");;
 	  }
   }
 }

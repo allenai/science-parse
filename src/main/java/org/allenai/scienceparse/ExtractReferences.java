@@ -1,5 +1,6 @@
 package org.allenai.scienceparse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ExtractReferences {
+	
+	CheckReferences cr;
+	
+	public ExtractReferences(String jsonFile) throws IOException {
+		cr = new CheckReferences(jsonFile);
+	}
 	
 	public static abstract class BibStractor {
 		public abstract List<BibRecord> parse(String source);
@@ -103,9 +110,9 @@ public class ExtractReferences {
 		if(Pattern.compile("\\p{Lu}\\..*").matcher(authString).matches()) {
 			firstLast = true;
 		}
-		log.info("auth string: " + authString);
+//		log.info("auth string: " + authString);
 		String [] names = authString.split("(,|( and ))+");
-		log.info("names: " + Arrays.toString(names));
+//		log.info("names: " + Arrays.toString(names));
 		if(firstLast) {
 			out = Arrays.asList(names);
 		}
@@ -117,7 +124,7 @@ public class ExtractReferences {
 					out.add(names[i].trim()); //hope for the best
 			}
 		}
-		log.info("out: " + out.toString());
+//		log.info("out: " + out.toString());
 		return out;
 	}
 	
@@ -169,7 +176,7 @@ public class ExtractReferences {
 				line = line.substring(4);
 			String [] citesa = line.split("<bb>");
 			List<String> cites = Arrays.asList(citesa);
-			log.info(cites.get(0));
+//			log.info(cites.get(0));
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
 				out.add(this.recParser.parseRecord(s));
@@ -216,6 +223,7 @@ public class ExtractReferences {
 			for(String s : cites) {
 				out.add(this.recParser.parseRecord(s));
 			}
+			out = removeNulls(out);
 			return out;
 		}
 	}
@@ -230,19 +238,30 @@ public class ExtractReferences {
 		return -1;
 	}
 	
-	public static int longestIdx(List<BibRecord> [] results) {
+	public int numFound(List<BibRecord> brs) {
+		int i=0;
+		for(BibRecord br : brs) {
+			if(cr.hasPaper(br.title, br.author, br.year, br.venue))
+				i++;
+		}
+		return i;
+	}
+	
+	public int longestIdx(List<BibRecord> [] results) {
 		int maxLen = -1;
 		int idx = -1;
 		for(int i=0; i<results.length; i++) {
 			if(results[i].size() > maxLen) {
 				idx = i;
 				maxLen = results[i].size();
+				log.info("found " + maxLen + " refs with extractor " + idx);
 			}
 		}
 		return idx;
 	}
 	
-	public static List<BibRecord> findReferences(List<String> paper) {
+	
+	public List<BibRecord> findReferences(List<String> paper) {
 		int start = refStart(paper) + 1;
 		List<BibRecord> [] results = new ArrayList[extractors.size()];
 		for(int i=0; i<results.length; i++)
@@ -263,4 +282,5 @@ public class ExtractReferences {
 		ArrayList<CitationRecord> out = new ArrayList<>();
 		return out;
 	}
+	
 }
