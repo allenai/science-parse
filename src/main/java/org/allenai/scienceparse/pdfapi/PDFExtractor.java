@@ -256,67 +256,76 @@ public class PDFExtractor {
 
     @SneakyThrows
     public PdfDocExtractionResult extractResultFromInputStream(InputStream is) {
-        PDDocument pdfBoxDoc = PDDocument.load(is);
-        val info = pdfBoxDoc.getDocumentInformation();
-        List<String> keywords = guessKeywordList(info.getKeywords());
-        List<String> authors = guessAuthorList(info.getAuthor());
-        val meta = PDFMetadata.builder()
-            .title(info.getTitle() != null ? info.getTitle().trim() : null)
-            .keywords(keywords)
-            .authors(authors)
-            .creator(info.getCreator());
-        String createDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
-        if (createDate != null) {
-            meta.createDate(toDate(createDate));
-        } else {
-            // last ditch attempt to read date from non-standard meta
-            OptionalInt guessYear = Stream.of("Date", "Created")
-                .map(info::getCustomMetadataValue)
-                .filter(d -> d != null && d.matches("\\d\\d\\d\\d"))
-                .mapToInt(Integer::parseInt)
-                .findFirst();
-            if (guessYear.isPresent()) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.clear();
-                calendar.set(Calendar.YEAR, guessYear.getAsInt());
-                meta.createDate(calendar.getTime());
-            }
-        }
-        String lastModDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
-        if (lastModDate != null) {
-            meta.lastModifiedDate(toDate(lastModDate));
-        }
-        val stripper = new PDFCaptureTextStripper();
-        // SIDE-EFFECT pages ivar in stripper is populated
-        stripper.getText(pdfBoxDoc);
-        String title = info.getTitle();
-        // kill bad title
-        if (badPDFTitle(stripper.pages.get(0), title)) {
-            title = null;
-        }
-        boolean highPrecision = title != null;
-        // Title heuristic
-        if (opts.useHeuristicTitle && title == null) {
-            try {
-                String guessTitle = getHeuristicTitle(stripper);
-                if (!badPDFTitleFast(guessTitle)) {
-                    title = guessTitle;
+        try(PDDocument pdfBoxDoc = PDDocument.load(is)) {
+            val info = pdfBoxDoc.getDocumentInformation();
+            List<String> keywords = guessKeywordList(info.getKeywords());
+            List<String> authors = guessAuthorList(info.getAuthor());
+            val meta = PDFMetadata.builder()
+                    .title(info.getTitle() != null ? info.getTitle().trim() : null)
+                    .keywords(keywords)
+                    .authors(authors)
+                    .creator(info.getCreator());
+            String createDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
+            if (createDate != null) {
+                meta.createDate(toDate(createDate));
+            } else {
+                // last ditch attempt to read date from non-standard meta
+                OptionalInt guessYear = Stream.of("Date", "Created")
+                        .map(info::getCustomMetadataValue)
+                        .filter(d -> d != null && d.matches("\\d\\d\\d\\d"))
+                        .mapToInt(Integer::parseInt)
+                        .findFirst();
+                if (guessYear.isPresent()) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.clear();
+                    calendar.set(Calendar.YEAR, guessYear.getAsInt());
+                    meta.createDate(calendar.getTime());
                 }
             }
-            catch (Exception ex) {}
-        }
-        meta.title(title);
-        pdfBoxDoc.close();
-        PDFPage firstPage = stripper.pages.get(0);
-        PDFDoc doc = PDFDoc.builder()
-            .pages(stripper.pages)
-            .headerStopLinePosition(getHeuristicHeaderStopIndex(firstPage))
-            .meta(meta.build())
-            .build();
+            String lastModDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
+            if (lastModDate != null) {
+                meta.lastModifiedDate(toDate(lastModDate));
+            }
+            val stripper = new PDFCaptureTextStripper();
+            // SIDE-EFFECT pages ivar in stripper is populated
+            stripper.getText(pdfBoxDoc);
+            String title = info.getTitle();
+            // kill bad title
+            if (stripper.pages.isEmpty() || badPDFTitle(stripper.pages.get(0), title)) {
+                title = null;
+            }
+            boolean highPrecision = title != null;
+            // Title heuristic
+            if (opts.useHeuristicTitle && title == null) {
+                try {
+                    String guessTitle = getHeuristicTitle(stripper);
+                    if (!badPDFTitleFast(guessTitle)) {
+                        title = guessTitle;
+                    }
+                } catch (Exception ex) {
+                }
+            }
+            meta.title(title);
 
-        return PdfDocExtractionResult.builder()
-            .document(doc)
-            .highPrecision(highPrecision).build();
+            int headerStopIndex = -1;
+            if(!stripper.pages.isEmpty()) {
+                final PDFPage firstPage = stripper.pages.get(0);
+                headerStopIndex = getHeuristicHeaderStopIndex(firstPage);
+            } else {
+                // Anecdotally, when we have no pages, the output is such garbage that we might be
+                // better off throwing an exception. TBD
+            }
+
+            PDFDoc doc = PDFDoc.builder()
+                .pages(stripper.pages)
+                .headerStopLinePosition(headerStopIndex)
+                .meta(meta.build())
+                .build();
+
+            return PdfDocExtractionResult.builder()
+                .document(doc)
+                .highPrecision(highPrecision).build();
+        }
     }
 
     @SneakyThrows
@@ -339,13 +348,18 @@ public class PDFExtractor {
             return abstractIdx.getAsInt();
         }
         // Find smallest line on page and if it appears in acceptable range, take it
-        double smallestSize = firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min().getAsDouble();
-        OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
-            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
-            .findFirst();
-        if (smallIdx.isPresent()) {
-            if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
-                return smallIdx.getAsInt();
+        final OptionalDouble smallestSizeOption =
+            firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min();
+        if(smallestSizeOption.isPresent()) {
+            final double smallestSize = smallestSizeOption.getAsDouble();
+
+            OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
+                    .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
+                    .findFirst();
+            if (smallIdx.isPresent()) {
+                if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
+                    return smallIdx.getAsInt();
+                }
             }
         }
         return -1;

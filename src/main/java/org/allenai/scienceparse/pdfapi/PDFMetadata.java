@@ -32,12 +32,21 @@ public class PDFMetadata {
     @SneakyThrows
     public static void main(String[] args) {
         val extractor = new PDFExtractor();
+        ObjectWriter ow = new ObjectMapper().writer();
+        if(args.length <= 1)
+            ow = ow.withDefaultPrettyPrinter();
         for(final String arg : args) {
+            String prefix = "";
+            if(args.length > 1)
+                prefix = arg + "\t";
             try(InputStream pdfInputStream = new FileInputStream(arg)) {
-                PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
-                ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-                String json = ow.writeValueAsString(meta);
-                System.out.println(json);
+                try {
+                    PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
+                    String json = ow.writeValueAsString(meta);
+                    System.out.println(prefix + json);
+                } catch (final Exception e) {
+                    System.out.println(prefix + "ERROR: " + e);
+                }
             }
         }
     }
