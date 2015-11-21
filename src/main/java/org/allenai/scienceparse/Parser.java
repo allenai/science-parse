@@ -604,7 +604,7 @@ public class Parser {
 			  }
 			  catch(Exception e) {
 				  logger.info("Parse error: " + f);
-				  //e.printStackTrace();
+				  e.printStackTrace();
 			  }
 			  fis.close();
 			  

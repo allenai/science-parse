@@ -21,22 +21,38 @@ public class ExtractReferences {
 		cr = new CheckReferences(jsonFile);
 	}
 	
-	public static abstract class BibStractor {
+	public static abstract class BibStractor  {
 		public abstract List<BibRecord> parse(String source);
 		public abstract String getCiteRegex();
 		public abstract String getCiteDelimiter();
 		final BibRecordParser recParser;
-		BibStractor(BibRecordParser rp) {
-			recParser = rp;
+		BibStractor(Class c) {
+			BibRecordParser b = null;
+			try {
+				b = (BibRecordParser) c.newInstance();
+			}
+			catch(Exception e) {
+				log.info("Exception " + e.getStackTrace());
+			}
+			recParser = b;
 		}
 	}
 	
-	public static interface BibRecordParser {
-		public BibRecord parseRecord(String line);
+	public interface BibRecordParser {
+		public abstract BibRecord parseRecord(String line);
 	}
 	
-	private static List<BibStractor> extractors = Arrays.asList(new BracketNumber(), new NamedYear());
+	//279
+	//378
+	//480
 	
+	private static List<BibStractor> extractors = 
+//			Arrays.asList(new BracketNumber(InitialFirstQuotedBibRecordParser.class), 
+//			new NamedYear(AuthorYearBibParser.class), new NumberDot(NumberDotYearAtEndBibRecordParser.class));
+			Arrays.asList(new BracketNumber(InitialFirstQuotedBibRecordParser.class), 
+			new NamedYear(AuthorYearBibParser.class), new NumberDot(NumberDotYearAtEndBibRecordParser.class));
+	
+			
 	private static class DefaultBibRecordParser implements BibRecordParser{
 		public BibRecord parseRecord(String line) {
 			return new BibRecord(line, null, null, null, 0);
@@ -57,7 +73,9 @@ public class ExtractReferences {
 		return a;
 	}
 	
-	private static class InitialFirstQuotedBibRecordParser implements BibRecordParser{
+	private static class InitialFirstQuotedBibRecordParser implements  BibRecordParser {
+		public InitialFirstQuotedBibRecordParser() {
+		}
 		//example:
 	//	"[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
 //				+ "arrays,” in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
@@ -75,10 +93,30 @@ public class ExtractReferences {
 		}
 	}
 	
+	private static class NumberDotYearAtEndBibRecordParser implements  BibRecordParser {
+		public NumberDotYearAtEndBibRecordParser() {
+		}
+		//example: 
+		//TODO
+		public BibRecord parseRecord(String line) {
+//			log.info("trying " + line);
+			String regEx = "([0-9]+)\\. ([^:]+): ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) \\(([0-9]{4})\\)(?: .*)?"; //last part is for header break
+			Matcher m = Pattern.compile(regEx).matcher(line.trim());
+			if(m.matches()) {
+//				log.info("year string: " + m.group(5));
+				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
+						m.group(4), "[" + m.group(1) + "]", extractRefYear(m.group(5)));
+						return out;
+			}
+			else
+				return null;
+		}
+	}
+	
 	private static class AuthorYearBibParser implements BibRecordParser {
 		//example:
 		//STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
-		
+		public AuthorYearBibParser() {}
 		public BibRecord parseRecord(String line) {
 			String regEx = "([\\p{L}\\p{P}\\., ]+) ([0-9]{4}[a-z]?)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
 			Matcher m = Pattern.compile(regEx).matcher(line.trim());
@@ -98,6 +136,9 @@ public class ExtractReferences {
 		
 	}
 
+
+
+	
 	/**
 	 * Takes in a string mentioning several authors, returns normalized list of authors
 	 * @param authString
@@ -146,8 +187,8 @@ public class ExtractReferences {
 		private final String citeRegex = "\\[(, [0-9]{4})+\\]";
 		private final String citeDelimiter = ";";
 		
-		NamedYear() {
-			super(new AuthorYearBibParser());
+		NamedYear(Class c) {
+			super(c);
 		}
 		
 		public String getCiteRegex() {
@@ -163,10 +204,10 @@ public class ExtractReferences {
 				return getAuthorLastName(authors.get(0)) + " et al.";
 			}
 			else if(authors.size() == 1) {
-				return getAuthorLastName(authors.get(0));
+				return getAuthorLastName(authors.get(0) +",");
 			}
 			else if(authors.size() == 2) {
-				return getAuthorLastName(authors.get(0)) + " and " + getAuthorLastName(authors.get(1));
+				return getAuthorLastName(authors.get(0)) + " and " + getAuthorLastName(authors.get(1) +",");
 			}
 			return null;
 		}
@@ -186,13 +227,42 @@ public class ExtractReferences {
 		}
 		
 	}
+
+	private static class NumberDot extends BracketNumber {
+		NumberDot(Class c) {
+			super(c);
+		}
+		public List<BibRecord> parse(String line) {
+			line = line.replaceAll("<bb>", " ");
+			int i=0;
+			String tag = " " + (++i) + ". ";
+			List<String> cites = new ArrayList<String>();
+			while(line.contains(tag)) {
+				int st = line.indexOf(tag);
+				tag = " " + (++i) + ". ";
+				int end = line.indexOf(tag);
+				if(end > 0) {
+					cites.add(line.substring(st, end));
+				}
+				else {
+					cites.add(line.substring(st));
+				}
+			}
+			List<BibRecord> out = new ArrayList<BibRecord>();
+			for(String s : cites) {
+				out.add(this.recParser.parseRecord(s));
+			}
+			out = removeNulls(out);
+			return out;
+		}
+	}
 	
 	private static class BracketNumber extends BibStractor {
-		private final String citeRegex = "\\[([0-9,]+)\\]";
-		private final String citeDelimiter = ",";
+		protected final String citeRegex = "\\[([0-9,]+)\\]";
+		protected final String citeDelimiter = ",";
 		
-		BracketNumber() {
-			super(new InitialFirstQuotedBibRecordParser());
+		BracketNumber(Class c) {
+			super(c);
 		}
 		
 		public String getCiteRegex() {

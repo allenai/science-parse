@@ -237,6 +237,11 @@ public class PDFToCRFInput {
 				s.append(lineToString(l) + " ");
 				prevLine = l;
 			}
+			//HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
+			if(s.length() > 0) {
+				out.add(s.toString().trim());
+				s = new StringBuffer();
+			}
 		}
 		return out;
 	}
