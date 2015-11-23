@@ -592,6 +592,7 @@ public class Parser {
 			  val fis = new FileInputStream(f);
 			  ExtractedMetadata em = null;
 			  try {
+				  logger.info(f.getName());
 				  em = p.doParse(fis, MAXHEADERWORDS);
 				  List<BibRecord> br = er.findReferences(em.raw);
 				  if(br.size() > 3) {  //HACK: assume > 3 refs means valid ref list

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.testng.annotations.Test;
 
@@ -23,6 +24,32 @@ public class ExtractReferencesTest {
 	  
 	  public String resourceDirectory(String path) {
 		  return (new File(this.getClass().getResource(path).getFile())).getParent();
+	  }
+	  
+	  public void testAuthorPattern() throws Exception {
+		  String auth = ExtractReferences.authLastCommaInitial;
+		  Assert.assertTrue(Pattern.matches(auth, "Jones, C. M."));
+		  Assert.assertTrue(Pattern.matches(auth, "Hu, Y."));
+		  Assert.assertTrue(Pattern.matches(
+				  "(" + auth + 
+					"(?:; " + auth + ")*)",
+				  //"Jones, C. M.; Henry, E. R.; Hu, Y."));
+				  "Jones, C. M.; Henry, E. R.; Hu, Y.; Chan, C. K.; Luck, S. D.; Bhuyan, A.; Roder, H.; Hofrichter, J."));
+		  String auth2 = ExtractReferences.authInitialsLast;
+		  String test2 = "S.H. Han";
+		  Assert.assertTrue(Pattern.matches(auth2, test2));
+		  String auth3 = ExtractReferences.authInitialsLastList + "\\.";
+		  String test3 = "B.K. Shim, Y.K. Cho, J.B. Won, and S.H. Han.";
+		  Assert.assertTrue(Pattern.matches(auth3, test3));
+	  }
+	  
+	  public void testNumberDotAuthorNoTitleBibRecordParser() {
+		  val f = new ExtractReferences.NumberDotAuthorNoTitleBibRecordParser();
+		  String line = "1. Jones, C. M.; Henry, E. R.; Hu, Y.; Chan, C. K.; Luck S. D.; Bhuyan, A.; Roder, H.; Hofrichter, J.; " 
+				  +"Eaton, W. A. Proc Natl Acad Sci USA 1993, 90, 11860.";
+		  BibRecord br = f.parseRecord(line);
+		  Assert.assertTrue(br != null);
+		  Assert.assertEquals(br.year, 1993);
 	  }
 	  
 	public void testFindReferences() throws Exception {

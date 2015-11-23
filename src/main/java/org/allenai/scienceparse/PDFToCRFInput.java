@@ -218,12 +218,12 @@ public class PDFToCRFInput {
 	
 	/**
 	 * Returns list of strings representation of this file.  Breaks new lines when pdf line break larger than median line break.
+	 * All original line breaks indicated by <lb>
 	 * @param pdf
 	 * @return
 	 */
 	public static List<String> getRaw(PDFDoc pdf) {
 		ArrayList<String> out = new ArrayList<>();
-		int pg = 0;
 		double qLineBreak = getTopQuartileLineBreak(pdf);
 		//log.info("median line break: " + qLineBreak);
 		StringBuffer s = new StringBuffer();
@@ -231,15 +231,23 @@ public class PDFToCRFInput {
 		for(PDFPage p : pdf.getPages()) {
 			for(PDFLine l : p.getLines()) {
 				if(breakSize(l, prevLine) > qLineBreak) {
-					out.add(s.toString().trim());
+					String sAdd = s.toString();
+					if(sAdd.endsWith("<lb>"))
+						sAdd = sAdd.substring(0, sAdd.length()-4);
+					out.add(sAdd);
 					s = new StringBuffer();
 				}
-				s.append(lineToString(l) + " ");
+				String sAdd = lineToString(l);
+				if(sAdd.length() > 0)
+					s.append(sAdd + "<lb>");
 				prevLine = l;
 			}
 			//HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
 			if(s.length() > 0) {
-				out.add(s.toString().trim());
+				String sAdd = s.toString();
+				if(sAdd.endsWith("<lb>"))
+					sAdd = sAdd.substring(0, sAdd.length()-4);
+				out.add(sAdd);
 				s = new StringBuffer();
 			}
 		}
