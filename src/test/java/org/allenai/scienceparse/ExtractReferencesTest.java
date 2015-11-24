@@ -41,6 +41,10 @@ public class ExtractReferencesTest {
 		  String auth3 = ExtractReferences.authInitialsLastList + "\\.";
 		  String test3 = "B.K. Shim, Y.K. Cho, J.B. Won, and S.H. Han.";
 		  Assert.assertTrue(Pattern.matches(auth3, test3));
+		  
+		  String test4 = "D. Kowalsky and A. Pelc,";
+		  String auth4 = ExtractReferences.authInitialsLastList + ",";
+		  Assert.assertTrue(Pattern.matches(auth4, test4));
 	  }
 	  
 	  public void testNumberDotAuthorNoTitleBibRecordParser() {
@@ -56,9 +60,6 @@ public class ExtractReferencesTest {
 		
 		ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
 		
-		String ans1 = "[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
-				+ "arrays,” in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
-				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.";
 		File paper1 = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));
 		File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
 		//File paper = new File("e:\\data\\science-parse\\qtest\\aaai04.pdf");
