@@ -182,7 +182,11 @@ public class PDFToCRFInput {
 	public static double breakSize(PDFLine l2, PDFLine l1) {
 		if(l2==null || l1==null)
 			return 0.0;
-		return getY(l2, true) - getY(l1, false);
+		float h1 = getH(l1);
+		float h2 = getH(l2);
+		if(h1 < 0.0f)
+			log.info("negative height!!!!");
+		return (getY(l2, true) - getY(l1, false))/Math.min(h1,h2);
 	}
 	
 	public static float getY(PDFLine l, boolean upper) {
@@ -192,21 +196,39 @@ public class PDFToCRFInput {
 			return l.bounds().get(3);
 	}
 	
+	public static float getH(PDFLine l) {
+		return l.bounds().get(3) - l.bounds().get(1);
+	}
+
+	
 	public static double getTopQuartileLineBreak(PDFDoc pdf) {
 		ArrayList<Double> breaks = new ArrayList<>();
+		PDFLine prevLine = null;
 		for(PDFPage p : pdf.getPages()) {
-			PDFLine prevLine = null;
 			for(PDFLine l : p.getLines()) {
 				double bs = breakSize(l, prevLine);
-				if(bs > 0) //assume <= 0 is error
+				if(bs > 0) { //<= 0 due to math, tables, new pages, should be ignored 
 					breaks.add(bs);
+				//	log.info(l.toString());
+				}
+//				else {
+//					log.info("negative break size!!!");
+//					if(prevLine != null) {
+//						String s = prevLine.tokens.stream().map(t -> t.token).collect(Collectors.toList()).toString();
+//						log.info(s);
+//					}
+//					if(l != null) {
+//						String s = l.tokens.stream().map(t -> t.token).collect(Collectors.toList()).toString();
+//						log.info(s);
+//					}
+//				}
 				prevLine = l;
 			}
 		}
 		breaks.sort((d1, d2) -> Double.compare(d1, d2));
 //		log.info("breaks: ");
 //		log.info(breaks.toString());
-		int idx = (1 * breaks.size())/3;
+		int idx = (7 * breaks.size())/9;
 		return breaks.get(idx);
 	}
 	
@@ -224,10 +246,11 @@ public class PDFToCRFInput {
 	 */
 	public static List<String> getRaw(PDFDoc pdf) {
 		ArrayList<String> out = new ArrayList<>();
-		double qLineBreak = getTopQuartileLineBreak(pdf);
+		
 		//log.info("median line break: " + qLineBreak);
 		StringBuffer s = new StringBuffer();
 		PDFLine prevLine = null;
+		double qLineBreak = getTopQuartileLineBreak(pdf);
 		for(PDFPage p : pdf.getPages()) {
 			for(PDFLine l : p.getLines()) {
 				if(breakSize(l, prevLine) > qLineBreak) {

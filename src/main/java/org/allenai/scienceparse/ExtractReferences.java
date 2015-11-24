@@ -60,21 +60,6 @@ public class ExtractReferences {
 			return new BibRecord(line, null, null, null, 0);
 		}
 	}
-
-	private static int extractRefYear(String sYear) {
-		String yearPattern = "[1-2][0-9][0-9][0-9]";
-		Matcher mYear = Pattern.compile(yearPattern).matcher(sYear);
-		int a = 0;
-		while(mYear.find()) {
-			try {
-				a = Integer.parseInt(mYear.group().trim());
-			} catch(Exception e) {};
-			if(a > BibRecord.MINYEAR && a < BibRecord.MAXYEAR)
-				return a;
-		}
-		return a;
-	} 
-	
 	
 	public static final String authOneName = "\\p{Lu}[\\p{L}'`]+";
 			
@@ -82,12 +67,12 @@ public class ExtractReferences {
 	
 	public static final String authLastCommaInitial = authOneName + ",(?: \\p{Lu}\\.)+";
 	
-	public static final String authInitialsLast = "(?:\\p{Lu}\\.?)+ " + authOneName;
+	public static final String authInitialsLast = "(?:\\p{Lu}\\.?(?:-| )?)+ " + authOneName;
 	public static final String authInitialsLastList = authInitialsLast + "(?:(?:, and|,) (?:" + authInitialsLast + "))*";
 	
 	public static final String authPlain = authOneName + "(?:\\p{Lu}\\. )?" + authOneName;
 	public static final String authPlainList = authPlain + "(?:(?:, and|,) (?:" + authPlain + "))*";
-		
+	
 	
 	private static class InitialFirstQuotedBibRecordParser implements  BibRecordParser {
 		public InitialFirstQuotedBibRecordParser() {
@@ -131,7 +116,6 @@ public class ExtractReferences {
 				return null;
 		}		
 	}
-	
 	
 	private static class NumberDotYearParensBibRecordParser implements  BibRecordParser {
 		public NumberDotYearParensBibRecordParser() {
@@ -178,9 +162,11 @@ public class ExtractReferences {
 		//STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
 		public AuthorYearBibParser() {}
 		public BibRecord parseRecord(String line) {
+//			log.info("trying " + line);
 			String regEx = "([\\p{L}\\p{P}\\., ]+) ([1-2][0-9]{3}[a-z]?)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
 			Matcher m = Pattern.compile(regEx).matcher(line.trim());
 			if(m.matches()) {
+//				log.info("year : " + m.group(2));
 				List<String> authors = authorStringToList(m.group(1));
 				int year = Integer.parseInt(m.group(2).substring(0, 4));
 				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ", " + year;
@@ -196,52 +182,6 @@ public class ExtractReferences {
 		
 	}
 
-
-
-	
-	/**
-	 * Takes in a string mentioning several authors, returns normalized list of authors
-	 * @param authString
-	 * @return
-	 */
-	public static List<String> authorStringToList(String authString) {
-		//figure out whether M. Johnson or Johnson, M.:
-		boolean firstLast = false;
-		List<String> out = new ArrayList<>();
-		if(Pattern.compile("\\p{Lu}\\..*").matcher(authString).matches()) {
-			firstLast = true;
-		}
-//		log.info("auth string: " + authString);
-		String [] names = authString.split("(,|( and ))+");
-//		log.info("names: " + Arrays.toString(names));
-		if(firstLast) {
-			out = Arrays.asList(names);
-		}
-		else {
-			for(int i=0; i<names.length; i+=2) {
-				if(names.length > i+1)
-					out.add(names[i+1].trim() + " " + names[i].trim());
-				else
-					out.add(names[i].trim()); //hope for the best
-			}
-		}
-//		log.info("out: " + out.toString());
-		return out;
-	}
-	
-	private static <T> List<T> removeNulls(List<T> in) {
-		List<T> out = new ArrayList<T>();
-		for(T a : in) {
-			if(a != null)
-				out.add(a);
-		}
-		return out;
-	}
-	
-	private static String getAuthorLastName(String authName) {
-		int idx = authName.lastIndexOf(" ");
-		return authName.substring(idx+1);
-	}
 	
 	private static class NamedYear extends BibStractor {
 		private final String citeRegex = "\\[(, [0-9]{4})+\\]";
@@ -295,11 +235,12 @@ public class ExtractReferences {
 		}
 		public List<BibRecord> parse(String line) {
 			line = line.replaceAll("<bb>", "<lb>");
+//			log.info("trying with " + line);
 			int i=0;
 			String tag = "<lb>" + (++i) + ". ";
 			List<String> cites = new ArrayList<String>();
+			int st = line.indexOf(tag);
 			while(line.contains(tag)) {
-				int st = line.indexOf(tag);
 				tag = "<lb>" + (++i) + ". ";
 				int end = line.indexOf(tag, st);
 				if(end > 0) {
@@ -308,6 +249,7 @@ public class ExtractReferences {
 				else {
 					cites.add(line.substring(st));
 				}
+				st = end;
 			}
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
@@ -341,8 +283,8 @@ public class ExtractReferences {
 			int i=0;
 			String tag = "[" + (++i) + "]";
 			List<String> cites = new ArrayList<String>();
+			int st = line.indexOf(tag);
 			while(line.contains(tag)) {
-				int st = line.indexOf(tag);
 				tag = "<lb>[" + (++i) + "]";
 				int end = line.indexOf(tag, st);
 				if(end > 0) {
@@ -351,6 +293,7 @@ public class ExtractReferences {
 				else {
 					cites.add(line.substring(st));
 				}
+				st = end;
 			}
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
@@ -366,12 +309,79 @@ public class ExtractReferences {
 	
 	
 	
+	
+	private static int extractRefYear(String sYear) {
+		String yearPattern = "[1-2][0-9][0-9][0-9]";
+		Matcher mYear = Pattern.compile(yearPattern).matcher(sYear);
+		int a = 0;
+		while(mYear.find()) {
+			try {
+				a = Integer.parseInt(mYear.group().trim());
+			} catch(Exception e) {};
+			if(a > BibRecord.MINYEAR && a < BibRecord.MAXYEAR)
+				return a;
+		}
+		return a;
+	} 
+	
+	
+	/**
+	 * Takes in a string mentioning several authors, returns normalized list of authors
+	 * @param authString
+	 * @return
+	 */
+	public static List<String> authorStringToList(String authString) {
+		//figure out whether M. Johnson or Johnson, M.:
+		boolean firstLast = false;
+		List<String> out = new ArrayList<>();
+		if(Pattern.compile("\\p{Lu}\\..*").matcher(authString).matches()) {
+			firstLast = true;
+		}
+//		log.info("auth string: " + authString);
+		String [] names = authString.split("(,|( and ))+");
+//		log.info("names: " + Arrays.toString(names));
+		if(firstLast) {
+			out = Arrays.asList(names);
+		}
+		else {
+			for(int i=0; i<names.length; i+=2) {
+				if(names.length > i+1)
+					out.add(names[i+1].trim() + " " + names[i].trim());
+				else
+					out.add(names[i].trim()); //hope for the best
+			}
+		}
+//		log.info("out: " + out.toString());
+		return out;
+	}
+	
+	private static <T> List<T> removeNulls(List<T> in) {
+		List<T> out = new ArrayList<T>();
+		for(T a : in) {
+			if(a != null)
+				out.add(a);
+		}
+		return out;
+	}
+	
+	private static String getAuthorLastName(String authName) {
+		int idx = authName.lastIndexOf(" ");
+		return authName.substring(idx+1);
+	}
+
+	
+	
+	
 	private static int refStart(List<String> paper) {
 		for(int i=0; i<paper.size(); i++) {
 			String s = paper.get(i);
 			if(s.endsWith("References")||s.endsWith("Citations")||s.endsWith("Bibliography")||
 					s.endsWith("REFERENCES")||s.endsWith("CITATIONS")||s.endsWith("BIBLIOGRAPHY"))
 				return i;
+			else if(s.contains("<lb>References<lb>")||s.contains("<lb>Citations<lb>")||s.contains("<lb>Bibliography<lb>")||
+					s.contains("<lb>REFERENCES<lb>")||s.contains("<lb>CITATIONS<lb>")||s.contains("<lb>BIBLIOGRAPHY<lb>")) {
+				return i-1;
+			}
 		}
 		return -1;
 	}
