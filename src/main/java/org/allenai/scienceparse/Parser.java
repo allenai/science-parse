@@ -92,6 +92,7 @@ public class Parser {
     	  em.setYearFromDate(doc.meta.createDate);
       clean(em);
       em.raw = PDFToCRFInput.getRaw(doc);
+      em.rawReferences = PDFToCRFInput.getRawReferences(doc);
       return em;
   }
   
@@ -594,7 +595,7 @@ public class Parser {
 			  try {
 				  logger.info(f.getName());
 				  em = p.doParse(fis, MAXHEADERWORDS);
-				  List<BibRecord> br = er.findReferences(em.raw);
+				  List<BibRecord> br = er.findReferences(em.rawReferences);
 				  if(br.size() > 3) {  //HACK: assume > 3 refs means valid ref list
 					  foundRefs.add(f.getAbsolutePath());
 					  mapper.writeValue(new File(outDir, f.getName() + ".dat"), br);

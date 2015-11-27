@@ -41,6 +41,7 @@ public class ExtractedMetadata {
 	public List<String> emails; //extracted by special (non-CRF) heuristic process
 	int year;
 	public List<String> raw; //the full paper text
+	public List<String> rawReferences; //approximately the references text
 	public Pair<List<BibRecord>, List<CitationRecord>> references; //references, with char offsets relative to raw
 	
 	@RequiredArgsConstructor

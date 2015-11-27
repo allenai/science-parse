@@ -457,8 +457,8 @@ public class ExtractReferences {
 			if(s.endsWith("References")||s.endsWith("Citations")||s.endsWith("Bibliography")||
 					s.endsWith("REFERENCES")||s.endsWith("CITATIONS")||s.endsWith("BIBLIOGRAPHY"))
 				return i;
-			else if(s.contains("<lb>References<lb>")||s.contains("<lb>Citations<lb>")||s.contains("<lb>Bibliography<lb>")||
-					s.contains("<lb>REFERENCES<lb>")||s.contains("<lb>CITATIONS<lb>")||s.contains("<lb>BIBLIOGRAPHY<lb>")) {
+			else if(s.contains("References<lb>")||s.contains("Citations<lb>")||s.contains("Bibliography<lb>")||
+					s.contains("REFERENCES<lb>")||s.contains("CITATIONS<lb>")||s.contains("BIBLIOGRAPHY<lb>")) {
 				return i-1;
 			}
 		}

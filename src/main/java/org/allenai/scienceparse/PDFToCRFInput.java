@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -196,6 +197,13 @@ public class PDFToCRFInput {
 			return l.bounds().get(3);
 	}
 	
+	public static float getX(PDFLine l, boolean left) {
+		if(left)
+			return l.bounds().get(0);
+		else
+			return l.bounds().get(2);
+	}
+	
 	public static float getH(PDFLine l) {
 		return l.bounds().get(3) - l.bounds().get(1);
 	}
@@ -209,26 +217,12 @@ public class PDFToCRFInput {
 				double bs = breakSize(l, prevLine);
 				if(bs > 0) { //<= 0 due to math, tables, new pages, should be ignored 
 					breaks.add(bs);
-				//	log.info(l.toString());
 				}
-//				else {
-//					log.info("negative break size!!!");
-//					if(prevLine != null) {
-//						String s = prevLine.tokens.stream().map(t -> t.token).collect(Collectors.toList()).toString();
-//						log.info(s);
-//					}
-//					if(l != null) {
-//						String s = l.tokens.stream().map(t -> t.token).collect(Collectors.toList()).toString();
-//						log.info(s);
-//					}
-//				}
 				prevLine = l;
 			}
 		}
 		breaks.sort((d1, d2) -> Double.compare(d1, d2));
-//		log.info("breaks: ");
-//		log.info(breaks.toString());
-		int idx = (7 * breaks.size())/9;
+		int idx = (7 * breaks.size())/9; //hand-tuned threshold good for breaking references 
 		return breaks.get(idx);
 	}
 	
@@ -236,6 +230,77 @@ public class PDFToCRFInput {
 		StringBuffer sb = new StringBuffer();
 		l.tokens.forEach(t -> sb.append(t.token + " "));
 		return sb.toString().trim();
+	}
+	
+	/**
+	 * Returns best guess of list of strings representation of the references of this file, 
+	 * intended to be one reference per list element, using spacing and indentation as cues
+	 * @param pdf
+	 * @return
+	 */
+	public static List<String> getRawReferences(PDFDoc pdf) {
+		final List<String> refTags = Arrays.asList("References", "REFERENCES", "Citations", "CITATIONS", "Bibliography",
+				"BIBLIOGRAPHY");
+		List<String> out = new ArrayList<String>();
+		PDFLine prevLine = null;
+		boolean inRefs = false;
+		double qLineBreak = getTopQuartileLineBreak(pdf);
+		double farLeft = Double.MAX_VALUE; //of current column
+		double farRight = -1.0; //of current column
+		StringBuffer sb = new StringBuffer();
+		for(PDFPage p : pdf.getPages()) {
+			for(PDFLine l : p.getLines()) {
+				if(!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
+					if(l.tokens.get(l.tokens.size()-1).token != null &&
+							refTags.contains(l.tokens.get(l.tokens.size()-1).token)) {
+						inRefs = true;
+					}
+				}
+				else if(inRefs) {
+					double left = getX(l, true);
+					double right = getX(l, false);
+					if(farRight >= 0 && right > farRight) { //new column, reset
+						farLeft = Double.MAX_VALUE;
+						farRight = -1.0;
+					}
+					farLeft = Math.min(left, farLeft);
+					farRight = Math.max(right, farRight);
+					boolean br = false;
+					if(l.tokens != null && l.tokens.size() > 0) {
+						String sAdd = lineToString(l);
+						if(left > farLeft + l.tokens.get(0).fontMetrics.spaceWidth) {
+//							log.info("indent " + sAdd);
+							br = false;
+						}
+						else if(getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
+//							log.info("short line before -- breaking " + sAdd);
+							br = true;
+						}
+						else if(breakSize(l, prevLine) > qLineBreak) {
+//							log.info("over max line break -- breaking " + sAdd);
+							br = true;
+						}
+						if(br) {
+							out.add(sb.toString());
+							sb = new StringBuffer(sAdd);							
+						}
+						else {
+							sb.append("<lb>" + sAdd);							
+						}
+					}
+				}
+				prevLine = l;
+			}
+			//HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
+			if(sb.length() > 0) {
+				String sAdd = sb.toString();
+				if(sAdd.endsWith("<lb>"))
+					sAdd = sAdd.substring(0, sAdd.length()-4);
+				out.add(sAdd);
+				sb = new StringBuffer();
+			}
+		}
+		return out;
 	}
 	
 	/**
