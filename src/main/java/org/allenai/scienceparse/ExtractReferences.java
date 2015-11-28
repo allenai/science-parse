@@ -10,6 +10,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
+
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -89,7 +93,7 @@ public class ExtractReferences {
 		}
 		//example:
 	//	"[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
-//				+ "arrays,” in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
+//				+ "arrays," in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221."
 		public BibRecord parseRecord(String line) {
 			String regEx = "\\[([0-9]+)\\] (.*), \\p{Pi}(.*),\\p{Pf} (?:(?:I|i)n )?(.*)\\.?";
@@ -488,8 +492,12 @@ public class ExtractReferences {
 		return idx;
 	}
 	
-	
-	public List<BibRecord> findReferences(List<String> paper) {
+	/**
+	 * Returns the list of BibRecords, plus the extractor that produced them (in order to enable citation parsing)
+	 * @param paper
+	 * @return
+	 */
+	public Pair<List<BibRecord>, BibStractor> findReferences(List<String> paper) {
 		int start = refStart(paper) + 1;
 		List<BibRecord> [] results = new ArrayList[extractors.size()];
 		for(int i=0; i<results.length; i++)
@@ -503,11 +511,39 @@ public class ExtractReferences {
 			results[i] = extractors.get(i).parse(text);
 		}
 		int idx = longestIdx(results);
-		return results[idx];
+		return Tuples.pair(results[idx], extractors.get(idx));
 	}
 	
-	public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib) {
+	
+	public static int getIdxOf(List<BibRecord> bib, String citeStr) {
+		//note: slow
+		for(int i=0; i<bib.size(); i++) {
+			if(bib.get(i).citeStr.equalsIgnoreCase(citeStr))
+				return i;
+		}
+		return -1;
+	}
+	
+	public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
 		ArrayList<CitationRecord> out = new ArrayList<>();
+		Pattern p = Pattern.compile(bs.getCiteRegex());
+		log.info("looking for pattern " + p.pattern());
+		
+		for(int i=0; i<paper.size(); i++) {
+			log.info("trying " + paper.get(i));
+			String s = paper.get(i);
+			Matcher m = p.matcher(s);
+			while(m.find()) {
+				log.info("match");
+				String [] citations = m.group(1).split(bs.getCiteDelimiter());
+				for(int j=0; j<citations.length; j++) {
+					int idx = getIdxOf(bib, citations[j]);
+					if(idx >=0) {
+						out.add(new CitationRecord(i, m.start(), m.end(), idx));
+					}
+				}
+			}
+		}
 		return out;
 	}
 	

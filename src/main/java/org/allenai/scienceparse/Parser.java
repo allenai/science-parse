@@ -24,6 +24,7 @@ import org.allenai.ml.util.Indexer;
 //import org.allenai.ml.sequences.crf.conll.Evaluator;
 //import org.allenai.ml.sequences.crf.conll.Trainer;
 import org.allenai.ml.util.Parallel;
+import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
@@ -64,9 +65,11 @@ public class Parser {
 
   
   public Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw, ExtractReferences er) throws IOException {
-      List<BibRecord> brs = er.findReferences(raw);
-      List<CitationRecord> crs = er.findCitations(raw, brs);
-      return Tuples.pair(brs, crs);
+		Pair<List<BibRecord>, BibStractor> fnd =er.findReferences(raw);  
+		List<BibRecord> br = fnd.getOne();
+		BibStractor bs = fnd.getTwo();
+      List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
+      return Tuples.pair(br, crs);
   }
   
   public ExtractedMetadata doParse(InputStream is, int headerMax) throws IOException {
@@ -595,7 +598,8 @@ public class Parser {
 			  try {
 				  logger.info(f.getName());
 				  em = p.doParse(fis, MAXHEADERWORDS);
-				  List<BibRecord> br = er.findReferences(em.rawReferences);
+				  Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(em.rawReferences);
+				  List<BibRecord> br = fnd.getOne();
 				  if(br.size() > 3) {  //HACK: assume > 3 refs means valid ref list
 					  foundRefs.add(f.getAbsolutePath());
 					  mapper.writeValue(new File(outDir, f.getName() + ".dat"), br);

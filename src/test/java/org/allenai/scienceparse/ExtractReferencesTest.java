@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gs.collections.api.tuple.Pair;
 
 import junit.framework.Assert;
 import lombok.val;
@@ -56,7 +58,7 @@ public class ExtractReferencesTest {
 		  Assert.assertEquals(br.year, 1993);
 	  }
 	  
-	public void testFindReferences() throws Exception {
+	public void testFindReferencesAndCitations() throws Exception {
 		
 		ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
 		
@@ -94,7 +96,10 @@ public class ExtractReferencesTest {
 			//e.printStackTrace();
 		}
 		fis.close();
-		List<BibRecord> br = er.findReferences(em.raw);
+		Pair<List<BibRecord>, BibStractor> fnd =er.findReferences(em.rawReferences);  
+		List<BibRecord> br = fnd.getOne();
+		BibStractor bs = fnd.getTwo();
+		
 		int j=0;
 		for(BibRecord b : br)
 			log.info("reference " + (j++) + " " + (b==null?"null":b.toString()));
@@ -111,6 +116,13 @@ public class ExtractReferencesTest {
 //		Assert.assertEquals("IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.", br.get(0).venue.trim());
 		
+		List<CitationRecord> crs = ExtractReferences.findCitations(em.raw,  br,  bs);
+		log.info(crs.toString());
+		Assert.assertEquals("[12]", em.raw.get(crs.get(0).lineIdx).substring(crs.get(0).startOffset, crs.get(0).endOffset));
+		Assert.assertTrue(em.raw.get(crs.get(0).lineIdx).startsWith("Keeton and Katz"));
+
+		
+		
 		//paper2:
 		fis = new FileInputStream(paper2);
 		em = null;
@@ -122,7 +134,9 @@ public class ExtractReferencesTest {
 			//e.printStackTrace();
 		}
 		fis.close();
-		br = er.findReferences(em.raw);
+		fnd =er.findReferences(em.rawReferences);  
+		br = fnd.getOne();
+		
 		j=0;
 		for(BibRecord b : br)
 			log.info("reference " + (j++) + " " + (b==null?"null":b.toString()));
@@ -138,6 +152,8 @@ public class ExtractReferencesTest {
 		Assert.assertEquals(1995, tbr.year);
 		log.info(br.get(0).venue.trim());
 		Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
+		
+		
 		
 	}
 	
