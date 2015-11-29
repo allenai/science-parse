@@ -69,11 +69,11 @@ public class ExtractReferences {
 		}
 	}
 	
-	public static final String authOneName = "\\p{Lu}[\\p{L}'`\\-]+";
+	public static final String authOneName = "\\p{Lu}[\\p{L}'`\\- ]+"; //space for things like De Mori
 			
 	//pattern for matching single author name, format as in Jones, C. M.
 	
-	public static final String authLastCommaInitial = authOneName + ", (?:\\p{Lu}\\. ?)+";
+	public static final String authLastCommaInitial = authOneName + ", (?:\\p{Lu}\\.-? ?)+";
 	
 	public static final String authConnect = "(?:(?:, |, and | and )";
 	
@@ -85,7 +85,7 @@ public class ExtractReferences {
 	public static final String authPlain = authOneName + "(?:\\p{Lu}\\. )?" + authOneName;
 	public static final String authPlainList = authPlain + "(?:(?:, and|,) (?:" + authPlain + "))*";
 	public static final String authGeneral = "\\p{Lu}[\\p{L}\\.'`\\- ]+";
-	public static final String authGeneralList = authGeneral + "(?:(?:, |, and | and )" + authGeneral + ")*";
+	public static final String authGeneralList = authGeneral + "(?:(?:; |, |, and |; and | and )" + authGeneral + ")*"; 
 
 	
 	private static class BracketNumberInitialsQuotedBibRecordParser implements  BibRecordParser {
@@ -137,7 +137,7 @@ public class ExtractReferences {
 		public BibRecord parseRecord(String line) {
 //			log.info("trying " + line);
 			String regEx = "([0-9]+)\\. +(" + authLastCommaInitial + 
-					"(?:; " + authLastCommaInitial + ")+)" + " (.*) ([1-2][0-9]{3}), (?:[0-9, ]*.)?";
+					"(?:; " + authLastCommaInitial + ")*)" + " ([^0-9]*) ([1-2][0-9]{3})(?:\\.|,[0-9, ]*)(?:.*)";
 			
 			Matcher m = Pattern.compile(regEx).matcher(line.trim());
 			if(m.matches()) {
@@ -205,7 +205,7 @@ public class ExtractReferences {
 				int year = Integer.parseInt(m1.group(2).substring(0, 4));
 				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m1.group(2);
 				BibRecord out = new BibRecord(m1.group(3), authors,
-						m1.group(4), Pattern.compile(citeStr), year);
+						m1.group(4), Pattern.compile(citeStr, Pattern.CASE_INSENSITIVE), year);
 //				BibRecord out = new BibRecord("title", null, null, null, 0);
 				
 						return out;
@@ -228,7 +228,7 @@ public class ExtractReferences {
 				int year = Integer.parseInt(m2.group(2).substring(0, 4));
 				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m2.group(2);
 				BibRecord out = new BibRecord(m2.group(3), authors,
-						m2.group(4), Pattern.compile(citeStr), year);
+						m2.group(4), Pattern.compile(citeStr, Pattern.CASE_INSENSITIVE), year);
 						return out;				
 			}
 			else
@@ -415,6 +415,11 @@ public class ExtractReferences {
 	 * @return
 	 */
 	public static List<String> authorStringToList(String authString) {
+		boolean semiDelim = false;
+		if(authString.contains(";")) { //assume semi-colon delimiter
+			semiDelim = true;
+		}
+		
 		//figure out whether M. Johnson or Johnson, M.:
 		boolean firstLast = false;
 		List<String> out = new ArrayList<>();
@@ -422,17 +427,28 @@ public class ExtractReferences {
 			firstLast = true;
 		}
 //		log.info("auth string: " + authString);
-		String [] names = authString.split("(,| and | AND | And )+");
+		String [] names;
+		if(semiDelim)
+			names = authString.split("(;|; and| and | AND | And )+");
+		else
+			names = authString.split("(,| and | AND | And )+");
 //		log.info("names: " + Arrays.toString(names));
 		if(firstLast) {
 			out = Arrays.asList(names);
 		}
 		else {
-			for(int i=0; i<names.length; i+=2) {
-				if(names.length > i+1)
-					out.add(names[i+1].trim() + " " + names[i].trim());
-				else
-					out.add(names[i].trim()); //hope for the best
+			if(semiDelim) {
+				for(int i=0; i<names.length; i++) {
+					out.add(ParserGroundTruth.invertAroundComma(names[i]));
+				}
+			}
+			else {
+				for(int i=0; i<names.length; i+=2) {
+					if(names.length > i+1)
+						out.add(names[i+1].trim() + " " + names[i].trim());
+					else
+						out.add(names[i].trim()); //hope for the best
+				}
 			}
 		}
 //		log.info("out: " + out.toString());

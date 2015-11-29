@@ -245,10 +245,10 @@ public class PDFToCRFInput {
 		PDFLine prevLine = null;
 		boolean inRefs = false;
 		double qLineBreak = getTopQuartileLineBreak(pdf);
-		double farLeft = Double.MAX_VALUE; //of current column
-		double farRight = -1.0; //of current column
 		StringBuffer sb = new StringBuffer();
 		for(PDFPage p : pdf.getPages()) {
+			double farLeft = Double.MAX_VALUE; //of current column
+			double farRight = -1.0; //of current column			
 			for(PDFLine l : p.getLines()) {
 				if(!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
 					if(l.tokens.get(l.tokens.size()-1).token != null &&
@@ -273,7 +273,9 @@ public class PDFToCRFInput {
 							br = false;
 						}
 						else if(getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
-//							log.info("short line before -- breaking " + sAdd);
+							
+//							log.info("short line before -- " + getX(prevLine, false) + " " + 
+//									l.tokens.get(0).fontMetrics.spaceWidth + " " + farRight + " breaking " + sAdd);
 							br = true;
 						}
 						else if(breakSize(l, prevLine) > qLineBreak) {

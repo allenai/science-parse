@@ -64,8 +64,8 @@ public class Parser {
   
 
   
-  public Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw, ExtractReferences er) throws IOException {
-		Pair<List<BibRecord>, BibStractor> fnd =er.findReferences(raw);  
+  public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw, List<String> rawReferences, ExtractReferences er) throws IOException {
+		Pair<List<BibRecord>, BibStractor> fnd =er.findReferences(rawReferences);  
 		List<BibRecord> br = fnd.getOne();
 		BibStractor bs = fnd.getTwo();
       List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
@@ -598,15 +598,16 @@ public class Parser {
 			  try {
 				  logger.info(f.getName());
 				  em = p.doParse(fis, MAXHEADERWORDS);
-				  Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(em.rawReferences);
+				  Pair<List<BibRecord>, List<CitationRecord>> fnd = Parser.getReferences(em.raw, em.rawReferences, er);
 				  List<BibRecord> br = fnd.getOne();
-				  if(br.size() > 3) {  //HACK: assume > 3 refs means valid ref list
+				  List<CitationRecord> cr = fnd.getTwo();
+				  if(br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
 					  foundRefs.add(f.getAbsolutePath());
-					  mapper.writeValue(new File(outDir, f.getName() + ".dat"), br);
 				  }
 				  else {
 					  unfoundRefs.add(f.getAbsolutePath());
 				  }
+				  mapper.writeValue(new File(outDir, f.getName() + ".dat"), fnd);
 			  }
 			  catch(Exception e) {
 				  logger.info("Parse error: " + f);
