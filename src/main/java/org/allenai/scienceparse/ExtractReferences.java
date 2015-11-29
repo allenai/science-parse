@@ -100,7 +100,7 @@ public class ExtractReferences {
 			Matcher m = Pattern.compile(regEx).matcher(line.trim());
 			if(m.matches()) {
 				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), m.group(1), extractRefYear(m.group(4)));
+						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(4)));
 						return out;
 			}
 			else
@@ -121,7 +121,7 @@ public class ExtractReferences {
 			if(m.matches()) {
 //				log.info("year: " + m.group(5));
 				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), m.group(1), extractRefYear(m.group(5)));
+						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
 						return out;
 			}
 			else
@@ -143,7 +143,7 @@ public class ExtractReferences {
 			if(m.matches()) {
 //				log.info("year string: " + m.group(4));
 				BibRecord out = new BibRecord("", authorStringToList(m.group(2)),
-						m.group(3), m.group(1), extractRefYear(m.group(4)));
+						m.group(3), Pattern.compile(m.group(1)), extractRefYear(m.group(4)));
 						return out;
 			}
 			else
@@ -163,7 +163,7 @@ public class ExtractReferences {
 			if(m.matches()) {
 //				log.info("year string: " + m.group(5));
 				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), m.group(1), extractRefYear(m.group(5)));
+						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
 						return out;
 			}
 			else
@@ -183,7 +183,7 @@ public class ExtractReferences {
 			if(m.matches()) {
 //				log.info("year string: " + m.group(5));
 				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), m.group(1), extractRefYear(m.group(5)));
+						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
 						return out;
 			}
 			else
@@ -203,9 +203,9 @@ public class ExtractReferences {
 //				log.info("year : " + m1.group(2));
 				List<String> authors = authorStringToList(m1.group(1));
 				int year = Integer.parseInt(m1.group(2).substring(0, 4));
-				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ", " + year;
+				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m1.group(2);
 				BibRecord out = new BibRecord(m1.group(3), authors,
-						m1.group(4), citeStr, year);
+						m1.group(4), Pattern.compile(citeStr), year);
 //				BibRecord out = new BibRecord("title", null, null, null, 0);
 				
 						return out;
@@ -226,9 +226,9 @@ public class ExtractReferences {
 			if(m2.matches()) {
 				List<String> authors = authorStringToList(m2.group(1));
 				int year = Integer.parseInt(m2.group(2).substring(0, 4));
-				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ", " + year;
+				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m2.group(2);
 				BibRecord out = new BibRecord(m2.group(3), authors,
-						m2.group(4), citeStr, year);
+						m2.group(4), Pattern.compile(citeStr), year);
 						return out;				
 			}
 			else
@@ -251,13 +251,13 @@ public class ExtractReferences {
 			if(m.matches()) {
 	//			log.info("matched with ex1 " + m.group(3));
 				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), m.group(1), extractRefYear(m.group(5)));
+						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
 						return out;
 			}
 			else if(m2.matches()) {
 //				log.info("matched with ex2 " + m2.group(3));
 				BibRecord out = new BibRecord(m2.group(3), authorStringToList(m2.group(2)),
-						m2.group(4), m2.group(1), extractRefYear(m2.group(5)));
+						m2.group(4), Pattern.compile(m2.group(1)), extractRefYear(m2.group(5)));
 						return out;
 			}
 			else
@@ -267,7 +267,7 @@ public class ExtractReferences {
 	
 	
 	private static class NamedYear extends BibStractor {
-		private final String citeRegex = "\\[(, [0-9]{4})+\\]";
+		private final String citeRegex = "(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
 		private final String citeDelimiter = ";";
 		
 		NamedYear(Class c) {
@@ -282,15 +282,16 @@ public class ExtractReferences {
 			return citeDelimiter;
 		}
 	
+		//in regex form
 		public static String getCiteAuthorFromAuthors(List<String> authors) {
 			if(authors.size() > 2) {
-				return getAuthorLastName(authors.get(0)) + " et al.";
+				return getAuthorLastName(authors.get(0)) + " et al\\.";
 			}
 			else if(authors.size() == 1) {
-				return getAuthorLastName(authors.get(0) +",");
+				return getAuthorLastName(authors.get(0));
 			}
 			else if(authors.size() == 2) {
-				return getAuthorLastName(authors.get(0)) + " and " + getAuthorLastName(authors.get(1) +",");
+				return getAuthorLastName(authors.get(0)) + " and " + getAuthorLastName(authors.get(1));
 			}
 			return null;
 		}
@@ -518,26 +519,31 @@ public class ExtractReferences {
 	public static int getIdxOf(List<BibRecord> bib, String citeStr) {
 		//note: slow
 		for(int i=0; i<bib.size(); i++) {
-			if(bib.get(i).citeStr.equalsIgnoreCase(citeStr))
+			
+			if(bib.get(i).citeRegEx.matcher(citeStr).matches())
 				return i;
 		}
 		return -1;
 	}
 	
+	//note, also replaces <lb> with spaces in lines with found references
 	public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
 		ArrayList<CitationRecord> out = new ArrayList<>();
 		Pattern p = Pattern.compile(bs.getCiteRegex());
-		log.info("looking for pattern " + p.pattern());
+//		log.info("looking for pattern " + p.pattern());
+
+		int stop = refStart(paper); //stop at start of refs
+		if(stop<0)
+			stop = paper.size(); //start of refs not found (should never happen for non-null bibliography...)
 		
-		for(int i=0; i<paper.size(); i++) {
-			log.info("trying " + paper.get(i));
-			String s = paper.get(i);
+		for(int i=0; i<stop; i++) {
+			String s = paper.get(i).replaceAll("<lb>", " ");
+			paper.set(i, s);
 			Matcher m = p.matcher(s);
 			while(m.find()) {
-				log.info("match");
 				String [] citations = m.group(1).split(bs.getCiteDelimiter());
 				for(int j=0; j<citations.length; j++) {
-					int idx = getIdxOf(bib, citations[j]);
+					int idx = getIdxOf(bib, citations[j].trim());
 					if(idx >=0) {
 						out.add(new CitationRecord(i, m.start(), m.end(), idx));
 					}

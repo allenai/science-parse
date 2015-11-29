@@ -107,7 +107,7 @@ public class ExtractReferencesTest {
 			Assert.assertNotNull(b);
 		Assert.assertEquals(17, br.size());
 		Assert.assertEquals("Scalable video data placement on parallel disk arrays", br.get(0).title);
-		Assert.assertEquals("1", br.get(0).citeStr);
+		Assert.assertEquals("1", br.get(0).citeRegEx.pattern());
 		Assert.assertEquals("E. Chang", br.get(0).author.get(0));
 		Assert.assertEquals("A. Zakhor", br.get(0).author.get(1));
 		Assert.assertEquals(1994, br.get(0).year);
@@ -117,7 +117,7 @@ public class ExtractReferencesTest {
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.", br.get(0).venue.trim());
 		
 		List<CitationRecord> crs = ExtractReferences.findCitations(em.raw,  br,  bs);
-		log.info(crs.toString());
+		log.info("found " + crs.size() + " citations.");
 		Assert.assertEquals("[12]", em.raw.get(crs.get(0).lineIdx).substring(crs.get(0).startOffset, crs.get(0).endOffset));
 		Assert.assertTrue(em.raw.get(crs.get(0).lineIdx).startsWith("Keeton and Katz"));
 
@@ -136,7 +136,7 @@ public class ExtractReferencesTest {
 		fis.close();
 		fnd =er.findReferences(em.rawReferences);  
 		br = fnd.getOne();
-		
+		bs = fnd.getTwo();
 		j=0;
 		for(BibRecord b : br)
 			log.info("reference " + (j++) + " " + (b==null?"null":b.toString()));
@@ -145,14 +145,20 @@ public class ExtractReferencesTest {
 		Assert.assertEquals(16, br.size());
 		BibRecord tbr = br.get(15);
 		Assert.assertEquals("DASD dancing: A disk load balancing optimization scheme for video-on-demand computer systems", tbr.title);
-		Assert.assertEquals("Wolf et al., 1995", tbr.citeStr);
+		Assert.assertEquals("Wolf et al\\.,? 1995", tbr.citeRegEx.pattern());
 		Assert.assertEquals("J. Wolf", tbr.author.get(0));
 		Assert.assertEquals("P. Yu", tbr.author.get(1));
 		Assert.assertEquals("H. Shachnai", tbr.author.get(2));
 		Assert.assertEquals(1995, tbr.year);
 		log.info(br.get(0).venue.trim());
 		Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
-		
+		crs = ExtractReferences.findCitations(em.raw,  br,  bs);
+		log.info("found " + crs.size() + " citations.");
+		CitationRecord cr = crs.get(crs.size()-1);
+		log.info(cr.toString());
+		Assert.assertEquals("[Shachnai and Tamir 2000a]", em.raw.get(cr.lineIdx).substring(cr.startOffset, cr.endOffset));
+		log.info(em.raw.get(cr.lineIdx));
+		Assert.assertTrue(em.raw.get(cr.lineIdx).startsWith("We have implemented"));
 		
 		
 	}

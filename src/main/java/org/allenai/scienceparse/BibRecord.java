@@ -2,6 +2,7 @@ package org.allenai.scienceparse;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import lombok.Data;
 
@@ -13,6 +14,6 @@ public class BibRecord {
 	public final String title;
 	public final List<String> author;
 	public final String venue;
-	public final String citeStr;
+	public final Pattern citeRegEx;
 	public final int year;
 }
