@@ -232,6 +232,13 @@ public class PDFToCRFInput {
 		return sb.toString().trim();
 	}
 	
+	public static String cleanLine(String s) {
+		s = s.replaceAll("\r|\t|\n", " ").trim();
+		while(s.contains("  "))
+			s= s.replaceAll("  ", " ");
+		return s; 
+	}
+	
 	/**
 	 * Returns best guess of list of strings representation of the references of this file, 
 	 * intended to be one reference per list element, using spacing and indentation as cues
@@ -248,12 +255,14 @@ public class PDFToCRFInput {
 		StringBuffer sb = new StringBuffer();
 		for(PDFPage p : pdf.getPages()) {
 			double farLeft = Double.MAX_VALUE; //of current column
-			double farRight = -1.0; //of current column			
+			double farRight = -1.0; //of current column		
 			for(PDFLine l : p.getLines()) {
+//				log.info("line : " + lineToString(l));
 				if(!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
 					if(l.tokens.get(l.tokens.size()-1).token != null &&
-							refTags.contains(l.tokens.get(l.tokens.size()-1).token)) {
+							refTags.contains(l.tokens.get(l.tokens.size()-1).token.trim())) {
 						inRefs = true;
+//						log.info("in refs!");
 					}
 				}
 				else if(inRefs) {
@@ -283,7 +292,7 @@ public class PDFToCRFInput {
 							br = true;
 						}
 						if(br) {
-							out.add(sb.toString());
+							out.add(cleanLine(sb.toString()));
 							sb = new StringBuffer(sAdd);							
 						}
 						else {
@@ -298,7 +307,7 @@ public class PDFToCRFInput {
 				String sAdd = sb.toString();
 				if(sAdd.endsWith("<lb>"))
 					sAdd = sAdd.substring(0, sAdd.length()-4);
-				out.add(sAdd);
+				out.add(cleanLine(sAdd));
 				sb = new StringBuffer();
 			}
 		}

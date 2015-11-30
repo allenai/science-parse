@@ -96,9 +96,12 @@ public class ExtractReferences {
 //				+ "arrays," in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221."
 		public BibRecord parseRecord(String line) {
-			String regEx = "\\[([0-9]+)\\] (.*), \\p{Pi}(.*),\\p{Pf} (?:(?:I|i)n )?(.*)\\.?";
+//			log.info("trying " + line);
+			//String regEx = "\\[([0-9]+)\\] (.*), \\p{Pi}(.*),\\p{Pf} (?:(?:I|i)n )?(.*)\\.?";
+			String regEx = "\\[([0-9]+)\\] (.*)(?:,|\\.|:) [\\p{Pi}\"\']+(.*),[\\p{Pf}\"\']+ (?:(?:I|i)n )?(.*)\\.?";
 			Matcher m = Pattern.compile(regEx).matcher(line.trim());
 			if(m.matches()) {
+//				log.info("title: " + m.group(3));
 				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
 						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(4)));
 						return out;
@@ -221,11 +224,13 @@ public class ExtractReferences {
 		//STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
 		public NamedYearInParensBibRecordParser() {}
 		public BibRecord parseRecord(String line) {
+//			log.info("trying " + line);
 			String regEx2 = "(" + authGeneralList + ") +\\(([1-2][0-9]{3}[a-z]?)\\)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
 			Matcher m2 = Pattern.compile(regEx2).matcher(line.trim());
 			if(m2.matches()) {
 				List<String> authors = authorStringToList(m2.group(1));
 				int year = Integer.parseInt(m2.group(2).substring(0, 4));
+//				log.info("year: " + year);
 				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m2.group(2);
 				BibRecord out = new BibRecord(m2.group(3), authors,
 						m2.group(4), Pattern.compile(citeStr, Pattern.CASE_INSENSITIVE), year);

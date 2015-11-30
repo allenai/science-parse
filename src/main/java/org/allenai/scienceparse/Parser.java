@@ -589,7 +589,8 @@ public class Parser {
 		  HashSet<String> unfoundRefs = new HashSet<String>();
 
 		  ObjectMapper mapper = new ObjectMapper();
-		  
+		  int totalRefs = 0;
+		  int totalCites = 0;
 		  for(File f : inFiles) {
 			  if(!f.getName().endsWith(".pdf"))
 				  continue;
@@ -607,6 +608,8 @@ public class Parser {
 				  else {
 					  unfoundRefs.add(f.getAbsolutePath());
 				  }
+				  totalRefs += br.size();
+				  totalCites += cr.size();
 				  mapper.writeValue(new File(outDir, f.getName() + ".dat"), fnd);
 			  }
 			  catch(Exception e) {
@@ -620,8 +623,9 @@ public class Parser {
 		  //Object to JSON in file
 		  mapper.writeValue(new File(outDir, "unfoundReferences.dat"), unfoundRefs);
 		  mapper.writeValue(new File(outDir, "foundReferences.dat"), foundRefs);
-		  logger.info("found refs for " + foundRefs.size() + " papers.");;
-		  logger.info("failed to find refs for " + unfoundRefs.size() + " papers.");;
+		  logger.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");;
+		  logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");;
+		  logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
 	  }
   }
 }
