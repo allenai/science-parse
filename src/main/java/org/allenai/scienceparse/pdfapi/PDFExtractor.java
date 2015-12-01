@@ -91,8 +91,7 @@ public class PDFExtractor {
             }
             FloatList bounds = FloatArrayList.newListWith(minX, minY, maxX, maxY);
             builder.bounds(bounds);
-        	PDFToken out = builder.build();
-            return out;
+        	return builder.build();
         }
     }
 
@@ -114,8 +113,7 @@ public class PDFExtractor {
             // Build current token and decide if on the same line as previous token or starts a new line
             List<TextPosition> curPositions = new ArrayList<>();
             List<PDFToken> tokens = new ArrayList<>();
-            for (int idx = 0; idx < textPositions.size(); idx++) {
-                TextPosition tp = textPositions.get(idx);
+            for (TextPosition tp : textPositions) {
                 if (tp.getCharacter().trim().isEmpty()) {
                     List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
                     if (tokenPositions.size() > 0) {
@@ -223,10 +221,7 @@ public class PDFExtractor {
         boolean hasCapitalWord = Stream.of(words)
             .filter(w -> !w.isEmpty())
             .anyMatch(w -> Character.isUpperCase(w.charAt(0)));
-        if (!hasCapitalWord) {
-            return true;
-        }
-        return false;
+        return !hasCapitalWord;
     }
 
     private boolean badPDFTitle(PDFPage firstPage, String title) {
@@ -249,8 +244,9 @@ public class PDFExtractor {
         Calendar cal = null;
         try {
         	cal = DateConverter.toCalendar(strippedDate);
+        } catch(final IOException e) {
+            // proceed with null
         }
-        catch(IOException e) {} //proceed with null
         return cal == null ? null : cal.getTime();
     }
 
@@ -301,8 +297,10 @@ public class PDFExtractor {
                 if (!badPDFTitleFast(guessTitle)) {
                     title = guessTitle;
                 }
+            } catch (final Exception ex) {
+                log.warn("Exception while guessing heuristic title", ex);
+                // continue with previous title
             }
-            catch (Exception ex) {}
         }
         meta.title(title);
         pdfBoxDoc.close();
@@ -371,9 +369,6 @@ public class PDFExtractor {
         if (startIdx == stopIdx) {
             return null;
         }
-        if (DEBUG) {
-            System.out.println("HERE");
-        }
         double lastYDiff = Double.NaN;
         List<PDFLine> titleLines = firstPage.lines.subList(startIdx, stopIdx);
         if (titleLines.size() == 1) {
@@ -398,5 +393,4 @@ public class PDFExtractor {
         }
         return titleLines.stream().map(PDFLine::lineText).collect(Collectors.joining(" "));
     }
-
 }
