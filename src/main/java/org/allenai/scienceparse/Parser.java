@@ -421,13 +421,13 @@ public class Parser {
   
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
-			  (args.length==4 && args[0].equalsIgnoreCase("parse"))||
+			  (args.length==5 && args[0].equalsIgnoreCase("parse"))||
 			  (args.length==7 && args[0].equalsIgnoreCase("learn"))||
 			  (args.length==5 && args[0].equalsIgnoreCase("parseAndScore"))||
 			  (args.length==5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
 		  System.err.println("Usage: bootstrap <input dir> <model output file>");
 		  System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
-		  System.err.println("OR:    parse <input dir> <model input file> <output dir>");
+		  System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
 		  System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
 		  System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file>");
 	  }
@@ -463,6 +463,7 @@ public class Parser {
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
+		  ExtractReferences er = new ExtractReferences(args[4]);
 		  ObjectMapper mapper = new ObjectMapper();
 
 		  for(File f : inFiles) {
@@ -478,7 +479,12 @@ public class Parser {
 				  //e.printStackTrace();
 			  }
 			  fis.close();
-			  
+			  try {
+				  em.references = getReferences(em.raw, em.rawReferences, er);
+			  }
+			  catch(Exception e) {
+				  logger.info("Reference extraction error: " + f);
+			  }
 			  //Object to JSON in file
 			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
 		  }

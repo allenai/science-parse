@@ -60,7 +60,8 @@ public class ExtractReferences {
 			new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
 			new NumberDot(NumberDotYearNoParensBibRecordParser.class),
 			new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
-			new BracketNumber(BracketNumberBibRecordParser.class));
+			new BracketNumber(BracketNumberBibRecordParser.class),
+			new BracketName(BracketNameBibRecordParser.class));
 	
 			
 	private static class DefaultBibRecordParser implements BibRecordParser{
@@ -69,16 +70,17 @@ public class ExtractReferences {
 		}
 	}
 	
-	public static final String authOneName = "\\p{Lu}[\\p{L}'`\\- ]+"; //space for things like De Mori
+	public static final String authUnit = "\\p{Lu}[\\p{L}'`\\-]+";
+	public static final String authOneName = authUnit + "(?: " + authUnit + ")?"; //space and repetition for things like De Mori
 			
 	//pattern for matching single author name, format as in Jones, C. M.
 	
 	public static final String authLastCommaInitial = authOneName + ", (?:\\p{Lu}\\.-? ?)+";
 	
-	public static final String authConnect = "(?:(?:, |, and | and )";
+	public static final String authConnect = "(?:; |, |, and |; and | and )";
 	
 	public static final String authInitialsLast = "(?:\\p{Lu}\\.?(?:-| )?)+ " + authOneName;
-	public static final String authInitialsLastList = authInitialsLast + authConnect + "(?:" + authInitialsLast + "))*";
+	public static final String authInitialsLastList = authInitialsLast + "(?:" + authConnect + authInitialsLast + ")*";
 	
 	
 	
@@ -208,7 +210,7 @@ public class ExtractReferences {
 				int year = Integer.parseInt(m1.group(2).substring(0, 4));
 				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m1.group(2);
 				BibRecord out = new BibRecord(m1.group(3), authors,
-						m1.group(4), Pattern.compile(citeStr, Pattern.CASE_INSENSITIVE), year);
+						m1.group(4), authStrToPat(citeStr), year);
 //				BibRecord out = new BibRecord("title", null, null, null, 0);
 				
 						return out;
@@ -233,8 +235,8 @@ public class ExtractReferences {
 //				log.info("year: " + year);
 				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m2.group(2);
 				BibRecord out = new BibRecord(m2.group(3), authors,
-						m2.group(4), Pattern.compile(citeStr, Pattern.CASE_INSENSITIVE), year);
-						return out;				
+						m2.group(4), authStrToPat(citeStr), year);
+						return out;
 			}
 			else
 				return null;
@@ -270,10 +272,46 @@ public class ExtractReferences {
 		}
 	}
 	
+	private static class BracketNameBibRecordParser implements BibRecordParser {
+		public BracketNameBibRecordParser() {
+		}
+		//example:
+//		[Magnini et al., 2002] B. Magnini, M. Negri, R. Prevete, and
+//		H. Tanev. Is it the right answer? exploiting web redundancy
+//				for answer validation. In ACL, 2002.
+		
+		public BibRecord parseRecord(String line) {
+//			log.info("trying " + line);
+			String regEx1 = "\\[([^\\]]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";
+			String regEx2 = "\\[([^\\]]+)\\] (" + authGeneralList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*),? ([1-2][0-9]{3})\\..*";
+			Matcher m = Pattern.compile(regEx1).matcher(line.trim());
+			Matcher m2 = Pattern.compile(regEx2).matcher(line.trim());
+			if(m.matches()) {
+//				log.info("matched with ex1 " + m.group(3));
+				if(m.group(1).matches("[0-9]+")) //don't override BracketNumber
+					return null;
+				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
+						m.group(4), authStrToPat(cleanAuthString(m.group(1))), extractRefYear(m.group(5)));
+						return out;
+			}
+			else if(m2.matches()) {
+//				log.info("matched with ex2 " + m2.group(3));
+				if(m2.group(1).matches("[0-9]+")) //don't override BracketNumber
+					return null;
+				BibRecord out = new BibRecord(m2.group(3), authorStringToList(m2.group(2)),
+						m2.group(4), authStrToPat(cleanAuthString(m2.group(1))), extractRefYear(m2.group(5)));
+						return out;
+				
+			}
+			else
+				return null;
+		}
+	}
+	
 	
 	private static class NamedYear extends BibStractor {
 		private final String citeRegex = "(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
-		private final String citeDelimiter = ";";
+		private final String citeDelimiter = "; ?";
 		
 		NamedYear(Class c) {
 			super(c);
@@ -290,13 +328,13 @@ public class ExtractReferences {
 		//in regex form
 		public static String getCiteAuthorFromAuthors(List<String> authors) {
 			if(authors.size() > 2) {
-				return getAuthorLastName(authors.get(0)) + " et al\\.";
+				return cleanAuthString(getAuthorLastName(authors.get(0))) + " et al\\.";
 			}
 			else if(authors.size() == 1) {
-				return getAuthorLastName(authors.get(0));
+				return cleanAuthString(getAuthorLastName(authors.get(0)));
 			}
 			else if(authors.size() == 2) {
-				return getAuthorLastName(authors.get(0)) + " and " + getAuthorLastName(authors.get(1));
+				return cleanAuthString(getAuthorLastName(authors.get(0))) + " and " + cleanAuthString(getAuthorLastName(authors.get(1)));
 			}
 			return null;
 		}
@@ -309,7 +347,7 @@ public class ExtractReferences {
 //			log.info(cites.get(0));
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
-				s = s.replaceAll("<lb>", " ");
+				s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
 				out.add(this.recParser.parseRecord(s));
 			}
 			out = removeNulls(out);
@@ -342,7 +380,7 @@ public class ExtractReferences {
 			}
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
-				s = s.replaceAll("<lb>", " ");
+				s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
 				out.add(this.recParser.parseRecord(s));
 			}
 			out = removeNulls(out);
@@ -351,8 +389,8 @@ public class ExtractReferences {
 	}
 	
 	private static class BracketNumber extends BibStractor {
-		protected final String citeRegex = "\\[([0-9,]+)\\]";
-		protected final String citeDelimiter = ",";
+		protected final String citeRegex = "\\[([0-9, ]+)\\]";
+		protected final String citeDelimiter = "(,| |;)+";
 		
 		BracketNumber(Class c) {
 			super(c);
@@ -386,7 +424,39 @@ public class ExtractReferences {
 			}
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
-				s = s.replaceAll("<lb>", " ");
+				s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
+				out.add(this.recParser.parseRecord(s));
+			}
+			out = removeNulls(out);
+			return out;
+		}
+	}
+	
+	private static class BracketName extends BibStractor {
+		protected final String citeRegex = "\\[([^\\]]+)\\]";
+		protected final String citeDelimiter = "; ?";
+		
+		BracketName(Class c) {
+			super(c);
+		}
+		
+		public String getCiteRegex() {
+			return citeRegex;
+		}
+		
+		public String getCiteDelimiter() {
+			return citeDelimiter;
+		}
+		
+		public List<BibRecord> parse(String line) {
+			if(line.startsWith("<bb>"))
+				line = line.substring(4);
+			String [] citesa = line.split("<bb>");
+			List<String> cites = Arrays.asList(citesa);
+//			log.info(cites.get(0));
+			List<BibRecord> out = new ArrayList<BibRecord>();
+			for(String s : cites) {
+				s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
 				out.add(this.recParser.parseRecord(s));
 			}
 			out = removeNulls(out);
@@ -395,9 +465,15 @@ public class ExtractReferences {
 	}
 	
 	
+	private static Pattern authStrToPat(String s) {
+		Pattern p = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+		return p;
+	}
 	
-	
-	
+	//returns pattern-ready form of author
+	private static String cleanAuthString(String s) {
+		return s.replaceAll("\\p{P}", ".");//allow anything for any punctuation
+	}
 	
 	private static int extractRefYear(String sYear) {
 		String yearPattern = "[1-2][0-9][0-9][0-9]";
@@ -558,10 +634,12 @@ public class ExtractReferences {
 			stop = paper.size(); //start of refs not found (should never happen for non-null bibliography...)
 		
 		for(int i=0; i<stop; i++) {
-			String s = paper.get(i).replaceAll("<lb>", " ");
+			String s = paper.get(i).replaceAll("-<lb>", "").replaceAll("<lb>", " ");
 			paper.set(i, s);
+//			log.info("trying " + paper.get(i));
 			Matcher m = p.matcher(s);
 			while(m.find()) {
+//				log.info("found.");
 				String [] citations = m.group(1).split(bs.getCiteDelimiter());
 				for(int j=0; j<citations.length; j++) {
 					int idx = getIdxOf(bib, citations[j].trim());

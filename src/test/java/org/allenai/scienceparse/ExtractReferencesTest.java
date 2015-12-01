@@ -47,6 +47,14 @@ public class ExtractReferencesTest {
 		  String test4 = "D. Kowalsky and A. Pelc,";
 		  String auth4 = ExtractReferences.authInitialsLastList + ",";
 		  Assert.assertTrue(Pattern.matches(auth4, test4));
+		  String test5 = "E. Agichtein and L. Gravano.";
+		  String auth5 = ExtractReferences.authInitialsLastList + "(?:,|\\.)";
+		  Assert.assertTrue(Pattern.matches(auth5, test5));
+		  String test6 = "E. Agichtein and L.";
+		  String auth6 = ExtractReferences.authInitialsLastList + "(?:,|\\.)";
+		  Assert.assertFalse(Pattern.matches(auth6, test6));
+		  
+		  
 	  }
 	  
 	  public void testNumberDotAuthorNoTitleBibRecordParser() {
