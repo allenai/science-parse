@@ -1,6 +1,5 @@
 package org.allenai.scienceparse;
 
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,24 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
-import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 import org.allenai.scienceparse.pdfapi.PDFToken;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
 
-import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
-import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.tuple.Tuples;
-import com.sun.media.jfxmedia.logging.Logger;
 
 @Slf4j
 public class PDFToCRFInput {
@@ -185,9 +175,7 @@ public class PDFToCRFInput {
 			return 0.0;
 		float h1 = getH(l1);
 		float h2 = getH(l2);
-		if(h1 < 0.0f)
-			log.info("negative height!!!!");
-		return (getY(l2, true) - getY(l1, false))/Math.min(h1,h2);
+		return (getY(l2, true) - getY(l1, false)) / Math.min(h1,h2);
 	}
 	
 	public static float getY(PDFLine l, boolean upper) {
@@ -205,9 +193,14 @@ public class PDFToCRFInput {
 	}
 	
 	public static float getH(PDFLine l) {
-		return l.bounds().get(3) - l.bounds().get(1);
+		float result = l.bounds().get(3) - l.bounds().get(1);
+		if(result < 0) {
+			log.info("Negative height? Guessing a height of 5.");
+			return 5;
+		} else {
+			return result;
+		}
 	}
-
 	
 	public static double getTopQuartileLineBreak(PDFDoc pdf) {
 		ArrayList<Double> breaks = new ArrayList<>();
@@ -227,7 +220,7 @@ public class PDFToCRFInput {
 	}
 	
 	public static String lineToString(PDFLine l) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		l.tokens.forEach(t -> sb.append(t.token + " "));
 		return sb.toString().trim();
 	}
@@ -294,9 +287,9 @@ public class PDFToCRFInput {
 						if(br) {
 							out.add(cleanLine(sb.toString()));
 							sb = new StringBuffer(sAdd);							
-						}
-						else {
-							sb.append("<lb>" + sAdd);							
+						} else {
+							sb.append("<lb>");
+							sb.append(sAdd);
 						}
 					}
 				}
@@ -337,8 +330,10 @@ public class PDFToCRFInput {
 					s = new StringBuffer();
 				}
 				String sAdd = lineToString(l);
-				if(sAdd.length() > 0)
-					s.append(sAdd + "<lb>");
+				if(sAdd.length() > 0) {
+					s.append(sAdd);
+					s.append("<lb>");
+				}
 				prevLine = l;
 			}
 			//HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
@@ -401,7 +396,7 @@ public class PDFToCRFInput {
 	/**
 	 * Labels the (first occurrence of) given target in seq with given label
 	 * @param seq	The sequence
-	 * @param seqWLabel	The same sequence with labels
+	 * @param seqLabeled	The same sequence with labels
 	 * @param target	
 	 * @param labelStem
 	 * @return	True if target was found in seq, false otherwise
@@ -464,7 +459,7 @@ public class PDFToCRFInput {
 	public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
 		List<PaperToken> pts = toks.subList(span.getOne(), span.getTwo());
 		List<String> words = pts.stream().map(pt -> (pt.getLine()==-1)?"<S>":pt.getPdfToken().token).collect(Collectors.toList());
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for(String s : words) {
 			sb.append(s);
 			sb.append(" ");
