@@ -49,7 +49,7 @@ public class ParserGroundTruth {
 		return papers.get(lookup.get(key));
 	}
 	
-	private String invertAroundComma(String in) {
+	public static String invertAroundComma(String in) {
 		String [] fields = in.split(",");
 		if(fields.length==2)
 			return (fields[1] + " " + fields[0]).trim();

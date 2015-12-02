@@ -1,31 +1,22 @@
 package org.allenai.scienceparse;
 
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
-import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 import org.allenai.scienceparse.pdfapi.PDFToken;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
 
-import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
-import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.tuple.Tuples;
-import com.sun.media.jfxmedia.logging.Logger;
 
 @Slf4j
 public class PDFToCRFInput {
@@ -182,7 +173,9 @@ public class PDFToCRFInput {
 	public static double breakSize(PDFLine l2, PDFLine l1) {
 		if(l2==null || l1==null)
 			return 0.0;
-		return getY(l2, true) - getY(l1, false);
+		float h1 = getH(l1);
+		float h2 = getH(l2);
+		return (getY(l2, true) - getY(l1, false)) / Math.min(h1,h2);
 	}
 	
 	public static float getY(PDFLine l, boolean upper) {
@@ -192,50 +185,164 @@ public class PDFToCRFInput {
 			return l.bounds().get(3);
 	}
 	
+	public static float getX(PDFLine l, boolean left) {
+		if(left)
+			return l.bounds().get(0);
+		else
+			return l.bounds().get(2);
+	}
+	
+	public static float getH(PDFLine l) {
+		float result = l.bounds().get(3) - l.bounds().get(1);
+		if(result < 0) {
+			log.info("Negative height? Guessing a height of 5.");
+			return 5;
+		} else {
+			return result;
+		}
+	}
+	
 	public static double getTopQuartileLineBreak(PDFDoc pdf) {
 		ArrayList<Double> breaks = new ArrayList<>();
+		PDFLine prevLine = null;
 		for(PDFPage p : pdf.getPages()) {
-			PDFLine prevLine = null;
 			for(PDFLine l : p.getLines()) {
 				double bs = breakSize(l, prevLine);
-				if(bs > 0) //assume <= 0 is error
+				if(bs > 0) { //<= 0 due to math, tables, new pages, should be ignored 
 					breaks.add(bs);
+				}
 				prevLine = l;
 			}
 		}
 		breaks.sort((d1, d2) -> Double.compare(d1, d2));
-		log.info("breaks: ");
-		log.info(breaks.toString());
-		int idx = (3 * breaks.size())/4;
+		int idx = (7 * breaks.size())/9; //hand-tuned threshold good for breaking references 
 		return breaks.get(idx);
 	}
 	
 	public static String lineToString(PDFLine l) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		l.tokens.forEach(t -> sb.append(t.token + " "));
 		return sb.toString().trim();
 	}
 	
+	public static String cleanLine(String s) {
+		s = s.replaceAll("\r|\t|\n", " ").trim();
+		while(s.contains("  "))
+			s= s.replaceAll("  ", " ");
+		return s; 
+	}
+	
+	/**
+	 * Returns best guess of list of strings representation of the references of this file, 
+	 * intended to be one reference per list element, using spacing and indentation as cues
+	 * @param pdf
+	 * @return
+	 */
+	public static List<String> getRawReferences(PDFDoc pdf) {
+		final List<String> refTags = Arrays.asList("References", "REFERENCES", "Citations", "CITATIONS", "Bibliography",
+				"BIBLIOGRAPHY");
+		List<String> out = new ArrayList<String>();
+		PDFLine prevLine = null;
+		boolean inRefs = false;
+		double qLineBreak = getTopQuartileLineBreak(pdf);
+		StringBuffer sb = new StringBuffer();
+		for(PDFPage p : pdf.getPages()) {
+			double farLeft = Double.MAX_VALUE; //of current column
+			double farRight = -1.0; //of current column		
+			for(PDFLine l : p.getLines()) {
+//				log.info("line : " + lineToString(l));
+				if(!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
+					if(l.tokens.get(l.tokens.size()-1).token != null &&
+							refTags.contains(l.tokens.get(l.tokens.size()-1).token.trim())) {
+						inRefs = true;
+//						log.info("in refs!");
+					}
+				}
+				else if(inRefs) {
+					double left = getX(l, true);
+					double right = getX(l, false);
+					if(farRight >= 0 && right > farRight) { //new column, reset
+						farLeft = Double.MAX_VALUE;
+						farRight = -1.0;
+					}
+					farLeft = Math.min(left, farLeft);
+					farRight = Math.max(right, farRight);
+					boolean br = false;
+					if(l.tokens != null && l.tokens.size() > 0) {
+						String sAdd = lineToString(l);
+						if(left > farLeft + l.tokens.get(0).fontMetrics.spaceWidth) {
+//							log.info("indent " + sAdd);
+							br = false;
+						}
+						else if(getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
+							
+//							log.info("short line before -- " + getX(prevLine, false) + " " + 
+//									l.tokens.get(0).fontMetrics.spaceWidth + " " + farRight + " breaking " + sAdd);
+							br = true;
+						}
+						else if(breakSize(l, prevLine) > qLineBreak) {
+//							log.info("over max line break -- breaking " + sAdd);
+							br = true;
+						}
+						if(br) {
+							out.add(cleanLine(sb.toString()));
+							sb = new StringBuffer(sAdd);							
+						} else {
+							sb.append("<lb>");
+							sb.append(sAdd);
+						}
+					}
+				}
+				prevLine = l;
+			}
+			//HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
+			if(sb.length() > 0) {
+				String sAdd = sb.toString();
+				if(sAdd.endsWith("<lb>"))
+					sAdd = sAdd.substring(0, sAdd.length()-4);
+				out.add(cleanLine(sAdd));
+				sb = new StringBuffer();
+			}
+		}
+		return out;
+	}
+	
 	/**
 	 * Returns list of strings representation of this file.  Breaks new lines when pdf line break larger than median line break.
+	 * All original line breaks indicated by <lb>
 	 * @param pdf
 	 * @return
 	 */
 	public static List<String> getRaw(PDFDoc pdf) {
 		ArrayList<String> out = new ArrayList<>();
-		int pg = 0;
-		double qLineBreak = getTopQuartileLineBreak(pdf);
-		log.info("median line break: " + qLineBreak);
+		
+		//log.info("median line break: " + qLineBreak);
 		StringBuffer s = new StringBuffer();
 		PDFLine prevLine = null;
+		double qLineBreak = getTopQuartileLineBreak(pdf);
 		for(PDFPage p : pdf.getPages()) {
 			for(PDFLine l : p.getLines()) {
 				if(breakSize(l, prevLine) > qLineBreak) {
-					out.add(s.toString().trim());
+					String sAdd = s.toString();
+					if(sAdd.endsWith("<lb>"))
+						sAdd = sAdd.substring(0, sAdd.length()-4);
+					out.add(sAdd);
 					s = new StringBuffer();
 				}
-				s.append(lineToString(l) + " ");
+				String sAdd = lineToString(l);
+				if(sAdd.length() > 0) {
+					s.append(sAdd);
+					s.append("<lb>");
+				}
 				prevLine = l;
+			}
+			//HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
+			if(s.length() > 0) {
+				String sAdd = s.toString();
+				if(sAdd.endsWith("<lb>"))
+					sAdd = sAdd.substring(0, sAdd.length()-4);
+				out.add(sAdd);
+				s = new StringBuffer();
 			}
 		}
 		return out;
@@ -289,7 +396,7 @@ public class PDFToCRFInput {
 	/**
 	 * Labels the (first occurrence of) given target in seq with given label
 	 * @param seq	The sequence
-	 * @param seqWLabel	The same sequence with labels
+	 * @param seqLabeled	The same sequence with labels
 	 * @param target	
 	 * @param labelStem
 	 * @return	True if target was found in seq, false otherwise
@@ -352,7 +459,7 @@ public class PDFToCRFInput {
 	public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
 		List<PaperToken> pts = toks.subList(span.getOne(), span.getTwo());
 		List<String> words = pts.stream().map(pt -> (pt.getLine()==-1)?"<S>":pt.getPdfToken().token).collect(Collectors.toList());
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for(String s : words) {
 			sb.append(s);
 			sb.append(" ");
