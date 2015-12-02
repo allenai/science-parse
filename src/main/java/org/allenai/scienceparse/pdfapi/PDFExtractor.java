@@ -252,14 +252,15 @@ public class PDFExtractor {
 
     @SneakyThrows
     public PdfDocExtractionResult extractResultFromInputStream(InputStream is) {
-        PDDocument pdfBoxDoc = PDDocument.load(is);
+        try(PDDocument pdfBoxDoc = PDDocument.load(is)) {
         val info = pdfBoxDoc.getDocumentInformation();
         List<String> keywords = guessKeywordList(info.getKeywords());
         List<String> authors = guessAuthorList(info.getAuthor());
         val meta = PDFMetadata.builder()
             .title(info.getTitle() != null ? info.getTitle().trim() : null)
             .keywords(keywords)
-            .authors(authors);
+                    .authors(authors)
+                    .creator(info.getCreator());
         String createDate = info.getCustomMetadataValue(COSName.CREATION_DATE.getName());
         if (createDate != null) {
             meta.createDate(toDate(createDate));
@@ -286,7 +287,7 @@ public class PDFExtractor {
         stripper.getText(pdfBoxDoc);
         String title = info.getTitle();
         // kill bad title
-        if (badPDFTitle(stripper.pages.get(0), title)) {
+            if (stripper.pages.isEmpty() || badPDFTitle(stripper.pages.get(0), title)) {
             title = null;
         }
         boolean highPrecision = title != null;
@@ -303,17 +304,26 @@ public class PDFExtractor {
             }
         }
         meta.title(title);
-        pdfBoxDoc.close();
-        PDFPage firstPage = stripper.pages.get(0);
+
+            int headerStopIndex = -1;
+            if(!stripper.pages.isEmpty()) {
+                final PDFPage firstPage = stripper.pages.get(0);
+                headerStopIndex = getHeuristicHeaderStopIndex(firstPage);
+            } else {
+                // Anecdotally, when we have no pages, the output is such garbage that we might be
+                // better off throwing an exception. TBD
+            }
+
         PDFDoc doc = PDFDoc.builder()
             .pages(stripper.pages)
-            .headerStopLinePosition(getHeuristicHeaderStopIndex(firstPage))
+                .headerStopLinePosition(headerStopIndex)
             .meta(meta.build())
             .build();
 
         return PdfDocExtractionResult.builder()
             .document(doc)
             .highPrecision(highPrecision).build();
+    }
     }
 
     @SneakyThrows
@@ -336,13 +346,18 @@ public class PDFExtractor {
             return abstractIdx.getAsInt();
         }
         // Find smallest line on page and if it appears in acceptable range, take it
-        double smallestSize = firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min().getAsDouble();
-        OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
-            .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
-            .findFirst();
-        if (smallIdx.isPresent()) {
-            if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
-                return smallIdx.getAsInt();
+        final OptionalDouble smallestSizeOption =
+            firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min();
+        if(smallestSizeOption.isPresent()) {
+            final double smallestSize = smallestSizeOption.getAsDouble();
+
+            OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
+                .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
+                .findFirst();
+            if (smallIdx.isPresent()) {
+                if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
+                    return smallIdx.getAsInt();
+                }
             }
         }
         return -1;
