@@ -34,16 +34,15 @@ public class ExtractReferences {
 			BibRecordParser b = null;
 			try {
 				b = (BibRecordParser) c.newInstance();
-			}
-			catch(Exception e) {
-				log.info("Exception " + e.getStackTrace());
+			} catch(final Exception e) {
+				log.warn("Exception while creating BibStractor", e);
 			}
 			recParser = b;
 		}
 	}
 	
 	public interface BibRecordParser {
-		public abstract BibRecord parseRecord(String line);
+		BibRecord parseRecord(String line);
 	}
 	
 	//279
@@ -62,8 +61,7 @@ public class ExtractReferences {
 			new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
 			new BracketNumber(BracketNumberBibRecordParser.class),
 			new BracketName(BracketNameBibRecordParser.class));
-	
-			
+
 	private static class DefaultBibRecordParser implements BibRecordParser{
 		public BibRecord parseRecord(String line) {
 			return new BibRecord(line, null, null, null, 0);
@@ -81,237 +79,263 @@ public class ExtractReferences {
 	
 	public static final String authInitialsLast = "(?:\\p{Lu}\\.?(?:-| )?)+ " + authOneName;
 	public static final String authInitialsLastList = authInitialsLast + "(?:" + authConnect + authInitialsLast + ")*";
-	
-	
-	
 	public static final String authPlain = authOneName + "(?:\\p{Lu}\\. )?" + authOneName;
 	public static final String authPlainList = authPlain + "(?:(?:, and|,) (?:" + authPlain + "))*";
 	public static final String authGeneral = "\\p{Lu}[\\p{L}\\.'`\\- ]+";
 	public static final String authGeneralList = authGeneral + "(?:(?:; |, |, and |; and | and )" + authGeneral + ")*"; 
 
-	
-	private static class BracketNumberInitialsQuotedBibRecordParser implements  BibRecordParser {
-		public BracketNumberInitialsQuotedBibRecordParser() {
-		}
+	private static class BracketNumberInitialsQuotedBibRecordParser implements BibRecordParser {
+		public BracketNumberInitialsQuotedBibRecordParser() { }
+
+		private static final String regEx =
+			"\\[([0-9]+)\\] (.*)(?:,|\\.|:) [\\p{Pi}\"\']+(.*),[\\p{Pf}\"\']+ (?:(?:I|i)n )?(.*)\\.?";
+		private static final Pattern pattern = Pattern.compile(regEx);
+
 		//example:
-	//	"[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
-//				+ "arrays," in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
-//				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221."
+		//	"[1] E. Chang and A. Zakhor, “Scalable video data placement on parallel disk "
+		//+ "arrays," in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
+		//+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221."
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			//String regEx = "\\[([0-9]+)\\] (.*), \\p{Pi}(.*),\\p{Pf} (?:(?:I|i)n )?(.*)\\.?";
-			String regEx = "\\[([0-9]+)\\] (.*)(?:,|\\.|:) [\\p{Pi}\"\']+(.*),[\\p{Pf}\"\']+ (?:(?:I|i)n )?(.*)\\.?";
-			Matcher m = Pattern.compile(regEx).matcher(line.trim());
+			Matcher m = pattern.matcher(line.trim());
 			if(m.matches()) {
-//				log.info("title: " + m.group(3));
-				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(4)));
-						return out;
-			}
-			else
+				return new BibRecord(
+					m.group(3),
+					authorStringToList(m.group(2)),
+					m.group(4),
+					Pattern.compile(m.group(1)),
+					extractRefYear(m.group(4)));
+			} else {
 				return null;
+			}
 		}
 	}
 
 	private static class BracketNumberBibRecordParser implements BibRecordParser {
-		public BracketNumberBibRecordParser() {
-			
-		}
+		public BracketNumberBibRecordParser() { }
+
+		private static final String regEx =
+			"\\[([0-9]+)\\] (" + authInitialsLastList + ")\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*) ([1-2][0-9]{3})\\.( .*)?";
+		private static final Pattern pattern = Pattern.compile(regEx);
+
 		//example:
-	//TODO
+	    //TODO
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx = "\\[([0-9]+)\\] (" + authInitialsLastList + ")\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*) ([1-2][0-9]{3})\\.( .*)?";
-			Matcher m = Pattern.compile(regEx).matcher(line.trim());
+			Matcher m = pattern.matcher(line.trim());
 			if(m.matches()) {
-//				log.info("year: " + m.group(5));
-				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
-						return out;
-			}
-			else
+				return new BibRecord(
+					m.group(3),
+					authorStringToList(m.group(2)),
+					m.group(4),
+					Pattern.compile(m.group(1)),
+					extractRefYear(m.group(5)));
+			} else {
 				return null;
+			}
 		}
 	}
 	
 	static class NumberDotAuthorNoTitleBibRecordParser implements BibRecordParser {
-		public NumberDotAuthorNoTitleBibRecordParser() {}
+		public NumberDotAuthorNoTitleBibRecordParser() { }
+
+		private static final String regEx =
+			"([0-9]+)\\. +(" + authLastCommaInitial + "(?:; " + authLastCommaInitial + ")*)" + " ([^0-9]*) ([1-2][0-9]{3})(?:\\.|,[0-9, ]*)(?:.*)";
+		private static final Pattern pattern = Pattern.compile(regEx);
+
 		//example:
 		//1. Jones, C. M.; Henry, E. R.; Hu, Y.; Chan C. K; Luck S. D.; Bhuyan, A.; Roder, H.; Hofrichter, J.; 
 		//Eaton, W. A. Proc Natl Acad Sci USA 1993, 90, 11860.
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx = "([0-9]+)\\. +(" + authLastCommaInitial + 
-					"(?:; " + authLastCommaInitial + ")*)" + " ([^0-9]*) ([1-2][0-9]{3})(?:\\.|,[0-9, ]*)(?:.*)";
-			
-			Matcher m = Pattern.compile(regEx).matcher(line.trim());
+			Matcher m = pattern.matcher(line.trim());
 			if(m.matches()) {
-//				log.info("year string: " + m.group(4));
-				BibRecord out = new BibRecord("", authorStringToList(m.group(2)),
-						m.group(3), Pattern.compile(m.group(1)), extractRefYear(m.group(4)));
-						return out;
-			}
-			else
+				return new BibRecord(
+					"",
+					authorStringToList(m.group(2)),
+					m.group(3),
+					Pattern.compile(m.group(1)),
+					extractRefYear(m.group(4)));
+			} else {
 				return null;
+			}
 		}		
 	}
 	
-	private static class NumberDotYearParensBibRecordParser implements  BibRecordParser {
-		public NumberDotYearParensBibRecordParser() {
-		}
+	private static class NumberDotYearParensBibRecordParser implements BibRecordParser {
+		public NumberDotYearParensBibRecordParser() { }
+
+		private static final String regEx =
+			"([0-9]+)\\. ([^:]+): ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) \\(([0-9]{4})\\)(?: .*)?"; //last part is for header break
+		private static final Pattern pattern = Pattern.compile(regEx);
+
 		//example: 
 		//TODO
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx = "([0-9]+)\\. ([^:]+): ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) \\(([0-9]{4})\\)(?: .*)?"; //last part is for header break
-			Matcher m = Pattern.compile(regEx).matcher(line.trim());
+			Matcher m = pattern.matcher(line.trim());
 			if(m.matches()) {
-//				log.info("year string: " + m.group(5));
-				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
-						return out;
-			}
-			else
+				return new BibRecord(
+					m.group(3),
+					authorStringToList(m.group(2)),
+					m.group(4),
+					Pattern.compile(m.group(1)),
+					extractRefYear(m.group(5)));
+			} else {
 				return null;
+			}
 		}
 	}
 
 	private static class NumberDotYearNoParensBibRecordParser implements  BibRecordParser {
-		public NumberDotYearNoParensBibRecordParser() {
-		}
-		//example: 
+		public NumberDotYearNoParensBibRecordParser() { }
+
+		private static final String regEx =
+			"([0-9]+)\\. (" + authInitialsLastList + "). ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) ([1-2][0-9]{3}).( .*)?"; //last part for header break
+		private static final Pattern pattern = Pattern.compile(regEx);
+
+		//example:
 		//TODO
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx = "([0-9]+)\\. (" + authInitialsLastList + "). ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) ([1-2][0-9]{3}).( .*)?"; //last part for header break
-			Matcher m = Pattern.compile(regEx).matcher(line.trim());
+			Matcher m = pattern.matcher(line.trim());
 			if(m.matches()) {
-//				log.info("year string: " + m.group(5));
-				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
-						return out;
-			}
-			else
+				return new BibRecord(
+					m.group(3),
+					authorStringToList(m.group(2)),
+					m.group(4),
+					Pattern.compile(m.group(1)),
+					extractRefYear(m.group(5)));
+			} else {
 				return null;
+			}
 		}
 	}
 	
 	private static class NamedYearBibRecordParser implements BibRecordParser {
+		public NamedYearBibRecordParser() {}
+
+		private static final String regEx =
+			"(" + authGeneralList + ") +([1-2][0-9]{3}[a-z]?)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
+		private static final Pattern pattern = Pattern.compile(regEx);
+
 		//example:
 		//STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
-		public NamedYearBibRecordParser() {}
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx1 = "(" + authGeneralList + ") +([1-2][0-9]{3}[a-z]?)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
-			Matcher m1 = Pattern.compile(regEx1).matcher(line.trim());
-			if(m1.matches()) {
-//				log.info("year : " + m1.group(2));
-				List<String> authors = authorStringToList(m1.group(1));
-				int year = Integer.parseInt(m1.group(2).substring(0, 4));
-				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m1.group(2);
-				BibRecord out = new BibRecord(m1.group(3), authors,
-						m1.group(4), authStrToPat(citeStr), year);
-//				BibRecord out = new BibRecord("title", null, null, null, 0);
-				
-						return out;
-			}
-			else
+			Matcher m = pattern.matcher(line.trim());
+			if(m.matches()) {
+				final List<String> authors = authorStringToList(m.group(1));
+				final int year = Integer.parseInt(m.group(2).substring(0, 4));
+				final String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m.group(2);
+				return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), year);
+			} else {
 				return null;
+			}
 		}
 
 	}
 
 	private static class NamedYearInParensBibRecordParser implements BibRecordParser {
+		public NamedYearInParensBibRecordParser() { }
+
+		private static final String regEx =
+			"(" + authGeneralList + ") +\\(([1-2][0-9]{3}[a-z]?)\\)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
+		private static final Pattern pattern = Pattern.compile(regEx);
+
 		//example:
 		//STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
-		public NamedYearInParensBibRecordParser() {}
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx2 = "(" + authGeneralList + ") +\\(([1-2][0-9]{3}[a-z]?)\\)\\. ([^\\.]+)\\. (?:(?:I|i)n )?(.*)\\.?";
-			Matcher m2 = Pattern.compile(regEx2).matcher(line.trim());
-			if(m2.matches()) {
-				List<String> authors = authorStringToList(m2.group(1));
-				int year = Integer.parseInt(m2.group(2).substring(0, 4));
-//				log.info("year: " + year);
-				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m2.group(2);
-				BibRecord out = new BibRecord(m2.group(3), authors,
-						m2.group(4), authStrToPat(citeStr), year);
-						return out;
-			}
-			else
+			Matcher m = pattern.matcher(line.trim());
+			if(m.matches()) {
+				List<String> authors = authorStringToList(m.group(1));
+				int year = Integer.parseInt(m.group(2).substring(0, 4));
+				String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m.group(2);
+				return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), year);
+			} else {
 				return null;
+			}
 		}
 	}
 	
 	private static class BracketNumberInitialsYearParensCOMMAS implements BibRecordParser {
-		public BracketNumberInitialsYearParensCOMMAS() {
-		}
+		public BracketNumberInitialsYearParensCOMMAS() { }
+
+		private static final String regEx1 =
+			"\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*) +\\(.*([1-2][0-9]{3}).*\\).*";
+		private static final Pattern pattern1 = Pattern.compile(regEx1);
+
+		private static final String regEx2 =
+			"\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";
+		private static final Pattern pattern2 = Pattern.compile(regEx2);
+
 		//example:
-//		[1] S. Abiteboul, H. Kaplan, and T. Milo, Compact labeling schemes for ancestor queries. Proc. 12th Ann. ACM-SIAM Symp.
-//		on Discrete Algorithms (SODA 2001), 547-556.
+		// [1] S. Abiteboul, H. Kaplan, and T. Milo, Compact labeling schemes for ancestor queries. Proc. 12th Ann. ACM-SIAM Symp.
+		// on Discrete Algorithms (SODA 2001), 547-556.
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx1 = "\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*) +\\(.*([1-2][0-9]{3}).*\\).*";
-			String regEx2 = "\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";
-			Matcher m = Pattern.compile(regEx1).matcher(line.trim());
-			Matcher m2 = Pattern.compile(regEx2).matcher(line.trim());
+			Matcher m = pattern1.matcher(line.trim());
+			Matcher m2 = pattern2.matcher(line.trim());
 			if(m.matches()) {
-	//			log.info("matched with ex1 " + m.group(3));
-				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), Pattern.compile(m.group(1)), extractRefYear(m.group(5)));
-						return out;
-			}
-			else if(m2.matches()) {
-//				log.info("matched with ex2 " + m2.group(3));
-				BibRecord out = new BibRecord(m2.group(3), authorStringToList(m2.group(2)),
-						m2.group(4), Pattern.compile(m2.group(1)), extractRefYear(m2.group(5)));
-						return out;
-			}
-			else
+				return new BibRecord(
+					m.group(3),
+					authorStringToList(m.group(2)),
+					m.group(4),
+					Pattern.compile(m.group(1)),
+					extractRefYear(m.group(5)));
+			} else if(m2.matches()) {
+				return new BibRecord(
+					m2.group(3),
+					authorStringToList(m2.group(2)),
+					m2.group(4),
+					Pattern.compile(m2.group(1)),
+					extractRefYear(m2.group(5)));
+			} else {
 				return null;
+			}
 		}
 	}
 	
 	private static class BracketNameBibRecordParser implements BibRecordParser {
-		public BracketNameBibRecordParser() {
-		}
+		public BracketNameBibRecordParser() { }
+
+		private static final String regEx1 =
+			"\\[([^\\]]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";
+		private static final Pattern pattern1 = Pattern.compile(regEx1);
+
+		private static final String regEx2 =
+			"\\[([^\\]]+)\\] (" + authGeneralList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*),? ([1-2][0-9]{3})\\..*";
+		private static final Pattern pattern2 = Pattern.compile(regEx2);
+
 		//example:
-//		[Magnini et al., 2002] B. Magnini, M. Negri, R. Prevete, and
-//		H. Tanev. Is it the right answer? exploiting web redundancy
-//				for answer validation. In ACL, 2002.
-		
+		// [Magnini et al., 2002] B. Magnini, M. Negri, R. Prevete, and
+		// H. Tanev. Is it the right answer? exploiting web redundancy
+		//   for answer validation. In ACL, 2002.
 		public BibRecord parseRecord(String line) {
-//			log.info("trying " + line);
-			String regEx1 = "\\[([^\\]]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";
-			String regEx2 = "\\[([^\\]]+)\\] (" + authGeneralList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*),? ([1-2][0-9]{3})\\..*";
-			Matcher m = Pattern.compile(regEx1).matcher(line.trim());
-			Matcher m2 = Pattern.compile(regEx2).matcher(line.trim());
+			Matcher m = pattern1.matcher(line.trim());
+			Matcher m2 = pattern2.matcher(line.trim());
 			if(m.matches()) {
-//				log.info("matched with ex1 " + m.group(3));
 				if(m.group(1).matches("[0-9]+")) //don't override BracketNumber
 					return null;
-				BibRecord out = new BibRecord(m.group(3), authorStringToList(m.group(2)),
-						m.group(4), authStrToPat(cleanAuthString(m.group(1))), extractRefYear(m.group(5)));
-						return out;
-			}
-			else if(m2.matches()) {
-//				log.info("matched with ex2 " + m2.group(3));
+				return new BibRecord(
+					m.group(3),
+					authorStringToList(m.group(2)),
+					m.group(4),
+					authStrToPat(cleanAuthString(m.group(1))),
+					extractRefYear(m.group(5)));
+			} else if(m2.matches()) {
 				if(m2.group(1).matches("[0-9]+")) //don't override BracketNumber
 					return null;
-				BibRecord out = new BibRecord(m2.group(3), authorStringToList(m2.group(2)),
-						m2.group(4), authStrToPat(cleanAuthString(m2.group(1))), extractRefYear(m2.group(5)));
-						return out;
-				
-			}
-			else
+				return new BibRecord(
+					m2.group(3),
+					authorStringToList(m2.group(2)),
+					m2.group(4),
+					authStrToPat(cleanAuthString(m2.group(1))),
+					extractRefYear(m2.group(5)));
+			} else {
 				return null;
+			}
 		}
 	}
 	
 	
 	private static class NamedYear extends BibStractor {
-		private final String citeRegex = "(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
-		private final String citeDelimiter = "; ?";
+		private final static String citeRegex =
+			"(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
+		private final static String citeDelimiter = "; ?";
 		
 		NamedYear(Class c) {
 			super(c);
@@ -344,7 +368,6 @@ public class ExtractReferences {
 				line = line.substring(4);
 			String [] citesa = line.split("<bb>");
 			List<String> cites = Arrays.asList(citesa);
-//			log.info(cites.get(0));
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
 				s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
@@ -362,7 +385,6 @@ public class ExtractReferences {
 		}
 		public List<BibRecord> parse(String line) {
 			line = line.replaceAll("<bb>", "<lb>");
-//			log.info("trying with " + line);
 			int i=0;
 			String tag = "<lb>" + (++i) + ". ";
 			List<String> cites = new ArrayList<String>();
@@ -406,7 +428,6 @@ public class ExtractReferences {
 		
 		public List<BibRecord> parse(String line) {
 			line = line.replaceAll("<bb>", "<lb>");
-//			log.info("Trying " + line);
 			int i=0;
 			String tag = "[" + (++i) + "]";
 			List<String> cites = new ArrayList<String>();
@@ -453,7 +474,6 @@ public class ExtractReferences {
 				line = line.substring(4);
 			String [] citesa = line.split("<bb>");
 			List<String> cites = Arrays.asList(citesa);
-//			log.info(cites.get(0));
 			List<BibRecord> out = new ArrayList<BibRecord>();
 			for(String s : cites) {
 				s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
@@ -482,7 +502,9 @@ public class ExtractReferences {
 		while(mYear.find()) {
 			try {
 				a = Integer.parseInt(mYear.group().trim());
-			} catch(Exception e) {};
+			} catch(final NumberFormatException e) {
+				// do nothing
+			}
 			if(a > BibRecord.MINYEAR && a < BibRecord.MAXYEAR)
 				return a;
 		}
@@ -507,23 +529,19 @@ public class ExtractReferences {
 		if(Pattern.compile("\\p{Lu}\\..*").matcher(authString).matches()) {
 			firstLast = true;
 		}
-//		log.info("auth string: " + authString);
-		String [] names;
+		String[] names;
 		if(semiDelim)
 			names = authString.split("(;|; and| and | AND | And )+");
 		else
 			names = authString.split("(,| and | AND | And )+");
-//		log.info("names: " + Arrays.toString(names));
 		if(firstLast) {
 			out = Arrays.asList(names);
 		}
 		else {
 			if(semiDelim) {
-				for(int i=0; i<names.length; i++) {
-					out.add(ParserGroundTruth.invertAroundComma(names[i]));
-				}
-			}
-			else {
+				for(final String name : names)
+					out.add(ParserGroundTruth.invertAroundComma(name));
+			} else {
 				for(int i=0; i<names.length; i+=2) {
 					if(names.length > i+1)
 						out.add(names[i+1].trim() + " " + names[i].trim());
@@ -532,7 +550,6 @@ public class ExtractReferences {
 				}
 			}
 		}
-//		log.info("out: " + out.toString());
 		return out;
 	}
 	
@@ -550,9 +567,6 @@ public class ExtractReferences {
 		return authName.substring(idx+1);
 	}
 
-	
-	
-	
 	private static int refStart(List<String> paper) {
 		for(int i=0; i<paper.size(); i++) {
 			String s = paper.get(i);
@@ -600,9 +614,10 @@ public class ExtractReferences {
 		List<BibRecord> [] results = new ArrayList[extractors.size()];
 		for(int i=0; i<results.length; i++)
 			results[i] = new ArrayList<BibRecord>();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for(int i=start; i<paper.size(); i++) {
-			sb.append("<bb>" + paper.get(i));
+			sb.append("<bb>");
+			sb.append(paper.get(i));
 		}
 		String text = sb.toString();
 		for(int i=0; i<results.length; i++) {
@@ -616,7 +631,6 @@ public class ExtractReferences {
 	public static int getIdxOf(List<BibRecord> bib, String citeStr) {
 		//note: slow
 		for(int i=0; i<bib.size(); i++) {
-			
 			if(bib.get(i).citeRegEx.matcher(citeStr).matches())
 				return i;
 		}
@@ -627,7 +641,6 @@ public class ExtractReferences {
 	public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
 		ArrayList<CitationRecord> out = new ArrayList<>();
 		Pattern p = Pattern.compile(bs.getCiteRegex());
-//		log.info("looking for pattern " + p.pattern());
 
 		int stop = refStart(paper); //stop at start of refs
 		if(stop<0)
@@ -636,13 +649,11 @@ public class ExtractReferences {
 		for(int i=0; i<stop; i++) {
 			String s = paper.get(i).replaceAll("-<lb>", "").replaceAll("<lb>", " ");
 			paper.set(i, s);
-//			log.info("trying " + paper.get(i));
 			Matcher m = p.matcher(s);
 			while(m.find()) {
-//				log.info("found.");
 				String [] citations = m.group(1).split(bs.getCiteDelimiter());
-				for(int j=0; j<citations.length; j++) {
-					int idx = getIdxOf(bib, citations[j].trim());
+				for(final String citation : citations) {
+					int idx = getIdxOf(bib, citation.trim());
 					if(idx >=0) {
 						out.add(new CitationRecord(i, m.start(), m.end(), idx));
 					}
@@ -651,5 +662,4 @@ public class ExtractReferences {
 		}
 		return out;
 	}
-	
 }
