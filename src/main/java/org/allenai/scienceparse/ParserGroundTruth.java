@@ -75,9 +75,5 @@ public class ParserGroundTruth {
 			lookup.put(papers.get(i).id.substring(4), i);
 		}
 		papers.forEach((Paper p) -> {for(int i=0; i<p.authors.length;i++) p.authors[i] = invertAroundComma(p.authors[i]);});
-		
 	}
-	
-	
-	
 }
