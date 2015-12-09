@@ -5,6 +5,7 @@ import lombok.val;
 import static java.util.stream.Collectors.toList;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,9 +62,7 @@ public class Parser {
 	  public int minYear; //only process papers this year or later
 	  public boolean checkAuthors; //only bootstraps papers if all authors are found
   }
-  
 
-  
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw, List<String> rawReferences, ExtractReferences er) throws IOException {
 		Pair<List<BibRecord>, BibStractor> fnd =er.findReferences(rawReferences);  
 		List<BibRecord> br = fnd.getOne();
@@ -422,6 +421,7 @@ public class Parser {
   public static void main(String[] args) throws Exception {
 	  if(!((args.length==3 && args[0].equalsIgnoreCase("bootstrap"))||
 			  (args.length==5 && args[0].equalsIgnoreCase("parse"))||
+    		  (args.length==5 && args[0].equalsIgnoreCase("metaEval"))||
 			  (args.length==7 && args[0].equalsIgnoreCase("learn"))||
 			  (args.length==5 && args[0].equalsIgnoreCase("parseAndScore"))||
 			  (args.length==5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
@@ -484,6 +484,69 @@ public class Parser {
 			  }
 			  //Object to JSON in file
 			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
+		  }
+	  }
+	  else if(args[0].equalsIgnoreCase("metaEval")) {
+		  Parser p = new Parser(args[2]);
+		  File inDir = new File(args[1]);
+		  File outDir = new File(args[3]);
+		  List<File> inFiles = Arrays.asList(inDir.listFiles());
+		  ExtractReferences er = new ExtractReferences(args[4]);
+		  ObjectMapper mapper = new ObjectMapper();
+
+		  try(
+			  final PrintWriter authorFullNameExact = new PrintWriter(new File(outDir, "authorFullNameExact.tsv"), "UTF-8");
+			  final PrintWriter authorLastNameExact = new PrintWriter(new File(outDir, "authorLastNameExact.tsv"), "UTF-8");
+			  final PrintWriter authorLastNameNormalized = new PrintWriter(new File(outDir, "authorLastNameNormalized.tsv"), "UTF-8");
+			  final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8");
+			  final PrintWriter titleNormalized = new PrintWriter(new File(outDir, "titleNormalized.tsv"), "UTF-8")
+		  ) {
+			  final long start = System.currentTimeMillis();
+			  int paperCount = 0;
+			  int papersSucceeded = 0;
+
+			  for(File f : inFiles) {
+				  if(!f.getName().endsWith(".pdf"))
+					  continue;
+				  paperCount += 1;
+				  val fis = new FileInputStream(f);
+				  ExtractedMetadata em = null;
+				  try {
+					  em = p.doParse(fis, MAXHEADERWORDS);
+				  } catch(final Exception e) {
+					  logger.info("Parse error: " + f, e);
+					  continue;
+				  }
+				  fis.close();
+				  try {
+					  em.references = getReferences(em.raw, em.rawReferences, er);
+				  } catch(final Exception e) {
+					  logger.info("Reference extraction error: " + f, e);
+					  continue;
+				  }
+
+				  final String paperId = f.getName().substring(0, f.getName().length() - 4);
+
+				  authorFullNameExact.write(paperId);
+				  for(String author : em.authors) {
+					  authorFullNameExact.write('\t');
+					  authorFullNameExact.write(author);
+				  }
+				  authorFullNameExact.write('\n');
+
+				  titleExact.write(paperId);
+				  titleExact.write('\t');
+				  if(em.getTitle() != null)
+				  	titleExact.write(em.getTitle());
+				  titleExact.write('\n');
+
+				  papersSucceeded += 1;
+			  }
+
+			  final long end = System.currentTimeMillis();
+			  System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount, end - start));
+			  System.out.println(String.format("%d ms per paper", (end - start) / paperCount));
+			  System.out.println(String.format("%d failures (%f%%)", (paperCount - papersSucceeded), 100.0f * (paperCount - papersSucceeded) / paperCount));
 		  }
 	  }
 	  else if(args[0].equalsIgnoreCase("parseAndScore")) {
