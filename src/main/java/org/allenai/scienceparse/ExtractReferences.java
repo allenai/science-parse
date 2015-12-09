@@ -598,7 +598,6 @@ public class ExtractReferences {
 			if(f > maxLen) {
 				idx = i;
 				maxLen = f;
-				log.info(f + "\t" + idx);
 			}
 		}
 		return idx;

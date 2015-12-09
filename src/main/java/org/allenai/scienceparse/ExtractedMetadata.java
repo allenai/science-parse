@@ -26,8 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class ExtractedMetadata {
-
-	
 	public static final String titleTag = "T"; //label used in labeled data
 	public static final String authorTag = "A"; //label used in labeled data
 	
@@ -70,8 +68,8 @@ public class ExtractedMetadata {
 	}
 	
 	//assumes token contains @
-	 public static List<String> tokToMail(String tok) {
-		 ArrayList<String> out = new ArrayList<>();
+	public static List<String> tokToMail(String tok) {
+		ArrayList<String> out = new ArrayList<>();
             if (!tok.contains("@")) {
                 return null;
             }
@@ -95,15 +93,12 @@ public class ExtractedMetadata {
                 } else {
                     emails[0] = emailStrings;
                 }
-//	                System.out.println(line + "\t" + domain);
                 for (String email : emails) {
                     out.add(email.trim() + "@" + domain);
                 }
-            }
-            else {
+            } else {
             	log.debug("e-mail parts not 2");
             }
-            //log.info("outputting " + out.size() + " addresses");
         return out;
     }
 
@@ -187,5 +182,4 @@ public class ExtractedMetadata {
 		emails.forEach((String a) -> out.append("E: " + a + "\r\n"));
 		return out.toString();
 	}
-	
 }

@@ -473,17 +473,14 @@ public class Parser {
 			  ExtractedMetadata em = null;
 			  try {
 				  em = p.doParse(fis, MAXHEADERWORDS);
-			  }
-			  catch(Exception e) {
-				  logger.info("Parse error: " + f);
-				  //e.printStackTrace();
+			  } catch(final Exception e) {
+				  logger.info("Parse error: " + f, e);
 			  }
 			  fis.close();
 			  try {
 				  em.references = getReferences(em.raw, em.rawReferences, er);
-			  }
-			  catch(Exception e) {
-				  logger.info("Reference extraction error: " + f);
+			  } catch(final Exception e) {
+				  logger.info("Reference extraction error: " + f, e);
 			  }
 			  //Object to JSON in file
 			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
@@ -520,10 +517,8 @@ public class Parser {
 			  try {
 				  em = p.doParse(fis, MAXHEADERWORDS);
 				  totalProcessed++;
-			  }
-			  catch(Exception e) {
-				  logger.info("Parse error: " + f);
-				  //e.printStackTrace();
+			  } catch(final Exception e) {
+				  logger.info("Parse error: " + f, e);
 			  }
 			  
 			  if(em != null && em.title != null) {
