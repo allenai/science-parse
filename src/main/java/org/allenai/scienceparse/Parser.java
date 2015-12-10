@@ -5,9 +5,12 @@ import lombok.val;
 import static java.util.stream.Collectors.toList;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.allenai.ml.linalg.DenseVector;
@@ -20,10 +23,6 @@ import org.allenai.ml.sequences.crf.CRFTrainer;
 import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
-//import org.allenai.ml.sequences.crf.conll.ConllCRFEndToEndTest;
-//import org.allenai.ml.sequences.crf.conll.ConllFormat;
-//import org.allenai.ml.sequences.crf.conll.Evaluator;
-//import org.allenai.ml.sequences.crf.conll.Trainer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
@@ -494,59 +493,79 @@ public class Parser {
 		  ExtractReferences er = new ExtractReferences(args[4]);
 		  ObjectMapper mapper = new ObjectMapper();
 
-		  try(
+		  final ExecutorService e =
+			  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+		  try (
 			  final PrintWriter authorFullNameExact = new PrintWriter(new File(outDir, "authorFullNameExact.tsv"), "UTF-8");
-			  final PrintWriter authorLastNameExact = new PrintWriter(new File(outDir, "authorLastNameExact.tsv"), "UTF-8");
-			  final PrintWriter authorLastNameNormalized = new PrintWriter(new File(outDir, "authorLastNameNormalized.tsv"), "UTF-8");
-			  final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8");
-			  final PrintWriter titleNormalized = new PrintWriter(new File(outDir, "titleNormalized.tsv"), "UTF-8")
+			  final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8")
 		  ) {
 			  final long start = System.currentTimeMillis();
-			  int paperCount = 0;
-			  int papersSucceeded = 0;
+			  val paperCount = new AtomicInteger();
+			  val papersSucceeded = new AtomicInteger();
 
-			  for(File f : inFiles) {
-				  if(!f.getName().endsWith(".pdf"))
+			  for (File f : inFiles) {
+				  if (!f.getName().endsWith(".pdf"))
 					  continue;
-				  paperCount += 1;
-				  val fis = new FileInputStream(f);
-				  ExtractedMetadata em = null;
-				  try {
-					  em = p.doParse(fis, MAXHEADERWORDS);
-				  } catch(final Exception e) {
-					  logger.info("Parse error: " + f, e);
-					  continue;
-				  }
-				  fis.close();
-				  try {
-					  em.references = getReferences(em.raw, em.rawReferences, er);
-				  } catch(final Exception e) {
-					  logger.info("Reference extraction error: " + f, e);
-					  continue;
-				  }
 
-				  final String paperId = f.getName().substring(0, f.getName().length() - 4);
+				  e.execute(new Runnable() {
+					  @Override
+					  public void run() {
+						  try {
+							  paperCount.incrementAndGet();
+							  val fis = new FileInputStream(f);
+							  ExtractedMetadata em = null;
+							  try {
+								  em = p.doParse(fis, MAXHEADERWORDS);
+							  } catch (final Exception e) {
+								  logger.info("Parse error: " + f, e);
+								  return;
+							  }
+							  fis.close();
+							  try {
+								  em.references = getReferences(em.raw, em.rawReferences, er);
+							  } catch (final Exception e) {
+								  logger.info("Reference extraction error: " + f, e);
+								  return;
+							  }
 
-				  authorFullNameExact.write(paperId);
-				  for(String author : em.authors) {
-					  authorFullNameExact.write('\t');
-					  authorFullNameExact.write(author);
-				  }
-				  authorFullNameExact.write('\n');
+							  final String paperId =
+								  f.getName().substring(0, f.getName().length() - 4);
 
-				  titleExact.write(paperId);
-				  titleExact.write('\t');
-				  if(em.getTitle() != null)
-				  	titleExact.write(em.getTitle());
-				  titleExact.write('\n');
+							  synchronized (authorFullNameExact) {
+								  authorFullNameExact.write(paperId);
+								  for (String author : em.authors) {
+									  authorFullNameExact.write('\t');
+									  authorFullNameExact.write(author);
+								  }
+								  authorFullNameExact.write('\n');
+							  }
 
-				  papersSucceeded += 1;
+							  synchronized (titleExact) {
+								  titleExact.write(paperId);
+								  titleExact.write('\t');
+								  if (em.getTitle() != null)
+									  titleExact.write(em.getTitle());
+								  titleExact.write('\n');
+							  }
+
+							  papersSucceeded.incrementAndGet();
+						  } catch(final IOException e) {
+							  logger.warn(
+								  String.format(
+									  "IO Error while processing file %s",
+									  f.getName()), e);
+						  }
+					  }
+				  });
 			  }
 
+			  e.shutdown();
+			  e.awaitTermination(60, TimeUnit.SECONDS);
+
 			  final long end = System.currentTimeMillis();
-			  System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount, end - start));
-			  System.out.println(String.format("%d ms per paper", (end - start) / paperCount));
-			  System.out.println(String.format("%d failures (%f%%)", (paperCount - papersSucceeded), 100.0f * (paperCount - papersSucceeded) / paperCount));
+			  System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount.get(), end - start));
+			  System.out.println(String.format("%d ms per paper", (end - start) / paperCount.get()));
+			  System.out.println(String.format("%d failures (%f%%)", (paperCount.get() - papersSucceeded.get()), 100.0f * (paperCount.get() - papersSucceeded.get()) / paperCount.get()));
 		  }
 	  }
 	  else if(args[0].equalsIgnoreCase("parseAndScore")) {
