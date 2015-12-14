@@ -560,7 +560,7 @@ public class Parser {
 			  }
 
 			  e.shutdown();
-			  e.awaitTermination(60, TimeUnit.SECONDS);
+			  e.awaitTermination(60, TimeUnit.HOURS);
 
 			  final long end = System.currentTimeMillis();
 			  System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount.get(), end - start));
