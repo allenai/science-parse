@@ -195,7 +195,7 @@ public class PDFToCRFInput {
 	public static float getH(PDFLine l) {
 		float result = l.bounds().get(3) - l.bounds().get(1);
 		if(result < 0) {
-			log.info("Negative height? Guessing a height of 5.");
+			log.debug("Negative height? Guessing a height of 5.");
 			return 5;
 		} else {
 			return result;
@@ -250,12 +250,10 @@ public class PDFToCRFInput {
 			double farLeft = Double.MAX_VALUE; //of current column
 			double farRight = -1.0; //of current column		
 			for(PDFLine l : p.getLines()) {
-//				log.info("line : " + lineToString(l));
 				if(!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
 					if(l.tokens.get(l.tokens.size()-1).token != null &&
 							refTags.contains(l.tokens.get(l.tokens.size()-1).token.trim())) {
 						inRefs = true;
-//						log.info("in refs!");
 					}
 				}
 				else if(inRefs) {
@@ -271,17 +269,10 @@ public class PDFToCRFInput {
 					if(l.tokens != null && l.tokens.size() > 0) {
 						String sAdd = lineToString(l);
 						if(left > farLeft + l.tokens.get(0).fontMetrics.spaceWidth) {
-//							log.info("indent " + sAdd);
 							br = false;
-						}
-						else if(getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
-							
-//							log.info("short line before -- " + getX(prevLine, false) + " " + 
-//									l.tokens.get(0).fontMetrics.spaceWidth + " " + farRight + " breaking " + sAdd);
+						} else if(getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
 							br = true;
-						}
-						else if(breakSize(l, prevLine) > qLineBreak) {
-//							log.info("over max line break -- breaking " + sAdd);
+						} else if(breakSize(l, prevLine) > qLineBreak) {
 							br = true;
 						}
 						if(br) {
@@ -360,12 +351,6 @@ public class PDFToCRFInput {
 		ArrayList<PaperToken> out = new ArrayList<>();
 		if(heuristicHeader && pdf.heuristicHeader() != null) {
 			List<PDFLine> header = pdf.heuristicHeader();
-//			log.info("header lines " + header.size());
-//			if(header.size() > 0) {
-//				PDFLine last = header.get(header.size()-1);
-//				log.info("header last " + last.tokens.get(last.tokens.size()-1).token);
-//			}
-//			
 			addLineTokens(out, header, 0);
 		}
 		else {
@@ -414,8 +399,7 @@ public class PDFToCRFInput {
 			if(loc.getOne() == loc.getTwo() - 1) {
 				Pair<PaperToken, String> t = seqLabeled.get(loc.getOne());
 				seqLabeled.set(loc.getOne(), Tuples.pair(t.getOne(), "W_" + labelStem));
-			}
-			else {
+			} else {
 				for(int i=loc.getOne(); i<loc.getTwo();i++) {
 					Pair<PaperToken, String> t = seqLabeled.get(i);
 					seqLabeled.set(i, Tuples.pair(t.getOne(), 
@@ -471,5 +455,4 @@ public class PDFToCRFInput {
 	public static String getLabelString(List<Pair<PaperToken, String>> seq) {
 		return seq.stream().map((Pair<PaperToken, String> a) -> a.getTwo()).collect(Collectors.toList()).toString(); 
 	}
-	
 }

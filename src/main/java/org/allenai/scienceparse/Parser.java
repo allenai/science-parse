@@ -5,9 +5,12 @@ import lombok.val;
 import static java.util.stream.Collectors.toList;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.allenai.ml.linalg.DenseVector;
@@ -20,10 +23,6 @@ import org.allenai.ml.sequences.crf.CRFTrainer;
 import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
-//import org.allenai.ml.sequences.crf.conll.ConllCRFEndToEndTest;
-//import org.allenai.ml.sequences.crf.conll.ConllFormat;
-//import org.allenai.ml.sequences.crf.conll.Evaluator;
-//import org.allenai.ml.sequences.crf.conll.Trainer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
@@ -415,7 +414,7 @@ public class Parser {
   public static List<String> trimAuthors(List<String> auth) {
 	  List<String> out = new ArrayList<String>();
 	  auth.forEach(s -> {s = trimAuthor(s); if(!out.contains(s)) out.add(s);});
-	return out;  
+	  return out;
   }
   
   public static void main(String[] args) throws Exception {
@@ -430,8 +429,7 @@ public class Parser {
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
 		  System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
 		  System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file>");
-	  }
-	  else if(args[0].equalsIgnoreCase("bootstrap")) {
+	  } else if(args[0].equalsIgnoreCase("bootstrap")) {
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles()); 
 		  ParseOpts opts = new ParseOpts();
@@ -441,8 +439,7 @@ public class Parser {
 		  opts.iterations = inFiles.size()/10; //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  trainParser(inFiles, null, null, opts, null);		  
-	  }
-	  else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
+	  } else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
 		  ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
 		  ParseOpts opts = new ParseOpts();
 		  opts.modelFile = args[4];
@@ -457,8 +454,7 @@ public class Parser {
 		  opts.checkAuthors = true;
 		  opts.minYear = 2008;
 		  trainParser(null, pgt, args[3], opts, args[6]);
-	  }
-	  else if(args[0].equalsIgnoreCase("parse")) {
+	  } else if(args[0].equalsIgnoreCase("parse")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
@@ -485,8 +481,7 @@ public class Parser {
 			  //Object to JSON in file
 			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
 		  }
-	  }
-	  else if(args[0].equalsIgnoreCase("metaEval")) {
+	  } else if(args[0].equalsIgnoreCase("metaEval")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
@@ -494,62 +489,78 @@ public class Parser {
 		  ExtractReferences er = new ExtractReferences(args[4]);
 		  ObjectMapper mapper = new ObjectMapper();
 
-		  try(
+		  final ExecutorService e =
+			  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+		  try (
 			  final PrintWriter authorFullNameExact = new PrintWriter(new File(outDir, "authorFullNameExact.tsv"), "UTF-8");
-			  final PrintWriter authorLastNameExact = new PrintWriter(new File(outDir, "authorLastNameExact.tsv"), "UTF-8");
-			  final PrintWriter authorLastNameNormalized = new PrintWriter(new File(outDir, "authorLastNameNormalized.tsv"), "UTF-8");
-			  final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8");
-			  final PrintWriter titleNormalized = new PrintWriter(new File(outDir, "titleNormalized.tsv"), "UTF-8")
+			  final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8")
 		  ) {
 			  final long start = System.currentTimeMillis();
-			  int paperCount = 0;
-			  int papersSucceeded = 0;
+			  val paperCount = new AtomicInteger();
+			  val papersSucceeded = new AtomicInteger();
 
-			  for(File f : inFiles) {
-				  if(!f.getName().endsWith(".pdf"))
+			  for (File f : inFiles) {
+				  if (!f.getName().endsWith(".pdf"))
 					  continue;
-				  paperCount += 1;
-				  val fis = new FileInputStream(f);
-				  ExtractedMetadata em = null;
-				  try {
-					  em = p.doParse(fis, MAXHEADERWORDS);
-				  } catch(final Exception e) {
-					  logger.info("Parse error: " + f, e);
-					  continue;
-				  }
-				  fis.close();
-				  try {
-					  em.references = getReferences(em.raw, em.rawReferences, er);
-				  } catch(final Exception e) {
-					  logger.info("Reference extraction error: " + f, e);
-					  continue;
-				  }
 
-				  final String paperId = f.getName().substring(0, f.getName().length() - 4);
+				  e.execute(new Runnable() {
+					  @Override
+					  public void run() {
+						  try {
+							  paperCount.incrementAndGet();
+							  val fis = new FileInputStream(f);
+							  ExtractedMetadata em = null;
+							  try {
+								  em = p.doParse(fis, MAXHEADERWORDS);
+							  } catch (final Exception e) {
+								  logExceptionShort(e, "Parse error", f.getName());
+								  return;
+							  }
+							  fis.close();
+							  try {
+								  em.references = getReferences(em.raw, em.rawReferences, er);
+							  } catch (final Exception e) {
+								  logExceptionShort(e, "Reference extraction error", f.getName());
+								  return;
+							  }
 
-				  authorFullNameExact.write(paperId);
-				  for(String author : em.authors) {
-					  authorFullNameExact.write('\t');
-					  authorFullNameExact.write(author);
-				  }
-				  authorFullNameExact.write('\n');
+							  final String paperId =
+								  f.getName().substring(0, f.getName().length() - 4);
 
-				  titleExact.write(paperId);
-				  titleExact.write('\t');
-				  if(em.getTitle() != null)
-				  	titleExact.write(em.getTitle());
-				  titleExact.write('\n');
+							  synchronized (authorFullNameExact) {
+								  authorFullNameExact.write(paperId);
+								  for (String author : em.authors) {
+									  authorFullNameExact.write('\t');
+									  authorFullNameExact.write(author);
+								  }
+								  authorFullNameExact.write('\n');
+							  }
 
-				  papersSucceeded += 1;
+							  synchronized (titleExact) {
+								  titleExact.write(paperId);
+								  titleExact.write('\t');
+								  if (em.getTitle() != null)
+									  titleExact.write(em.getTitle());
+								  titleExact.write('\n');
+							  }
+
+							  papersSucceeded.incrementAndGet();
+						  } catch(final IOException e) {
+							  logExceptionShort(e, "IO error", f.getName());
+						  }
+					  }
+				  });
 			  }
 
+			  e.shutdown();
+			  e.awaitTermination(60, TimeUnit.HOURS);
+
 			  final long end = System.currentTimeMillis();
-			  System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount, end - start));
-			  System.out.println(String.format("%d ms per paper", (end - start) / paperCount));
-			  System.out.println(String.format("%d failures (%f%%)", (paperCount - papersSucceeded), 100.0f * (paperCount - papersSucceeded) / paperCount));
+			  System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount.get(), end - start));
+			  System.out.println(String.format("%d ms per paper", (end - start) / paperCount.get()));
+			  System.out.println(String.format("%d failures (%f%%)", (paperCount.get() - papersSucceeded.get()), 100.0f * (paperCount.get() - papersSucceeded.get()) / paperCount.get()));
 		  }
-	  }
-	  else if(args[0].equalsIgnoreCase("parseAndScore")) {
+	  } else if(args[0].equalsIgnoreCase("parseAndScore")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -642,8 +653,7 @@ public class Parser {
 		  logger.info("overall author precision: " + (crfPrecision + metaPrecision)/(crfTotal + metaTotal) );
 		  logger.info("overall author recall: " + (crfRecall + metaRecall)/((double) totalFiles) );
 		  //TODO: write output
-	  }
-	  else if(args[0].equalsIgnoreCase("scoreRefExtraction")) {
+	  } else if(args[0].equalsIgnoreCase("scoreRefExtraction")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
@@ -691,5 +701,22 @@ public class Parser {
 		  logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");;
 		  logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
 	  }
-  }
+    }
+
+	static void logExceptionShort(final Throwable t, final String errorType, final String filename) {
+		if(t.getStackTrace().length == 0) {
+			logger.warn("Exception without stack trace", t);
+		} else {
+			final StackTraceElement ste = t.getStackTrace()[0];
+			logger.warn(
+				String.format(
+					"%s while processing file %s at %s:%d: %s (%s)",
+					errorType,
+					filename,
+					ste.getFileName(),
+					ste.getLineNumber(),
+					t.getClass().getName(),
+					t.getMessage()));
+		}
+    }
 }
