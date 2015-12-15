@@ -414,7 +414,7 @@ public class Parser {
   public static List<String> trimAuthors(List<String> auth) {
 	  List<String> out = new ArrayList<String>();
 	  auth.forEach(s -> {s = trimAuthor(s); if(!out.contains(s)) out.add(s);});
-	return out;  
+	  return out;
   }
   
   public static void main(String[] args) throws Exception {
@@ -513,14 +513,14 @@ public class Parser {
 							  try {
 								  em = p.doParse(fis, MAXHEADERWORDS);
 							  } catch (final Exception e) {
-								  logger.info("Parse error: " + f, e);
+								  logExceptionShort(e, "Parse error", f.getName());
 								  return;
 							  }
 							  fis.close();
 							  try {
 								  em.references = getReferences(em.raw, em.rawReferences, er);
 							  } catch (final Exception e) {
-								  logger.info("Reference extraction error: " + f, e);
+								  logExceptionShort(e, "Reference extraction error", f.getName());
 								  return;
 							  }
 
@@ -546,10 +546,7 @@ public class Parser {
 
 							  papersSucceeded.incrementAndGet();
 						  } catch(final IOException e) {
-							  logger.warn(
-								  String.format(
-									  "IO Error while processing file %s",
-									  f.getName()), e);
+							  logExceptionShort(e, "IO error", f.getName());
 						  }
 					  }
 				  });
@@ -704,5 +701,22 @@ public class Parser {
 		  logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");;
 		  logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
 	  }
-  }
+    }
+
+	static void logExceptionShort(final Throwable t, final String errorType, final String filename) {
+		if(t.getStackTrace().length == 0) {
+			logger.warn("Exception without stack trace", t);
+		} else {
+			final StackTraceElement ste = t.getStackTrace()[0];
+			logger.warn(
+				String.format(
+					"%s while processing file %s at %s:%d: %s (%s)",
+					errorType,
+					filename,
+					ste.getFileName(),
+					ste.getLineNumber(),
+					t.getClass().getName(),
+					t.getMessage()));
+		}
+    }
 }
