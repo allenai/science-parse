@@ -570,7 +570,7 @@ public class Parser {
           int tempTP = scoreAuthors(authExpected, authGuessed);
           double prec = ((double) tempTP) / ((double) authGuessed.size() + 0.000000001);
           double rec = ((double) tempTP) / ((double) authExpected.length);
-          if (em.source == "CRF") {
+          if (em.source.equals("CRF")) {
             crfPrecision += prec;
             crfRecall += rec;
             crfTotal += 1.0;
@@ -584,14 +584,13 @@ public class Parser {
             logger.info("auth error: " + tempTP + " right, exp " + Arrays.toString(authExpected) + " got " + authGuessed);
             logger.info(f.getName());
           }
-          //logger.info("authors: " + em.authors);
           if (procExpected.equals(procGuessed))
-            if (em.source == "CRF")
+            if (em.source.equals("CRF"))
               crfTruePos++;
             else
               metaTruePos++;
           else {
-            if (em.source == "CRF")
+            if (em.source.equals("CRF"))
               crfFalsePos++;
             else
               metaFalsePos++;
