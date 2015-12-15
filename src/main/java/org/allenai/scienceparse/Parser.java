@@ -429,8 +429,7 @@ public class Parser {
 		  System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
 		  System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
 		  System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file>");
-	  }
-	  else if(args[0].equalsIgnoreCase("bootstrap")) {
+	  } else if(args[0].equalsIgnoreCase("bootstrap")) {
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles()); 
 		  ParseOpts opts = new ParseOpts();
@@ -440,8 +439,7 @@ public class Parser {
 		  opts.iterations = inFiles.size()/10; //HACK because training throws exceptions if you iterate too much
 		  opts.threads = 4;
 		  trainParser(inFiles, null, null, opts, null);		  
-	  }
-	  else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
+	  } else if(args[0].equalsIgnoreCase("learn")) { //learn from ground truth
 		  ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
 		  ParseOpts opts = new ParseOpts();
 		  opts.modelFile = args[4];
@@ -456,8 +454,7 @@ public class Parser {
 		  opts.checkAuthors = true;
 		  opts.minYear = 2008;
 		  trainParser(null, pgt, args[3], opts, args[6]);
-	  }
-	  else if(args[0].equalsIgnoreCase("parse")) {
+	  } else if(args[0].equalsIgnoreCase("parse")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
@@ -484,8 +481,7 @@ public class Parser {
 			  //Object to JSON in file
 			  mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
 		  }
-	  }
-	  else if(args[0].equalsIgnoreCase("metaEval")) {
+	  } else if(args[0].equalsIgnoreCase("metaEval")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
@@ -567,8 +563,7 @@ public class Parser {
 			  System.out.println(String.format("%d ms per paper", (end - start) / paperCount.get()));
 			  System.out.println(String.format("%d failures (%f%%)", (paperCount.get() - papersSucceeded.get()), 100.0f * (paperCount.get() - papersSucceeded.get()) / paperCount.get()));
 		  }
-	  }
-	  else if(args[0].equalsIgnoreCase("parseAndScore")) {
+	  } else if(args[0].equalsIgnoreCase("parseAndScore")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -661,8 +656,7 @@ public class Parser {
 		  logger.info("overall author precision: " + (crfPrecision + metaPrecision)/(crfTotal + metaTotal) );
 		  logger.info("overall author recall: " + (crfRecall + metaRecall)/((double) totalFiles) );
 		  //TODO: write output
-	  }
-	  else if(args[0].equalsIgnoreCase("scoreRefExtraction")) {
+	  } else if(args[0].equalsIgnoreCase("scoreRefExtraction")) {
 		  Parser p = new Parser(args[2]);
 		  File inDir = new File(args[1]);
 		  File outDir = new File(args[3]);
