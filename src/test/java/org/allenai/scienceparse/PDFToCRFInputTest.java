@@ -25,7 +25,7 @@ public class PDFToCRFInputTest {
   }
 
   public void testGetPaperTokens() throws IOException {
-    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, false);
     log.info("got " + pts.size() + " things.");
@@ -34,7 +34,7 @@ public class PDFToCRFInputTest {
 
   public void testFindString() throws IOException {
     String target = "How to make words with vectors: Phrase generation in distributional semantics";
-    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
     Pair<Integer, Integer> pos = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), target);
@@ -48,7 +48,7 @@ public class PDFToCRFInputTest {
   }
 
   public void testLabelMetadata() throws IOException {
-    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
@@ -92,7 +92,7 @@ public class PDFToCRFInputTest {
   }
 
   public void testAuthor() throws IOException {
-    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/p14-1059.pdf");
+    InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
