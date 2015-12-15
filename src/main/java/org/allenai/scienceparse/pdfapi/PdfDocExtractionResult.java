@@ -6,6 +6,6 @@ import lombok.Data;
 @Builder
 @Data
 public class PdfDocExtractionResult {
-    public final PDFDoc document;
-    public final boolean highPrecision;
+  public final PDFDoc document;
+  public final boolean highPrecision;
 }

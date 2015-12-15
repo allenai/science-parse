@@ -2,7 +2,6 @@ package org.allenai.scienceparse.pdfapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import jdk.nashorn.internal.runtime.options.Option;
 import lombok.Builder;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -21,33 +20,33 @@ import java.util.List;
 @Builder
 @Data
 public class PDFMetadata {
-    public final String title;
-    public final List<String> authors;
-    public final List<String> keywords;
-    public final Date createDate;
-    public final Date lastModifiedDate;
-    public final String creator;
+  public final String title;
+  public final List<String> authors;
+  public final List<String> keywords;
+  public final Date createDate;
+  public final Date lastModifiedDate;
+  public final String creator;
 
-    // HACK(aria42) For external testing purpose
-    @SneakyThrows
-    public static void main(String[] args) {
-        val extractor = new PDFExtractor();
-        ObjectWriter ow = new ObjectMapper().writer();
-        if(args.length <= 1)
-            ow = ow.withDefaultPrettyPrinter();
-        for(final String arg : args) {
-            String prefix = "";
-            if(args.length > 1)
-                prefix = arg + "\t";
-            try(InputStream pdfInputStream = new FileInputStream(arg)) {
-                try {
-                    PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
-                    String json = ow.writeValueAsString(meta);
-                    System.out.println(prefix + json);
-                } catch (final Exception e) {
-                    System.out.println(prefix + "ERROR: " + e);
-                }
-            }
+  // HACK(aria42) For external testing purpose
+  @SneakyThrows
+  public static void main(String[] args) {
+    val extractor = new PDFExtractor();
+    ObjectWriter ow = new ObjectMapper().writer();
+    if (args.length <= 1)
+      ow = ow.withDefaultPrettyPrinter();
+    for (final String arg : args) {
+      String prefix = "";
+      if (args.length > 1)
+        prefix = arg + "\t";
+      try (InputStream pdfInputStream = new FileInputStream(arg)) {
+        try {
+          PDFMetadata meta = extractor.extractFromInputStream(pdfInputStream).getMeta();
+          String json = ow.writeValueAsString(meta);
+          System.out.println(prefix + json);
+        } catch (final Exception e) {
+          System.out.println(prefix + "ERROR: " + e);
         }
+      }
     }
+  }
 }

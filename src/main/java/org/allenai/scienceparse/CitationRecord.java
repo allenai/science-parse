@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class CitationRecord {
-	public final int lineIdx;
-	public final int startOffset;
-	public final int endOffset;
-	public final int referenceID;
+  public final int lineIdx;
+  public final int startOffset;
+  public final int endOffset;
+  public final int referenceID;
 }
