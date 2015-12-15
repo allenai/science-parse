@@ -146,8 +146,6 @@ public class Parser {
         logger.info("author match");
       }
     }
-//      logger.info("first: " + labeledPaper.get(0).getTwo());
-//      logger.info("last: " + labeledPaper.get(labeledPaper.size()-1).getTwo());
 
     return labeledPaper;
   }
@@ -338,7 +336,6 @@ public class Parser {
   //changes extraction to remove common failure modes
   public static String processExtractedTitle(String t) {
     String out = t.replaceAll("(?<=[a-z])\\- ", ""); //continuation dash
-//	  out = out.replaceAll(" \\?", ""); //special char
     if (!out.endsWith("?") && !out.endsWith("\"") && !out.endsWith(")"))
       out = out.replaceFirst("\\W$", ""); //end of title punctuation if not ?, ", or )
     return out.trim();
@@ -548,7 +545,6 @@ public class Parser {
 
 
       for (File f : inFiles) {
-        //logger.info("parsing " + f);
         val fis = new FileInputStream(f);
         String key = f.getName().substring(0, f.getName().length() - 4);
         Paper pap = pgt.forKey(key);
