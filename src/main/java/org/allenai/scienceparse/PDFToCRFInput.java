@@ -195,7 +195,7 @@ public class PDFToCRFInput {
 	public static float getH(PDFLine l) {
 		float result = l.bounds().get(3) - l.bounds().get(1);
 		if(result < 0) {
-			log.info("Negative height? Guessing a height of 5.");
+			log.debug("Negative height? Guessing a height of 5.");
 			return 5;
 		} else {
 			return result;
