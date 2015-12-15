@@ -40,7 +40,7 @@ public class PDFPredicateExtractorTest {
 
   @Test
   public void titleFontFeatureCheck() throws IOException {
-    InputStream is = PDFPredicateExtractorTest.class.getResource("/p14-1059.pdf").openStream();
+    InputStream is = PDFPredicateExtractorTest.class.getResource("/P14-1059.pdf").openStream();
     titleFontFeatureCheckForStream(is);
     is.close();
   }
