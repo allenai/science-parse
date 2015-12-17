@@ -1,6 +1,6 @@
 package org.allenai.scienceparse
 
-import org.apache.pdfbox.pdmodel.common.PDRectangle
+import org.allenai.pdfbox.pdmodel.common.PDRectangle
 
 object Box {
 
