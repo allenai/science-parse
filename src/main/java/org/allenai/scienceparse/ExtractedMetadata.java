@@ -30,9 +30,7 @@ public class ExtractedMetadata {
 
   public String source;
   public String title;
-  public Pair<Integer, Integer> titleOffset; //these reference a PDFDoc unknown to this object
   public List<String> authors;
-  public List<Pair<Integer, Integer>> authorOffset; //these reference a PDFDoc unknown to this object
   public List<String> emails; //extracted by special (non-CRF) heuristic process
   public List<String> raw; //the full paper text
   public List<String> rawReferences; //approximately the references text
