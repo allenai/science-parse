@@ -219,6 +219,17 @@ class VisualLogger(
     }
   }
 
+  def logRasterizedFigures(page: Int, figures: Seq[RasterizedFigure]): Unit = {
+    if (logCleanFigures) {
+      val regionBB = Annotations(figures.map(_.figure.regionBoundary), VisualLogger.FigureRegionColor)
+      val cleanedBB = Annotations(
+        figures.map(f => f.imageRegion.scale(72.0 / f.dpi)),
+        VisualLogger.CleanedFigureColor, dashed = true
+      )
+      addToLog(page, CleanedFiguresKey, Seq(regionBB, cleanedBB))
+    }
+  }
+
   def logPagesWithCaption(pageWithCaptions: PageWithCaptions): Unit = {
     if (logCaptions) {
       val allAnnotations = Seq(
