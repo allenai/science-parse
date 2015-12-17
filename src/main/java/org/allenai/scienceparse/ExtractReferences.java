@@ -42,6 +42,7 @@ public class ExtractReferences {
       new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
       new BracketNumber(BracketNumberBibRecordParser.class),
       new BracketName(BracketNameBibRecordParser.class));
+
   CheckReferences cr;
 
   public ExtractReferences(String jsonFile) throws IOException {
@@ -201,10 +202,8 @@ public class ExtractReferences {
   }
 
   /**
-   * Returns the list of BibRecords, plus the extractor that produced them (in order to enable citation parsing)
-   *
-   * @param paper
-   * @return
+   * Returns the list of BibRecords, plus the extractor that produced them (in order to enable
+   * citation parsing)
    */
   public Pair<List<BibRecord>, BibStractor> findReferences(List<String> paper) {
     int start = refStart(paper) + 1;

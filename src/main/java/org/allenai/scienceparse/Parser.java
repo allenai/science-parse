@@ -62,7 +62,11 @@ public class Parser {
     model = loadModel(dis);
   }
 
-  public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(List<String> raw, List<String> rawReferences, ExtractReferences er) throws IOException {
+  public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
+    final List<String> raw,
+    final List<String> rawReferences,
+    final ExtractReferences er
+  ) throws IOException {
     Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
     List<BibRecord> br = fnd.getOne();
     BibStractor bs = fnd.getTwo();
