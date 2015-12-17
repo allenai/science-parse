@@ -35,5 +35,6 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.5.2",
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
   "org.testng" % "testng" % "6.8.1" % Test,
-  "org.allenai.common" %% "common-testkit" % "1.0.20" % Test
+  "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
+  "com.github.scopt" %% "scopt" % "3.3.0"
 )

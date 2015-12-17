@@ -2,7 +2,7 @@ package org.allenai.scienceparse
 
 import org.allenai.common.Config._
 import org.allenai.common.Logging
-import org.allenai.scienceparse.FigureExtractor.{ DocumentContent, Document }
+import org.allenai.scienceparse.FigureExtractor.{ DocumentWithRasterizedFigures, DocumentContent, Document }
 import org.allenai.scienceparse.SectionedTextBuilder.{ PdfText, DocumentSection }
 
 import com.typesafe.config.ConfigFactory
@@ -20,10 +20,25 @@ case class FigureExtractor(
     parseDocument(doc, pages, visualLogger).figures
   }
 
+  def getRasterizedFigures(doc: PDDocument, dpi: Int, pages: Option[Seq[Int]] = None,
+    visualLogger: Option[VisualLogger] = None): Iterable[RasterizedFigure] = {
+    val content = parseDocument(doc, pages, visualLogger)
+    content.pagesWithFigures.flatMap(page =>
+      FigureRenderer.rasterizeFigures(doc, page, dpi, cleanRasterizedFigureRegions, visualLogger))
+  }
+
   def getFiguresWithErrors(doc: PDDocument, pages: Option[Seq[Int]] = None,
     visualLogger: Option[VisualLogger] = None): FiguresInDocument = {
     val content = parseDocument(doc, pages, visualLogger)
     FiguresInDocument(content.figures, content.failedCaptions)
+  }
+
+  def getRasterizedFiguresWithErrors(doc: PDDocument, dpi: Int, pages: Option[Seq[Int]] = None,
+    visualLogger: Option[VisualLogger] = None): RasterizedFiguresInDocument = {
+    val content = parseDocument(doc, pages, visualLogger)
+    val rasterizedFigures = content.pagesWithFigures.flatMap(page =>
+      FigureRenderer.rasterizeFigures(doc, page, dpi, cleanRasterizedFigureRegions, visualLogger))
+    RasterizedFiguresInDocument(rasterizedFigures, content.failedCaptions)
   }
 
   def getFiguresWithText(doc: PDDocument, pages: Option[Seq[Int]] = None,
@@ -32,6 +47,16 @@ case class FigureExtractor(
     val abstractText = getAbstract(content)
     val sections = getSections(content)
     Document(content.figures, abstractText, sections)
+  }
+
+  def getRasterizedFiguresWithText(doc: PDDocument, dpi: Int, pages: Option[Seq[Int]] = None,
+    visualLogger: Option[VisualLogger] = None): DocumentWithRasterizedFigures = {
+    val content = parseDocument(doc, pages, visualLogger)
+    val abstractText = getAbstract(content)
+    val sections = getSections(content)
+    val rasterizedFigures = content.pagesWithFigures.flatMap(page =>
+      FigureRenderer.rasterizeFigures(doc, page, dpi, cleanRasterizedFigureRegions, visualLogger))
+    DocumentWithRasterizedFigures(rasterizedFigures, abstractText, sections)
   }
 
   private def getSections(content: DocumentContent): Seq[DocumentSection] = {
