@@ -12,8 +12,7 @@ case class FigureExtractor(
     allowOcr: Boolean,
     ignoreWhiteGraphics: Boolean,
     detectSectionTitlesFirst: Boolean,
-    rebuildParagraphs: Boolean,
-    cleanRasterizedFigureRegions: Boolean
+    rebuildParagraphs: Boolean
 ) extends Logging {
   def getFigures(doc: PDDocument, pages: Option[Seq[Int]] = None,
     visualLogger: Option[VisualLogger] = None): Iterable[Figure] = {
@@ -137,15 +136,6 @@ object FigureExtractor {
   case class Document(figures: Seq[Figure], abstractText: Option[PdfText],
     sections: Seq[DocumentSection])
 
-  /** Document with figures rasterized */
-  case class DocumentWithRasterizedFigures(
-    figures: Seq[RasterizedFigure], abstractText: Option[PdfText], sections: Seq[DocumentSection]
-  )
-
-  /** Document with figures saved to disk */
-  case class DocumentWithSavedFigures(figures: Seq[SavedFigure], abstractText: Option[PdfText],
-    sections: Seq[DocumentSection])
-
   /** Thrown if we detect an OCR PDF and `allowOcr` is set to false */
   class OcredPdfException(message: String = null, cause: Throwable = null)
     extends RuntimeException(message, cause)
@@ -155,15 +145,13 @@ object FigureExtractor {
   val detectSectionTitlesFirst = conf[Boolean]("detectSectionTitlesFirst")
   val rebuildParagraphs = conf[Boolean]("rebuildParagraphs")
   val ignoreWhiteGraphics = conf[Boolean]("ignoreWhiteGraphics")
-  val cleanRasterizedFigureRegions = conf[Boolean]("cleanRasterizedFigureRegions")
 
   def apply(): FigureExtractor = {
     new FigureExtractor(
       allowOcr = allowOcr,
       ignoreWhiteGraphics = ignoreWhiteGraphics,
       detectSectionTitlesFirst = detectSectionTitlesFirst,
-      rebuildParagraphs = rebuildParagraphs,
-      cleanRasterizedFigureRegions = cleanRasterizedFigureRegions
+      rebuildParagraphs = rebuildParagraphs
     )
   }
 }
