@@ -36,6 +36,7 @@ public class ExtractedMetadata {
   public List<String> rawReferences; //approximately the references text
   public Pair<List<BibRecord>, List<CitationRecord>> references; //references, with char offsets relative to raw
   public int year;
+  public String abstractText;
 
   /**
    * Constructs ExtractedMetadata from given text and labels

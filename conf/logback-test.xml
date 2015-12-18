@@ -17,4 +17,7 @@
   <logger name="org.spark-project.jetty" level="${logback_s2Level:-WARN}" />
   <logger name="org.apache.pdfbox" level="OFF" />
   <logger name="org.apache.fontbox" level="OFF" />
+  <logger name="org.allenai.pdfbox" level="OFF" />
+  <logger name="org.allenai.fontbox" level="OFF" />
+  <logger name="org.allenai.scienceparse.TextExtractor" level="ERROR" />
 </configuration>

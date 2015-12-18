@@ -8,6 +8,8 @@ import org.allenai.scienceparse.SectionedTextBuilder.{ PdfText, DocumentSection 
 import com.typesafe.config.ConfigFactory
 import org.allenai.pdfbox.pdmodel.PDDocument
 
+import java.io.InputStream
+
 case class FigureExtractor(
     allowOcr: Boolean,
     ignoreWhiteGraphics: Boolean,
@@ -159,8 +161,18 @@ object FigureExtractor {
   }
 
   /** Document with figures extracted and text broken up into sections */
-  case class Document(figures: Seq[Figure], abstractText: Option[PdfText],
-    sections: Seq[DocumentSection])
+  case class Document(
+    figures: Seq[Figure],
+    abstractText: Option[PdfText],
+    sections: Seq[DocumentSection]
+  )
+
+  object Document {
+    private val figureExtractor = new FigureExtractor(true, true, true, true, true)
+
+    def fromInputStream(is: InputStream): Document =
+      figureExtractor.getFiguresWithText(PDDocument.load(is))
+  }
 
   /** Document with figures rasterized */
   case class DocumentWithRasterizedFigures(

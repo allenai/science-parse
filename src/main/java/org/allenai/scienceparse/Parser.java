@@ -23,6 +23,7 @@ import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -684,30 +685,71 @@ public class Parser {
     }
   }
 
-  public ExtractedMetadata doParse(InputStream is, int headerMax) throws IOException {
-    PDFExtractor ext = new PDFExtractor();
-    PDFDoc doc = ext.extractFromInputStream(is);
-    List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
-    seq = seq.subList(0, Math.min(seq.size(), headerMax));
-    seq = PDFToCRFInput.padSequence(seq);
-    ExtractedMetadata em = null;
+  private static InputStream makeMarkableInputStream(final InputStream is) {
+    if(is.markSupported())
+      return is;
 
-    if (doc.meta == null || doc.meta.title == null) { //use the model
-      List<String> outSeq = model.bestGuess(seq);
-      //the output tag sequence will not include the start/stop states!
-      outSeq = PDFToCRFInput.padTagSequence(outSeq);
-      em = new ExtractedMetadata(seq, outSeq);
-      em.source = "CRF";
-    } else {
-      em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-      em.source = "META";
+    if(is instanceof FileInputStream)
+      return new MarkableFileInputStream((FileInputStream)is);
+
+    return new BufferedInputStream(is);
+  }
+
+  public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
+    try(final InputStream mis = makeMarkableInputStream(is)) {
+
+      mis.mark(20 * 1024 * 1024);
+
+      // Stupidly, we have to do this first. This uses PDFBox 2.0, which treats input streams with
+      // respect. The block below uses PDFBox 1.8, which takes the liberty of closing the input stream
+      // when it wants to, so we can't rely on it being open when we're done.
+      final String abstractText;
+      { // Get abstract from figure extraction.
+        final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromInputStream(mis);
+        if (doc.abstractText().isDefined()) {
+          final String stripPrefix = "abstract";
+          final String result = doc.abstractText().get().text().trim();
+          if(result.substring(0, stripPrefix.length()).toLowerCase().equals(stripPrefix))
+            abstractText = result.substring(stripPrefix.length()).trim();
+          else
+            abstractText = result;
+        } else {
+          abstractText = null;
+        }
+      }
+
+      // This is the block that uses PDFBox 1.8, which may or may not close the input stream. That's
+      // why it has to come second.
+      final ExtractedMetadata em;
+      {
+        PDFExtractor ext = new PDFExtractor();
+        mis.reset();
+        PDFDoc doc = ext.extractFromInputStream(mis);
+        List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+        seq = seq.subList(0, Math.min(seq.size(), headerMax));
+        seq = PDFToCRFInput.padSequence(seq);
+
+        if (doc.meta == null || doc.meta.title == null) { //use the model
+          List<String> outSeq = model.bestGuess(seq);
+          //the output tag sequence will not include the start/stop states!
+          outSeq = PDFToCRFInput.padTagSequence(outSeq);
+          em = new ExtractedMetadata(seq, outSeq);
+          em.source = "CRF";
+        } else {
+          em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+          em.source = "META";
+        }
+        if (doc.meta.createDate != null)
+          em.setYearFromDate(doc.meta.createDate);
+        clean(em);
+        em.raw = PDFToCRFInput.getRaw(doc);
+        em.rawReferences = PDFToCRFInput.getRawReferences(doc);
+      }
+
+      em.abstractText = abstractText;
+
+      return em;
     }
-    if (doc.meta.createDate != null)
-      em.setYearFromDate(doc.meta.createDate);
-    clean(em);
-    em.raw = PDFToCRFInput.getRaw(doc);
-    em.rawReferences = PDFToCRFInput.getRawReferences(doc);
-    return em;
   }
 
   public static class ParseOpts {
