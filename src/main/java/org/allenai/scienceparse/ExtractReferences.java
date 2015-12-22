@@ -152,6 +152,25 @@ public class ExtractReferences {
     return -1;
   }
 
+  public static Pair<Integer, Integer> shortCiteSearch(int yearPos, int year, String s, List<BibRecord> bib) {
+	  int start = -1;
+	  int idx = -1;
+	  int ct = 0;
+	  for(BibRecord br : bib) {
+		 Matcher m = br.citeRegEx.matcher(s);
+		 if(m.find()) {
+			 //TODO: handle multiple matches
+			 if(m.start() > yearPos)
+				 continue;
+			 start = m.start();
+			 idx = ct;
+			 break;
+		 }
+		 ct++;
+	  }
+	  return Tuples.pair(start, idx);
+  }
+  
   //note, also replaces <lb> with spaces in lines with found references
   public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
     ArrayList<CitationRecord> out = new ArrayList<>();
@@ -173,6 +192,19 @@ public class ExtractReferences {
             out.add(new CitationRecord(i, m.start(), m.end(), idx));
           }
         }
+      }
+      //short-cites are assumed to be e.g.: Etzioni et al. (2005)
+      if(bs.getShortCiteRegex() != null) {
+    	  Pattern p2 = Pattern.compile(bs.getShortCiteRegex());
+    	  Matcher m2 = p2.matcher(s);
+    	  while(m2.find()) {
+    		  Pair<Integer, Integer> shct = shortCiteSearch(m2.start(), Integer.parseInt(m2.group(1)), s, bib);
+    		  int start = shct.getOne();
+    		  int idx = shct.getTwo();
+    		  if(start > 0) {
+    			 out.add(new CitationRecord(i, start, m2.end()+1, idx));
+    		  }
+    	  }
       }
     }
     return out;
@@ -245,6 +277,8 @@ public class ExtractReferences {
     public abstract List<BibRecord> parse(String source);
 
     public abstract String getCiteRegex();
+    
+    public abstract String getShortCiteRegex(); //may return null for bibstractors without short cites
 
     public abstract String getCiteDelimiter();
   }
@@ -512,11 +546,13 @@ public class ExtractReferences {
   private static class NamedYear extends BibStractor {
     private final static String citeRegex =
       "(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
+    private final static String shortCiteRegex = "(?:\\[|\\()([1-2][0-9]{3}[a-z]?)(?:\\]|\\))";
     private final static String citeDelimiter = "; ?";
 
     NamedYear(Class c) {
       super(c);
     }
+    
 
     //in regex form
     public static String getCiteAuthorFromAuthors(List<String> authors) {
@@ -534,6 +570,10 @@ public class ExtractReferences {
       return citeRegex;
     }
 
+    public String getShortCiteRegex() {
+    	return shortCiteRegex;
+    }
+    
     public String getCiteDelimiter() {
       return citeDelimiter;
     }
@@ -597,6 +637,10 @@ public class ExtractReferences {
       return citeRegex;
     }
 
+    public String getShortCiteRegex() {
+    	return null;
+    }
+    
     public String getCiteDelimiter() {
       return citeDelimiter;
     }
@@ -635,6 +679,10 @@ public class ExtractReferences {
       super(c);
     }
 
+    public String getShortCiteRegex() {
+    	return null;
+    }
+    
     public String getCiteRegex() {
       return citeRegex;
     }
