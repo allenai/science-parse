@@ -3,6 +3,7 @@ package org.allenai.scienceparse
 import org.allenai.pdfbox.text.TextPosition
 
 import java.text.Normalizer
+import org.allenai.common.StringUtils._
 
 /** Span of text denoted by the starting and ending line number, inclusive */
 case class TextSpan(start: Int, end: Int) extends Ordered[TextSpan] {
@@ -37,7 +38,7 @@ object Paragraph {
       q += 1; q - 1
     }
     if (builder == null) {
-      word
+      word.removeUnprintable
     } else {
       builder.append(word.substring(p, q))
       builder.toString()
@@ -49,7 +50,7 @@ object Paragraph {
     val normalizedLines = paragraph.lines.map(_.words.map(w => normalizeWord(w.text)))
     val linesWithoutHyphens = normalizedLines.dropRight(1).map { line =>
       val lastWord = line.last
-      if (lastWord.last == '-' && lastWord.length > 1 && lastWord.exists(Character.isLetter)) {
+      if (lastWord.nonEmpty && lastWord.last == '-' && lastWord.length > 1 && lastWord.exists(Character.isLetter)) {
         line.mkString(" ").dropRight(1) // Don't add following space and drop the hyphen
       } else {
         line.mkString(" ") + " "

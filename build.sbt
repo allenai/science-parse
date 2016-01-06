@@ -17,7 +17,7 @@ mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
 resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
+  "org.allenai.common" %% "common-core" % "1.1.1-SNAPSHOT" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
   "org.apache.pdfbox" % "pdfbox" % "1.8.10" exclude ("commons-logging", "commons-logging"),
