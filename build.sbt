@@ -24,8 +24,8 @@ libraryDependencies ++= Seq(
   ),
   "org.apache.pdfbox" % "pdfbox" % "1.8.10" exclude ("commons-logging", "commons-logging"),
   "org.apache.pdfbox" % "fontbox" % "1.8.10" exclude ("commons-logging", "commons-logging"),
-  "org.allenai.pdfbox" % "pdfbox" % "2.0.0-RC2" exclude ("commons-logging", "commons-logging"),
-  "org.allenai.pdfbox" % "fontbox" % "2.0.0-RC2" exclude ("commons-logging", "commons-logging"),
+  "org.allenai.pdfbox" % "pdfbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
+  "org.allenai.pdfbox" % "fontbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
   "org.allenai" % "ml" % "0.9" excludeAll (
     ExclusionRule(organization = "args4j"),
