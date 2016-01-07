@@ -62,7 +62,6 @@ public class ExtractReferencesTest {
   }
 
   public void testFindReferencesAndCitations() throws Exception {
-
     ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
 
     File paper1 = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));

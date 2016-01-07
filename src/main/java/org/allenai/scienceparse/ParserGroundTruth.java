@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,31 +17,37 @@ import java.util.List;
 public class ParserGroundTruth {
 
   public List<Paper> papers;
+  public HashMap<String, Integer> lookup = new HashMap<>();
 
-  public HashMap<String, Integer> lookup;
-
-  public ParserGroundTruth(String jsonFile) throws IOException {
-    ObjectMapper om = new ObjectMapper();
-    ObjectReader r = om.reader(new TypeReference<List<Paper>>() {
-    });
-    InputStreamReader isr = new InputStreamReader(new FileInputStream(jsonFile), "UTF-8");
-
-    int c = isr.read(); // skip zero-width space if it exists
-    if (c != 0xfeff) {
-      isr.close();
-      isr = new InputStreamReader(new FileInputStream(jsonFile), "UTF-8");
-    }
-    papers = r.readValue(isr);
-    log.info("Read " + papers.size() + " papers.");
-    isr.close();
-    lookup = new HashMap<>();
+  private void buildLookup() {
     for (int i = 0; i < papers.size(); i++) {
       lookup.put(papers.get(i).id.substring(4), i);
     }
+  }
+
+  public ParserGroundTruth(List<Paper> papers) throws IOException {
+    this.papers = papers;
+    buildLookup();
+  }
+
+  public ParserGroundTruth(InputStream is) throws IOException {
+    InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+    ObjectMapper om = new ObjectMapper();
+    ObjectReader r = om.reader(new TypeReference<List<Paper>>() {});
+
+    papers = r.readValue(isr);
+    log.info("Read " + papers.size() + " papers.");
+    isr.close();
+
+    buildLookup();
     papers.forEach((Paper p) -> {
       for (int i = 0; i < p.authors.length; i++)
         p.authors[i] = invertAroundComma(p.authors[i]);
     });
+  }
+
+  public ParserGroundTruth(String jsonFile) throws IOException {
+    this(new FileInputStream(jsonFile));
   }
 
   public static String invertAroundComma(String in) {
@@ -68,14 +74,5 @@ public class ParserGroundTruth {
     String[] authors;
     int year;
     String venue;
-
-    @Override
-    public String toString() {
-      String out = "id: " + id + "\r\n";
-      out += "title: " + title + "\r\n";
-      out += "year: " + year + "\r\n";
-      out += Arrays.toString(authors);
-      return out;
-    }
   }
 }
