@@ -16,6 +16,8 @@ mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
 
 resolvers += Resolver.mavenLocal
 
+resolvers += Resolver.url("allenai-on-bintray", url("http://dl.bintray.com/allenai/maven"))
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.1.1" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
