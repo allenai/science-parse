@@ -14,8 +14,6 @@ sources in (Compile,doc) := Seq.empty
 
 mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
 
-resolvers += Resolver.mavenLocal
-
 resolvers += Resolver.url("allenai-on-bintray", url("http://dl.bintray.com/allenai/maven"))
 
 libraryDependencies ++= Seq(
