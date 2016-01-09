@@ -14,12 +14,16 @@ sources in (Compile,doc) := Seq.empty
 
 mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
 
+resolvers += Resolver.bintrayRepo("allenai", "maven")
+
 libraryDependencies ++= Seq(
-  "org.allenai.common" %% "common-core" % "1.0.4" excludeAll (
+  "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
   "org.apache.pdfbox" % "pdfbox" % "1.8.10" exclude ("commons-logging", "commons-logging"),
   "org.apache.pdfbox" % "fontbox" % "1.8.10" exclude ("commons-logging", "commons-logging"),
+  "org.allenai.pdfbox" % "pdfbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
+  "org.allenai.pdfbox" % "fontbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
   "org.allenai" % "ml" % "0.9" excludeAll (
     ExclusionRule(organization = "args4j"),
@@ -30,5 +34,7 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-core" % "2.5.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.5.2",
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
-  "org.testng" % "testng" % "6.8.1" % Test
+  "org.testng" % "testng" % "6.8.1" % Test,
+  "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
+  "com.github.scopt" %% "scopt" % "3.3.0"
 )

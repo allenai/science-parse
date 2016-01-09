@@ -340,7 +340,7 @@ public class PDFToCRFInput {
   /**
    * Returns the PaperToken sequence form of a given PDF document<br>
    *
-   * @param pdd             The PDF Document to convert into instances
+   * @param pdf             The PDF Document to convert into instances
    * @param heuristicHeader If true, tries to use heuristic header if found
    * @return The data sequence
    * @throws IOException
