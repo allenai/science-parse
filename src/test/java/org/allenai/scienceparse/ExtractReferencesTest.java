@@ -126,7 +126,7 @@ public class ExtractReferencesTest {
 
     //paper2:
     fis = new FileInputStream(paper2);
-    em = null;
+    em = null; 
     try {
       em = p.doParse(fis, Parser.MAXHEADERWORDS);
     } catch (Exception e) {

@@ -15,5 +15,6 @@ public class BibRecord {
   public final List<String> author;
   public final String venue;
   public final Pattern citeRegEx;
+  public final Pattern shortCiteRegEx;
   public final int year;
 }
