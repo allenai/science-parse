@@ -278,7 +278,7 @@ public class ExtractReferences {
 
     public abstract String getCiteRegex();
     
-    public abstract String getShortCiteRegex(); //may return null for bibstractors without short cites
+    public String getShortCiteRegex() { return null;} //may return null for bibstractors without short cites
 
     public abstract String getCiteDelimiter();
   }
@@ -572,6 +572,7 @@ public class ExtractReferences {
       return citeRegex;
     }
 
+    @Override
     public String getShortCiteRegex() {
     	return shortCiteRegex;
     }
@@ -638,10 +639,6 @@ public class ExtractReferences {
     public String getCiteRegex() {
       return citeRegex;
     }
-
-    public String getShortCiteRegex() {
-    	return null;
-    }
     
     public String getCiteDelimiter() {
       return citeDelimiter;
@@ -679,10 +676,6 @@ public class ExtractReferences {
 
     BracketName(Class c) {
       super(c);
-    }
-
-    public String getShortCiteRegex() {
-    	return null;
     }
     
     public String getCiteRegex() {
