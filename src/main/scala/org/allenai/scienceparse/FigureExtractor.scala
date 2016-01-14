@@ -147,8 +147,11 @@ case class FigureExtractor(
 }
 
 object FigureExtractor {
-  /** Fully parsed document, including non-figure information produced by intermediate steps */
-  private case class DocumentContent(
+  /** Fully parsed document, including non-figure information produced by intermediate steps. This is a "physical"
+    * page-based representation of a PDF, as opposed to a logical section-based representation of the paper that the
+    * Document class implementation
+    */
+  case class DocumentContent(
       layout: Option[DocumentLayout],
       pagesWithFigures: Seq[PageWithFigures], pagesWithoutFigures: Seq[PageWithClassifiedText]
   ) {
@@ -160,7 +163,9 @@ object FigureExtractor {
       pages.head.pageNumber + 1 == pages.last.pageNumber), "Pages number must be consecutive")
   }
 
-  /** Document with figures extracted and text broken up into sections */
+  /** Document with figures extracted and text broken up into sections. A logical, section-based representation of a
+    * paper as opposed to a page-based representation of the PDF that DocumentContent implements
+    */
   case class Document(
     figures: Seq[Figure],
     abstractText: Option[PdfText],
