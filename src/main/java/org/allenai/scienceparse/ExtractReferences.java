@@ -153,6 +153,25 @@ public class ExtractReferences {
     return -1;
   }
 
+  public static Pair<Integer, Integer> shortCiteSearch(int yearPos, int year, String s, List<BibRecord> bib) {
+	  int start = -1;
+	  int idx = -1;
+	  int ct = 0;
+	  for(BibRecord br : bib) {
+		 Matcher m = br.shortCiteRegEx.matcher(s);
+		 if(m.find()) {
+			 //TODO: handle multiple matches
+			 if(m.start() > yearPos)
+				 continue;
+			 start = m.start();
+			 idx = ct;
+			 break;
+		 }
+		 ct++;
+	  }
+	  return Tuples.pair(start, idx);
+  }
+  
   //note, also replaces <lb> with spaces in lines with found references
   public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
     ArrayList<CitationRecord> out = new ArrayList<>();
@@ -174,6 +193,19 @@ public class ExtractReferences {
             out.add(new CitationRecord(i, m.start(), m.end(), idx));
           }
         }
+      }
+      //short-cites are assumed to be e.g.: Etzioni et al. (2005)
+      if(bs.getShortCiteRegex() != null) {
+    	  Pattern p2 = Pattern.compile(bs.getShortCiteRegex());
+    	  Matcher m2 = p2.matcher(s);
+    	  while(m2.find()) {
+    		  Pair<Integer, Integer> shct = shortCiteSearch(m2.start(), Integer.parseInt(m2.group(1).substring(0, 4)), s, bib);
+    		  int start = shct.getOne();
+    		  int idx = shct.getTwo();
+    		  if(start > 0) {
+    			 out.add(new CitationRecord(i, start, m2.end()+1, idx));
+    		  }
+    	  }
       }
     }
     return out;
@@ -244,13 +276,15 @@ public class ExtractReferences {
     public abstract List<BibRecord> parse(String source);
 
     public abstract String getCiteRegex();
+    
+    public String getShortCiteRegex() { return null;} //may return null for bibstractors without short cites
 
     public abstract String getCiteDelimiter();
   }
 
   private static class DefaultBibRecordParser implements BibRecordParser {
     public BibRecord parseRecord(String line) {
-      return new BibRecord(line, null, null, null, 0);
+      return new BibRecord(line, null, null, null, null, 0);
     }
   }
 
@@ -273,7 +307,7 @@ public class ExtractReferences {
           m.group(3),
           authorStringToList(m.group(2)),
           m.group(4),
-          Pattern.compile(m.group(1)),
+          Pattern.compile(m.group(1)), null,
           extractRefYear(m.group(4)));
       } else {
         return null;
@@ -298,7 +332,7 @@ public class ExtractReferences {
           m.group(3),
           authorStringToList(m.group(2)),
           m.group(4),
-          Pattern.compile(m.group(1)),
+          Pattern.compile(m.group(1)), null,
           extractRefYear(m.group(5)));
       } else {
         return null;
@@ -324,7 +358,7 @@ public class ExtractReferences {
           "",
           authorStringToList(m.group(2)),
           m.group(3),
-          Pattern.compile(m.group(1)),
+          Pattern.compile(m.group(1)), null,
           extractRefYear(m.group(4)));
       } else {
         return null;
@@ -349,7 +383,7 @@ public class ExtractReferences {
           m.group(3),
           authorStringToList(m.group(2)),
           m.group(4),
-          Pattern.compile(m.group(1)),
+          Pattern.compile(m.group(1)), null,
           extractRefYear(m.group(5)));
       } else {
         return null;
@@ -374,7 +408,7 @@ public class ExtractReferences {
           m.group(3),
           authorStringToList(m.group(2)),
           m.group(4),
-          Pattern.compile(m.group(1)),
+          Pattern.compile(m.group(1)), null,
           extractRefYear(m.group(5)));
       } else {
         return null;
@@ -397,8 +431,9 @@ public class ExtractReferences {
       if (m.matches()) {
         final List<String> authors = authorStringToList(m.group(1));
         final int year = Integer.parseInt(m.group(2).substring(0, 4));
-        final String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m.group(2);
-        return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), year);
+        final String nameStr = NamedYear.getCiteAuthorFromAuthors(authors);
+        final String citeStr = nameStr + ",? " + m.group(2);
+        return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), authStrToPat(nameStr), year);
       } else {
         return null;
       }
@@ -421,8 +456,9 @@ public class ExtractReferences {
       if (m.matches()) {
         List<String> authors = authorStringToList(m.group(1));
         int year = Integer.parseInt(m.group(2).substring(0, 4));
-        String citeStr = NamedYear.getCiteAuthorFromAuthors(authors) + ",? " + m.group(2);
-        return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), year);
+        String nameStr = NamedYear.getCiteAuthorFromAuthors(authors);
+        String citeStr = nameStr + ",? " + m.group(2);
+        return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), authStrToPat(nameStr), year);
       } else {
         return null;
       }
@@ -451,14 +487,14 @@ public class ExtractReferences {
           m.group(3),
           authorStringToList(m.group(2)),
           m.group(4),
-          Pattern.compile(m.group(1)),
+          Pattern.compile(m.group(1)), null,
           extractRefYear(m.group(5)));
       } else if (m2.matches()) {
         return new BibRecord(
           m2.group(3),
           authorStringToList(m2.group(2)),
           m2.group(4),
-          Pattern.compile(m2.group(1)),
+          Pattern.compile(m2.group(1)), null,
           extractRefYear(m2.group(5)));
       } else {
         return null;
@@ -491,7 +527,7 @@ public class ExtractReferences {
           m.group(3),
           authorStringToList(m.group(2)),
           m.group(4),
-          authStrToPat(cleanAuthString(m.group(1))),
+          authStrToPat(cleanAuthString(m.group(1))), null,
           extractRefYear(m.group(5)));
       } else if (m2.matches()) {
         if (m2.group(1).matches("[0-9]+")) //don't override BracketNumber
@@ -500,7 +536,7 @@ public class ExtractReferences {
           m2.group(3),
           authorStringToList(m2.group(2)),
           m2.group(4),
-          authStrToPat(cleanAuthString(m2.group(1))),
+          authStrToPat(cleanAuthString(m2.group(1))), null,
           extractRefYear(m2.group(5)));
       } else {
         return null;
@@ -511,11 +547,13 @@ public class ExtractReferences {
   private static class NamedYear extends BibStractor {
     private final static String citeRegex =
       "(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
+    private final static String shortCiteRegex = "(?:\\[|\\()([1-2][0-9]{3}[a-z]?)(?:\\]|\\))";
     private final static String citeDelimiter = "; ?";
 
     NamedYear(Class c) {
       super(c);
     }
+    
 
     //in regex form
     public static String getCiteAuthorFromAuthors(List<String> authors) {
@@ -533,6 +571,11 @@ public class ExtractReferences {
       return citeRegex;
     }
 
+    @Override
+    public String getShortCiteRegex() {
+    	return shortCiteRegex;
+    }
+    
     public String getCiteDelimiter() {
       return citeDelimiter;
     }
@@ -595,7 +638,7 @@ public class ExtractReferences {
     public String getCiteRegex() {
       return citeRegex;
     }
-
+    
     public String getCiteDelimiter() {
       return citeDelimiter;
     }
@@ -633,7 +676,7 @@ public class ExtractReferences {
     BracketName(Class c) {
       super(c);
     }
-
+    
     public String getCiteRegex() {
       return citeRegex;
     }
