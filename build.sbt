@@ -6,13 +6,11 @@ javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf
 
 javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
-PublishTo.ai2Public
-
-disableBintray()
-
 sources in (Compile,doc) := Seq.empty
 
 mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
+
+bintrayPackage := s"${organization.value}:${name.value}_${scalaBinaryVersion.value}"
 
 resolvers += Resolver.bintrayRepo("allenai", "maven")
 
