@@ -50,7 +50,6 @@ private class TextExtractor extends PDFTextStripper with Logging {
   private val pages = mutable.ListBuffer[PageWithText]()
   private var onPage = 0
   private var onLine = 0
-  private var cropBox: PDRectangle = null
 
   def accumulatedPages: immutable.List[PageWithText] = pages.toList
 
@@ -59,7 +58,6 @@ private class TextExtractor extends PDFTextStripper with Logging {
   override def writeText(doc: PDDocument, outputStream: Writer): Unit = ??? // Use loadText
 
   override def processPage(page: PDPage): Unit = {
-    cropBox = page.getCropBox
     super.processPage(page)
   }
 
@@ -110,20 +108,10 @@ private class TextExtractor extends PDFTextStripper with Logging {
         if (minX == maxX && wordTextPositions.forall(p => p.getDir == 90 || p.getDir == 270)) {
           // Vertical text can sometimes be given a 0 width text box, so for these cases we give the
           // text a very conservative minimum width
-          val bb = Box(
-            minX - cropBox.getLowerLeftX - TextExtractor.MinVerticalTextWidth,
-            minY + cropBox.getLowerLeftY,
-            maxX - cropBox.getLowerLeftX,
-            maxY + cropBox.getLowerLeftY
-          )
+          val bb = Box(minX - TextExtractor.MinVerticalTextWidth, minY, maxX, maxY)
           wordsInLine.append(Word(stringBuilder.toString(), bb, wordTextPositions.toList))
         } else if (minX <= maxX && minY <= maxY) {
-          val bb = Box(
-            minX - cropBox.getLowerLeftX,
-            minY + cropBox.getLowerLeftY,
-            maxX - cropBox.getLowerLeftX,
-            maxY + cropBox.getLowerLeftY
-          )
+          val bb = Box(minX, minY, maxX, maxY)
           wordsInLine.append(Word(stringBuilder.toString(), bb, wordTextPositions.toList))
         } else {
           logger.warn(s"""Word "${stringBuilder.toString()}" on page $onPage had a negative """ +
