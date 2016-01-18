@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
@@ -22,6 +23,11 @@ public class PDFPredicateExtractorTest {
     String target = "How to make words with vectors: Phrase generation in distributional semantics";
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
+//    Iterator<PaperToken> it = pts.iterator();
+//    while(it.hasNext()) {
+//      PaperToken pt = it.next();
+//      log.info((pt.getPdfToken()==null)?"null":pt.getPdfToken().token + " f:" + pt.getPdfToken().fontMetrics.ptSize);
+//    }
     Pair<Integer, Integer> pos = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), target);
     PDFPredicateExtractor ppe = new PDFPredicateExtractor();
     List<ObjectDoubleMap<String>> preds = ppe.nodePredicates(pts);
@@ -69,8 +75,8 @@ public class PDFPredicateExtractorTest {
     Assert.assertTrue(ls.contains("%hasAt"));
   }
 
-//	public static void main(String [] args) throws Exception {
-//		(new PDFPredicateExtractorTest()).titleFontForExplicitFilePath("src\\test\\resources\\P14-1059.pdf");
-//	}
+	public static void main(String [] args) throws Exception {
+		(new PDFPredicateExtractorTest()).titleFontForExplicitFilePath("src\\test\\resources\\P14-1059.pdf");
+	}
 
 }

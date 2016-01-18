@@ -121,7 +121,7 @@ public class
       Object expectedValue = elems.get(1);
       if (type.equalsIgnoreCase("title")) {
         String guessValue = doc.getMeta().getTitle();
-        Assert.assertEquals(guessValue.trim(), expectedValue, String.format("Title error on %s", id));
+        Assert.assertEquals(guessValue==null?"":guessValue.trim(), expectedValue, String.format("Title error on %s", id));
       }
       if (type.equalsIgnoreCase("line")) {
         List<PDFLine> lines = doc.getPages().stream().flatMap(x -> x.getLines().stream()).collect(Collectors.toList());

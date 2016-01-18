@@ -40,7 +40,10 @@ public class ParserTest {
     List<PaperToken> justTokens = labeledData.get(6).stream().map(p ->
       p.getOne()).collect(Collectors.toList());
 
+    log.info("test bootstrap tokens: " + justTokens.stream().map(t -> (t==null)?"":t.toStringShort()).collect(Collectors.toList()).toString());
+    
     List<ObjectDoubleMap<String>> preds = ppe.nodePredicates(justTokens);
+    
 
     Assert.assertTrue((preds.get(26).containsKey("%fcb")));
   }

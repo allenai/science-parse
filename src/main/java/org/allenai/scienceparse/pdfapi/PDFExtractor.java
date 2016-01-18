@@ -7,14 +7,14 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.pdfbox.cos.COSName;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.util.DateConverter;
-import org.apache.pdfbox.util.PDFTextStripper;
-import org.apache.pdfbox.util.TextPosition;
+import org.allenai.pdfbox.pdmodel.PDDocument;
+import org.allenai.pdfbox.pdmodel.PDPage;
+import org.allenai.pdfbox.pdmodel.common.PDRectangle;
+import org.allenai.pdfbox.pdmodel.font.PDFont;
+import org.allenai.pdfbox.cos.COSName;
+import org.allenai.pdfbox.util.DateConverter;
+import org.allenai.pdfbox.text.PDFTextStripper;
+import org.allenai.pdfbox.text.TextPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,11 +107,7 @@ public class PDFExtractor {
     }
     String strippedDate = cosVal.replace("^D:", "");
     Calendar cal = null;
-    try {
-      cal = DateConverter.toCalendar(strippedDate);
-    } catch (final IOException e) {
-      // proceed with null
-    }
+    cal = DateConverter.toCalendar(strippedDate);
     return cal == null ? null : cal.getTime();
   }
 
@@ -280,7 +276,7 @@ public class PDFExtractor {
 
     public PDFToken toPDFToken() {
       val builder = PDFToken.builder();
-      String tokenText = textPositions.stream().map(TextPosition::getCharacter).collect(Collectors.joining(""));
+      String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));
       // separate ligands
       tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
       builder.token(tokenText);
@@ -290,6 +286,10 @@ public class PDFExtractor {
       val desc = pdFont.getFontDescriptor();
       String fontFamily = desc == null ? PDFFontMetrics.UNKNWON_FONT_FAMILY : desc.getFontName();
       float ptSize = firstTP.getFontSizeInPt();
+      //HACK(ddowney): it appears that sometimes (maybe when half-pt font sizes are used), pdfbox 2.0 will multiply
+      //  all of the true font sizes by 10.  If we detect this is likely, we divide font size by ten:
+      if(ptSize > 45.0f)
+        ptSize /= 10.0f;
       //HACK(ddowney): ensure unique sizes get unique names/objects:
       fontFamily += "_" + ptSize + "_" + firstTP.getWidthOfSpace();
       val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
@@ -341,7 +341,7 @@ public class PDFExtractor {
       List<TextPosition> curPositions = new ArrayList<>();
       List<PDFToken> tokens = new ArrayList<>();
       for (TextPosition tp : textPositions) {
-        if (tp.getCharacter().trim().isEmpty()) {
+        if (tp.getUnicode().trim().isEmpty()) {
           List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
           if (tokenPositions.size() > 0) {
             tokens.add(RawChunk.of(tokenPositions).toPDFToken());
