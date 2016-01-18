@@ -286,6 +286,10 @@ public class PDFExtractor {
       val desc = pdFont.getFontDescriptor();
       String fontFamily = desc == null ? PDFFontMetrics.UNKNWON_FONT_FAMILY : desc.getFontName();
       float ptSize = firstTP.getFontSizeInPt();
+      //HACK(ddowney): it appears that sometimes (maybe when half-pt font sizes are used), pdfbox 2.0 will multiply
+      //  all of the true font sizes by 10.  If we detect this is likely, we divide font size by ten:
+      if(ptSize > 45.0f)
+        ptSize /= 10.0f;
       //HACK(ddowney): ensure unique sizes get unique names/objects:
       fontFamily += "_" + ptSize + "_" + firstTP.getWidthOfSpace();
       val fontMetrics = PDFFontMetrics.of(fontFamily, ptSize, firstTP.getWidthOfSpace());
