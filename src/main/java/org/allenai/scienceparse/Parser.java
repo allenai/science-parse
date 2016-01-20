@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,8 +59,22 @@ public class Parser {
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
 
-  public Parser(String modelFile) throws Exception {
-    DataInputStream dis = new DataInputStream(new FileInputStream(modelFile));
+  public Parser(final String modelFile) throws Exception {
+    this(new File(modelFile));
+  }
+
+  public Parser(final Path modelFile) throws Exception {
+    this(modelFile.toFile());
+  }
+
+  public Parser(final File modelFile) throws Exception {
+    try(final DataInputStream is = new DataInputStream(new FileInputStream(modelFile))) {
+      model = loadModel(is);
+    }
+  }
+
+  public Parser(final InputStream stream) throws Exception {
+    final DataInputStream dis = new DataInputStream(stream);
     model = loadModel(dis);
   }
 
@@ -693,6 +708,10 @@ public class Parser {
       return new MarkableFileInputStream((FileInputStream)is);
 
     return new BufferedInputStream(is);
+  }
+
+  public ExtractedMetadata doParse(final InputStream is) throws IOException {
+    return doParse(is, MAXHEADERWORDS);
   }
 
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {

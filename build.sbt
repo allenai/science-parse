@@ -4,6 +4,8 @@ organization := "org.allenai"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
+javaOptions in Test += s"-Xmx8G"
+
 javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
 sources in (Compile,doc) := Seq.empty
@@ -32,5 +34,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
-  "com.github.scopt" %% "scopt" % "3.3.0"
+  "com.github.scopt" %% "scopt" % "3.3.0",
+  "org.allenai" %% "datastore" % "1.0.2" % Test,
+  "org.bouncycastle" % "bcprov-jdk16" % "1.46",
+  "org.bouncycastle" % "bcmail-jdk16" % "1.46"
 )
