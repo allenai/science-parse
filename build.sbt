@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   "org.allenai" % "ml" % "0.9" excludeAll (
     ExclusionRule(organization = "args4j"),
     ExclusionRule(organization = "org.slf4j", name="slf4j-simple")
-    ),
+  ),
   "org.projectlombok" % "lombok" % "1.16.6",
   "com.goldmansachs" % "gs-collections" % "6.1.0",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.5.2",
