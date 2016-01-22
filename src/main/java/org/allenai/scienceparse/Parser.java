@@ -441,9 +441,13 @@ public class Parser {
       trainParser(null, pgt, args[3], opts, args[6]);
     } else if (args[0].equalsIgnoreCase("parse")) {
       Parser p = new Parser(args[2]);
-      File inDir = new File(args[1]);
+      File input = new File(args[1]);
       File outDir = new File(args[3]);
-      List<File> inFiles = Arrays.asList(inDir.listFiles());
+      final List<File> inFiles;
+      if(input.isFile())
+        inFiles = Collections.singletonList(input);
+      else
+        inFiles = Arrays.asList(input.listFiles());
       ExtractReferences er = new ExtractReferences(args[4]);
       ObjectMapper mapper = new ObjectMapper();
 
