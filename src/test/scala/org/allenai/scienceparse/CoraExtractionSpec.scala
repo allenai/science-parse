@@ -10,7 +10,6 @@ import scala.io.Source
 import org.scalatest._
 import Matchers._
 
-
 class CoraExtractionSpec extends UnitSpec {
 
   case class Reference(
@@ -38,23 +37,24 @@ class CoraExtractionSpec extends UnitSpec {
   val extractor = new ExtractReferences(getClass.getResource("/referencesGroundTruth.json").getPath)
 
   Resource.using(
-    Source.fromInputStream(getClass.getResourceAsStream("/tagged_references.txt"))) {
-    source =>
-      for (
-        ref <- source.getLines
-      ) {
-        val authorMatch = "<author>(.*)</author>".r.findFirstMatchIn(ref)
-        val authors = authorMatch
+    Source.fromInputStream(getClass.getResourceAsStream("/tagged_references.txt"))
+  ) {
+      source =>
+        for (
+          ref <- source.getLines
+        ) {
+          val authorMatch = "<author>(.*)</author>".r.findFirstMatchIn(ref)
+          val authors = authorMatch
             .toSeq
             .flatMap(_.group(1).split(",|and|&"))
             .map(_.trim)
 
-        val title = "<title>(.*)</title>".r.findFirstMatchIn(ref).map(_.group(1).trim)
-        val date = "<date>(.*)</date>".r.findFirstMatchIn(ref).map(_.group(1).trim)
-        val raw = ref.replaceAll("<[^>]+>", "").replaceAll("</[^>]+>", "").trim
-        refs.append(Reference(raw, authors, title.getOrElse(""), date.getOrElse("")))
-      }
-  }
+          val title = "<title>(.*)</title>".r.findFirstMatchIn(ref).map(_.group(1).trim)
+          val date = "<date>(.*)</date>".r.findFirstMatchIn(ref).map(_.group(1).trim)
+          val raw = ref.replaceAll("<[^>]+>", "").replaceAll("</[^>]+>", "").trim
+          refs.append(Reference(raw, authors, title.getOrElse(""), date.getOrElse("")))
+        }
+    }
 
   // Successful as long as we got exactly one record.
   def segmentationTest(ref: Reference, extracted: Seq[BibRecord]): TestResult = {
