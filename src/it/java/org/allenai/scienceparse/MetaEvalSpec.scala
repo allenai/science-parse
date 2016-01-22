@@ -21,12 +21,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def normalize(s: String) = s.replaceFancyUnicodeChars.removeUnprintable.normalize
 
-    def calculatePR(gold: Set[String], extracted: Set[String]) = {
-      if(extracted.isEmpty) {
+    def calculatePR(goldData: Set[String], extractedData: Set[String]) = {
+      if(extractedData.isEmpty) {
         (0.0, 0.0)
       } else {
-        val precision = extracted.count(gold.contains).toDouble / extracted.size
-        val recall = gold.count(extracted.contains).toDouble / gold.size
+        val precision = extractedData.count(goldData.contains).toDouble / extractedData.size
+        val recall = goldData.count(extractedData.contains).toDouble / goldData.size
         (precision, recall)
       }
     }
