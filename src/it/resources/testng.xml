@@ -1,9 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Tests" parallel="classes" thread-count="10">
+<suite name="Integration Tests" parallel="classes" thread-count="10">
     <test name="Science-Parse">
         <groups>
             <run>
-                <exclude name="integration"/>
+                <include name="integration"/>
             </run>
         </groups>
         <packages>

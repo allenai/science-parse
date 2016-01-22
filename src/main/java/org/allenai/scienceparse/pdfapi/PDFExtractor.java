@@ -56,7 +56,10 @@ public class PDFExtractor {
   private static List<String> guessAuthorList(String listStr) {
     if (listStr != null && listStr.length() > 0) {
       String[] authorArray = listStr.indexOf(';') >= 0 ? listStr.split(";") : listStr.split(",");
-      return Arrays.asList(authorArray);
+      ArrayList<String> trimmedAuthors = new ArrayList<>(authorArray.length);
+      for(String author : authorArray)
+        trimmedAuthors.add(author.trim());
+      return trimmedAuthors;
     } else {
       return Collections.emptyList();
     }

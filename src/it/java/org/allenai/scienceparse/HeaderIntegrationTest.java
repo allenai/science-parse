@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Test
+@Test(groups = {"integration"})
 @Slf4j
 public class HeaderIntegrationTest {
     static final int kSampledPapers = 100;
