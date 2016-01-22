@@ -741,8 +741,6 @@ public class Parser {
         }
       }
 
-      // This is the block that uses PDFBox 1.8, which may or may not close the input stream. That's
-      // why it has to come second.
       final ExtractedMetadata em;
       {
         PDFExtractor ext = new PDFExtractor();
