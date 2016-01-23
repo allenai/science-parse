@@ -58,30 +58,31 @@ class CoraExtractionSpec extends UnitSpec {
 
   // Successful as long as we got exactly one record.
   def segmentationTest(ref: Reference, extracted: Seq[BibRecord]): TestResult = {
-    return TestResult(ref, extracted, 1, 1)
+    TestResult(ref, extracted, 1, 1)
   }
 
   def runTest(name: String, test: (Reference, Seq[BibRecord]) => TestResult): TestResults = {
-    val results = new ArrayBuffer[TestResult]
-    for (ref <- refs) {
+    def testRecord(ref: Reference): TestResult = {
       val text = Seq("Bibliography", ref.source).asJava
       val records = extractor.findReferences(text).getOne.asScala
       if (records.size == 0) {
-        results.append(TestResult(ref, records, 0, 0, Seq("Missing")))
         println(s"Missed extraction: ${ref.source}")
+        TestResult(ref, records, 0, 0, Seq("Missing"))
       } else if (records.size > 1) {
-        results.append(TestResult(ref, records, 0, 0, Seq("Too many extractions")))
+        TestResult(ref, records, 0, 0, Seq("Too many extractions"))
       } else {
-        results.append(test(ref, records))
+        test(ref, records)
       }
     }
+
+    val results: Seq[TestResult] = refs.map(testRecord _)
 
     val precision = results.map(_.precision).sum / results.size
     val recall = results.map(_.recall).sum / results.size
 
-    println(s"${name} precision: ${precision} recall: ${recall}")
+    println(s"$name precision: $precision recall: $recall")
 
-    return TestResults(precision, recall, results)
+    TestResults(precision, recall, results)
   }
 
   "cora-ie references" should "be extracted" in {
