@@ -59,9 +59,24 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map(normalize), (Set(extractedMetadata.getTitle) - null).map(normalize))
 
+    def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) = {
+      if (extractedMetadata.abstractText == null) {
+        (0.0, 0.0)
+      } else {
+        val extracted = extractedMetadata.abstractText.split(" ")
+        val gold = goldData.head.split(" ")
+        if (extracted.head == gold.head && extracted.last == gold.last) {
+          (1.0, 1.0)
+        } else {
+          (0.0, 0.0)
+        }
+      }
+    }
+
     case class Metric(
       name: String,
       goldFile: String,
+      // get P/R values for each individual paper. values will be averaged later across all papers
       evaluator: (ExtractedMetadata, Set[String]) => (Double, Double))
     val metrics = Seq(
       Metric("authorFullName", "/golddata/dblp/authorFullName.tsv", fullNameEvaluator),
@@ -69,7 +84,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("authorLastName", "/golddata/dblp/authorLastName.tsv", lastNameEvaluator),
       Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv", lastNameNormalizedEvaluator),
       Metric("title", "/golddata/dblp/title.tsv", titleEvaluator),
-      Metric("titleNormalized", "/golddata/dblp/title.tsv", titleNormalizedEvaluator)
+      Metric("titleNormalized", "/golddata/dblp/title.tsv", titleNormalizedEvaluator),
+      Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractEvaluator)
     )
 
 
@@ -94,7 +110,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     val extractions = {
       val parser = new Parser(publicFile("integrationTestModel.dat", 1))
-      val pdfDirectory = publicDirectory("PapersTestSet", 1)
+      val pdfDirectory = publicDirectory("PapersTestSet", 2)
 
       val documentCount = docIds.size
       logger.info(s"Running on $documentCount documents")
