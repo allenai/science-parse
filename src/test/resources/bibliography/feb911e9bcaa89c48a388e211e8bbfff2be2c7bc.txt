@@ -1,0 +1,24 @@
+
+[1] R. Burstall and J. Darlington. A transformation system for developing recursive programs. Journal of the ACM, 24(1):44–67, 1977.
+[2] M. Chakravarty and G. Keller. Functional array fusion. In Proc. ACM International Conference on Functional Programming, pages 205–216, 2001.
+[3] W-N. Chin. Safe fusion on functional expression. In Proc. ACM Conference on Lisp and Functional Programming, pages 11–20, 1992.
+[4] O. Chitil. Type inference builds a short cut to deforestation. In Proc. ACM International Conference on Functional Programming, pages 249–260, 1999.
+[5] N. Ghani, P. Johann, T. Uustalu, and V. Vene. Monadic augment and generalised short cut fusion. In Proc. ACM International Conference on Functional Programming, pages 294–305, 2005.
+[6] A. Gill, J. Launchbury, and S. Peyton Jones. A short cut to deforestation. In Proc. International Conference on Functional Programming Languages and Computer Architecture, pages 223– 232, 1993.
+[7] A. Gill. Cheap Deforestation for Non-strict Functional Languages. Ph.D thesis, University of Glasgow, 1996.
+[8] M. Hasegawa and Y. Kakutani. Axioms for recursion in call-by-value. Higher-Order and Symbolic Computation, 15(2-3):235–264, 2002.
+[9] Z. Hu, H. Iwasaki, and M. Takeichi. Deriving structural hylomor- phisms from recursive definitions. In Proc. ACM International Conference on Functional Programming, pages 73–82, 1996.
+[10] P. Johann and E. Visser. Warm fusion in Stratego: A case study in generation of program transformation systems. Annals of Mathematics and Artificial Intelligence, 29(1-4):1 – 34, 2000.
+[11] S. Katsumata and S. Nishimura. Algebraic fusion of functions with an accumulating parameter and its improvement. In Proc. ACM International Conference on Functional Programming, pages 227– 238, 2006.
+[12] J. Launchbury and T. Sheard. Warm fusion: Deriving build-catas from recursive definitions. In Proc. ACM Conference on Functional Programming Languages and Computer Architecture, pages 314– 323, 1995.
+[13] G. Malcolm. Homomorphism and promotability. In Proc. Mathemat- ics of Program Construction, pages 335–347, 1989.
+[14] E. Meijer, M. Fokkinga, and R. Paterson. Functional programming with bananas, lenses, envelopes and barbed wire. In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA’91), Lecture Notes in Computer Sci- ence 523, pages 124–144, 1991.
+[15] L. Nemeth and S. Peyton Jones. A design for warm fusion. In Proc. International Workshop on Implementation of Functional Languages, pages 381–393, 1998.
+[16] Y. Onoue, Z. Hu, H. Iwasaki, and M. Takeichi. Verification of practical effectiveness of program fusion (in Japanese). Computer Software, 17(3):81–85, 2000.
+[17] S. Peyton Jones, A. Tolmach, and T. Hoare. Playing by the rules: rewriting as a practical optimisation technique in GHC. In Proc. ACM Haskell workshop, 2001.
+[18] D. Sands. Proving the correctness of recursion-based automatic program transformations. Theoretical Computer Science, 167(1- 2):193–233, 1996.
+[19] T. Sheard and L. Fegaras. A fold for all seasons. In Proc. Functional Programming Languages and Computer Architecture, pages 233– 242, 1993.
+[20] SML# home page. http://www.riec.tohoku.ac.jp/smlsharp/, 2006.
+[21] J. Svenningsson. Shortcut fusion for accumulating parameters & zip- like functions. In Proc. ACM International Conference on Functional Programming, pages 124–132, 2002.
+[22] A. Takano and E. Meijer. Shortcut deforestation in calculational form. In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture, pages 306–313, 1995.
+[23] P. Wadler. Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231–248, 1990. Special issue of selected papers from 2’nd European Symposium on Programming.

@@ -1,0 +1,22 @@
+1. Bachmann, T. (1991). Identification of spatially queatized tachistoscopic images of faces: How many pixels does it take to carry identity? European J. of Cog. Psychology. 3:85-103.
+2. Bailer, W., Schober, C., and Thallinger, G. (2006). Video Content Browsing Based on Iterative Feature Clustering for Rushes Exploration. TRECVID Workshop. 230-239.
+3. Chang, L., Yang, Y., and Hua, X.S. (2008). Smart Video Player. IEEE Multimedia and Expo. 1605-1606.
+4. Chen, L., Chen, G.C., Xu, C.Z., March, J., and Benford, S. (2008). EmoPlayer: A Media Player for Video Clips with Affective Annotations. Int. with Comp. 20:17-28.
+5. Divakaran, A. and Forlines, C. and Lanning, T. and Shipman, S. and Wittenburg, K. (2005). Augmenting Fast-Forward and Rewind for Personal Digital Video Recorders. ICCE. 43-44.
+6. Doulamis, A.D. and Doulamis, N.D. (2004). Optimal Content- based Video Decomposition for Interactive Video Navigation. IEEE CSVT. 757-775.
+7. Dragicevic, P., Ramos, G., Bibliowitcz, J., Nowrouzezahrai, D., Balakrishnan, R., and Singh, K. (2008). Video browsing by direct manipulation. CHI. 237-246.
+8. Grossman, T., Matejka, J., and Fitzmaurice, G. (2010). Chronicle: Capture, Exploration, and Playback of Document Workflow Histories. UIST. 143-152.
+9. Hanson, G. and Haridakis, P. (2008). YouTube Users Watching and Sharing the News: A Uses and Gratifications Approach. Journal of Electronic Publishing. 11:3.
+10. Hefeeda, M. and Hsu, C.H. (2008). Rate-Distortion Optimized Streaming of Fine-Grained Scalable Video Sequences. ACM TOMCCAP. 1-28.
+11. Holthe, O. and Ronningen, L.A. (2006). Video Browsing Techniques for Web Interfaces. IEEE CCNC. 1224-1228.
+12. Hürst, W. (2006). Interactive Audio-Visual Video Browsing. ACM MM. 675-678.
+13. Karrer, T., Weiss, M., Lee, E., and Borchers, J. (2008). DRAGON : A Direct Manipulation Interface for Frame- Accurate In-Scene Video Navigation. CHI. 247-250.
+14. Janin, A., Gottlieb, L., and Friedland, G. (2010). Joke-o-Mat HD: Browsing Sitcoms with Human Derived Transcripts. ACM MM. 1591-1594.
+15. Krasic, C. and Légaré, J.S. (2008). Interactivity and Scalability Enhancements for Quality-Adaptive Streaming. MM. 753-756. 16. MacKenzie, I.S. and Ware, C. (1993). Lag as a Determinant of Human Performance in Interactive Systems. CHI. 488-493. 17. Pavlovych, A. and Stuerzlinger, W. (2009). The Tradeoff between Spatial Jitter and Latency in Pointing Tasks. ACM Symposium on Eng. Interactive Comp. Syst. 33-44.
+18. Pavlovych, A. and Stuerzlinger, W. (2011). Target Following Performance in the Presence of Latency, Jitter, and Signal Dropouts. GI. 33-44.
+19. Pongnumkul, S., Wang, J., Ramos, G., and Cohen, M. (2010).  Content-Aware dynamic timeline for video browsing. ACM UIST. 139-142.
+20. Ramos, G. and Balakrishnan, R. (2003). Fluid Interaction Techniques for the Control and Annotation of Digital Video.  ACM UIST. 105-114.
+21. Schoeffmann, K., Hopfgartner, F., Marques, O., Boeszoerme- nyi, L., and Jose, J.M. (2010). Video browsing interfaces and applications: a review. SPIE Reviews. 18004:1-35.  22. Schoeffmann, K., Taschwer, M., and Boeszoermenyi, L. (2010). The Video Explorer – A Tool for Navigation and Searching within a Single Video based on Fast Content Analysis. ACM SIGMM. 247-258.
+23. Torralba, A., Fergus, R., and Freeman, W.T. (2008). 80 million tiny images: A large data set for non-parametric object and scene recognition. IEEE Pattern Analysis and Machine Intelligence. 1958-1970.
+24. Truong, B.T. and Venkatesh, S. (2007). Video Abstraction: A Systematic Review and Classification. ACM TOMCCAP. Appl. 3, 1, Article 3.
+25. Uchihashi, S., Foote, J., Girgensohn, A., and Boreczky, J. (1999). Video Manga: Generating Semantically Meaningful Video Summaries. ACM CHI. 383-392.
