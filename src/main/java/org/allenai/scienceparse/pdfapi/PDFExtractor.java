@@ -117,6 +117,12 @@ public class PDFExtractor {
   @SneakyThrows
   public PdfDocExtractionResult extractResultFromInputStream(InputStream is) {
     try (PDDocument pdfBoxDoc = PDDocument.load(is)) {
+      return extractResultFromPDDocument(pdfBoxDoc);
+    }
+  }
+  
+  @SneakyThrows
+  public PdfDocExtractionResult extractResultFromPDDocument(PDDocument pdfBoxDoc) {
       val info = pdfBoxDoc.getDocumentInformation();
       List<String> keywords = guessKeywordList(info.getKeywords());
       List<String> authors = guessAuthorList(info.getAuthor());
@@ -187,7 +193,6 @@ public class PDFExtractor {
       return PdfDocExtractionResult.builder()
         .document(doc)
         .highPrecision(highPrecision).build();
-    }
   }
 
   @SneakyThrows
