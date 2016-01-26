@@ -1,0 +1,10 @@
+*__pycache__
+*.DS_Store
+*.pyc
+
+datasets/*/pdfs
+datasets/*/page_images_gray
+datasets/*/page_images_color
+s2_wip
+conference_wip
+acl_wip
