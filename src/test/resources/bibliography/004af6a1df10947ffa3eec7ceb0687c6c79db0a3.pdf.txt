@@ -1,0 +1,15 @@
+[1] C. Bessiere and J. Regin, “Arc consistency for general constraint net- works: preliminary results”, Proc. IJCAI’97: 398-404.
+[2] F.L. Chan, M.D. Spiller, and A.R. Newton, “Weld - an environment for web-based electronic design”, Proc. 35th DAC, June 1998.
+[3] T.F. Chiueh and R.H. Katz, “Intelligent VLSI Design Object Manage- ment”, in Proc. EDAC, pp. 410-414, 1992.
+[4] J. Cohn et al., “KOAN/ANAGRAM II: New tools for device-level ana- log placement and routing”, IEEE JSSC, 26(3):330-342, March 1991.
+[5] J. D’Ambrosio, ConstrLib: An Interval Constraint Propagation Library, AI Lab, The University of Michigan, 1998.
+[6] M.Fitting, First-Order Logic and Automated Theorem Proving, Springer Verlag, New York, second edition, 1996.
+[7] S.M. Fohn et al., “A Constraint-system Shell to Support Concurrent Engineering Approaches to Design”, AI in Engineering, (9):1–17, 1994.
+[8] S.T. Frezza, S.P. Levitan, and P.C. Chrysanthis, “Requirements-based Design Evaluation”, Proc. 32nd DAC, June 1995.
+[9] D. Kuokka et al., “A parametric design assistant for concurrent engi- neering”, AI-EDAM, no. 9: 135-144, 1995.
+[10] M.Jacome and S.Director, “A formal basis for design process planning and management”, IEEE Trans. CAD, 15(10):1197–1211, Oct. 1996.
+[11] V. Kumar, “Algorithms for Constraint Satisfaction”, AI Magazine, 13(1):32–44, 1992.
+[12] A. Silberschatz et al., Database System Concepts, McGraw-Hill, 1996. [13] P. R. Sutton, J.B. Brockman, and S.W. Director, “Design Management Using Dynamically Defined Flows”, Proc. DAC: 648–653, 1993.
+[14] P. R. Sutton and S. W. Director, “A Description Language for Design Process Management”, Proc. 33rd DAC, 1996.
+[15] P. R. Sutton and S. W. Director, “Framework Encapsulations: A New Approach to CAD Tool Interoperability”, Proc. 35th DAC, June 1998. [16] K.O. ten Bosch et al., “Design Flow Management in the Nelsis CAD Framework”, Proc. 28th DAC: 711–716, June 1991.
+[17] M. Zaman, MISTIC User’s Guide, Univ. of Michigan, 1997.
