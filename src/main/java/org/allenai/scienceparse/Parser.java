@@ -464,7 +464,10 @@ public class Parser {
         }
         fis.close();
         try {
-          em.references = getReferences(em.raw, em.rawReferences, er);
+          final Pair<List<BibRecord>, List<CitationRecord>> pair =
+            getReferences(em.raw, em.rawReferences, er);
+          em.references = pair.getOne();
+          em.referenceMentions = pair.getTwo();
         } catch (final Exception e) {
           logger.info("Reference extraction error: " + f, e);
         }
@@ -508,7 +511,10 @@ public class Parser {
                 }
                 fis.close();
                 try {
-                  em.references = getReferences(em.raw, em.rawReferences, er);
+                  final Pair<List<BibRecord>, List<CitationRecord>> pair =
+                    getReferences(em.raw, em.rawReferences, er);
+                  em.references = pair.getOne();
+                  em.referenceMentions = pair.getTwo();
                 } catch (final Exception e) {
                   logExceptionShort(e, "Reference extraction error", f.getName());
                   return;

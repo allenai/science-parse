@@ -119,8 +119,8 @@ public class ExtractReferencesTest {
 
     List<CitationRecord> crs = ExtractReferences.findCitations(em.raw, br, bs);
     log.info("found " + crs.size() + " citations.");
-    Assert.assertEquals("[12]", em.raw.get(crs.get(0).lineIdx).substring(crs.get(0).startOffset, crs.get(0).endOffset));
-    Assert.assertTrue(em.raw.get(crs.get(0).lineIdx).startsWith("Keeton and Katz"));
+    Assert.assertEquals("[12]", crs.get(0).context.substring(crs.get(0).startOffset, crs.get(0).endOffset));
+    Assert.assertTrue(crs.get(0).context.startsWith("Keeton and Katz"));
 
 
     //paper2:
@@ -155,9 +155,9 @@ public class ExtractReferencesTest {
     log.info("found " + crs.size() + " citations.");
     CitationRecord cr = crs.get(crs.size() - 1);
     log.info(cr.toString());
-    Assert.assertEquals("[Shachnai and Tamir 2000a]", em.raw.get(cr.lineIdx).substring(cr.startOffset, cr.endOffset));
-    log.info(em.raw.get(cr.lineIdx));
-    Assert.assertTrue(em.raw.get(cr.lineIdx).startsWith("We have implemented"));
+    Assert.assertEquals("[Shachnai and Tamir 2000a]", cr.context.substring(cr.startOffset, cr.endOffset));
+    log.info(cr.context);
+    Assert.assertTrue(cr.context.startsWith("We have implemented"));
 
 
   }
