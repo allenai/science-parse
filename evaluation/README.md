@@ -45,7 +45,12 @@ the poppler-utility "pdftoppm" to be installed. The script "download_from_urls.p
 is not as reliable since it can get stuck on PDFs for which we don't have valid URLs for.
 
 ## Dependencies:
-python3 and the python library 'Pillow'. 
+python3 and the python library 'Pillow'. On Mac, do
+
+```
+brew install python3
+sudo pip3 install pillow
+```
 
 If the PDFs are being downloaded from URLs the 'requests' library is also needed, 
 as well as the poppler utility 'pdftoppm' to rasterize the PDF pages
@@ -58,20 +63,20 @@ A typical workflow using this setup might be (after downloading everything):
 1. Makes some changes to an extractor
 2. Run "build_evaluation.py" to re-evaluate the extractor. For example:
 
-`python build_evaluation.py conference scalafigures -o new_evaluation.pkl -w all`
+`python3 build_evaluation.py conference scalafigures -o new_evaluation.pkl -w all`
 
 to evaluate the extractor named "scalafigures" against all the PDFs in the dataset named "conference"
  and save the results to "evaluation.pkl".
 
 3. Run "compare_evaluation.py" to see what changed between this run and a previous run:
 
-`python compare_evaluation.py new_evaluation.pkl old_evaluation.pkl`
+`python3 compare_evaluation.py new_evaluation.pkl old_evaluation.pkl`
 
 to view how the results in "new_evaluation.pkl" differed from "old_evaluation.pkl"
 
 3. Run "parse_evaluation.py" to review the scores or to visualize the errors:
 
-`python parse_evaluation.py new_evaluation.pkl`
+`python3 parse_evaluation.py new_evaluation.pkl`
 
 ## Evaluation Methology
 We evaluate figures and captions as follows:
