@@ -59,12 +59,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map(normalize), (Set(extractedMetadata.getTitle) - null).map(normalize))
 
-    def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) = {
+    def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String], normalizer: String => String = identity[String]) = {
       if (extractedMetadata.abstractText == null) {
         (0.0, 0.0)
       } else {
-        val extracted = extractedMetadata.abstractText.split(" ")
-        val gold = goldData.head.split(" ")
+        val extracted = normalizer(extractedMetadata.abstractText).split(" ")
+        val gold = normalizer(goldData.head).split(" ")
         if (extracted.head == gold.head && extracted.last == gold.last) {
           (1.0, 1.0)
         } else {
@@ -72,6 +72,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         }
       }
     }
+
+    def abstractUnnormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      abstractEvaluator(extractedMetadata, goldData)
+
+    def abstractNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      abstractEvaluator(extractedMetadata, goldData, normalize)
 
     case class Metric(
       name: String,
@@ -85,7 +91,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv", lastNameNormalizedEvaluator),
       Metric("title", "/golddata/dblp/title.tsv", titleEvaluator),
       Metric("titleNormalized", "/golddata/dblp/title.tsv", titleNormalizedEvaluator),
-      Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractEvaluator)
+      Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
+      Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator)
     )
 
 
