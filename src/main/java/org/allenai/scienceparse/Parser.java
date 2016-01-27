@@ -24,7 +24,6 @@ import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -59,24 +58,30 @@ public class Parser {
   public static final String DATA_VERSION = "0.1";
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
+  private ExtractReferences referenceExtractor;
 
-  public Parser(final String modelFile) throws Exception {
-    this(new File(modelFile));
+  public Parser(final String modelFile, final String gazetteerFile) throws Exception {
+    this(new File(modelFile), new File(gazetteerFile));
   }
 
-  public Parser(final Path modelFile) throws Exception {
-    this(modelFile.toFile());
+  public Parser(final Path modelFile, final Path gazetteerFile) throws Exception {
+    this(modelFile.toFile(), gazetteerFile.toFile());
   }
 
-  public Parser(final File modelFile) throws Exception {
-    try(final DataInputStream is = new DataInputStream(new FileInputStream(modelFile))) {
-      model = loadModel(is);
+  public Parser(final File modelFile, final File gazetteerFile) throws Exception {
+    try(
+      final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
+      final InputStream gazetteerIs = new FileInputStream(gazetteerFile)
+    ) {
+      model = loadModel(modelIs);
+      referenceExtractor = new ExtractReferences(gazetteerIs);
     }
   }
 
-  public Parser(final InputStream stream) throws Exception {
-    final DataInputStream dis = new DataInputStream(stream);
+  public Parser(final InputStream modelStream, final InputStream gazetteerStream) throws Exception {
+    final DataInputStream dis = new DataInputStream(modelStream);
     model = loadModel(dis);
+    referenceExtractor = new ExtractReferences(gazetteerStream);
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
@@ -441,7 +446,7 @@ public class Parser {
       opts.minYear = 2008;
       trainParser(null, pgt, args[3], opts, args[6]);
     } else if (args[0].equalsIgnoreCase("parse")) {
-      Parser p = new Parser(args[2]);
+      Parser p = new Parser(args[2], args[4]);
       File input = new File(args[1]);
       File outDir = new File(args[3]);
       final List<File> inFiles;
@@ -449,7 +454,6 @@ public class Parser {
         inFiles = Collections.singletonList(input);
       else
         inFiles = Arrays.asList(input.listFiles());
-      ExtractReferences er = new ExtractReferences(args[4]);
       ObjectMapper mapper = new ObjectMapper();
 
       for (File f : inFiles) {
@@ -463,23 +467,14 @@ public class Parser {
           logger.info("Parse error: " + f, e);
         }
         fis.close();
-        try {
-          final Pair<List<BibRecord>, List<CitationRecord>> pair =
-            getReferences(em.raw, em.rawReferences, er);
-          em.references = pair.getOne();
-          em.referenceMentions = pair.getTwo();
-        } catch (final Exception e) {
-          logger.info("Reference extraction error: " + f, e);
-        }
         //Object to JSON in file
         mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
       }
     } else if (args[0].equalsIgnoreCase("metaEval")) {
-      Parser p = new Parser(args[2]);
+      Parser p = new Parser(args[2], args[4]);
       File inDir = new File(args[1]);
       File outDir = new File(args[3]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
-      ExtractReferences er = new ExtractReferences(args[4]);
       ObjectMapper mapper = new ObjectMapper();
 
       final ExecutorService e =
@@ -510,15 +505,6 @@ public class Parser {
                   return;
                 }
                 fis.close();
-                try {
-                  final Pair<List<BibRecord>, List<CitationRecord>> pair =
-                    getReferences(em.raw, em.rawReferences, er);
-                  em.references = pair.getOne();
-                  em.referenceMentions = pair.getTwo();
-                } catch (final Exception e) {
-                  logExceptionShort(e, "Reference extraction error", f.getName());
-                  return;
-                }
 
                 final String paperId =
                   f.getName().substring(0, f.getName().length() - 4);
@@ -557,7 +543,7 @@ public class Parser {
         System.out.println(String.format("%d failures (%f%%)", (paperCount.get() - papersSucceeded.get()), 100.0f * (paperCount.get() - papersSucceeded.get()) / paperCount.get()));
       }
     } else if (args[0].equalsIgnoreCase("parseAndScore")) {
-      Parser p = new Parser(args[2]);
+      Parser p = new Parser(args[2], args[4]);
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
       ParserGroundTruth pgt = new ParserGroundTruth(args[4]);
@@ -647,10 +633,9 @@ public class Parser {
       logger.info("overall author recall: " + (crfRecall + metaRecall) / ((double) totalFiles));
       //TODO: write output
     } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
-      Parser p = new Parser(args[2]);
+      Parser p = new Parser(args[2], args[4]);
       File inDir = new File(args[1]);
       File outDir = new File(args[3]);
-      ExtractReferences er = new ExtractReferences(args[4]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
       HashSet<String> foundRefs = new HashSet<String>();
       HashSet<String> unfoundRefs = new HashSet<String>();
@@ -666,9 +651,8 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
-          Pair<List<BibRecord>, List<CitationRecord>> fnd = Parser.getReferences(em.raw, em.rawReferences, er);
-          List<BibRecord> br = fnd.getOne();
-          List<CitationRecord> cr = fnd.getTwo();
+          final List<BibRecord> br = em.references;
+          final List<CitationRecord> cr = em.referenceMentions;
           if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
             foundRefs.add(f.getAbsolutePath());
           } else {
@@ -676,7 +660,9 @@ public class Parser {
           }
           totalRefs += br.size();
           totalCites += cr.size();
-          mapper.writeValue(new File(outDir, f.getName() + ".dat"), fnd);
+          mapper.writeValue(
+            new File(outDir, f.getName() + ".dat"),
+            Tuples.pair(em.references, em.referenceMentions));
         } catch (Exception e) {
           logger.info("Parse error: " + f);
           e.printStackTrace();
@@ -735,6 +721,7 @@ public class Parser {
 
     final ExtractedMetadata em;
     {
+      // extract everything but references
       PDFExtractor ext = new PDFExtractor();
       PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
@@ -755,7 +742,13 @@ public class Parser {
         em.setYearFromDate(doc.meta.createDate);
       clean(em);
       em.raw = PDFToCRFInput.getRaw(doc);
-      em.rawReferences = PDFToCRFInput.getRawReferences(doc);
+
+      // extract references
+      final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
+      final Pair<List<BibRecord>, List<CitationRecord>> pair =
+        getReferences(em.raw, rawReferences, referenceExtractor);
+      em.references = pair.getOne();
+      em.referenceMentions = pair.getTwo();
     }
 
     em.abstractText = abstractText;

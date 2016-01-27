@@ -33,7 +33,6 @@ public class ExtractedMetadata {
   public List<String> authors;
   public List<String> emails; //extracted by special (non-CRF) heuristic process
   public List<String> raw; //the full paper text
-  public List<String> rawReferences; //approximately the references text
   public List<BibRecord> references;
   public List<CitationRecord> referenceMentions;
   public int year;

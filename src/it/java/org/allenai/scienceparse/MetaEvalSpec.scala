@@ -93,7 +93,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     val extractions = {
-      val parser = new Parser(publicFile("integrationTestModel.dat", 1))
+      val parser = Resource.using2(
+        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
+        getClass.getResourceAsStream("/referencesGroundTruth.json")
+      ) { case (modelIs, gazetteerIs) =>
+        new Parser(modelIs, gazetteerIs)
+      }
       val pdfDirectory = publicDirectory("PapersTestSet", 1)
 
       val documentCount = docIds.size

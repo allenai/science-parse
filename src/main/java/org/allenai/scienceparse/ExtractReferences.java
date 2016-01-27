@@ -5,6 +5,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +48,10 @@ public class ExtractReferences {
 
   public ExtractReferences(String jsonFile) throws IOException {
     cr = new CheckReferences(jsonFile);
+  }
+
+  public ExtractReferences(final InputStream is) throws IOException {
+    cr = new CheckReferences(is);
   }
 
   private static Pattern authStrToPat(String s) {

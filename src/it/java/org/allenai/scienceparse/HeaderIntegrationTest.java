@@ -1,6 +1,7 @@
 package org.allenai.scienceparse;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.allenai.pdfbox.io.IOUtils;
 import org.testng.annotations.Test;
 
@@ -59,7 +60,10 @@ public class HeaderIntegrationTest {
     public Parser trainParser(ParserGroundTruth pgt) throws Exception {
         ParserGroundTruth subset = new ParserGroundTruth(pgt.papers.subList(0, 100));
         Parser.ParseOpts opts = new Parser.ParseOpts();
-        opts.modelFile = "testdata/integration.model";
+
+        final File tempModelFile = File.createTempFile("science-parse-temp-model.", ".dat");
+        tempModelFile.deleteOnExit();
+        opts.modelFile = tempModelFile.getPath();
         opts.headerMax = Parser.MAXHEADERWORDS;
         opts.iterations = 10;
         opts.threads = 4;
@@ -73,11 +77,24 @@ public class HeaderIntegrationTest {
         log.info("Training CRF with {} papers", subset.papers.size());
         Parser.trainParser(null, subset, "testdata/papers", opts, null);
 
-        return new Parser("testdata/integration.model");
+        final Parser result;
+        try(
+          val modelStream = new FileInputStream(tempModelFile);
+          val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
+        ){
+          result = new Parser(modelStream, gazetteerStream);
+        }
+        tempModelFile.delete();
+        return result;
     }
 
     public Parser loadProductionParser() throws Exception {
-        return new Parser("models/model-production_12_1_15.dat");
+        try(
+          val modelStream = new FileInputStream("models/model-production_12_1_15.dat");
+          val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
+        ){
+          return new Parser(modelStream, gazetteerStream);
+        }
     }
 
     public static HashSet<String> authorSet(Iterable<String> authors) {

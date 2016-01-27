@@ -1,14 +1,20 @@
 package org.allenai.scienceparse;
 
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
 import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.allenai.pdfbox.pdmodel.PDDocument;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
+import org.allenai.scienceparse.pdfapi.PDFDoc;
+import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -61,105 +67,87 @@ public class ExtractReferencesTest {
     Assert.assertEquals(br.year, 1993);
   }
 
+  private Pair<List<String>, List<String>> parseDoc(final File file) throws IOException {
+    final PDDocument pdDoc;
+    try(final InputStream is = new FileInputStream(file)) {
+      pdDoc = PDDocument.load(is);
+    }
+    val ext = new PDFExtractor();
+    final PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
+    final List<String> raw = PDFToCRFInput.getRaw(doc);
+    final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
+    return Tuples.pair(raw, rawReferences);
+  }
+
   public void testFindReferencesAndCitations() throws Exception {
     ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
 
     File paper1 = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));
     File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
-    //File paper = new File("e:\\data\\science-parse\\qtest\\aaai04.pdf");
-
-    Parser.ParseOpts opts = new Parser.ParseOpts();
-    opts.iterations = 10;
-    opts.threads = 4;
-    opts.modelFile = "src/test/resources/test.model";
-    opts.headerMax = Parser.MAXHEADERWORDS;
-    opts.backgroundSamples = 3;
-    opts.gazetteerFile = null;
-    opts.trainFraction = 0.9;
-    opts.backgroundDirectory = filePathOfResource("/groundTruth.json");
-    opts.minYear = -1;
-    opts.checkAuthors = false;
-
-    File f = new File(opts.modelFile);
-    f.deleteOnExit();
-    ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
-    Parser.trainParser(null, pgt, resourceDirectory("/groundTruth.json"), opts, null); //assumes pdfs in same dir as groundTruth
-    Parser p = new Parser(opts.modelFile);
-
 
     //paper 1:
-    FileInputStream fis = new FileInputStream(paper1);
-    ExtractedMetadata em = null;
-    try {
-      em = p.doParse(fis, Parser.MAXHEADERWORDS);
-    } catch (Exception e) {
-      log.info("Parse error: " + f);
-      //e.printStackTrace();
-    }
-    fis.close();
-    Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(em.rawReferences);
-    List<BibRecord> br = fnd.getOne();
-    BibStractor bs = fnd.getTwo();
+    {
+      final Pair<List<String>, List<String>> content = parseDoc(paper1);
+      final List<String> raw = content.getOne();
+      final List<String> rawReferences = content.getTwo();
+      final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
+      final List<BibRecord> br = fnd.getOne();
+      final BibStractor bs = fnd.getTwo();
 
-    int j = 0;
-    for (BibRecord b : br)
-      log.info("reference " + (j++) + " " + (b == null ? "null" : b.toString()));
-    for (BibRecord b : br)
-      Assert.assertNotNull(b);
-    Assert.assertEquals(17, br.size());
-    Assert.assertEquals("Scalable video data placement on parallel disk arrays", br.get(0).title);
-    Assert.assertEquals("1", br.get(0).citeRegEx.pattern());
-    Assert.assertEquals("E. Chang", br.get(0).author.get(0));
-    Assert.assertEquals("A. Zakhor", br.get(0).author.get(1));
-    Assert.assertEquals(1994, br.get(0).year);
-    Assert.assertTrue(br.get(0).venue.trim().startsWith("IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208"));
-    //can't use below because dash is special:
+      int j = 0;
+      for (BibRecord b : br)
+        log.info("reference " + (j++) + " " + (b == null ? "null" : b.toString()));
+      for (BibRecord b : br)
+        Assert.assertNotNull(b);
+      Assert.assertEquals(17, br.size());
+      Assert.assertEquals("Scalable video data placement on parallel disk arrays", br.get(0).title);
+      Assert.assertEquals("1", br.get(0).citeRegEx.pattern());
+      Assert.assertEquals("E. Chang", br.get(0).author.get(0));
+      Assert.assertEquals("A. Zakhor", br.get(0).author.get(1));
+      Assert.assertEquals(1994, br.get(0).year);
+      Assert.assertTrue(br.get(0).venue.trim().startsWith("IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208"));
+      //can't use below because dash is special:
 //		Assert.assertEquals("IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.", br.get(0).venue.trim());
 
-    List<CitationRecord> crs = ExtractReferences.findCitations(em.raw, br, bs);
-    log.info("found " + crs.size() + " citations.");
-    Assert.assertEquals("[12]", crs.get(0).context.substring(crs.get(0).startOffset, crs.get(0).endOffset));
-    Assert.assertTrue(crs.get(0).context.startsWith("Keeton and Katz"));
+      final List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
+      log.info("found " + crs.size() + " citations.");
+      Assert.assertEquals("[12]", crs.get(0).context.substring(crs.get(0).startOffset, crs.get(0).endOffset));
+      Assert.assertTrue(crs.get(0).context.startsWith("Keeton and Katz"));
+    }
 
 
     //paper2:
-    fis = new FileInputStream(paper2);
-    em = null;
-    try {
-      em = p.doParse(fis, Parser.MAXHEADERWORDS);
-    } catch (Exception e) {
-      log.info("Parse error: " + f);
-      //e.printStackTrace();
+    {
+      final Pair<List<String>, List<String>> content = parseDoc(paper2);
+      final List<String> raw = content.getOne();
+      final List<String> rawReferences = content.getTwo();
+      final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
+      final List<BibRecord> br = fnd.getOne();
+      final BibStractor bs = fnd.getTwo();
+
+      int j = 0;
+      for (BibRecord b : br)
+        log.info("reference " + (j++) + " " + (b == null ? "null" : b.toString()));
+      for (BibRecord b : br)
+        Assert.assertNotNull(b);
+      Assert.assertEquals(16, br.size());
+      BibRecord tbr = br.get(15);
+      Assert.assertEquals("DASD dancing: A disk load balancing optimization scheme for video-on-demand computer systems", tbr.title);
+      Assert.assertEquals("Wolf et al\\.,? 1995", tbr.citeRegEx.pattern());
+      Assert.assertEquals("J. Wolf", tbr.author.get(0));
+      Assert.assertEquals("P. Yu", tbr.author.get(1));
+      Assert.assertEquals("H. Shachnai", tbr.author.get(2));
+      Assert.assertEquals(1995, tbr.year);
+      log.info(br.get(0).venue.trim());
+      Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
+      final List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
+      log.info("found " + crs.size() + " citations.");
+      CitationRecord cr = crs.get(crs.size() - 1);
+      log.info(cr.toString());
+      Assert.assertEquals("[Shachnai and Tamir 2000a]", cr.context.substring(cr.startOffset, cr.endOffset));
+      log.info(cr.context);
+      Assert.assertTrue(cr.context.startsWith("We have implemented"));
     }
-    fis.close();
-    fnd = er.findReferences(em.rawReferences);
-    br = fnd.getOne();
-    bs = fnd.getTwo();
-    j = 0;
-    for (BibRecord b : br)
-      log.info("reference " + (j++) + " " + (b == null ? "null" : b.toString()));
-    for (BibRecord b : br)
-      Assert.assertNotNull(b);
-    Assert.assertEquals(16, br.size());
-    BibRecord tbr = br.get(15);
-    Assert.assertEquals("DASD dancing: A disk load balancing optimization scheme for video-on-demand computer systems", tbr.title);
-    Assert.assertEquals("Wolf et al\\.,? 1995", tbr.citeRegEx.pattern());
-    Assert.assertEquals("J. Wolf", tbr.author.get(0));
-    Assert.assertEquals("P. Yu", tbr.author.get(1));
-    Assert.assertEquals("H. Shachnai", tbr.author.get(2));
-    Assert.assertEquals(1995, tbr.year);
-    log.info(br.get(0).venue.trim());
-    Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
-    crs = ExtractReferences.findCitations(em.raw, br, bs);
-    log.info("found " + crs.size() + " citations.");
-    CitationRecord cr = crs.get(crs.size() - 1);
-    log.info(cr.toString());
-    Assert.assertEquals("[Shachnai and Tamir 2000a]", cr.context.substring(cr.startOffset, cr.endOffset));
-    log.info(cr.context);
-    Assert.assertTrue(cr.context.startsWith("We have implemented"));
-
-
   }
-
 }
