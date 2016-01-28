@@ -59,9 +59,30 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map(normalize), (Set(extractedMetadata.getTitle) - null).map(normalize))
 
+    def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String], normalizer: String => String = identity[String]) = {
+      if (extractedMetadata.abstractText == null) {
+        (0.0, 0.0)
+      } else {
+        val extracted = normalizer(extractedMetadata.abstractText).split(" ")
+        val gold = normalizer(goldData.head).split(" ")
+        if (extracted.head == gold.head && extracted.last == gold.last) {
+          (1.0, 1.0)
+        } else {
+          (0.0, 0.0)
+        }
+      }
+    }
+
+    def abstractUnnormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      abstractEvaluator(extractedMetadata, goldData)
+
+    def abstractNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      abstractEvaluator(extractedMetadata, goldData, normalize)
+
     case class Metric(
       name: String,
       goldFile: String,
+      // get P/R values for each individual paper. values will be averaged later across all papers
       evaluator: (ExtractedMetadata, Set[String]) => (Double, Double))
     val metrics = Seq(
       Metric("authorFullName", "/golddata/dblp/authorFullName.tsv", fullNameEvaluator),
@@ -69,7 +90,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("authorLastName", "/golddata/dblp/authorLastName.tsv", lastNameEvaluator),
       Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv", lastNameNormalizedEvaluator),
       Metric("title", "/golddata/dblp/title.tsv", titleEvaluator),
-      Metric("titleNormalized", "/golddata/dblp/title.tsv", titleNormalizedEvaluator)
+      Metric("titleNormalized", "/golddata/dblp/title.tsv", titleNormalizedEvaluator),
+      Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
+      Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator)
     )
 
 
@@ -93,8 +116,13 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     val extractions = {
-      val parser = new Parser(publicFile("integrationTestModel.dat", 1))
-      val pdfDirectory = publicDirectory("PapersTestSet", 1)
+      val parser = Resource.using2(
+        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
+        getClass.getResourceAsStream("/referencesGroundTruth.json")
+      ) { case (modelIs, gazetteerIs) =>
+        new Parser(modelIs, gazetteerIs)
+      }
+      val pdfDirectory = publicDirectory("PapersTestSet", 2)
 
       val documentCount = docIds.size
       logger.info(s"Running on $documentCount documents")
@@ -130,7 +158,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val failures = result.values.collect { case Failure(e) => e }
       val errorRate = 100.0 * failures.size / documentCount
       logger.info(f"Failed ${failures.size} times ($errorRate%.2f%%)")
-      assert(errorRate < 5.0)
       if(failures.nonEmpty) {
         logger.info("Top errors:")
         failures.
@@ -142,6 +169,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
           foreach { case (error, count) =>
             logger.info(s"$count\t$error")
           }
+        assert(errorRate < 5.0)
       }
 
       result

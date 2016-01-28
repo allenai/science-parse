@@ -4,6 +4,7 @@ import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,8 +12,11 @@ public class CheckReferences {
   private LongHashSet paperHashCodes = new LongHashSet();
 
   public CheckReferences(String jsonFile) throws IOException {
-    ParserGroundTruth pgt = new ParserGroundTruth(jsonFile);
-    addPapers(pgt.papers);
+    addPapers(new ParserGroundTruth(jsonFile).papers);
+  }
+
+  public CheckReferences(final InputStream is) throws IOException {
+    addPapers(new ParserGroundTruth(is).papers);
   }
 
   public int getHashSize() {
@@ -41,5 +45,4 @@ public class CheckReferences {
       addPaper(p.title, Arrays.asList(p.authors), p.year, p.venue);
     }
   }
-
 }

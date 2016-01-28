@@ -5,6 +5,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +48,10 @@ public class ExtractReferences {
 
   public ExtractReferences(String jsonFile) throws IOException {
     cr = new CheckReferences(jsonFile);
+  }
+
+  public ExtractReferences(final InputStream is) throws IOException {
+    cr = new CheckReferences(is);
   }
 
   private static Pattern authStrToPat(String s) {
@@ -190,7 +195,7 @@ public class ExtractReferences {
         for (final String citation : citations) {
           int idx = getIdxOf(bib, citation.trim());
           if (idx >= 0) {
-            out.add(new CitationRecord(i, m.start(), m.end(), idx));
+            out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
           }
         }
       }
@@ -199,11 +204,12 @@ public class ExtractReferences {
     	  Pattern p2 = Pattern.compile(bs.getShortCiteRegex());
     	  Matcher m2 = p2.matcher(s);
     	  while(m2.find()) {
-    		  Pair<Integer, Integer> shct = shortCiteSearch(m2.start(), Integer.parseInt(m2.group(1).substring(0, 4)), s, bib);
+    		  Pair<Integer, Integer> shct =
+            shortCiteSearch(m2.start(), Integer.parseInt(m2.group(1).substring(0, 4)), s, bib);
     		  int start = shct.getOne();
     		  int idx = shct.getTwo();
     		  if(start > 0) {
-    			 out.add(new CitationRecord(i, start, m2.end()+1, idx));
+    			  out.add(new CitationRecord(idx, paper.get(i), start, m2.end()+1));
     		  }
     	  }
       }

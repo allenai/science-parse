@@ -10,7 +10,7 @@ javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/
 
 sources in (Compile,doc) := Seq.empty
 
-mainClass in assembly := Some("org.allenai.scienceparse.pdfapi.PDFMetadata")
+mainClass in assembly := Some("org.allenai.scienceparse.FigureExtractorBatchCli")
 
 bintrayPackage := s"${organization.value}:${name.value}_${scalaBinaryVersion.value}"
 
