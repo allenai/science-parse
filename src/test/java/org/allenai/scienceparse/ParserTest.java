@@ -10,6 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -93,17 +94,25 @@ public class ParserTest {
   }
 
   public void testParser() throws Exception {
+    final File testModelFile = File.createTempFile("science-parse-test-model.", ".dat");
+    testModelFile.deleteOnExit();
 
     Parser.ParseOpts opts = new Parser.ParseOpts();
     opts.iterations = 10;
     opts.threads = 4;
-    opts.modelFile = "src/test/resources/test.model";
+    opts.modelFile = testModelFile.getPath();
     opts.headerMax = 100;
     opts.trainFraction = 0.9;
     File f = new File(opts.modelFile);
     f.deleteOnExit();
     Parser.trainParser(resolveKeys(pdfKeys), null, null, opts, null);
-    Parser p = new Parser(opts.modelFile);
+    final Parser p;
+    try(
+      val modelStream = new FileInputStream(opts.modelFile);
+      val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
+    ) {
+      p = new Parser(modelStream, gazetteerStream);
+    }
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;
@@ -117,13 +126,18 @@ public class ParserTest {
     avgAuthorRec /= cases;
     log.info("Title precision = recall = " + avgTitlePrec);
     log.info("Author recall = " + avgAuthorRec);
+
+    testModelFile.delete();
   }
 
   public void testParserWithGroundTruth() throws Exception {
+    final File testModelFile = File.createTempFile("science-parse-test-model.", ".dat");
+    testModelFile.deleteOnExit();
+
     Parser.ParseOpts opts = new Parser.ParseOpts();
     opts.iterations = 10;
     opts.threads = 4;
-    opts.modelFile = "src/test/resources/test.model";
+    opts.modelFile = testModelFile.getPath();
     opts.headerMax = Parser.MAXHEADERWORDS;
     opts.backgroundSamples = 3;
     opts.gazetteerFile = null;
@@ -136,7 +150,13 @@ public class ParserTest {
     f.deleteOnExit();
     ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
     Parser.trainParser(null, pgt, resourceDirectory("/groundTruth.json"), opts, null); //assumes pdfs in same dir as groundTruth
-    Parser p = new Parser(opts.modelFile);
+    final Parser p;
+    try(
+      val modelStream = new FileInputStream(opts.modelFile);
+      val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
+    ) {
+      p = new Parser(modelStream, gazetteerStream);
+    }
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;
@@ -150,6 +170,8 @@ public class ParserTest {
     avgAuthorRec /= cases;
     log.info("Title precision = recall = " + avgTitlePrec);
     log.info("Author recall = " + avgAuthorRec);
+
+    testModelFile.delete();
   }
 
   public void testParserGroundTruth() throws Exception {
@@ -161,5 +183,4 @@ public class ParserTest {
 //	  ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/papers-parseBugs.json"));
 //	  Assert.assertEquals(false, true);
   }
-
 }

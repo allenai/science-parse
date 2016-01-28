@@ -116,7 +116,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     val extractions = {
-      val parser = new Parser(publicFile("integrationTestModel.dat", 1))
+      val parser = Resource.using2(
+        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
+        getClass.getResourceAsStream("/referencesGroundTruth.json")
+      ) { case (modelIs, gazetteerIs) =>
+        new Parser(modelIs, gazetteerIs)
+      }
       val pdfDirectory = publicDirectory("PapersTestSet", 2)
 
       val documentCount = docIds.size
@@ -153,7 +158,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val failures = result.values.collect { case Failure(e) => e }
       val errorRate = 100.0 * failures.size / documentCount
       logger.info(f"Failed ${failures.size} times ($errorRate%.2f%%)")
-      assert(errorRate < 5.0)
       if(failures.nonEmpty) {
         logger.info("Top errors:")
         failures.
@@ -165,6 +169,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
           foreach { case (error, count) =>
             logger.info(s"$count\t$error")
           }
+        assert(errorRate < 5.0)
       }
 
       result
