@@ -36,9 +36,9 @@ each PDF need to be built or downloaded.
 Currently the PDFs and their page renders are stored in the datastore in org.allenai.figure-extractor-eval.
 The zipped files in that folder need to be download and placed in their respective folders in the 
 /dataset directory. For examples, 's2-pdfs' needs to be stored as datasets/s2/pdfs. There is a 
-script to do this automatically:
+script to do this automatically (you can get the `DataStoreCLI.jar` [here](https://github.com/allenai/datastore)):
 
-`python down_load_from_datastore.py /path/to/DataStoreCLI.jar`
+`python3 down_load_from_datastore.py /path/to/DataStoreCLI.jar`
 
 Alternatively one could re-download the PDFs and rebuild the rasterized images from scratch. This requires
 the poppler-utility "pdftoppm" to be installed. The script "download_from_urls.py" can do this, but

@@ -271,7 +271,7 @@ class AclMetaEval(Dataset):
         download_from_urls(doc_id_to_url, self.pdf_dir)
 
     def datastore_version(self):
-        return 2
+        return 1
 
     def __eq__(self, other):
         return isinstance(other, AclMetaEval) and self.__dict__ == other.__dict__
