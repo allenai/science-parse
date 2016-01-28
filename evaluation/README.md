@@ -28,6 +28,22 @@ for which the two evaluations differed.
 Existing evaluations to compare against exist in the "evaluations" folder. 
 
 ## Setup
+
+### Dependencies
+python3 and the python library 'Pillow'. On Mac, do
+
+```
+brew install python3
+sudo pip3 install pillow
+```
+
+If the PDFs are being downloaded from URLs the 'requests' library is also needed,
+as well as the poppler utility 'pdftoppm' to rasterize the PDF pages
+
+Building new datasets requires some additional dependencies, see datasets/README.md
+
+### PDF Download
+
 To build an evaluation one first needs to download the PDFs for each dataset. When grading extractors it 
 is also helpful to ensure the extracted bounding boxes get cropped to the same
 rasterization of the PDF as the gold annotations. For this purpose gray scale images of each page for
@@ -44,18 +60,13 @@ Alternatively one could re-download the PDFs and rebuild the rasterized images f
 the poppler-utility "pdftoppm" to be installed. The script "download_from_urls.py" can do this, but
 is not as reliable since it can get stuck on PDFs for which we don't have valid URLs for.
 
-## Dependencies:
-python3 and the python library 'Pillow'. On Mac, do
+### Environment Variables
+
+You need to set `FIGURE_EXTRACTOR_HOME` to point to the science-parse figure extraction directory.
 
 ```
-brew install python3
-sudo pip3 install pillow
+export FIGURE_EXTRACTOR_HOME=/Users/<you>/science-parse
 ```
-
-If the PDFs are being downloaded from URLs the 'requests' library is also needed, 
-as well as the poppler utility 'pdftoppm' to rasterize the PDF pages
-
-Building new datasets requires some additional dependencies, see datasets/README.md
 
 ## Workflow
 A typical workflow using this setup might be (after downloading everything):

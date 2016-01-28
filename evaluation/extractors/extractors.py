@@ -34,7 +34,7 @@ class ScalaFigures(object):
                              " ex. /scholar/offline/figure-extractor")
         target = join(environ["FIGURE_EXTRACTOR_HOME"], "target", "scala-2.11")
         if not isdir(target):
-            raise ValueError("No target directory found (figure extractor not compiled?)" % target)
+            raise ValueError("No target directory %s found (figure extractor not compiled?)" % target)
 
         jars = [x for x in listdir(target) if x.endswith("jar") and "assembly" in x]
         if len(jars) == 0:
