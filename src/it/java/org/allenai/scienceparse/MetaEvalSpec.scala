@@ -63,7 +63,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibliographyEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map { ref =>
-        val Array(title, year, venue, authors) = ref.split(",")
+        val Array(title, year, venue, authors) = ref.split("\\|", -1)
         new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt)
       }, extractedMetadata.references.asScala.toSet)
 
@@ -132,7 +132,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       ) { case (modelIs, gazetteerIs) =>
         new Parser(modelIs, gazetteerIs)
       }
-      val pdfDirectory = publicDirectory("PapersTestSet", 2)
+      val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
       val documentCount = docIds.size
       logger.info(s"Running on $documentCount documents")
