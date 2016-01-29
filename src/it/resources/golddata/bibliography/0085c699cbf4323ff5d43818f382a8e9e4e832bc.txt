@@ -1,7 +1,0 @@
-1. Kalai, A., Vempala, S.: Efficient algorithms for on-line optimization. In: Proceedings of the The 16th Annual Conference on Learning Theory. (2003)
-2. Awerbuch, B., Kleinberg, R.: Adaptive routing with end-to-end feedback: Distributed learn- ing and geometric approaches. In: Proceedings of the 36th ACM Symposium on Theory of Computing. (2004) To appear.
-3. Takimoto, E., Warmuth, M.K.: Path kernels and multiplicative updates. In: Proceedings of the 15th Annual Conference on Computational Learning Theory. Lecture Notes in Artificial Intelligence, Springer (2002)
-4. Auer, P., Cesa-Bianchi, N., Freund, Y., Schapire, R.E.: The nonstochastic multiarmed bandit problem. SIAM Journal on Computing 32 (2002) 48–77
-5. Auer, P., Cesa-Bianchi, N., Freund, Y., Schapire, R.E.: Gambling in a rigged casino: the adversarial multi-armed bandit problem. In: Proceedings of the 36th Annual Symposium on Foundations of Computer Science, IEEE Computer Society Press, Los Alamitos, CA (1995) 322–331
-6. Zinkevich, M.: Online convex programming and generalized infinitesimal gradient ascent. In: Proceedings of the Twentieth International Conference on Machine Learning. (2003)
-7. Motwani, R., Raghavan, P.: Randomized algorithms. Cambridge University Press (1995)

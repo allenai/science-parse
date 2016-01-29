@@ -61,25 +61,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map(normalize), (Set(extractedMetadata.getTitle) - null).map(normalize))
 
-    def getBibGold(id: String): Set[BibRecord] = {
-      val filename = s"/golddata/bibliography/$id.xml"
-      val xmlStr = Source.fromInputStream(getClass.getResourceAsStream(filename)).mkString
-      val xml = XML.loadString(xmlStr)
-      (xml \ "citation").map { citation =>
-        new BibRecord(
-          (citation \ "title").text,
-          (citation \ "authors").map(a => (a \ "author").text).asJava,
-          (citation \ "journal").text,
-          null, null,
-          (citation \ "year").text.toInt
-        )
-      }.toSet
-    }
-
     def bibliographyEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
-      calculatePR(getBibGold(goldData.head), extractedMetadata.references.asScala.toSet)
-
-    def isaacBibliographyEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map { ref =>
         val Array(title, year, venue, authors) = ref.split(",")
         new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt)
@@ -120,9 +102,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
       Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
       // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
-      Metric("gold bibliography", "/golddata/isaac/bibliographies.tsv", isaacBibliographyEvaluator),
-      // ls *.txt | awk -F'[_.]' '{print $1"\t"$1}' > pdfs.tsv
-      Metric("pyrite bibliography", "/golddata/bibliography/pdfs.tsv", bibliographyEvaluator)
+      Metric("gold bibliography", "/golddata/isaac/bibliographies.tsv", bibliographyEvaluator)
     )
 
 
