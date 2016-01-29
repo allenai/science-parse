@@ -1,60 +1,787 @@
+<?xml version="1.0"?>
 <citations>
-<citation valid='true'><authors><author>ANUBIS</author></authors><title>A platform for the dynamic analysis of malware. http://anubis.iseclab.org</title><year>2009</year><raw_string>[1] ANUBIS: A platform for the dynamic analysis of malware. http://anubis.iseclab.org, 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Baecher M Koetter</author><author>T Holz M Dornseif</author><author>F Freiling</author></authors><title>The Nepenthes Platform: An Efficient Approach to Collect Malware</title><booktitle>In 9th International Symposium on Recent Ad- vances in Intrusion Detection (RAID</booktitle><year>2006</year><raw_string>[2] P.Baecher,M.Koetter,T.Holz,M.Dornseif,and F.Freiling. The Nepenthes Platform: An Efficient Approach to Collect Malware. In 9th International Symposium on Recent Ad- vances in Intrusion Detection (RAID), September 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>The Nepenthes Platform: An Efficient Approach to Collect Malware</rft:atitle><rft:date>2006</rft:date><rft:btitle>In 9th International Symposium on Recent Ad- vances in Intrusion Detection (RAID</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>P Baecher M Koetter</rft:au><rft:au>T Holz M Dornseif</rft:au><rft:au>F Freiling</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Bailey</author><author>J Oberheide</author><author>J Andersen</author><author>Z M Mao</author><author>F Jaha- nian</author><author>J Nazario</author></authors><title>Automated classification and analysis of internet malware</title><booktitle>In Proceedings of the 10th Interna- tional Symposium on Recent Advances in Intrusion Detec- tion (RAID’07</booktitle><year>2007</year><raw_string>[3] M. Bailey, J. Oberheide, J. Andersen, Z. M. Mao, F. Jaha- nian, and J. Nazario. Automated classification and analysis of internet malware. In Proceedings of the 10th Interna- tional Symposium on Recent Advances in Intrusion Detec- tion (RAID’07), September 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Automated classification and analysis of internet malware</rft:atitle><rft:date>2007</rft:date><rft:btitle>In Proceedings of the 10th Interna- tional Symposium on Recent Advances in Intrusion Detec- tion (RAID’07</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>M Bailey</rft:au><rft:au>J Oberheide</rft:au><rft:au>J Andersen</rft:au><rft:au>Z M Mao</rft:au><rft:au>F Jaha- nian</rft:au><rft:au>J Nazario</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>U Bayer</author><author>P M Comparetti</author><author>C Hlauschek</author><author>C Kruegel</author><author>E Kirda Scalable</author></authors><title>Behavior-Based Malware Clustering</title><booktitle>In 16th Annual Network&amp; Distributed System Security Sympo- sium</booktitle><year>2009</year><raw_string>[4] U. Bayer, P. M. Comparetti, C. Hlauschek, C. Kruegel, and E. Kirda. Scalable, Behavior-Based Malware Clustering. In 16th Annual Network&amp; Distributed System Security Sympo- sium, 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Behavior-Based Malware Clustering</rft:atitle><rft:date>2009</rft:date><rft:btitle>In 16th Annual Network&amp; Distributed System Security Sympo- sium</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>U Bayer</rft:au><rft:au>P M Comparetti</rft:au><rft:au>C Hlauschek</rft:au><rft:au>C Kruegel</rft:au><rft:au>E Kirda Scalable</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>U Bayer</author><author>I Habibi</author><author>D Balzarotti</author><author>E Kirda</author><author>C Kruegel</author></authors><title>Insights into current malware behavior</title><booktitle>In LEET’09: 2nd USENIX Workshop on Large-Scale Exploits and Emergent Threats, April 21, 2009</booktitle><location>Boston, MA, USA</location><year>2009</year><raw_string>[5] U. Bayer, I. Habibi, D. Balzarotti, E. Kirda, and C. Kruegel. Insights into current malware behavior. In LEET’09: 2nd USENIX Workshop on Large-Scale Exploits and Emergent Threats, April 21, 2009, Boston, MA, USA, Apr 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Boston, MA, USA</rft:place><rft:atitle>Insights into current malware behavior</rft:atitle><rft:date>2009</rft:date><rft:btitle>In LEET’09: 2nd USENIX Workshop on Large-Scale Exploits and Emergent Threats, April 21, 2009</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>U Bayer</rft:au><rft:au>I Habibi</rft:au><rft:au>D Balzarotti</rft:au><rft:au>E Kirda</rft:au><rft:au>C Kruegel</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>U Bayer</author><author>C Kruegel</author><author>E Kirda</author></authors><title>TTAnalyze: A Tool for Analyzing Malware</title><booktitle>In 15th European Institute for Com- puter Antivirus Research (EICAR 2006) Annual Conference</booktitle><year>2006</year><raw_string>[6] U. Bayer, C. Kruegel, and E. Kirda. TTAnalyze: A Tool for Analyzing Malware. In 15th European Institute for Com- puter Antivirus Research (EICAR 2006) Annual Conference, April 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>TTAnalyze: A Tool for Analyzing Malware</rft:atitle><rft:date>2006</rft:date><rft:btitle>In 15th European Institute for Com- puter Antivirus Research (EICAR 2006) Annual Conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>U Bayer</rft:au><rft:au>C Kruegel</rft:au><rft:au>E Kirda</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Canto</author><author>M Dacier</author><author>E Kirda</author><author>C Leita</author></authors><title>Large scale malware collection: Lessons learned</title><journal>In IEEE SRDS Work- shop on Sharing Field Data and Experiment Measurements on Resilience of Distributed Computing Systems</journal><year>2008</year><raw_string>[7] J. Canto, M. Dacier, E. Kirda, and C. Leita. Large scale malware collection: Lessons learned. In IEEE SRDS Work- shop on Sharing Field Data and Experiment Measurements on Resilience of Distributed Computing Systems, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Large scale malware collection: Lessons learned</rft:atitle><rft:date>2008</rft:date><rft:stitle>In IEEE SRDS Work- shop on Sharing Field Data and Experiment Measurements on Resilience of Distributed Computing Systems</rft:stitle><rft:genre>article</rft:genre><rft:au>J Canto</rft:au><rft:au>M Dacier</rft:au><rft:au>E Kirda</rft:au><rft:au>C Leita</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>E Carrera Pefile</author><author>http code google comp pefile</author></authors><raw_string>[8] E. Carrera. Pefile, http://code.google.com/p/ pefile/.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J R Crandall</author><author>Z Su</author><author>S F Wu</author></authors><title>On deriving unknown vulnerabilities from zero-day polymorphic and metamor- phic worm exploits</title><booktitle>In 12th ACM conference on Computer and Communications Security</booktitle><publisher>ACM Press</publisher><location>New York, NY, USA</location><pages>235--248</pages><year>2005</year><raw_string>[9] J. R. Crandall, Z. Su, and S. F. Wu. On deriving unknown vulnerabilities from zero-day polymorphic and metamor- phic worm exploits. In 12th ACM conference on Computer and Communications Security, pages 235–248. ACM Press New York, NY, USA, 2005.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:50-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>New York, NY, USA</rft:place><rft:atitle>On deriving unknown vulnerabilities from zero-day polymorphic and metamor- phic worm exploits</rft:atitle><rft:spage>235</rft:spage><rft:date>2005</rft:date><rft:btitle>In 12th ACM conference on Computer and Communications Security</rft:btitle><rft:genre>proceeding</rft:genre><rft:pub>ACM Press</rft:pub><rft:epage>248</rft:epage><rft:au>J R Crandall</rft:au><rft:au>Z Su</rft:au><rft:au>S F Wu</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>F-Secure</author></authors><title>Malware information pages: Allaple.a, http://www.f-secure.com/v-descs/allaplea.shtml</title><year>2006</year><raw_string>[10] F-Secure. Malware information pages: Allaple.a, http://www.f-secure.com/v-descs/allaplea.shtml, December 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Gheorghescu</author></authors><title>An Automated Virus Classification Sys- tem</title><booktitle>In Virus Bulletin conference</booktitle><year>2005</year><raw_string>[11] M. Gheorghescu. An Automated Virus Classification Sys- tem. In Virus Bulletin conference, 2005.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>An Automated Virus Classification Sys- tem</rft:atitle><rft:date>2005</rft:date><rft:btitle>In Virus Bulletin conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>M Gheorghescu</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Holz</author><author>C Willems</author><author>K Rieck</author><author>P Duessel</author><author>P Laskov</author></authors><title>Learning and Classification of Malware Behavior</title><booktitle>In Fifth Conference on Detection of Intrusions and Malware &amp; Vul- nerability Assessment (DIMVA 08</booktitle><year>2008</year><raw_string>[12] T. Holz, C. Willems, K. Rieck, P. Duessel, and P. Laskov. Learning and Classification of Malware Behavior. In Fifth Conference on Detection of Intrusions and Malware &amp; Vul- nerability Assessment (DIMVA 08), June 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Learning and Classification of Malware Behavior</rft:atitle><rft:date>2008</rft:date><rft:btitle>In Fifth Conference on Detection of Intrusions and Malware &amp; Vul- nerability Assessment (DIMVA 08</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>T Holz</rft:au><rft:au>C Willems</rft:au><rft:au>K Rieck</rft:au><rft:au>P Duessel</rft:au><rft:au>P Laskov</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>K Julisch</author></authors><title>Clustering intrusion detection alarms to support root cause analysis</title><journal>ACM Transactions on Information and System Security (TISSEC</journal><volume>6</volume><number>4</number><year>2003</year><raw_string>[13] K. Julisch. Clustering intrusion detection alarms to support root cause analysis. ACM Transactions on Information and System Security (TISSEC), 6(4):443–471, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>4</rft:quarter><rft:atitle>Clustering intrusion detection alarms to support root cause analysis</rft:atitle><rft:date>2003</rft:date><rft:stitle>ACM Transactions on Information and System Security (TISSEC</rft:stitle><rft:genre>article</rft:genre><rft:volume>6</rft:volume><rft:au>K Julisch</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Z Kolter</author><author>M A Maloof wild J Mach Learn Res</author></authors><title>Learning to detect and clas- sify malicious executables in the</title><raw_string>[14] J. Z. Kolter and M. A. Maloof. Learning to detect and clas- sify malicious executables in the wild. J. Mach. Learn. Res., 7:2721–2744, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Lee</author><author>J J Mody</author></authors><title>Behavioral Classification</title><booktitle>In EICAR Conference</booktitle><year>2006</year><raw_string>[15] T. Lee and J. J. Mody. Behavioral Classification. In EICAR Conference, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Behavioral Classification</rft:atitle><rft:date>2006</rft:date><rft:btitle>In EICAR Conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>T Lee</rft:au><rft:au>J J Mody</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Leita</author></authors><title>Automated protocol learning for the observation of malicious threats</title><institution>Universite ́ de Nice-Sophia Antipolis</institution><year>2008</year><tech>PhD thesis</tech><raw_string>[16] C. Leita. Automated protocol learning for the observation of malicious threats. PhD thesis, Universite ́ de Nice-Sophia Antipolis, December 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:dissertation</ctx:format><ctx:metadata><dissertation xmlns:rft='info:ofi/fmt:xml:xsd:dissertation' xsi:schemaLocation='info:ofi/fmt:xml:xsd:dissertation http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:dissertation'><rft:degree>PhD</rft:degree><rft:title>Automated protocol learning for the observation of malicious threats</rft:title><rft:date>2008</rft:date><rft:inst>Universite ́ de Nice-Sophia Antipolis</rft:inst><rft:au>C Leita</rft:au></dissertation></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Leita</author><author>M Dacier</author></authors><title>SGNET: a worldwide deployable framework to support the analysis of malware threat mod- els</title><booktitle>In 7th European Dependable Computing Conference (EDCC</booktitle><year>2008</year><raw_string>[17] C. Leita and M. Dacier. SGNET: a worldwide deployable framework to support the analysis of malware threat mod- els. In 7th European Dependable Computing Conference (EDCC 2008), May 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>SGNET: a worldwide deployable framework to support the analysis of malware threat mod- els</rft:atitle><rft:date>2008</rft:date><rft:btitle>In 7th European Dependable Computing Conference (EDCC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>C Leita</rft:au><rft:au>M Dacier</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Leita</author><author>M Dacier</author></authors><title>SGNET: Implementation Insights</title><booktitle>In IEEE/IFIP Network Operations and Management Sym- posium</booktitle><year>2008</year><raw_string>[18] C. Leita and M. Dacier. SGNET: Implementation Insights. In IEEE/IFIP Network Operations and Management Sym- posium, April 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>SGNET: Implementation Insights</rft:atitle><rft:date>2008</rft:date><rft:btitle>In IEEE/IFIP Network Operations and Management Sym- posium</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>C Leita</rft:au><rft:au>M Dacier</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Leita</author><author>M Dacier</author><author>F Massicotte</author></authors><title>Automatic han- dling of protocol dependencies and reaction to 0-day attacks with ScriptGen based honeypots</title><booktitle>In 9th International Sym- posium on Recent Advances in Intrusion Detection (RAID</booktitle><year>2006</year><raw_string>[19] C. Leita, M. Dacier, and F. Massicotte. Automatic han- dling of protocol dependencies and reaction to 0-day attacks with ScriptGen based honeypots. In 9th International Sym- posium on Recent Advances in Intrusion Detection (RAID), Sep 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Automatic han- dling of protocol dependencies and reaction to 0-day attacks with ScriptGen based honeypots</rft:atitle><rft:date>2006</rft:date><rft:btitle>In 9th International Sym- posium on Recent Advances in Intrusion Detection (RAID</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>C Leita</rft:au><rft:au>M Dacier</rft:au><rft:au>F Massicotte</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Leita</author><author>K Mermoud</author><author>M Dacier</author></authors><title>Scriptgen: an au- tomated script generation tool for honeyd</title><booktitle>In 21st An- nual Computer Security Applications Conference, Decem</booktitle><year>2005</year><raw_string>[20] C. Leita, K. Mermoud, and M. Dacier. Scriptgen: an au- tomated script generation tool for honeyd. In 21st An- nual Computer Security Applications Conference, Decem- ber 2005.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Scriptgen: an au- tomated script generation tool for honeyd</rft:atitle><rft:date>2005</rft:date><rft:btitle>In 21st An- nual Computer Security Applications Conference, Decem</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>C Leita</rft:au><rft:au>K Mermoud</rft:au><rft:au>M Dacier</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Linn</author><author>S Debray</author></authors><title>Obfuscation of executable code to improve resistance to static disassembly</title><booktitle>In 10th ACM con- ference on Computer and communications security</booktitle><publisher>ACM</publisher><location>New York, NY, USA</location><pages>290--299</pages><year>2003</year><raw_string>[21] C. Linn and S. Debray. Obfuscation of executable code to improve resistance to static disassembly. In 10th ACM con- ference on Computer and communications security, pages 290–299. ACM New York, NY, USA, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>New York, NY, USA</rft:place><rft:atitle>Obfuscation of executable code to improve resistance to static disassembly</rft:atitle><rft:spage>290</rft:spage><rft:date>2003</rft:date><rft:btitle>In 10th ACM con- ference on Computer and communications security</rft:btitle><rft:genre>bookitem</rft:genre><rft:pub>ACM</rft:pub><rft:epage>299</rft:epage><rft:au>C Linn</rft:au><rft:au>S Debray</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Moser</author><author>C Kruegel</author><author>E Kirda</author></authors><title>Limits of static analysis for malware detection</title><booktitle>In 23rd Annual Computer Security Applications Conference (ACSAC</booktitle><year>2007</year><raw_string>[22] A. Moser, C. Kruegel, and E. Kirda. Limits of static analysis for malware detection. In 23rd Annual Computer Security Applications Conference (ACSAC), 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Limits of static analysis for malware detection</rft:atitle><rft:date>2007</rft:date><rft:btitle>In 23rd Annual Computer Security Applications Conference (ACSAC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>A Moser</rft:au><rft:au>C Kruegel</rft:au><rft:au>E Kirda</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>G Portokalidis</author><author>A Slowinska</author><author>H Bos</author></authors><title>Argos: an em- ulator for fingerprinting zero-day attacks</title><booktitle>In ACM Sigops EuroSys</booktitle><year>2006</year><raw_string>[23] G. Portokalidis, A. Slowinska, and H. Bos. Argos: an em- ulator for fingerprinting zero-day attacks. In ACM Sigops EuroSys, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Argos: an em- ulator for fingerprinting zero-day attacks</rft:atitle><rft:date>2006</rft:date><rft:btitle>In ACM Sigops EuroSys</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>G Portokalidis</rft:au><rft:au>A Slowinska</rft:au><rft:au>H Bos</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>D Smith</author></authors><title>Allaple worm (ISC diary</title><raw_string>[24] D. Smith. Allaple worm (ISC diary), http://isc. sans.org/diary.html?storyid=2451.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>VirusTotal www virustotal com</author></authors><year>2007</year><raw_string>[25] VirusTotal. www.virustotal.com, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>G Wicherski</author></authors><title>pehash: A novel approach to fast malware clustering</title><booktitle>In 2nd USENIX Workshop on Large-Scale Ex</booktitle><raw_string>[26] G. Wicherski. pehash: A novel approach to fast malware clustering. In 2nd USENIX Workshop on Large-Scale Ex-</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>pehash: A novel approach to fast malware clustering</rft:atitle><rft:date></rft:date><rft:btitle>In 2nd USENIX Workshop on Large-Scale Ex</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>G Wicherski</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>ploits</author><author>Emergent Threats</author></authors><year>2009</year><raw_string>ploits and Emergent Threats, April 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Yetiser</author></authors><title>Polymorphic viruses - implementation, detec</title><raw_string>[27] T. Yetiser. Polymorphic viruses - implementation, detec-</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>tion</author><author>protection</author></authors><raw_string>tion, and protection , http://vx.netlux.org/lib/ ayt01.html.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:51-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
-
+  <citation valid="true">
+    <authors>
+      <author>ANUBIS</author>
+    </authors>
+    <title>A platform for the dynamic analysis of malware. http://anubis.iseclab.org</title>
+    <year>2009</year>
+    <raw_string>[1] ANUBIS: A platform for the dynamic analysis of malware. http://anubis.iseclab.org, 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Baecher M Koetter</author>
+      <author>T Holz M Dornseif</author>
+      <author>F Freiling</author>
+    </authors>
+    <title>The Nepenthes Platform: An Efficient Approach to Collect Malware</title>
+    <booktitle>In 9th International Symposium on Recent Ad- vances in Intrusion Detection (RAID</booktitle>
+    <year>2006</year>
+    <raw_string>[2] P.Baecher,M.Koetter,T.Holz,M.Dornseif,and F.Freiling. The Nepenthes Platform: An Efficient Approach to Collect Malware. In 9th International Symposium on Recent Ad- vances in Intrusion Detection (RAID), September 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>The Nepenthes Platform: An Efficient Approach to Collect Malware</rft:atitle>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In 9th International Symposium on Recent Ad- vances in Intrusion Detection (RAID</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>P Baecher M Koetter</rft:au>
+              <rft:au>T Holz M Dornseif</rft:au>
+              <rft:au>F Freiling</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Bailey</author>
+      <author>J Oberheide</author>
+      <author>J Andersen</author>
+      <author>Z M Mao</author>
+      <author>F Jaha- nian</author>
+      <author>J Nazario</author>
+    </authors>
+    <title>Automated classification and analysis of internet malware</title>
+    <booktitle>In Proceedings of the 10th Interna- tional Symposium on Recent Advances in Intrusion Detec- tion (RAID&#x2019;07</booktitle>
+    <year>2007</year>
+    <raw_string>[3] M. Bailey, J. Oberheide, J. Andersen, Z. M. Mao, F. Jaha- nian, and J. Nazario. Automated classification and analysis of internet malware. In Proceedings of the 10th Interna- tional Symposium on Recent Advances in Intrusion Detec- tion (RAID&#x2019;07), September 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Automated classification and analysis of internet malware</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In Proceedings of the 10th Interna- tional Symposium on Recent Advances in Intrusion Detec- tion (RAID&#x2019;07</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>M Bailey</rft:au>
+              <rft:au>J Oberheide</rft:au>
+              <rft:au>J Andersen</rft:au>
+              <rft:au>Z M Mao</rft:au>
+              <rft:au>F Jaha- nian</rft:au>
+              <rft:au>J Nazario</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>U Bayer</author>
+      <author>P M Comparetti</author>
+      <author>C Hlauschek</author>
+      <author>C Kruegel</author>
+      <author>E Kirda Scalable</author>
+    </authors>
+    <title>Behavior-Based Malware Clustering</title>
+    <booktitle>In 16th Annual Network&amp; Distributed System Security Sympo- sium</booktitle>
+    <year>2009</year>
+    <raw_string>[4] U. Bayer, P. M. Comparetti, C. Hlauschek, C. Kruegel, and E. Kirda. Scalable, Behavior-Based Malware Clustering. In 16th Annual Network&amp; Distributed System Security Sympo- sium, 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Behavior-Based Malware Clustering</rft:atitle>
+              <rft:date>2009</rft:date>
+              <rft:btitle>In 16th Annual Network&amp; Distributed System Security Sympo- sium</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>U Bayer</rft:au>
+              <rft:au>P M Comparetti</rft:au>
+              <rft:au>C Hlauschek</rft:au>
+              <rft:au>C Kruegel</rft:au>
+              <rft:au>E Kirda Scalable</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>U Bayer</author>
+      <author>I Habibi</author>
+      <author>D Balzarotti</author>
+      <author>E Kirda</author>
+      <author>C Kruegel</author>
+    </authors>
+    <title>Insights into current malware behavior</title>
+    <booktitle>In LEET&#x2019;09: 2nd USENIX Workshop on Large-Scale Exploits and Emergent Threats, April 21, 2009</booktitle>
+    <location>Boston, MA, USA</location>
+    <year>2009</year>
+    <raw_string>[5] U. Bayer, I. Habibi, D. Balzarotti, E. Kirda, and C. Kruegel. Insights into current malware behavior. In LEET&#x2019;09: 2nd USENIX Workshop on Large-Scale Exploits and Emergent Threats, April 21, 2009, Boston, MA, USA, Apr 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Boston, MA, USA</rft:place>
+              <rft:atitle>Insights into current malware behavior</rft:atitle>
+              <rft:date>2009</rft:date>
+              <rft:btitle>In LEET&#x2019;09: 2nd USENIX Workshop on Large-Scale Exploits and Emergent Threats, April 21, 2009</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>U Bayer</rft:au>
+              <rft:au>I Habibi</rft:au>
+              <rft:au>D Balzarotti</rft:au>
+              <rft:au>E Kirda</rft:au>
+              <rft:au>C Kruegel</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>U Bayer</author>
+      <author>C Kruegel</author>
+      <author>E Kirda</author>
+    </authors>
+    <title>TTAnalyze: A Tool for Analyzing Malware</title>
+    <booktitle>In 15th European Institute for Com- puter Antivirus Research (EICAR 2006) Annual Conference</booktitle>
+    <year>2006</year>
+    <raw_string>[6] U. Bayer, C. Kruegel, and E. Kirda. TTAnalyze: A Tool for Analyzing Malware. In 15th European Institute for Com- puter Antivirus Research (EICAR 2006) Annual Conference, April 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>TTAnalyze: A Tool for Analyzing Malware</rft:atitle>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In 15th European Institute for Com- puter Antivirus Research (EICAR 2006) Annual Conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>U Bayer</rft:au>
+              <rft:au>C Kruegel</rft:au>
+              <rft:au>E Kirda</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Canto</author>
+      <author>M Dacier</author>
+      <author>E Kirda</author>
+      <author>C Leita</author>
+    </authors>
+    <title>Large scale malware collection: Lessons learned</title>
+    <journal>In IEEE SRDS Work- shop on Sharing Field Data and Experiment Measurements on Resilience of Distributed Computing Systems</journal>
+    <year>2008</year>
+    <raw_string>[7] J. Canto, M. Dacier, E. Kirda, and C. Leita. Large scale malware collection: Lessons learned. In IEEE SRDS Work- shop on Sharing Field Data and Experiment Measurements on Resilience of Distributed Computing Systems, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Large scale malware collection: Lessons learned</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:stitle>In IEEE SRDS Work- shop on Sharing Field Data and Experiment Measurements on Resilience of Distributed Computing Systems</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:au>J Canto</rft:au>
+              <rft:au>M Dacier</rft:au>
+              <rft:au>E Kirda</rft:au>
+              <rft:au>C Leita</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>E Carrera Pefile</author>
+      <author>http code google comp pefile</author>
+    </authors>
+    <raw_string>[8] E. Carrera. Pefile, http://code.google.com/p/ pefile/.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J R Crandall</author>
+      <author>Z Su</author>
+      <author>S F Wu</author>
+    </authors>
+    <title>On deriving unknown vulnerabilities from zero-day polymorphic and metamor- phic worm exploits</title>
+    <booktitle>In 12th ACM conference on Computer and Communications Security</booktitle>
+    <publisher>ACM Press</publisher>
+    <location>New York, NY, USA</location>
+    <pages>235--248</pages>
+    <year>2005</year>
+    <raw_string>[9] J. R. Crandall, Z. Su, and S. F. Wu. On deriving unknown vulnerabilities from zero-day polymorphic and metamor- phic worm exploits. In 12th ACM conference on Computer and Communications Security, pages 235&#x2013;248. ACM Press New York, NY, USA, 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:50-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>New York, NY, USA</rft:place>
+              <rft:atitle>On deriving unknown vulnerabilities from zero-day polymorphic and metamor- phic worm exploits</rft:atitle>
+              <rft:spage>235</rft:spage>
+              <rft:date>2005</rft:date>
+              <rft:btitle>In 12th ACM conference on Computer and Communications Security</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:pub>ACM Press</rft:pub>
+              <rft:epage>248</rft:epage>
+              <rft:au>J R Crandall</rft:au>
+              <rft:au>Z Su</rft:au>
+              <rft:au>S F Wu</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>F-Secure</author>
+    </authors>
+    <title>Malware information pages: Allaple.a, http://www.f-secure.com/v-descs/allaplea.shtml</title>
+    <year>2006</year>
+    <raw_string>[10] F-Secure. Malware information pages: Allaple.a, http://www.f-secure.com/v-descs/allaplea.shtml, December 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Gheorghescu</author>
+    </authors>
+    <title>An Automated Virus Classification Sys- tem</title>
+    <booktitle>In Virus Bulletin conference</booktitle>
+    <year>2005</year>
+    <raw_string>[11] M. Gheorghescu. An Automated Virus Classification Sys- tem. In Virus Bulletin conference, 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>An Automated Virus Classification Sys- tem</rft:atitle>
+              <rft:date>2005</rft:date>
+              <rft:btitle>In Virus Bulletin conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>M Gheorghescu</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Holz</author>
+      <author>C Willems</author>
+      <author>K Rieck</author>
+      <author>P Duessel</author>
+      <author>P Laskov</author>
+    </authors>
+    <title>Learning and Classification of Malware Behavior</title>
+    <booktitle>In Fifth Conference on Detection of Intrusions and Malware &amp; Vul- nerability Assessment (DIMVA 08</booktitle>
+    <year>2008</year>
+    <raw_string>[12] T. Holz, C. Willems, K. Rieck, P. Duessel, and P. Laskov. Learning and Classification of Malware Behavior. In Fifth Conference on Detection of Intrusions and Malware &amp; Vul- nerability Assessment (DIMVA 08), June 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Learning and Classification of Malware Behavior</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Fifth Conference on Detection of Intrusions and Malware &amp; Vul- nerability Assessment (DIMVA 08</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>T Holz</rft:au>
+              <rft:au>C Willems</rft:au>
+              <rft:au>K Rieck</rft:au>
+              <rft:au>P Duessel</rft:au>
+              <rft:au>P Laskov</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>K Julisch</author>
+    </authors>
+    <title>Clustering intrusion detection alarms to support root cause analysis</title>
+    <journal>ACM Transactions on Information and System Security (TISSEC</journal>
+    <volume>6</volume>
+    <number>4</number>
+    <year>2003</year>
+    <raw_string>[13] K. Julisch. Clustering intrusion detection alarms to support root cause analysis. ACM Transactions on Information and System Security (TISSEC), 6(4):443&#x2013;471, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>4</rft:quarter>
+              <rft:atitle>Clustering intrusion detection alarms to support root cause analysis</rft:atitle>
+              <rft:date>2003</rft:date>
+              <rft:stitle>ACM Transactions on Information and System Security (TISSEC</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>6</rft:volume>
+              <rft:au>K Julisch</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Z Kolter</author>
+      <author>M A Maloof wild J Mach Learn Res</author>
+    </authors>
+    <title>Learning to detect and clas- sify malicious executables in the</title>
+    <raw_string>[14] J. Z. Kolter and M. A. Maloof. Learning to detect and clas- sify malicious executables in the wild. J. Mach. Learn. Res., 7:2721&#x2013;2744, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Lee</author>
+      <author>J J Mody</author>
+    </authors>
+    <title>Behavioral Classification</title>
+    <booktitle>In EICAR Conference</booktitle>
+    <year>2006</year>
+    <raw_string>[15] T. Lee and J. J. Mody. Behavioral Classification. In EICAR Conference, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Behavioral Classification</rft:atitle>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In EICAR Conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>T Lee</rft:au>
+              <rft:au>J J Mody</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Leita</author>
+    </authors>
+    <title>Automated protocol learning for the observation of malicious threats</title>
+    <institution>Universite &#x301; de Nice-Sophia Antipolis</institution>
+    <year>2008</year>
+    <tech>PhD thesis</tech>
+    <raw_string>[16] C. Leita. Automated protocol learning for the observation of malicious threats. PhD thesis, Universite &#x301; de Nice-Sophia Antipolis, December 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:dissertation</ctx:format>
+          <ctx:metadata>
+            <dissertation xmlns:rft="info:ofi/fmt:xml:xsd:dissertation" xsi:schemaLocation="info:ofi/fmt:xml:xsd:dissertation http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:dissertation">
+              <rft:degree>PhD</rft:degree>
+              <rft:title>Automated protocol learning for the observation of malicious threats</rft:title>
+              <rft:date>2008</rft:date>
+              <rft:inst>Universite &#x301; de Nice-Sophia Antipolis</rft:inst>
+              <rft:au>C Leita</rft:au>
+            </dissertation>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Leita</author>
+      <author>M Dacier</author>
+    </authors>
+    <title>SGNET: a worldwide deployable framework to support the analysis of malware threat mod- els</title>
+    <booktitle>In 7th European Dependable Computing Conference (EDCC</booktitle>
+    <year>2008</year>
+    <raw_string>[17] C. Leita and M. Dacier. SGNET: a worldwide deployable framework to support the analysis of malware threat mod- els. In 7th European Dependable Computing Conference (EDCC 2008), May 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>SGNET: a worldwide deployable framework to support the analysis of malware threat mod- els</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In 7th European Dependable Computing Conference (EDCC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>C Leita</rft:au>
+              <rft:au>M Dacier</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Leita</author>
+      <author>M Dacier</author>
+    </authors>
+    <title>SGNET: Implementation Insights</title>
+    <booktitle>In IEEE/IFIP Network Operations and Management Sym- posium</booktitle>
+    <year>2008</year>
+    <raw_string>[18] C. Leita and M. Dacier. SGNET: Implementation Insights. In IEEE/IFIP Network Operations and Management Sym- posium, April 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>SGNET: Implementation Insights</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In IEEE/IFIP Network Operations and Management Sym- posium</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>C Leita</rft:au>
+              <rft:au>M Dacier</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Leita</author>
+      <author>M Dacier</author>
+      <author>F Massicotte</author>
+    </authors>
+    <title>Automatic han- dling of protocol dependencies and reaction to 0-day attacks with ScriptGen based honeypots</title>
+    <booktitle>In 9th International Sym- posium on Recent Advances in Intrusion Detection (RAID</booktitle>
+    <year>2006</year>
+    <raw_string>[19] C. Leita, M. Dacier, and F. Massicotte. Automatic han- dling of protocol dependencies and reaction to 0-day attacks with ScriptGen based honeypots. In 9th International Sym- posium on Recent Advances in Intrusion Detection (RAID), Sep 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Automatic han- dling of protocol dependencies and reaction to 0-day attacks with ScriptGen based honeypots</rft:atitle>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In 9th International Sym- posium on Recent Advances in Intrusion Detection (RAID</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>C Leita</rft:au>
+              <rft:au>M Dacier</rft:au>
+              <rft:au>F Massicotte</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Leita</author>
+      <author>K Mermoud</author>
+      <author>M Dacier</author>
+    </authors>
+    <title>Scriptgen: an au- tomated script generation tool for honeyd</title>
+    <booktitle>In 21st An- nual Computer Security Applications Conference, Decem</booktitle>
+    <year>2005</year>
+    <raw_string>[20] C. Leita, K. Mermoud, and M. Dacier. Scriptgen: an au- tomated script generation tool for honeyd. In 21st An- nual Computer Security Applications Conference, Decem- ber 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Scriptgen: an au- tomated script generation tool for honeyd</rft:atitle>
+              <rft:date>2005</rft:date>
+              <rft:btitle>In 21st An- nual Computer Security Applications Conference, Decem</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>C Leita</rft:au>
+              <rft:au>K Mermoud</rft:au>
+              <rft:au>M Dacier</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Linn</author>
+      <author>S Debray</author>
+    </authors>
+    <title>Obfuscation of executable code to improve resistance to static disassembly</title>
+    <booktitle>In 10th ACM con- ference on Computer and communications security</booktitle>
+    <publisher>ACM</publisher>
+    <location>New York, NY, USA</location>
+    <pages>290--299</pages>
+    <year>2003</year>
+    <raw_string>[21] C. Linn and S. Debray. Obfuscation of executable code to improve resistance to static disassembly. In 10th ACM con- ference on Computer and communications security, pages 290&#x2013;299. ACM New York, NY, USA, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>New York, NY, USA</rft:place>
+              <rft:atitle>Obfuscation of executable code to improve resistance to static disassembly</rft:atitle>
+              <rft:spage>290</rft:spage>
+              <rft:date>2003</rft:date>
+              <rft:btitle>In 10th ACM con- ference on Computer and communications security</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:pub>ACM</rft:pub>
+              <rft:epage>299</rft:epage>
+              <rft:au>C Linn</rft:au>
+              <rft:au>S Debray</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Moser</author>
+      <author>C Kruegel</author>
+      <author>E Kirda</author>
+    </authors>
+    <title>Limits of static analysis for malware detection</title>
+    <booktitle>In 23rd Annual Computer Security Applications Conference (ACSAC</booktitle>
+    <year>2007</year>
+    <raw_string>[22] A. Moser, C. Kruegel, and E. Kirda. Limits of static analysis for malware detection. In 23rd Annual Computer Security Applications Conference (ACSAC), 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Limits of static analysis for malware detection</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In 23rd Annual Computer Security Applications Conference (ACSAC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>A Moser</rft:au>
+              <rft:au>C Kruegel</rft:au>
+              <rft:au>E Kirda</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>G Portokalidis</author>
+      <author>A Slowinska</author>
+      <author>H Bos</author>
+    </authors>
+    <title>Argos: an em- ulator for fingerprinting zero-day attacks</title>
+    <booktitle>In ACM Sigops EuroSys</booktitle>
+    <year>2006</year>
+    <raw_string>[23] G. Portokalidis, A. Slowinska, and H. Bos. Argos: an em- ulator for fingerprinting zero-day attacks. In ACM Sigops EuroSys, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Argos: an em- ulator for fingerprinting zero-day attacks</rft:atitle>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In ACM Sigops EuroSys</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>G Portokalidis</rft:au>
+              <rft:au>A Slowinska</rft:au>
+              <rft:au>H Bos</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Smith</author>
+    </authors>
+    <title>Allaple worm (ISC diary</title>
+    <raw_string>[24] D. Smith. Allaple worm (ISC diary), http://isc. sans.org/diary.html?storyid=2451.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>VirusTotal www virustotal com</author>
+    </authors>
+    <year>2007</year>
+    <raw_string>[25] VirusTotal. www.virustotal.com, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>G Wicherski</author>
+    </authors>
+    <title>pehash: A novel approach to fast malware clustering</title>
+    <booktitle>In 2nd USENIX Workshop on Large-Scale Ex</booktitle>
+    <raw_string>[26] G. Wicherski. pehash: A novel approach to fast malware clustering. In 2nd USENIX Workshop on Large-Scale Ex-</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>pehash: A novel approach to fast malware clustering</rft:atitle>
+              <rft:date/>
+              <rft:btitle>In 2nd USENIX Workshop on Large-Scale Ex</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>G Wicherski</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>ploits</author>
+      <author>Emergent Threats</author>
+    </authors>
+    <year>2009</year>
+    <raw_string>ploits and Emergent Threats, April 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Yetiser</author>
+    </authors>
+    <title>Polymorphic viruses - implementation, detec</title>
+    <raw_string>[27] T. Yetiser. Polymorphic viruses - implementation, detec-</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>tion</author>
+      <author>protection</author>
+    </authors>
+    <raw_string>tion, and protection , http://vx.netlux.org/lib/ ayt01.html.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:51-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

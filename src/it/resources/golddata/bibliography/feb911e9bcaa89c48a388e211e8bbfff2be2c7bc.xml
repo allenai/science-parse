@@ -1,48 +1,722 @@
+<?xml version="1.0"?>
 <citations>
-<citation valid='true'><authors><author>R Burstall</author><author>J Darlington</author></authors><title>A transformation system for developing recursive programs</title><journal>Journal of the ACM</journal><volume>24</volume><number>1</number><year>1977</year><raw_string>[1] R. Burstall and J. Darlington. A transformation system for developing recursive programs. Journal of the ACM, 24(1):44–67, 1977.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1</rft:quarter><rft:atitle>A transformation system for developing recursive programs</rft:atitle><rft:date>1977</rft:date><rft:stitle>Journal of the ACM</rft:stitle><rft:genre>article</rft:genre><rft:volume>24</rft:volume><rft:au>R Burstall</rft:au><rft:au>J Darlington</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Chakravarty</author><author>G Keller</author></authors><title>Functional array fusion</title><booktitle>In Proc. ACM International Conference on Functional Programming</booktitle><pages>205--216</pages><year>2001</year><raw_string>[2] M. Chakravarty and G. Keller. Functional array fusion. In Proc. ACM International Conference on Functional Programming, pages 205–216, 2001.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Functional array fusion</rft:atitle><rft:spage>205</rft:spage><rft:date>2001</rft:date><rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>216</rft:epage><rft:au>M Chakravarty</rft:au><rft:au>G Keller</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>W-N Chin Safe</author></authors><title>fusion on functional expression</title><booktitle>In Proc. ACM Conference on Lisp and Functional Programming</booktitle><pages>pages </pages><year>1992</year><raw_string>[3] W-N. Chin. Safe fusion on functional expression. In Proc. ACM Conference on Lisp and Functional Programming, pages 11–20, 1992.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>fusion on functional expression</rft:atitle><rft:date>1992</rft:date><rft:btitle>In Proc. ACM Conference on Lisp and Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:pages>pages </rft:pages><rft:au>W-N Chin Safe</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>O Chitil</author></authors><title>Type inference builds a short cut to deforestation</title><booktitle>In Proc. ACM International Conference on Functional Programming</booktitle><pages>249--260</pages><year>1999</year><raw_string>[4] O. Chitil. Type inference builds a short cut to deforestation. In Proc. ACM International Conference on Functional Programming, pages 249–260, 1999.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Type inference builds a short cut to deforestation</rft:atitle><rft:spage>249</rft:spage><rft:date>1999</rft:date><rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>260</rft:epage><rft:au>O Chitil</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>N Ghani</author><author>P Johann</author><author>T Uustalu</author><author>V Vene</author></authors><title>Monadic augment and generalised short cut fusion</title><booktitle>In Proc. ACM International Conference on Functional Programming</booktitle><pages>294--305</pages><year>2005</year><raw_string>[5] N. Ghani, P. Johann, T. Uustalu, and V. Vene. Monadic augment and generalised short cut fusion. In Proc. ACM International Conference on Functional Programming, pages 294–305, 2005.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Monadic augment and generalised short cut fusion</rft:atitle><rft:spage>294</rft:spage><rft:date>2005</rft:date><rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>305</rft:epage><rft:au>N Ghani</rft:au><rft:au>P Johann</rft:au><rft:au>T Uustalu</rft:au><rft:au>V Vene</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Gill</author><author>J Launchbury</author><author>S Peyton Jones</author></authors><title>A short cut to deforestation</title><booktitle>In Proc. International Conference on Functional Programming Languages and Computer Architecture</booktitle><pages>223--232</pages><year>1993</year><raw_string>[6] A. Gill, J. Launchbury, and S. Peyton Jones. A short cut to deforestation. In Proc. International Conference on Functional Programming Languages and Computer Architecture, pages 223– 232, 1993.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>A short cut to deforestation</rft:atitle><rft:spage>223</rft:spage><rft:date>1993</rft:date><rft:btitle>In Proc. International Conference on Functional Programming Languages and Computer Architecture</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>232</rft:epage><rft:au>A Gill</rft:au><rft:au>J Launchbury</rft:au><rft:au>S Peyton Jones</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Gill</author></authors><title>Cheap Deforestation for Non-strict Functional Languages</title><institution>University of Glasgow</institution><year>1996</year><tech>Ph.D thesis</tech><raw_string>[7] A. Gill. Cheap Deforestation for Non-strict Functional Languages. Ph.D thesis, University of Glasgow, 1996.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:dissertation</ctx:format><ctx:metadata><dissertation xmlns:rft='info:ofi/fmt:xml:xsd:dissertation' xsi:schemaLocation='info:ofi/fmt:xml:xsd:dissertation http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:dissertation'><rft:degree>Ph.D</rft:degree><rft:title>Cheap Deforestation for Non-strict Functional Languages</rft:title><rft:date>1996</rft:date><rft:inst>University of Glasgow</rft:inst><rft:au>A Gill</rft:au></dissertation></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Hasegawa</author><author>Y Kakutani</author></authors><title>Axioms for recursion in call-by-value</title><journal>Higher-Order and Symbolic Computation</journal><pages>15--2</pages><year>2002</year><raw_string>[8] M. Hasegawa and Y. Kakutani. Axioms for recursion in call-by-value. Higher-Order and Symbolic Computation, 15(2-3):235–264, 2002.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Axioms for recursion in call-by-value</rft:atitle><rft:spage>15</rft:spage><rft:date>2002</rft:date><rft:jtitle>Higher-Order and Symbolic Computation</rft:jtitle><rft:genre>article</rft:genre><rft:epage>2</rft:epage><rft:au>M Hasegawa</rft:au><rft:au>Y Kakutani</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Z Hu</author><author>H Iwasaki</author><author>M Takeichi</author></authors><title>Deriving structural hylomor- phisms from recursive definitions</title><booktitle>In Proc. ACM International Conference on Functional Programming</booktitle><pages>73--82</pages><year>1996</year><raw_string>[9] Z. Hu, H. Iwasaki, and M. Takeichi. Deriving structural hylomor- phisms from recursive definitions. In Proc. ACM International Conference on Functional Programming, pages 73–82, 1996.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Deriving structural hylomor- phisms from recursive definitions</rft:atitle><rft:spage>73</rft:spage><rft:date>1996</rft:date><rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>82</rft:epage><rft:au>Z Hu</rft:au><rft:au>H Iwasaki</rft:au><rft:au>M Takeichi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Johann</author><author>E Visser</author></authors><title>Warm fusion in Stratego: A case study in generation of program transformation systems</title><journal>Annals of Mathematics and Artificial Intelligence</journal><pages>29--1</pages><year>2000</year><raw_string>[10] P. Johann and E. Visser. Warm fusion in Stratego: A case study in generation of program transformation systems. Annals of Mathematics and Artificial Intelligence, 29(1-4):1 – 34, 2000.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Warm fusion in Stratego: A case study in generation of program transformation systems</rft:atitle><rft:spage>29</rft:spage><rft:date>2000</rft:date><rft:stitle>Annals of Mathematics and Artificial Intelligence</rft:stitle><rft:genre>article</rft:genre><rft:epage>1</rft:epage><rft:au>P Johann</rft:au><rft:au>E Visser</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>S Katsumata</author><author>S Nishimura</author></authors><title>Algebraic fusion of functions with an accumulating parameter and its improvement</title><booktitle>In Proc. ACM International Conference on Functional Programming</booktitle><pages>227--238</pages><year>2006</year><raw_string>[11] S. Katsumata and S. Nishimura. Algebraic fusion of functions with an accumulating parameter and its improvement. In Proc. ACM International Conference on Functional Programming, pages 227– 238, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Algebraic fusion of functions with an accumulating parameter and its improvement</rft:atitle><rft:spage>227</rft:spage><rft:date>2006</rft:date><rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>238</rft:epage><rft:au>S Katsumata</rft:au><rft:au>S Nishimura</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Launchbury</author><author>T Sheard Warm</author></authors><title>fusion: Deriving build-catas from recursive definitions</title><booktitle>In Proc. ACM Conference on Functional Programming Languages and Computer Architecture</booktitle><pages>314--323</pages><year>1995</year><raw_string>[12] J. Launchbury and T. Sheard. Warm fusion: Deriving build-catas from recursive definitions. In Proc. ACM Conference on Functional Programming Languages and Computer Architecture, pages 314– 323, 1995.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>fusion: Deriving build-catas from recursive definitions</rft:atitle><rft:spage>314</rft:spage><rft:date>1995</rft:date><rft:btitle>In Proc. ACM Conference on Functional Programming Languages and Computer Architecture</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>323</rft:epage><rft:au>J Launchbury</rft:au><rft:au>T Sheard Warm</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>G Malcolm</author></authors><title>Homomorphism and promotability</title><booktitle>In Proc. Mathemat- ics of Program Construction</booktitle><pages>335--347</pages><year>1989</year><raw_string>[13] G. Malcolm. Homomorphism and promotability. In Proc. Mathemat- ics of Program Construction, pages 335–347, 1989.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Homomorphism and promotability</rft:atitle><rft:spage>335</rft:spage><rft:date>1989</rft:date><rft:btitle>In Proc. Mathemat- ics of Program Construction</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>347</rft:epage><rft:au>G Malcolm</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>E Meijer</author><author>M Fokkinga</author><author>R Paterson</author></authors><title>Functional programming with bananas, lenses, envelopes and barbed wire</title><booktitle>In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA’91), Lecture Notes in Computer Sci- ence 523</booktitle><pages>124--144</pages><year>1991</year><raw_string>[14] E. Meijer, M. Fokkinga, and R. Paterson. Functional programming with bananas, lenses, envelopes and barbed wire. In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA’91), Lecture Notes in Computer Sci- ence 523, pages 124–144, 1991.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Functional programming with bananas, lenses, envelopes and barbed wire</rft:atitle><rft:spage>124</rft:spage><rft:date>1991</rft:date><rft:btitle>In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA’91), Lecture Notes in Computer Sci- ence 523</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>144</rft:epage><rft:au>E Meijer</rft:au><rft:au>M Fokkinga</rft:au><rft:au>R Paterson</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>L Nemeth</author><author>S Peyton Jones</author></authors><title>A design for warm fusion</title><booktitle>In Proc. International Workshop on Implementation of Functional Languages</booktitle><pages>381--393</pages><year>1998</year><raw_string>[15] L. Nemeth and S. Peyton Jones. A design for warm fusion. In Proc. International Workshop on Implementation of Functional Languages, pages 381–393, 1998.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>A design for warm fusion</rft:atitle><rft:spage>381</rft:spage><rft:date>1998</rft:date><rft:btitle>In Proc. International Workshop on Implementation of Functional Languages</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>393</rft:epage><rft:au>L Nemeth</rft:au><rft:au>S Peyton Jones</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Y Onoue</author><author>Z Hu</author><author>H Iwasaki</author><author>M Takeichi</author></authors><title>Verification of practical effectiveness of program fusion (in Japanese</title><journal>Computer Software</journal><volume>17</volume><number>3</number><year>2000</year><raw_string>[16] Y. Onoue, Z. Hu, H. Iwasaki, and M. Takeichi. Verification of practical effectiveness of program fusion (in Japanese). Computer Software, 17(3):81–85, 2000.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>3</rft:quarter><rft:atitle>Verification of practical effectiveness of program fusion (in Japanese</rft:atitle><rft:date>2000</rft:date><rft:jtitle>Computer Software</rft:jtitle><rft:genre>article</rft:genre><rft:volume>17</rft:volume><rft:au>Y Onoue</rft:au><rft:au>Z Hu</rft:au><rft:au>H Iwasaki</rft:au><rft:au>M Takeichi</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>S Peyton Jones</author><author>A Tolmach</author><author>T Hoare</author></authors><title>Playing by the rules: rewriting as a practical optimisation technique in GHC</title><booktitle>In Proc. ACM Haskell workshop</booktitle><year>2001</year><raw_string>[17] S. Peyton Jones, A. Tolmach, and T. Hoare. Playing by the rules: rewriting as a practical optimisation technique in GHC. In Proc. ACM Haskell workshop, 2001.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Playing by the rules: rewriting as a practical optimisation technique in GHC</rft:atitle><rft:date>2001</rft:date><rft:btitle>In Proc. ACM Haskell workshop</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>S Peyton Jones</rft:au><rft:au>A Tolmach</rft:au><rft:au>T Hoare</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>D Sands</author></authors><title>Proving the correctness of recursion-based automatic program transformations</title><journal>Theoretical Computer Science</journal><volume>167</volume><number>1</number><pages>2--193</pages><year>1996</year><raw_string>[18] D. Sands. Proving the correctness of recursion-based automatic program transformations. Theoretical Computer Science, 167(1- 2):193–233, 1996.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1</rft:quarter><rft:atitle>Proving the correctness of recursion-based automatic program transformations</rft:atitle><rft:spage>2</rft:spage><rft:date>1996</rft:date><rft:jtitle>Theoretical Computer Science</rft:jtitle><rft:genre>article</rft:genre><rft:volume>167</rft:volume><rft:epage>193</rft:epage><rft:au>D Sands</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Sheard</author><author>L Fegaras</author></authors><title>A fold for all seasons</title><booktitle>In Proc. Functional Programming Languages and Computer Architecture</booktitle><pages>233--242</pages><year>1993</year><raw_string>[19] T. Sheard and L. Fegaras. A fold for all seasons. In Proc. Functional Programming Languages and Computer Architecture, pages 233– 242, 1993.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>A fold for all seasons</rft:atitle><rft:spage>233</rft:spage><rft:date>1993</rft:date><rft:btitle>In Proc. Functional Programming Languages and Computer Architecture</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>242</rft:epage><rft:au>T Sheard</rft:au><rft:au>L Fegaras</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>SML home page http www riec tohoku ac jpsmlsharp</author></authors><year>2006</year><raw_string>[20] SML# home page. http://www.riec.tohoku.ac.jp/smlsharp/, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Svenningsson</author></authors><title>Shortcut fusion for accumulating parameters &amp; zip- like functions</title><booktitle>In Proc. ACM International Conference on Functional Programming</booktitle><pages>124--132</pages><year>2002</year><raw_string>[21] J. Svenningsson. Shortcut fusion for accumulating parameters &amp; zip- like functions. In Proc. ACM International Conference on Functional Programming, pages 124–132, 2002.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Shortcut fusion for accumulating parameters &amp; zip- like functions</rft:atitle><rft:spage>124</rft:spage><rft:date>2002</rft:date><rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>132</rft:epage><rft:au>J Svenningsson</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Takano</author><author>E Meijer</author></authors><title>Shortcut deforestation in calculational form</title><booktitle>In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture</booktitle><pages>306--313</pages><year>1995</year><raw_string>[22] A. Takano and E. Meijer. Shortcut deforestation in calculational form. In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture, pages 306–313, 1995.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Shortcut deforestation in calculational form</rft:atitle><rft:spage>306</rft:spage><rft:date>1995</rft:date><rft:btitle>In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>313</rft:epage><rft:au>A Takano</rft:au><rft:au>E Meijer</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Wadler</author></authors><title>Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231–248, Special issue of selected papers from</title><booktitle>2’nd European Symposium on Programming</booktitle><year>1990</year><raw_string>[23] P. Wadler. Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231–248, 1990. Special issue of selected papers from 2’nd European Symposium on Programming.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:28:00-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231–248, Special issue of selected papers from</rft:atitle><rft:date>1990</rft:date><rft:btitle>2’nd European Symposium on Programming</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>P Wadler</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
-
+  <citation valid="true">
+    <authors>
+      <author>R Burstall</author>
+      <author>J Darlington</author>
+    </authors>
+    <title>A transformation system for developing recursive programs</title>
+    <journal>Journal of the ACM</journal>
+    <volume>24</volume>
+    <number>1</number>
+    <year>1977</year>
+    <raw_string>[1] R. Burstall and J. Darlington. A transformation system for developing recursive programs. Journal of the ACM, 24(1):44&#x2013;67, 1977.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1</rft:quarter>
+              <rft:atitle>A transformation system for developing recursive programs</rft:atitle>
+              <rft:date>1977</rft:date>
+              <rft:stitle>Journal of the ACM</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>24</rft:volume>
+              <rft:au>R Burstall</rft:au>
+              <rft:au>J Darlington</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Chakravarty</author>
+      <author>G Keller</author>
+    </authors>
+    <title>Functional array fusion</title>
+    <booktitle>In Proc. ACM International Conference on Functional Programming</booktitle>
+    <pages>205--216</pages>
+    <year>2001</year>
+    <raw_string>[2] M. Chakravarty and G. Keller. Functional array fusion. In Proc. ACM International Conference on Functional Programming, pages 205&#x2013;216, 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Functional array fusion</rft:atitle>
+              <rft:spage>205</rft:spage>
+              <rft:date>2001</rft:date>
+              <rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>216</rft:epage>
+              <rft:au>M Chakravarty</rft:au>
+              <rft:au>G Keller</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>W-N Chin Safe</author>
+    </authors>
+    <title>fusion on functional expression</title>
+    <booktitle>In Proc. ACM Conference on Lisp and Functional Programming</booktitle>
+    <pages>pages </pages>
+    <year>1992</year>
+    <raw_string>[3] W-N. Chin. Safe fusion on functional expression. In Proc. ACM Conference on Lisp and Functional Programming, pages 11&#x2013;20, 1992.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>fusion on functional expression</rft:atitle>
+              <rft:date>1992</rft:date>
+              <rft:btitle>In Proc. ACM Conference on Lisp and Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:pages>pages </rft:pages>
+              <rft:au>W-N Chin Safe</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>O Chitil</author>
+    </authors>
+    <title>Type inference builds a short cut to deforestation</title>
+    <booktitle>In Proc. ACM International Conference on Functional Programming</booktitle>
+    <pages>249--260</pages>
+    <year>1999</year>
+    <raw_string>[4] O. Chitil. Type inference builds a short cut to deforestation. In Proc. ACM International Conference on Functional Programming, pages 249&#x2013;260, 1999.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Type inference builds a short cut to deforestation</rft:atitle>
+              <rft:spage>249</rft:spage>
+              <rft:date>1999</rft:date>
+              <rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>260</rft:epage>
+              <rft:au>O Chitil</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>N Ghani</author>
+      <author>P Johann</author>
+      <author>T Uustalu</author>
+      <author>V Vene</author>
+    </authors>
+    <title>Monadic augment and generalised short cut fusion</title>
+    <booktitle>In Proc. ACM International Conference on Functional Programming</booktitle>
+    <pages>294--305</pages>
+    <year>2005</year>
+    <raw_string>[5] N. Ghani, P. Johann, T. Uustalu, and V. Vene. Monadic augment and generalised short cut fusion. In Proc. ACM International Conference on Functional Programming, pages 294&#x2013;305, 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Monadic augment and generalised short cut fusion</rft:atitle>
+              <rft:spage>294</rft:spage>
+              <rft:date>2005</rft:date>
+              <rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>305</rft:epage>
+              <rft:au>N Ghani</rft:au>
+              <rft:au>P Johann</rft:au>
+              <rft:au>T Uustalu</rft:au>
+              <rft:au>V Vene</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Gill</author>
+      <author>J Launchbury</author>
+      <author>S Peyton Jones</author>
+    </authors>
+    <title>A short cut to deforestation</title>
+    <booktitle>In Proc. International Conference on Functional Programming Languages and Computer Architecture</booktitle>
+    <pages>223--232</pages>
+    <year>1993</year>
+    <raw_string>[6] A. Gill, J. Launchbury, and S. Peyton Jones. A short cut to deforestation. In Proc. International Conference on Functional Programming Languages and Computer Architecture, pages 223&#x2013; 232, 1993.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>A short cut to deforestation</rft:atitle>
+              <rft:spage>223</rft:spage>
+              <rft:date>1993</rft:date>
+              <rft:btitle>In Proc. International Conference on Functional Programming Languages and Computer Architecture</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>232</rft:epage>
+              <rft:au>A Gill</rft:au>
+              <rft:au>J Launchbury</rft:au>
+              <rft:au>S Peyton Jones</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Gill</author>
+    </authors>
+    <title>Cheap Deforestation for Non-strict Functional Languages</title>
+    <institution>University of Glasgow</institution>
+    <year>1996</year>
+    <tech>Ph.D thesis</tech>
+    <raw_string>[7] A. Gill. Cheap Deforestation for Non-strict Functional Languages. Ph.D thesis, University of Glasgow, 1996.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:dissertation</ctx:format>
+          <ctx:metadata>
+            <dissertation xmlns:rft="info:ofi/fmt:xml:xsd:dissertation" xsi:schemaLocation="info:ofi/fmt:xml:xsd:dissertation http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:dissertation">
+              <rft:degree>Ph.D</rft:degree>
+              <rft:title>Cheap Deforestation for Non-strict Functional Languages</rft:title>
+              <rft:date>1996</rft:date>
+              <rft:inst>University of Glasgow</rft:inst>
+              <rft:au>A Gill</rft:au>
+            </dissertation>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Hasegawa</author>
+      <author>Y Kakutani</author>
+    </authors>
+    <title>Axioms for recursion in call-by-value</title>
+    <journal>Higher-Order and Symbolic Computation</journal>
+    <pages>15--2</pages>
+    <year>2002</year>
+    <raw_string>[8] M. Hasegawa and Y. Kakutani. Axioms for recursion in call-by-value. Higher-Order and Symbolic Computation, 15(2-3):235&#x2013;264, 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Axioms for recursion in call-by-value</rft:atitle>
+              <rft:spage>15</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:jtitle>Higher-Order and Symbolic Computation</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:epage>2</rft:epage>
+              <rft:au>M Hasegawa</rft:au>
+              <rft:au>Y Kakutani</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Z Hu</author>
+      <author>H Iwasaki</author>
+      <author>M Takeichi</author>
+    </authors>
+    <title>Deriving structural hylomor- phisms from recursive definitions</title>
+    <booktitle>In Proc. ACM International Conference on Functional Programming</booktitle>
+    <pages>73--82</pages>
+    <year>1996</year>
+    <raw_string>[9] Z. Hu, H. Iwasaki, and M. Takeichi. Deriving structural hylomor- phisms from recursive definitions. In Proc. ACM International Conference on Functional Programming, pages 73&#x2013;82, 1996.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Deriving structural hylomor- phisms from recursive definitions</rft:atitle>
+              <rft:spage>73</rft:spage>
+              <rft:date>1996</rft:date>
+              <rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>82</rft:epage>
+              <rft:au>Z Hu</rft:au>
+              <rft:au>H Iwasaki</rft:au>
+              <rft:au>M Takeichi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Johann</author>
+      <author>E Visser</author>
+    </authors>
+    <title>Warm fusion in Stratego: A case study in generation of program transformation systems</title>
+    <journal>Annals of Mathematics and Artificial Intelligence</journal>
+    <pages>29--1</pages>
+    <year>2000</year>
+    <raw_string>[10] P. Johann and E. Visser. Warm fusion in Stratego: A case study in generation of program transformation systems. Annals of Mathematics and Artificial Intelligence, 29(1-4):1 &#x2013; 34, 2000.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Warm fusion in Stratego: A case study in generation of program transformation systems</rft:atitle>
+              <rft:spage>29</rft:spage>
+              <rft:date>2000</rft:date>
+              <rft:stitle>Annals of Mathematics and Artificial Intelligence</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:epage>1</rft:epage>
+              <rft:au>P Johann</rft:au>
+              <rft:au>E Visser</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Katsumata</author>
+      <author>S Nishimura</author>
+    </authors>
+    <title>Algebraic fusion of functions with an accumulating parameter and its improvement</title>
+    <booktitle>In Proc. ACM International Conference on Functional Programming</booktitle>
+    <pages>227--238</pages>
+    <year>2006</year>
+    <raw_string>[11] S. Katsumata and S. Nishimura. Algebraic fusion of functions with an accumulating parameter and its improvement. In Proc. ACM International Conference on Functional Programming, pages 227&#x2013; 238, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Algebraic fusion of functions with an accumulating parameter and its improvement</rft:atitle>
+              <rft:spage>227</rft:spage>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>238</rft:epage>
+              <rft:au>S Katsumata</rft:au>
+              <rft:au>S Nishimura</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Launchbury</author>
+      <author>T Sheard Warm</author>
+    </authors>
+    <title>fusion: Deriving build-catas from recursive definitions</title>
+    <booktitle>In Proc. ACM Conference on Functional Programming Languages and Computer Architecture</booktitle>
+    <pages>314--323</pages>
+    <year>1995</year>
+    <raw_string>[12] J. Launchbury and T. Sheard. Warm fusion: Deriving build-catas from recursive definitions. In Proc. ACM Conference on Functional Programming Languages and Computer Architecture, pages 314&#x2013; 323, 1995.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>fusion: Deriving build-catas from recursive definitions</rft:atitle>
+              <rft:spage>314</rft:spage>
+              <rft:date>1995</rft:date>
+              <rft:btitle>In Proc. ACM Conference on Functional Programming Languages and Computer Architecture</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>323</rft:epage>
+              <rft:au>J Launchbury</rft:au>
+              <rft:au>T Sheard Warm</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>G Malcolm</author>
+    </authors>
+    <title>Homomorphism and promotability</title>
+    <booktitle>In Proc. Mathemat- ics of Program Construction</booktitle>
+    <pages>335--347</pages>
+    <year>1989</year>
+    <raw_string>[13] G. Malcolm. Homomorphism and promotability. In Proc. Mathemat- ics of Program Construction, pages 335&#x2013;347, 1989.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Homomorphism and promotability</rft:atitle>
+              <rft:spage>335</rft:spage>
+              <rft:date>1989</rft:date>
+              <rft:btitle>In Proc. Mathemat- ics of Program Construction</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>347</rft:epage>
+              <rft:au>G Malcolm</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>E Meijer</author>
+      <author>M Fokkinga</author>
+      <author>R Paterson</author>
+    </authors>
+    <title>Functional programming with bananas, lenses, envelopes and barbed wire</title>
+    <booktitle>In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA&#x2019;91), Lecture Notes in Computer Sci- ence 523</booktitle>
+    <pages>124--144</pages>
+    <year>1991</year>
+    <raw_string>[14] E. Meijer, M. Fokkinga, and R. Paterson. Functional programming with bananas, lenses, envelopes and barbed wire. In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA&#x2019;91), Lecture Notes in Computer Sci- ence 523, pages 124&#x2013;144, 1991.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Functional programming with bananas, lenses, envelopes and barbed wire</rft:atitle>
+              <rft:spage>124</rft:spage>
+              <rft:date>1991</rft:date>
+              <rft:btitle>In Proc. Inter- national Conference on Functional Programming Languages and Computer Architecture (FPCA&#x2019;91), Lecture Notes in Computer Sci- ence 523</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>144</rft:epage>
+              <rft:au>E Meijer</rft:au>
+              <rft:au>M Fokkinga</rft:au>
+              <rft:au>R Paterson</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>L Nemeth</author>
+      <author>S Peyton Jones</author>
+    </authors>
+    <title>A design for warm fusion</title>
+    <booktitle>In Proc. International Workshop on Implementation of Functional Languages</booktitle>
+    <pages>381--393</pages>
+    <year>1998</year>
+    <raw_string>[15] L. Nemeth and S. Peyton Jones. A design for warm fusion. In Proc. International Workshop on Implementation of Functional Languages, pages 381&#x2013;393, 1998.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>A design for warm fusion</rft:atitle>
+              <rft:spage>381</rft:spage>
+              <rft:date>1998</rft:date>
+              <rft:btitle>In Proc. International Workshop on Implementation of Functional Languages</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>393</rft:epage>
+              <rft:au>L Nemeth</rft:au>
+              <rft:au>S Peyton Jones</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Onoue</author>
+      <author>Z Hu</author>
+      <author>H Iwasaki</author>
+      <author>M Takeichi</author>
+    </authors>
+    <title>Verification of practical effectiveness of program fusion (in Japanese</title>
+    <journal>Computer Software</journal>
+    <volume>17</volume>
+    <number>3</number>
+    <year>2000</year>
+    <raw_string>[16] Y. Onoue, Z. Hu, H. Iwasaki, and M. Takeichi. Verification of practical effectiveness of program fusion (in Japanese). Computer Software, 17(3):81&#x2013;85, 2000.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>3</rft:quarter>
+              <rft:atitle>Verification of practical effectiveness of program fusion (in Japanese</rft:atitle>
+              <rft:date>2000</rft:date>
+              <rft:jtitle>Computer Software</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>17</rft:volume>
+              <rft:au>Y Onoue</rft:au>
+              <rft:au>Z Hu</rft:au>
+              <rft:au>H Iwasaki</rft:au>
+              <rft:au>M Takeichi</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Peyton Jones</author>
+      <author>A Tolmach</author>
+      <author>T Hoare</author>
+    </authors>
+    <title>Playing by the rules: rewriting as a practical optimisation technique in GHC</title>
+    <booktitle>In Proc. ACM Haskell workshop</booktitle>
+    <year>2001</year>
+    <raw_string>[17] S. Peyton Jones, A. Tolmach, and T. Hoare. Playing by the rules: rewriting as a practical optimisation technique in GHC. In Proc. ACM Haskell workshop, 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Playing by the rules: rewriting as a practical optimisation technique in GHC</rft:atitle>
+              <rft:date>2001</rft:date>
+              <rft:btitle>In Proc. ACM Haskell workshop</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>S Peyton Jones</rft:au>
+              <rft:au>A Tolmach</rft:au>
+              <rft:au>T Hoare</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Sands</author>
+    </authors>
+    <title>Proving the correctness of recursion-based automatic program transformations</title>
+    <journal>Theoretical Computer Science</journal>
+    <volume>167</volume>
+    <number>1</number>
+    <pages>2--193</pages>
+    <year>1996</year>
+    <raw_string>[18] D. Sands. Proving the correctness of recursion-based automatic program transformations. Theoretical Computer Science, 167(1- 2):193&#x2013;233, 1996.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1</rft:quarter>
+              <rft:atitle>Proving the correctness of recursion-based automatic program transformations</rft:atitle>
+              <rft:spage>2</rft:spage>
+              <rft:date>1996</rft:date>
+              <rft:jtitle>Theoretical Computer Science</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>167</rft:volume>
+              <rft:epage>193</rft:epage>
+              <rft:au>D Sands</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Sheard</author>
+      <author>L Fegaras</author>
+    </authors>
+    <title>A fold for all seasons</title>
+    <booktitle>In Proc. Functional Programming Languages and Computer Architecture</booktitle>
+    <pages>233--242</pages>
+    <year>1993</year>
+    <raw_string>[19] T. Sheard and L. Fegaras. A fold for all seasons. In Proc. Functional Programming Languages and Computer Architecture, pages 233&#x2013; 242, 1993.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>A fold for all seasons</rft:atitle>
+              <rft:spage>233</rft:spage>
+              <rft:date>1993</rft:date>
+              <rft:btitle>In Proc. Functional Programming Languages and Computer Architecture</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>242</rft:epage>
+              <rft:au>T Sheard</rft:au>
+              <rft:au>L Fegaras</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>SML home page http www riec tohoku ac jpsmlsharp</author>
+    </authors>
+    <year>2006</year>
+    <raw_string>[20] SML# home page. http://www.riec.tohoku.ac.jp/smlsharp/, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Svenningsson</author>
+    </authors>
+    <title>Shortcut fusion for accumulating parameters &amp; zip- like functions</title>
+    <booktitle>In Proc. ACM International Conference on Functional Programming</booktitle>
+    <pages>124--132</pages>
+    <year>2002</year>
+    <raw_string>[21] J. Svenningsson. Shortcut fusion for accumulating parameters &amp; zip- like functions. In Proc. ACM International Conference on Functional Programming, pages 124&#x2013;132, 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Shortcut fusion for accumulating parameters &amp; zip- like functions</rft:atitle>
+              <rft:spage>124</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:btitle>In Proc. ACM International Conference on Functional Programming</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>132</rft:epage>
+              <rft:au>J Svenningsson</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Takano</author>
+      <author>E Meijer</author>
+    </authors>
+    <title>Shortcut deforestation in calculational form</title>
+    <booktitle>In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture</booktitle>
+    <pages>306--313</pages>
+    <year>1995</year>
+    <raw_string>[22] A. Takano and E. Meijer. Shortcut deforestation in calculational form. In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture, pages 306&#x2013;313, 1995.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Shortcut deforestation in calculational form</rft:atitle>
+              <rft:spage>306</rft:spage>
+              <rft:date>1995</rft:date>
+              <rft:btitle>In Proc. ACM/IFIP Conference on Functional Programming Languages and Computer Architecture</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>313</rft:epage>
+              <rft:au>A Takano</rft:au>
+              <rft:au>E Meijer</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Wadler</author>
+    </authors>
+    <title>Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231&#x2013;248, Special issue of selected papers from</title>
+    <booktitle>2&#x2019;nd European Symposium on Programming</booktitle>
+    <year>1990</year>
+    <raw_string>[23] P. Wadler. Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231&#x2013;248, 1990. Special issue of selected papers from 2&#x2019;nd European Symposium on Programming.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:28:00-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Deforestation: transforming programs to eliminate trees. Theoretical Computer Science, 73:231&#x2013;248, Special issue of selected papers from</rft:atitle>
+              <rft:date>1990</rft:date>
+              <rft:btitle>2&#x2019;nd European Symposium on Programming</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>P Wadler</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

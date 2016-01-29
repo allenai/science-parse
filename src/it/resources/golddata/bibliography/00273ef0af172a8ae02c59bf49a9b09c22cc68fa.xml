@@ -1,1 +1,626 @@
-<citations><citation valid='true'><authors><author>Rakesh Agrawal</author><author>Ramakrishnan Srikant</author></authors><title>Miningsequential patterns</title><booktitle>In Proc. ICDE’95</booktitle><pages>3--14</pages><year>1995</year><raw_string>[1] Rakesh Agrawal and Ramakrishnan Srikant. Miningsequential patterns. In Proc. ICDE’95, pages 3–14, 1995.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:31-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Miningsequential patterns</rft:atitle><rft:spage>3</rft:spage><rft:date>1995</rft:date><rft:btitle>In Proc. ICDE’95</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>14</rft:epage><rft:au>Rakesh Agrawal</rft:au><rft:au>Ramakrishnan Srikant</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>J Buhler</author></authors><title>Efficient large-scale sequence comparison by locality-sensitive hashing</title><journal>Bioinformatics</journal><volume>17</volume><number>5</number><year>2001</year><raw_string>[2] J. Buhler. Efficient large-scale sequence comparison by locality-sensitive hashing. Bioinformatics, 17(5):419–428, 2001.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>5</rft:quarter><rft:atitle>Efficient large-scale sequence comparison by locality-sensitive hashing</rft:atitle><rft:date>2001</rft:date><rft:stitle>Bioinformatics</rft:stitle><rft:genre>article</rft:genre><rft:volume>17</rft:volume><rft:au>J Buhler</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>G J Cullinan</author></authors><title>Picking them by their batting averages: recency-frequency-monetary method of controlling circulation</title><journal>Manual release</journal><year>2013</year><raw_string>[3] G. J. Cullinan. Picking them by their batting averages: recency-frequency-monetary method of controlling circulation. Manual release 2013, 1977.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Picking them by their batting averages: recency-frequency-monetary method of controlling circulation</rft:atitle><rft:date>2013</rft:date><rft:jtitle>Manual release</rft:jtitle><rft:genre>article</rft:genre><rft:au>G J Cullinan</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Werner F M DeBondt</author><author>Richard Thaler</author></authors><title>Does the stock market overreact</title><journal>J. Finan</journal><volume>40</volume><number>3</number><year>1985</year><raw_string>[4] Werner F.M. DeBondt and Richard Thaler. Does the stock market overreact? J. Finan., 40(3):793–805, 1985.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>3</rft:quarter><rft:atitle>Does the stock market overreact</rft:atitle><rft:date>1985</rft:date><rft:stitle>J. Finan</rft:stitle><rft:genre>article</rft:genre><rft:volume>40</rft:volume><rft:au>Werner F M DeBondt</rft:au><rft:au>Richard Thaler</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Eugene F Fama</author><author>Kenneth R French</author><author>bonds J Finan Econ</author><author>33</author></authors><title>Common risk factors in the returns on stocks</title><year>1993</year><raw_string>[5] Eugene F. Fama and Kenneth R. French. Common risk factors in the returns on stocks and bonds. J. Finan. Econ., 33(1):3–56, Feb 1993.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Eugene F Fama</author><author>Kenneth R French</author></authors><title>The anatomy of value and growth stock returns</title><journal>Finan. Analysts J</journal><volume>63</volume><number>6</number><year>2007</year><raw_string>[6] Eugene F. Fama and Kenneth R. French. The anatomy of value and growth stock returns. Finan. Analysts J., 63(6):44–54, 2007.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>6</rft:quarter><rft:atitle>The anatomy of value and growth stock returns</rft:atitle><rft:date>2007</rft:date><rft:stitle>Finan. Analysts J</rft:stitle><rft:genre>article</rft:genre><rft:volume>63</rft:volume><rft:au>Eugene F Fama</rft:au><rft:au>Kenneth R French</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='false'><authors><author>Eugene F Fama</author><author>Kenneth R French Migration Finan Analysts J</author></authors><year>2007</year><raw_string>[7] Eugene F. Fama and Kenneth R. French. Migration. Finan. Analysts J., 40:48–58, 2007.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Scott Gaffney</author><author>Padhraic Smyth</author></authors><title>Trajectory clustering with mixtures of regression models</title><booktitle>In Proc. KDD’99</booktitle><pages>63--72</pages><year>1999</year><raw_string>[8] Scott Gaffney and Padhraic Smyth. Trajectory clustering with mixtures of regression models. In Proc. KDD’99, pages 63–72, 1999.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Trajectory clustering with mixtures of regression models</rft:atitle><rft:spage>63</rft:spage><rft:date>1999</rft:date><rft:btitle>In Proc. KDD’99</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>72</rft:epage><rft:au>Scott Gaffney</rft:au><rft:au>Padhraic Smyth</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Fosca Giannotti</author><author>Mirco Nanni</author><author>Dino Pedreschi</author></authors><title>Efficient mining of temporally annotated sequences</title><booktitle>In Proc. SDM’06</booktitle><pages>346--357</pages><year>2006</year><raw_string>[9] Fosca Giannotti, Mirco Nanni, and Dino Pedreschi. Efficient mining of temporally annotated sequences. In Proc. SDM’06, pages 346–357, 2006.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Efficient mining of temporally annotated sequences</rft:atitle><rft:spage>346</rft:spage><rft:date>2006</rft:date><rft:btitle>In Proc. SDM’06</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>357</rft:epage><rft:au>Fosca Giannotti</rft:au><rft:au>Mirco Nanni</rft:au><rft:au>Dino Pedreschi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Fosca Giannotti</author><author>Mirco Nanni</author><author>Fabio Pinelli</author><author>Dino Pedreschi</author></authors><title>Trajectory pattern mining</title><booktitle>In Proc. KDD’07</booktitle><pages>330--339</pages><year>2007</year><raw_string>[10] Fosca Giannotti, Mirco Nanni, Fabio Pinelli, and Dino Pedreschi. Trajectory pattern mining. In Proc. KDD’07, pages 330–339, 2007.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Trajectory pattern mining</rft:atitle><rft:spage>330</rft:spage><rft:date>2007</rft:date><rft:btitle>In Proc. KDD’07</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>339</rft:epage><rft:au>Fosca Giannotti</rft:au><rft:au>Mirco Nanni</rft:au><rft:au>Fabio Pinelli</rft:au><rft:au>Dino Pedreschi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Narasimhan Jegadeesh</author><author>Sheridan Titman</author></authors><title>Returns to buying winners and selling losers: Implications for stock market efficiency</title><journal>J. Finan</journal><volume>48</volume><number>1</number><year>1993</year><raw_string>[11] Narasimhan Jegadeesh and Sheridan Titman. Returns to buying winners and selling losers: Implications for stock market efficiency. J. Finan., 48(1):65–91, 1993.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1</rft:quarter><rft:atitle>Returns to buying winners and selling losers: Implications for stock market efficiency</rft:atitle><rft:date>1993</rft:date><rft:stitle>J. Finan</rft:stitle><rft:genre>article</rft:genre><rft:volume>48</rft:volume><rft:au>Narasimhan Jegadeesh</rft:au><rft:au>Sheridan Titman</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Ina Koch</author></authors><title>Enumerating all connected maximal common subgraphs in two graphs</title><journal>Theor. Comput. Sci</journal><pages>250--1</pages><year>2001</year><raw_string>[12] Ina Koch. Enumerating all connected maximal common subgraphs in two graphs. Theor. Comput. Sci., 250(1-2):1–30, 2001.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Enumerating all connected maximal common subgraphs in two graphs</rft:atitle><rft:spage>250</rft:spage><rft:date>2001</rft:date><rft:jtitle>Theor. Comput. Sci</rft:jtitle><rft:genre>article</rft:genre><rft:epage>1</rft:epage><rft:au>Ina Koch</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Jae-Gil Lee</author><author>Jiawei Han</author><author>Kyu-Young Whang</author></authors><title>Trajectory clustering: a partition-and-group framework</title><booktitle>In Proc. SIGMOD’07</booktitle><pages>593--604</pages><year>2007</year><raw_string>[13] Jae-Gil Lee, Jiawei Han, and Kyu-Young Whang. Trajectory clustering: a partition-and-group framework. In Proc. SIGMOD’07, pages 593–604, 2007.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Trajectory clustering: a partition-and-group framework</rft:atitle><rft:spage>593</rft:spage><rft:date>2007</rft:date><rft:btitle>In Proc. SIGMOD’07</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>604</rft:epage><rft:au>Jae-Gil Lee</rft:au><rft:au>Jiawei Han</rft:au><rft:au>Kyu-Young Whang</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Jessica Lin</author><author>Eamonn Keogh</author><author>Stefano Lonardi</author><author>Pranav Patel</author></authors><title>Finding motifs in time series</title><booktitle>In Proc. 2nd Workshop on Temporal Data Mining</booktitle><pages>53--68</pages><year>2002</year><raw_string>[14] Jessica Lin, Eamonn Keogh, Stefano Lonardi, and Pranav Patel. Finding motifs in time series. In Proc. 2nd Workshop on Temporal Data Mining, pages 53–68, 2002.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Finding motifs in time series</rft:atitle><rft:spage>53</rft:spage><rft:date>2002</rft:date><rft:btitle>In Proc. 2nd Workshop on Temporal Data Mining</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>68</rft:epage><rft:au>Jessica Lin</rft:au><rft:au>Eamonn Keogh</rft:au><rft:au>Stefano Lonardi</rft:au><rft:au>Pranav Patel</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>John Lintner comment Rev Econ</author><author>Stat</author></authors><title>The valuation of risk assets and the selection of risky investments in stock portfolios and capital budgets: A</title><year>1965</year><raw_string>[15] John Lintner. The valuation of risk assets and the selection of risky investments in stock portfolios and capital budgets: A comment. Rev. Econ. &amp; Stat., 47(2):13–37, 1965.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Yunhao Liu</author><author>Lei Chen</author><author>Jian Pei</author><author>Qiuxia Chen</author><author>Yiyang Zhao</author></authors><title>Mining frequent trajectory patterns for activity monitoring using radio frequency tag arrays</title><booktitle>In Proc. PerCom’07</booktitle><pages>37--46</pages><year>2007</year><raw_string>[16] Yunhao Liu, Lei Chen, Jian Pei, Qiuxia Chen, and Yiyang Zhao. Mining frequent trajectory patterns for activity monitoring using radio frequency tag arrays. In Proc. PerCom’07, pages 37–46, 2007.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Mining frequent trajectory patterns for activity monitoring using radio frequency tag arrays</rft:atitle><rft:spage>37</rft:spage><rft:date>2007</rft:date><rft:btitle>In Proc. PerCom’07</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>46</rft:epage><rft:au>Yunhao Liu</rft:au><rft:au>Lei Chen</rft:au><rft:au>Jian Pei</rft:au><rft:au>Qiuxia Chen</rft:au><rft:au>Yiyang Zhao</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>H Sakoe</author><author>S Chiba</author></authors><title>Dynamic programming algorithm optimization for spoken word recognition</title><journal>IEEE Trans. Acoustics, Speech, and Signal Processing</journal><volume>26</volume><number>1</number><year>1978</year><raw_string>[17] H.Sakoe and S.Chiba. Dynamic programming algorithm optimization for spoken word recognition. IEEE Trans. Acoustics, Speech, and Signal Processing, 26(1), 1978.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1</rft:quarter><rft:atitle>Dynamic programming algorithm optimization for spoken word recognition</rft:atitle><rft:date>1978</rft:date><rft:stitle>IEEE Trans. Acoustics, Speech, and Signal Processing</rft:stitle><rft:genre>article</rft:genre><rft:volume>26</rft:volume><rft:au>H Sakoe</rft:au><rft:au>S Chiba</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>William F Sharpe risk J Finan</author></authors><title>Capital asset prices: A theory of market equilibrium under conditions of</title><year>1964</year><raw_string>[18] William F. Sharpe. Capital asset prices: A theory of market equilibrium under conditions of risk. J. Finan., 19(3):425–442, 1964.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Yoshiki Tanaka</author><author>Kazuhisa Iwamoto</author><author>Kuniaki Uehara principle Mach Learn</author></authors><title>Discovery of time-series motif from multi-dimensional data based on mdl</title><pages>58--2</pages><year>2005</year><raw_string>[19] Yoshiki Tanaka, Kazuhisa Iwamoto, and Kuniaki Uehara. Discovery of time-series motif from multi-dimensional data based on mdl principle. Mach. Learn., 58(2-3):269–300, 2005.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Michail Vlachos</author><author>Dimitrios Gunopoulos</author><author>George Kollios</author></authors><title>Discovering similar multidimensional trajectories</title><journal>IEEE Comput. Soc</journal><booktitle>In Proc. ICDE’02</booktitle><pages>673</pages><year>2002</year><raw_string>[20] Michail Vlachos, Dimitrios Gunopoulos, and George Kollios. Discovering similar multidimensional trajectories. In Proc. ICDE’02, page 673. IEEE Comput. Soc., 2002.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Discovering similar multidimensional trajectories</rft:atitle><rft:date>2002</rft:date><rft:btitle>In Proc. ICDE’02</rft:btitle><rft:genre>proceeding</rft:genre><rft:pages>673</rft:pages><rft:au>Michail Vlachos</rft:au><rft:au>Dimitrios Gunopoulos</rft:au><rft:au>George Kollios</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Michail Vlachos</author><author>Dimitrios Gunopulos</author><author>George Kollios</author></authors><title>Robust similarity measures for mobile object trajectories</title><journal>IEEE Comput. Soc</journal><booktitle>In Proc. DEXA Workshops</booktitle><pages>721--728</pages><year>2002</year><raw_string>[21] Michail Vlachos, Dimitrios Gunopulos, and George Kollios. Robust similarity measures for mobile object trajectories. In Proc. DEXA Workshops, pages 721–728. IEEE Comput. Soc., 2002.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:32-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Robust similarity measures for mobile object trajectories</rft:atitle><rft:spage>721</rft:spage><rft:date>2002</rft:date><rft:btitle>In Proc. DEXA Workshops</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>728</rft:epage><rft:au>Michail Vlachos</rft:au><rft:au>Dimitrios Gunopulos</rft:au><rft:au>George Kollios</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
+<?xml version="1.0"?>
+<citations>
+  <citation valid="true">
+    <authors>
+      <author>Rakesh Agrawal</author>
+      <author>Ramakrishnan Srikant</author>
+    </authors>
+    <title>Miningsequential patterns</title>
+    <booktitle>In Proc. ICDE&#x2019;95</booktitle>
+    <pages>3--14</pages>
+    <year>1995</year>
+    <raw_string>[1] Rakesh Agrawal and Ramakrishnan Srikant. Miningsequential patterns. In Proc. ICDE&#x2019;95, pages 3&#x2013;14, 1995.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:31-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Miningsequential patterns</rft:atitle>
+              <rft:spage>3</rft:spage>
+              <rft:date>1995</rft:date>
+              <rft:btitle>In Proc. ICDE&#x2019;95</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>14</rft:epage>
+              <rft:au>Rakesh Agrawal</rft:au>
+              <rft:au>Ramakrishnan Srikant</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Buhler</author>
+    </authors>
+    <title>Efficient large-scale sequence comparison by locality-sensitive hashing</title>
+    <journal>Bioinformatics</journal>
+    <volume>17</volume>
+    <number>5</number>
+    <year>2001</year>
+    <raw_string>[2] J. Buhler. Efficient large-scale sequence comparison by locality-sensitive hashing. Bioinformatics, 17(5):419&#x2013;428, 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>5</rft:quarter>
+              <rft:atitle>Efficient large-scale sequence comparison by locality-sensitive hashing</rft:atitle>
+              <rft:date>2001</rft:date>
+              <rft:stitle>Bioinformatics</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>17</rft:volume>
+              <rft:au>J Buhler</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>G J Cullinan</author>
+    </authors>
+    <title>Picking them by their batting averages: recency-frequency-monetary method of controlling circulation</title>
+    <journal>Manual release</journal>
+    <year>2013</year>
+    <raw_string>[3] G. J. Cullinan. Picking them by their batting averages: recency-frequency-monetary method of controlling circulation. Manual release 2013, 1977.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Picking them by their batting averages: recency-frequency-monetary method of controlling circulation</rft:atitle>
+              <rft:date>2013</rft:date>
+              <rft:jtitle>Manual release</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:au>G J Cullinan</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Werner F M DeBondt</author>
+      <author>Richard Thaler</author>
+    </authors>
+    <title>Does the stock market overreact</title>
+    <journal>J. Finan</journal>
+    <volume>40</volume>
+    <number>3</number>
+    <year>1985</year>
+    <raw_string>[4] Werner F.M. DeBondt and Richard Thaler. Does the stock market overreact? J. Finan., 40(3):793&#x2013;805, 1985.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>3</rft:quarter>
+              <rft:atitle>Does the stock market overreact</rft:atitle>
+              <rft:date>1985</rft:date>
+              <rft:stitle>J. Finan</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>40</rft:volume>
+              <rft:au>Werner F M DeBondt</rft:au>
+              <rft:au>Richard Thaler</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Eugene F Fama</author>
+      <author>Kenneth R French</author>
+      <author>bonds J Finan Econ</author>
+      <author>33</author>
+    </authors>
+    <title>Common risk factors in the returns on stocks</title>
+    <year>1993</year>
+    <raw_string>[5] Eugene F. Fama and Kenneth R. French. Common risk factors in the returns on stocks and bonds. J. Finan. Econ., 33(1):3&#x2013;56, Feb 1993.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Eugene F Fama</author>
+      <author>Kenneth R French</author>
+    </authors>
+    <title>The anatomy of value and growth stock returns</title>
+    <journal>Finan. Analysts J</journal>
+    <volume>63</volume>
+    <number>6</number>
+    <year>2007</year>
+    <raw_string>[6] Eugene F. Fama and Kenneth R. French. The anatomy of value and growth stock returns. Finan. Analysts J., 63(6):44&#x2013;54, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>6</rft:quarter>
+              <rft:atitle>The anatomy of value and growth stock returns</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:stitle>Finan. Analysts J</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>63</rft:volume>
+              <rft:au>Eugene F Fama</rft:au>
+              <rft:au>Kenneth R French</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>Eugene F Fama</author>
+      <author>Kenneth R French Migration Finan Analysts J</author>
+    </authors>
+    <year>2007</year>
+    <raw_string>[7] Eugene F. Fama and Kenneth R. French. Migration. Finan. Analysts J., 40:48&#x2013;58, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Scott Gaffney</author>
+      <author>Padhraic Smyth</author>
+    </authors>
+    <title>Trajectory clustering with mixtures of regression models</title>
+    <booktitle>In Proc. KDD&#x2019;99</booktitle>
+    <pages>63--72</pages>
+    <year>1999</year>
+    <raw_string>[8] Scott Gaffney and Padhraic Smyth. Trajectory clustering with mixtures of regression models. In Proc. KDD&#x2019;99, pages 63&#x2013;72, 1999.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Trajectory clustering with mixtures of regression models</rft:atitle>
+              <rft:spage>63</rft:spage>
+              <rft:date>1999</rft:date>
+              <rft:btitle>In Proc. KDD&#x2019;99</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>72</rft:epage>
+              <rft:au>Scott Gaffney</rft:au>
+              <rft:au>Padhraic Smyth</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Fosca Giannotti</author>
+      <author>Mirco Nanni</author>
+      <author>Dino Pedreschi</author>
+    </authors>
+    <title>Efficient mining of temporally annotated sequences</title>
+    <booktitle>In Proc. SDM&#x2019;06</booktitle>
+    <pages>346--357</pages>
+    <year>2006</year>
+    <raw_string>[9] Fosca Giannotti, Mirco Nanni, and Dino Pedreschi. Efficient mining of temporally annotated sequences. In Proc. SDM&#x2019;06, pages 346&#x2013;357, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Efficient mining of temporally annotated sequences</rft:atitle>
+              <rft:spage>346</rft:spage>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In Proc. SDM&#x2019;06</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>357</rft:epage>
+              <rft:au>Fosca Giannotti</rft:au>
+              <rft:au>Mirco Nanni</rft:au>
+              <rft:au>Dino Pedreschi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Fosca Giannotti</author>
+      <author>Mirco Nanni</author>
+      <author>Fabio Pinelli</author>
+      <author>Dino Pedreschi</author>
+    </authors>
+    <title>Trajectory pattern mining</title>
+    <booktitle>In Proc. KDD&#x2019;07</booktitle>
+    <pages>330--339</pages>
+    <year>2007</year>
+    <raw_string>[10] Fosca Giannotti, Mirco Nanni, Fabio Pinelli, and Dino Pedreschi. Trajectory pattern mining. In Proc. KDD&#x2019;07, pages 330&#x2013;339, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Trajectory pattern mining</rft:atitle>
+              <rft:spage>330</rft:spage>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In Proc. KDD&#x2019;07</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>339</rft:epage>
+              <rft:au>Fosca Giannotti</rft:au>
+              <rft:au>Mirco Nanni</rft:au>
+              <rft:au>Fabio Pinelli</rft:au>
+              <rft:au>Dino Pedreschi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Narasimhan Jegadeesh</author>
+      <author>Sheridan Titman</author>
+    </authors>
+    <title>Returns to buying winners and selling losers: Implications for stock market efficiency</title>
+    <journal>J. Finan</journal>
+    <volume>48</volume>
+    <number>1</number>
+    <year>1993</year>
+    <raw_string>[11] Narasimhan Jegadeesh and Sheridan Titman. Returns to buying winners and selling losers: Implications for stock market efficiency. J. Finan., 48(1):65&#x2013;91, 1993.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1</rft:quarter>
+              <rft:atitle>Returns to buying winners and selling losers: Implications for stock market efficiency</rft:atitle>
+              <rft:date>1993</rft:date>
+              <rft:stitle>J. Finan</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>48</rft:volume>
+              <rft:au>Narasimhan Jegadeesh</rft:au>
+              <rft:au>Sheridan Titman</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Ina Koch</author>
+    </authors>
+    <title>Enumerating all connected maximal common subgraphs in two graphs</title>
+    <journal>Theor. Comput. Sci</journal>
+    <pages>250--1</pages>
+    <year>2001</year>
+    <raw_string>[12] Ina Koch. Enumerating all connected maximal common subgraphs in two graphs. Theor. Comput. Sci., 250(1-2):1&#x2013;30, 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Enumerating all connected maximal common subgraphs in two graphs</rft:atitle>
+              <rft:spage>250</rft:spage>
+              <rft:date>2001</rft:date>
+              <rft:jtitle>Theor. Comput. Sci</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:epage>1</rft:epage>
+              <rft:au>Ina Koch</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Jae-Gil Lee</author>
+      <author>Jiawei Han</author>
+      <author>Kyu-Young Whang</author>
+    </authors>
+    <title>Trajectory clustering: a partition-and-group framework</title>
+    <booktitle>In Proc. SIGMOD&#x2019;07</booktitle>
+    <pages>593--604</pages>
+    <year>2007</year>
+    <raw_string>[13] Jae-Gil Lee, Jiawei Han, and Kyu-Young Whang. Trajectory clustering: a partition-and-group framework. In Proc. SIGMOD&#x2019;07, pages 593&#x2013;604, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Trajectory clustering: a partition-and-group framework</rft:atitle>
+              <rft:spage>593</rft:spage>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In Proc. SIGMOD&#x2019;07</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>604</rft:epage>
+              <rft:au>Jae-Gil Lee</rft:au>
+              <rft:au>Jiawei Han</rft:au>
+              <rft:au>Kyu-Young Whang</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Jessica Lin</author>
+      <author>Eamonn Keogh</author>
+      <author>Stefano Lonardi</author>
+      <author>Pranav Patel</author>
+    </authors>
+    <title>Finding motifs in time series</title>
+    <booktitle>In Proc. 2nd Workshop on Temporal Data Mining</booktitle>
+    <pages>53--68</pages>
+    <year>2002</year>
+    <raw_string>[14] Jessica Lin, Eamonn Keogh, Stefano Lonardi, and Pranav Patel. Finding motifs in time series. In Proc. 2nd Workshop on Temporal Data Mining, pages 53&#x2013;68, 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Finding motifs in time series</rft:atitle>
+              <rft:spage>53</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:btitle>In Proc. 2nd Workshop on Temporal Data Mining</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>68</rft:epage>
+              <rft:au>Jessica Lin</rft:au>
+              <rft:au>Eamonn Keogh</rft:au>
+              <rft:au>Stefano Lonardi</rft:au>
+              <rft:au>Pranav Patel</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>John Lintner comment Rev Econ</author>
+      <author>Stat</author>
+    </authors>
+    <title>The valuation of risk assets and the selection of risky investments in stock portfolios and capital budgets: A</title>
+    <year>1965</year>
+    <raw_string>[15] John Lintner. The valuation of risk assets and the selection of risky investments in stock portfolios and capital budgets: A comment. Rev. Econ. &amp; Stat., 47(2):13&#x2013;37, 1965.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Yunhao Liu</author>
+      <author>Lei Chen</author>
+      <author>Jian Pei</author>
+      <author>Qiuxia Chen</author>
+      <author>Yiyang Zhao</author>
+    </authors>
+    <title>Mining frequent trajectory patterns for activity monitoring using radio frequency tag arrays</title>
+    <booktitle>In Proc. PerCom&#x2019;07</booktitle>
+    <pages>37--46</pages>
+    <year>2007</year>
+    <raw_string>[16] Yunhao Liu, Lei Chen, Jian Pei, Qiuxia Chen, and Yiyang Zhao. Mining frequent trajectory patterns for activity monitoring using radio frequency tag arrays. In Proc. PerCom&#x2019;07, pages 37&#x2013;46, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Mining frequent trajectory patterns for activity monitoring using radio frequency tag arrays</rft:atitle>
+              <rft:spage>37</rft:spage>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In Proc. PerCom&#x2019;07</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>46</rft:epage>
+              <rft:au>Yunhao Liu</rft:au>
+              <rft:au>Lei Chen</rft:au>
+              <rft:au>Jian Pei</rft:au>
+              <rft:au>Qiuxia Chen</rft:au>
+              <rft:au>Yiyang Zhao</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>H Sakoe</author>
+      <author>S Chiba</author>
+    </authors>
+    <title>Dynamic programming algorithm optimization for spoken word recognition</title>
+    <journal>IEEE Trans. Acoustics, Speech, and Signal Processing</journal>
+    <volume>26</volume>
+    <number>1</number>
+    <year>1978</year>
+    <raw_string>[17] H.Sakoe and S.Chiba. Dynamic programming algorithm optimization for spoken word recognition. IEEE Trans. Acoustics, Speech, and Signal Processing, 26(1), 1978.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1</rft:quarter>
+              <rft:atitle>Dynamic programming algorithm optimization for spoken word recognition</rft:atitle>
+              <rft:date>1978</rft:date>
+              <rft:stitle>IEEE Trans. Acoustics, Speech, and Signal Processing</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>26</rft:volume>
+              <rft:au>H Sakoe</rft:au>
+              <rft:au>S Chiba</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>William F Sharpe risk J Finan</author>
+    </authors>
+    <title>Capital asset prices: A theory of market equilibrium under conditions of</title>
+    <year>1964</year>
+    <raw_string>[18] William F. Sharpe. Capital asset prices: A theory of market equilibrium under conditions of risk. J. Finan., 19(3):425&#x2013;442, 1964.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Yoshiki Tanaka</author>
+      <author>Kazuhisa Iwamoto</author>
+      <author>Kuniaki Uehara principle Mach Learn</author>
+    </authors>
+    <title>Discovery of time-series motif from multi-dimensional data based on mdl</title>
+    <pages>58--2</pages>
+    <year>2005</year>
+    <raw_string>[19] Yoshiki Tanaka, Kazuhisa Iwamoto, and Kuniaki Uehara. Discovery of time-series motif from multi-dimensional data based on mdl principle. Mach. Learn., 58(2-3):269&#x2013;300, 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Michail Vlachos</author>
+      <author>Dimitrios Gunopoulos</author>
+      <author>George Kollios</author>
+    </authors>
+    <title>Discovering similar multidimensional trajectories</title>
+    <journal>IEEE Comput. Soc</journal>
+    <booktitle>In Proc. ICDE&#x2019;02</booktitle>
+    <pages>673</pages>
+    <year>2002</year>
+    <raw_string>[20] Michail Vlachos, Dimitrios Gunopoulos, and George Kollios. Discovering similar multidimensional trajectories. In Proc. ICDE&#x2019;02, page 673. IEEE Comput. Soc., 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Discovering similar multidimensional trajectories</rft:atitle>
+              <rft:date>2002</rft:date>
+              <rft:btitle>In Proc. ICDE&#x2019;02</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:pages>673</rft:pages>
+              <rft:au>Michail Vlachos</rft:au>
+              <rft:au>Dimitrios Gunopoulos</rft:au>
+              <rft:au>George Kollios</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Michail Vlachos</author>
+      <author>Dimitrios Gunopulos</author>
+      <author>George Kollios</author>
+    </authors>
+    <title>Robust similarity measures for mobile object trajectories</title>
+    <journal>IEEE Comput. Soc</journal>
+    <booktitle>In Proc. DEXA Workshops</booktitle>
+    <pages>721--728</pages>
+    <year>2002</year>
+    <raw_string>[21] Michail Vlachos, Dimitrios Gunopulos, and George Kollios. Robust similarity measures for mobile object trajectories. In Proc. DEXA Workshops, pages 721&#x2013;728. IEEE Comput. Soc., 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:32-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Robust similarity measures for mobile object trajectories</rft:atitle>
+              <rft:spage>721</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:btitle>In Proc. DEXA Workshops</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>728</rft:epage>
+              <rft:au>Michail Vlachos</rft:au>
+              <rft:au>Dimitrios Gunopulos</rft:au>
+              <rft:au>George Kollios</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

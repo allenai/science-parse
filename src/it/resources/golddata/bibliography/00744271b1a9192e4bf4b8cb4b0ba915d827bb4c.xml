@@ -1,1 +1,639 @@
-<citations><citation valid='true'><authors><author>R Bekkerman</author></authors><title>Distributional clustering of words for text categorization</title><institution>CS Department, Technion—Israel Inst. of Technology</institution><year>2003</year><tech>Master’s thesis</tech><raw_string>Bekkerman, R. (2003). Distributional clustering of words for text categorization. Master’s thesis, CS Department, Technion—Israel Inst. of Technology.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>J Brank</author><author>M Grobelnik</author><author>N Milic-Frayling</author><author>D Mladenic</author></authors><title>Interaction of feature selection methods and linear classification models. Workshop on Text Learning held at</title><year>2002</year><raw_string>Brank, J., Grobelnik, M., Milic-Frayling, N., &amp; Mladenic, D. (2002). Interaction of feature selection methods and linear classification models. Workshop on Text Learning held at ICML-2002.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>S Chakrabarti</author><author>M M Joshi</author><author>K Punera</author><author>D M Pennock</author></authors><title>The structure of broad topics on the web</title><booktitle>Proc. of the Int’l World Wide Web Conference</booktitle><year>2002</year><raw_string>Chakrabarti, S., Joshi, M. M., Punera, K., &amp; Pennock, D. M. (2002). The structure of broad topics on the web. Proc. of the Int’l World Wide Web Conference.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>The structure of broad topics on the web</rft:atitle><rft:date>2002</rft:date><rft:btitle>Proc. of the Int’l World Wide Web Conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>S Chakrabarti</rft:au><rft:au>M M Joshi</rft:au><rft:au>K Punera</rft:au><rft:au>D M Pennock</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>D Cohen</author><author>M Herscovici</author><author>Y Petruschka</author><author>Y S Maarek</author><author>A Soffer</author><author>D Newbold</author></authors><title>Personalized pocket directories for mobile devices</title><booktitle>Proc. of the Int’l World Wide Web Conference</booktitle><year>2002</year><raw_string>Cohen, D., Herscovici, M., Petruschka, Y., Maarek, Y. S., Soffer, A., &amp; Newbold, D. (2002). Personalized pocket directories for mobile devices. Proc. of the Int’l World Wide Web Conference.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Personalized pocket directories for mobile devices</rft:atitle><rft:date>2002</rft:date><rft:btitle>Proc. of the Int’l World Wide Web Conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>D Cohen</rft:au><rft:au>M Herscovici</rft:au><rft:au>Y Petruschka</rft:au><rft:au>Y S Maarek</rft:au><rft:au>A Soffer</rft:au><rft:au>D Newbold</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>D Davidov</author><author>E Gabrilovich</author><author>S Markovitch</author></authors><title>Parameterized generation of labeled datasets for text categorization based on a hierarchical directory</title><year>2004</year><note>To appear in SIGIR’04</note><raw_string>Davidov, D., Gabrilovich, E., &amp; Markovitch, S. (2004). Parameterized generation of labeled datasets for text categorization based on a hierarchical directory. To appear in SIGIR’04.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>R Duda</author><author>P Hart</author></authors><title>Pattern classification and scene analysis</title><publisher>John Wiley and Sons</publisher><year>1973</year><raw_string>Duda, R., &amp; Hart, P. (1973). Pattern classification and scene analysis. John Wiley and Sons.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>S Dumais</author><author>J Platt</author><author>D Heckerman</author><author>M Sahami</author></authors><title>Inductive learning algorithms and representations for text categorization</title><publisher>CIKM</publisher><pages>148--155</pages><year>1998</year><raw_string>Dumais, S., Platt, J., Heckerman, D., &amp; Sahami, M. (1998). Inductive learning algorithms and representations for text categorization. CIKM (pp. 148–155).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>C Fellbaum</author></authors><title>Wordnet: An electronic lexical database</title><publisher>MIT Press</publisher><year>1998</year><raw_string>Fellbaum, C. (Ed.). (1998). Wordnet: An electronic lexical database. MIT Press.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>G Forman</author></authors><title>An extensive empirical study of feature selection metrics for text classification</title><journal>Journal of Machine Learning Research</journal><volume>3</volume><pages>1289--1305</pages><year>2003</year><raw_string>Forman, G. (2003). An extensive empirical study of feature selection metrics for text classification. Journal of Machine Learning Research, 3, 1289–1305.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>An extensive empirical study of feature selection metrics for text classification</rft:atitle><rft:spage>1289</rft:spage><rft:date>2003</rft:date><rft:stitle>Journal of Machine Learning Research</rft:stitle><rft:genre>article</rft:genre><rft:volume>3</rft:volume><rft:epage>1305</rft:epage><rft:au>G Forman</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>T Joachims</author></authors><title>Text categorization with support vector machines: Learning with many relevant features. ECML’98</title><pages>137--142</pages><year>1998</year><raw_string>Joachims, T. (1998). Text categorization with support vector machines: Learning with many relevant features. ECML’98 (pp. 137–142).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>T Joachims</author></authors><title>Making large-scale SVM learning practical. Advances in kernel methods – support vector learning</title><editor>In B. Schoelkopf, C. Burges and A. Smola (Eds</editor><publisher>The MIT Press</publisher><year>1999</year><raw_string>Joachims, T. (1999). Making large-scale SVM learning practical. In B. Schoelkopf, C. Burges and A. Smola (Eds.), Advances in kernel methods – support vector learning. The MIT Press.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>K Lang</author></authors><title>Newsweeder: Learning to filter netnews. ICML’95</title><pages>331--339</pages><year>1995</year><raw_string>Lang, K. (1995). Newsweeder: Learning to filter netnews. ICML’95 (pp. 331–339).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>E Leopold</author><author>J Kindermann</author></authors><title>Text categorization with support vector machines: How to represent texts in input space</title><journal>Machine Learning</journal><volume>46</volume><pages>423--444</pages><year>2002</year><raw_string>Leopold, E., &amp; Kindermann, J. (2002). Text categorization with support vector machines: How to represent texts in input space. Machine Learning, 46, 423–444.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Text categorization with support vector machines: How to represent texts in input space</rft:atitle><rft:spage>423</rft:spage><rft:date>2002</rft:date><rft:jtitle>Machine Learning</rft:jtitle><rft:genre>article</rft:genre><rft:volume>46</rft:volume><rft:epage>444</rft:epage><rft:au>E Leopold</rft:au><rft:au>J Kindermann</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>D D Lewis</author><author>Y Yang</author><author>T Rose</author><author>F Li</author></authors><title>RCV1: A new benchmark collection for text categorization research</title><journal>JMLR</journal><volume>5</volume><pages>361--397</pages><year>2004</year><raw_string>Lewis, D. D., Yang, Y., Rose, T., &amp; Li, F. (2004). RCV1: A new benchmark collection for text categorization research. JMLR, 5, 361–397.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>RCV1: A new benchmark collection for text categorization research</rft:atitle><rft:spage>361</rft:spage><rft:date>2004</rft:date><rft:stitle>JMLR</rft:stitle><rft:genre>article</rft:genre><rft:volume>5</rft:volume><rft:epage>397</rft:epage><rft:au>D D Lewis</rft:au><rft:au>Y Yang</rft:au><rft:au>T Rose</rft:au><rft:au>F Li</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>D Mladenic</author></authors><title>Feature subset selection in text learning. ECML’98</title><pages>95--100</pages><year>1998</year><raw_string>Mladenic, D. (1998). Feature subset selection in text learning. ECML’98 (pp. 95–100).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>D Mladenic</author><author>Grobelnik M Electrotech</author><author>Comp Sci Conf</author></authors><title>Word sequences as features in text-learning</title><booktitle>Proc. of 7th</booktitle><pages>145--148</pages><year>1998</year><raw_string>Mladenic, D., &amp; Grobelnik, M. (1998). Word sequences as features in text-learning. Proc. of 7th Electrotech. and Comp. Sci. Conf. (pp. 145–148).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Word sequences as features in text-learning</rft:atitle><rft:spage>145</rft:spage><rft:date>1998</rft:date><rft:btitle>Proc. of 7th</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>148</rft:epage><rft:au>D Mladenic</rft:au><rft:au>Grobelnik M Electrotech</rft:au><rft:au>Comp Sci Conf</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>B Pang</author><author>L Lee</author><author>S Vaithyanathan</author></authors><title>Thumbs up? Sentiment classification using machine learning techniques. EMNLP’02</title><pages>79--86</pages><year>2002</year><raw_string>Pang, B., Lee, L., &amp; Vaithyanathan, S. (2002). Thumbs up? Sentiment classification using machine learning techniques. EMNLP’02 (pp. 79–86).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>J R Quinlan</author></authors><title>C4.5: Programs for machine learning</title><publisher>Morgan Kaufmann</publisher><year>1993</year><raw_string>Quinlan, J. R. (1993). C4.5: Programs for machine learning. Morgan Kaufmann.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Reuters</author></authors><title>Reuters-21578 text categorization test collection, Distribution 1.0. Reuters. http://www.daviddlewis.com/resources</title><pages>21578</pages><year>1997</year><raw_string>Reuters (1997). Reuters-21578 text categorization test collection, Distribution 1.0. Reuters. http://www.daviddlewis.com/resources/ testcollections/reuters21578.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>M Rogati</author><author>Y Yang</author></authors><title>High-performing feature selection for text classification. CIKM’02</title><pages>659--661</pages><year>2002</year><raw_string>Rogati, M., &amp; Yang, Y. (2002). High-performing feature selection for text classification. CIKM’02 (pp. 659–661).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>S Scott</author><author>S Matwin</author></authors><title>Feature engineering for text classification. ICML’99</title><pages>379--388</pages><year>1999</year><raw_string>Scott, S., &amp; Matwin, S. (1999). Feature engineering for text classification. ICML’99 (pp. 379–388).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>F Sebastiani</author></authors><title>Machine learning in automated text categorization</title><journal>ACM Comp. Surveys</journal><volume>34</volume><pages>1--47</pages><year>2002</year><raw_string>Sebastiani, F. (2002). Machine learning in automated text categorization. ACM Comp. Surveys, 34, 1–47.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>Machine learning in automated text categorization</rft:atitle><rft:spage>1</rft:spage><rft:date>2002</rft:date><rft:jtitle>ACM Comp. Surveys</rft:jtitle><rft:genre>article</rft:genre><rft:volume>34</rft:volume><rft:epage>47</rft:epage><rft:au>F Sebastiani</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>V Vapnik</author></authors><title>The nature of statistical learning theory</title><publisher>Springer-Verlag</publisher><year>1995</year><raw_string>Vapnik, V. (1995). The nature of statistical learning theory. Springer-Verlag.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>S Wermter</author><author>C Hung</author></authors><title>Self-organizing classification on the reuters news corpus</title><pages>02</pages><year>2002</year><raw_string>Wermter, S., &amp; Hung, C. (2002). Self-organizing classification on the reuters news corpus. COLING’02.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Y Yang</author><author>X Liu</author></authors><title>A re-examination of text categorization methods. SIGIR’99</title><pages>42--49</pages><year>1999</year><raw_string>Yang, Y., &amp; Liu, X. (1999). A re-examination of text categorization methods. SIGIR’99 (pp. 42–49).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Y Yang</author><author>J Pedersen</author></authors><title>A comparative study on feature selection in text categorization. ICML’97</title><pages>412--420</pages><year>1997</year><raw_string>Yang, Y., &amp; Pedersen, J. (1997). A comparative study on feature selection in text categorization. ICML’97 (pp. 412–420).</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Y Yang</author><author>S Slattery</author><author>R Ghani</author></authors><title>A study of approaches to hypertext categorization</title><journal>JIIS</journal><volume>18</volume><pages>219--241</pages><year>2002</year><raw_string>Yang, Y., Slattery, S., &amp; Ghani, R. (2002). A study of approaches to hypertext categorization. JIIS, 18, 219–241.</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:37-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>A study of approaches to hypertext categorization</rft:atitle><rft:spage>219</rft:spage><rft:date>2002</rft:date><rft:stitle>JIIS</rft:stitle><rft:genre>article</rft:genre><rft:volume>18</rft:volume><rft:epage>241</rft:epage><rft:au>Y Yang</rft:au><rft:au>S Slattery</rft:au><rft:au>R Ghani</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
+<?xml version="1.0"?>
+<citations>
+  <citation valid="true">
+    <authors>
+      <author>R Bekkerman</author>
+    </authors>
+    <title>Distributional clustering of words for text categorization</title>
+    <institution>CS Department, Technion&#x2014;Israel Inst. of Technology</institution>
+    <year>2003</year>
+    <tech>Master&#x2019;s thesis</tech>
+    <raw_string>Bekkerman, R. (2003). Distributional clustering of words for text categorization. Master&#x2019;s thesis, CS Department, Technion&#x2014;Israel Inst. of Technology.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Brank</author>
+      <author>M Grobelnik</author>
+      <author>N Milic-Frayling</author>
+      <author>D Mladenic</author>
+    </authors>
+    <title>Interaction of feature selection methods and linear classification models. Workshop on Text Learning held at</title>
+    <year>2002</year>
+    <raw_string>Brank, J., Grobelnik, M., Milic-Frayling, N., &amp; Mladenic, D. (2002). Interaction of feature selection methods and linear classification models. Workshop on Text Learning held at ICML-2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Chakrabarti</author>
+      <author>M M Joshi</author>
+      <author>K Punera</author>
+      <author>D M Pennock</author>
+    </authors>
+    <title>The structure of broad topics on the web</title>
+    <booktitle>Proc. of the Int&#x2019;l World Wide Web Conference</booktitle>
+    <year>2002</year>
+    <raw_string>Chakrabarti, S., Joshi, M. M., Punera, K., &amp; Pennock, D. M. (2002). The structure of broad topics on the web. Proc. of the Int&#x2019;l World Wide Web Conference.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>The structure of broad topics on the web</rft:atitle>
+              <rft:date>2002</rft:date>
+              <rft:btitle>Proc. of the Int&#x2019;l World Wide Web Conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>S Chakrabarti</rft:au>
+              <rft:au>M M Joshi</rft:au>
+              <rft:au>K Punera</rft:au>
+              <rft:au>D M Pennock</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Cohen</author>
+      <author>M Herscovici</author>
+      <author>Y Petruschka</author>
+      <author>Y S Maarek</author>
+      <author>A Soffer</author>
+      <author>D Newbold</author>
+    </authors>
+    <title>Personalized pocket directories for mobile devices</title>
+    <booktitle>Proc. of the Int&#x2019;l World Wide Web Conference</booktitle>
+    <year>2002</year>
+    <raw_string>Cohen, D., Herscovici, M., Petruschka, Y., Maarek, Y. S., Soffer, A., &amp; Newbold, D. (2002). Personalized pocket directories for mobile devices. Proc. of the Int&#x2019;l World Wide Web Conference.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Personalized pocket directories for mobile devices</rft:atitle>
+              <rft:date>2002</rft:date>
+              <rft:btitle>Proc. of the Int&#x2019;l World Wide Web Conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>D Cohen</rft:au>
+              <rft:au>M Herscovici</rft:au>
+              <rft:au>Y Petruschka</rft:au>
+              <rft:au>Y S Maarek</rft:au>
+              <rft:au>A Soffer</rft:au>
+              <rft:au>D Newbold</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Davidov</author>
+      <author>E Gabrilovich</author>
+      <author>S Markovitch</author>
+    </authors>
+    <title>Parameterized generation of labeled datasets for text categorization based on a hierarchical directory</title>
+    <year>2004</year>
+    <note>To appear in SIGIR&#x2019;04</note>
+    <raw_string>Davidov, D., Gabrilovich, E., &amp; Markovitch, S. (2004). Parameterized generation of labeled datasets for text categorization based on a hierarchical directory. To appear in SIGIR&#x2019;04.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R Duda</author>
+      <author>P Hart</author>
+    </authors>
+    <title>Pattern classification and scene analysis</title>
+    <publisher>John Wiley and Sons</publisher>
+    <year>1973</year>
+    <raw_string>Duda, R., &amp; Hart, P. (1973). Pattern classification and scene analysis. John Wiley and Sons.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Dumais</author>
+      <author>J Platt</author>
+      <author>D Heckerman</author>
+      <author>M Sahami</author>
+    </authors>
+    <title>Inductive learning algorithms and representations for text categorization</title>
+    <publisher>CIKM</publisher>
+    <pages>148--155</pages>
+    <year>1998</year>
+    <raw_string>Dumais, S., Platt, J., Heckerman, D., &amp; Sahami, M. (1998). Inductive learning algorithms and representations for text categorization. CIKM (pp. 148&#x2013;155).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Fellbaum</author>
+    </authors>
+    <title>Wordnet: An electronic lexical database</title>
+    <publisher>MIT Press</publisher>
+    <year>1998</year>
+    <raw_string>Fellbaum, C. (Ed.). (1998). Wordnet: An electronic lexical database. MIT Press.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>G Forman</author>
+    </authors>
+    <title>An extensive empirical study of feature selection metrics for text classification</title>
+    <journal>Journal of Machine Learning Research</journal>
+    <volume>3</volume>
+    <pages>1289--1305</pages>
+    <year>2003</year>
+    <raw_string>Forman, G. (2003). An extensive empirical study of feature selection metrics for text classification. Journal of Machine Learning Research, 3, 1289&#x2013;1305.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>An extensive empirical study of feature selection metrics for text classification</rft:atitle>
+              <rft:spage>1289</rft:spage>
+              <rft:date>2003</rft:date>
+              <rft:stitle>Journal of Machine Learning Research</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>3</rft:volume>
+              <rft:epage>1305</rft:epage>
+              <rft:au>G Forman</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Joachims</author>
+    </authors>
+    <title>Text categorization with support vector machines: Learning with many relevant features. ECML&#x2019;98</title>
+    <pages>137--142</pages>
+    <year>1998</year>
+    <raw_string>Joachims, T. (1998). Text categorization with support vector machines: Learning with many relevant features. ECML&#x2019;98 (pp. 137&#x2013;142).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Joachims</author>
+    </authors>
+    <title>Making large-scale SVM learning practical. Advances in kernel methods &#x2013; support vector learning</title>
+    <editor>In B. Schoelkopf, C. Burges and A. Smola (Eds</editor>
+    <publisher>The MIT Press</publisher>
+    <year>1999</year>
+    <raw_string>Joachims, T. (1999). Making large-scale SVM learning practical. In B. Schoelkopf, C. Burges and A. Smola (Eds.), Advances in kernel methods &#x2013; support vector learning. The MIT Press.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>K Lang</author>
+    </authors>
+    <title>Newsweeder: Learning to filter netnews. ICML&#x2019;95</title>
+    <pages>331--339</pages>
+    <year>1995</year>
+    <raw_string>Lang, K. (1995). Newsweeder: Learning to filter netnews. ICML&#x2019;95 (pp. 331&#x2013;339).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>E Leopold</author>
+      <author>J Kindermann</author>
+    </authors>
+    <title>Text categorization with support vector machines: How to represent texts in input space</title>
+    <journal>Machine Learning</journal>
+    <volume>46</volume>
+    <pages>423--444</pages>
+    <year>2002</year>
+    <raw_string>Leopold, E., &amp; Kindermann, J. (2002). Text categorization with support vector machines: How to represent texts in input space. Machine Learning, 46, 423&#x2013;444.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Text categorization with support vector machines: How to represent texts in input space</rft:atitle>
+              <rft:spage>423</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:jtitle>Machine Learning</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>46</rft:volume>
+              <rft:epage>444</rft:epage>
+              <rft:au>E Leopold</rft:au>
+              <rft:au>J Kindermann</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D D Lewis</author>
+      <author>Y Yang</author>
+      <author>T Rose</author>
+      <author>F Li</author>
+    </authors>
+    <title>RCV1: A new benchmark collection for text categorization research</title>
+    <journal>JMLR</journal>
+    <volume>5</volume>
+    <pages>361--397</pages>
+    <year>2004</year>
+    <raw_string>Lewis, D. D., Yang, Y., Rose, T., &amp; Li, F. (2004). RCV1: A new benchmark collection for text categorization research. JMLR, 5, 361&#x2013;397.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>RCV1: A new benchmark collection for text categorization research</rft:atitle>
+              <rft:spage>361</rft:spage>
+              <rft:date>2004</rft:date>
+              <rft:stitle>JMLR</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>5</rft:volume>
+              <rft:epage>397</rft:epage>
+              <rft:au>D D Lewis</rft:au>
+              <rft:au>Y Yang</rft:au>
+              <rft:au>T Rose</rft:au>
+              <rft:au>F Li</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Mladenic</author>
+    </authors>
+    <title>Feature subset selection in text learning. ECML&#x2019;98</title>
+    <pages>95--100</pages>
+    <year>1998</year>
+    <raw_string>Mladenic, D. (1998). Feature subset selection in text learning. ECML&#x2019;98 (pp. 95&#x2013;100).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Mladenic</author>
+      <author>Grobelnik M Electrotech</author>
+      <author>Comp Sci Conf</author>
+    </authors>
+    <title>Word sequences as features in text-learning</title>
+    <booktitle>Proc. of 7th</booktitle>
+    <pages>145--148</pages>
+    <year>1998</year>
+    <raw_string>Mladenic, D., &amp; Grobelnik, M. (1998). Word sequences as features in text-learning. Proc. of 7th Electrotech. and Comp. Sci. Conf. (pp. 145&#x2013;148).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Word sequences as features in text-learning</rft:atitle>
+              <rft:spage>145</rft:spage>
+              <rft:date>1998</rft:date>
+              <rft:btitle>Proc. of 7th</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>148</rft:epage>
+              <rft:au>D Mladenic</rft:au>
+              <rft:au>Grobelnik M Electrotech</rft:au>
+              <rft:au>Comp Sci Conf</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>B Pang</author>
+      <author>L Lee</author>
+      <author>S Vaithyanathan</author>
+    </authors>
+    <title>Thumbs up? Sentiment classification using machine learning techniques. EMNLP&#x2019;02</title>
+    <pages>79--86</pages>
+    <year>2002</year>
+    <raw_string>Pang, B., Lee, L., &amp; Vaithyanathan, S. (2002). Thumbs up? Sentiment classification using machine learning techniques. EMNLP&#x2019;02 (pp. 79&#x2013;86).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J R Quinlan</author>
+    </authors>
+    <title>C4.5: Programs for machine learning</title>
+    <publisher>Morgan Kaufmann</publisher>
+    <year>1993</year>
+    <raw_string>Quinlan, J. R. (1993). C4.5: Programs for machine learning. Morgan Kaufmann.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Reuters</author>
+    </authors>
+    <title>Reuters-21578 text categorization test collection, Distribution 1.0. Reuters. http://www.daviddlewis.com/resources</title>
+    <pages>21578</pages>
+    <year>1997</year>
+    <raw_string>Reuters (1997). Reuters-21578 text categorization test collection, Distribution 1.0. Reuters. http://www.daviddlewis.com/resources/ testcollections/reuters21578.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Rogati</author>
+      <author>Y Yang</author>
+    </authors>
+    <title>High-performing feature selection for text classification. CIKM&#x2019;02</title>
+    <pages>659--661</pages>
+    <year>2002</year>
+    <raw_string>Rogati, M., &amp; Yang, Y. (2002). High-performing feature selection for text classification. CIKM&#x2019;02 (pp. 659&#x2013;661).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Scott</author>
+      <author>S Matwin</author>
+    </authors>
+    <title>Feature engineering for text classification. ICML&#x2019;99</title>
+    <pages>379--388</pages>
+    <year>1999</year>
+    <raw_string>Scott, S., &amp; Matwin, S. (1999). Feature engineering for text classification. ICML&#x2019;99 (pp. 379&#x2013;388).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>F Sebastiani</author>
+    </authors>
+    <title>Machine learning in automated text categorization</title>
+    <journal>ACM Comp. Surveys</journal>
+    <volume>34</volume>
+    <pages>1--47</pages>
+    <year>2002</year>
+    <raw_string>Sebastiani, F. (2002). Machine learning in automated text categorization. ACM Comp. Surveys, 34, 1&#x2013;47.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>Machine learning in automated text categorization</rft:atitle>
+              <rft:spage>1</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:jtitle>ACM Comp. Surveys</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>34</rft:volume>
+              <rft:epage>47</rft:epage>
+              <rft:au>F Sebastiani</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>V Vapnik</author>
+    </authors>
+    <title>The nature of statistical learning theory</title>
+    <publisher>Springer-Verlag</publisher>
+    <year>1995</year>
+    <raw_string>Vapnik, V. (1995). The nature of statistical learning theory. Springer-Verlag.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Wermter</author>
+      <author>C Hung</author>
+    </authors>
+    <title>Self-organizing classification on the reuters news corpus</title>
+    <pages>02</pages>
+    <year>2002</year>
+    <raw_string>Wermter, S., &amp; Hung, C. (2002). Self-organizing classification on the reuters news corpus. COLING&#x2019;02.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Yang</author>
+      <author>X Liu</author>
+    </authors>
+    <title>A re-examination of text categorization methods. SIGIR&#x2019;99</title>
+    <pages>42--49</pages>
+    <year>1999</year>
+    <raw_string>Yang, Y., &amp; Liu, X. (1999). A re-examination of text categorization methods. SIGIR&#x2019;99 (pp. 42&#x2013;49).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Yang</author>
+      <author>J Pedersen</author>
+    </authors>
+    <title>A comparative study on feature selection in text categorization. ICML&#x2019;97</title>
+    <pages>412--420</pages>
+    <year>1997</year>
+    <raw_string>Yang, Y., &amp; Pedersen, J. (1997). A comparative study on feature selection in text categorization. ICML&#x2019;97 (pp. 412&#x2013;420).</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Yang</author>
+      <author>S Slattery</author>
+      <author>R Ghani</author>
+    </authors>
+    <title>A study of approaches to hypertext categorization</title>
+    <journal>JIIS</journal>
+    <volume>18</volume>
+    <pages>219--241</pages>
+    <year>2002</year>
+    <raw_string>Yang, Y., Slattery, S., &amp; Ghani, R. (2002). A study of approaches to hypertext categorization. JIIS, 18, 219&#x2013;241.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:37-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>A study of approaches to hypertext categorization</rft:atitle>
+              <rft:spage>219</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:stitle>JIIS</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>18</rft:volume>
+              <rft:epage>241</rft:epage>
+              <rft:au>Y Yang</rft:au>
+              <rft:au>S Slattery</rft:au>
+              <rft:au>R Ghani</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

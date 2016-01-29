@@ -1,56 +1,701 @@
+<?xml version="1.0"?>
 <citations>
-<citation valid='true'><authors><author>H T Odum</author></authors><title>Energy quality and carrying capacity of the earth,”Tropical Ecology</title><year>1976</year><raw_string>[1] H. T. Odum, “Energy quality and carrying capacity of the earth,”Tropical Ecology, 1976.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Pedram</author><author>N Chang</author><author>Y Kim</author><author>Y Wang</author></authors><title>Hybrid electrical energy storage systems</title><booktitle>Proc. of ISLPED</booktitle><year>2010</year><raw_string>[2] M. Pedram, N. Chang, Y. Kim, and Y. Wang, “Hybrid electrical energy storage systems,” Proc. of ISLPED, Aug. 2010.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Hybrid electrical energy storage systems</rft:atitle><rft:date>2010</rft:date><rft:btitle>Proc. of ISLPED</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>M Pedram</rft:au><rft:au>N Chang</rft:au><rft:au>Y Kim</rft:au><rft:au>Y Wang</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>F Koushanfar</author></authors><title>Hierarchical hybrid power supply networks</title><booktitle>Proc. of DAC</booktitle><year>2010</year><raw_string>[3] F. Koushanfar, “Hierarchical hybrid power supply networks,” Proc. of DAC, Jun. 2010.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Hierarchical hybrid power supply networks</rft:atitle><rft:date>2010</rft:date><rft:btitle>Proc. of DAC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>F Koushanfar</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Mirhoseini</author><author>F Koushanfar</author></authors><title>HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency</title><booktitle>Proc. of DATE</booktitle><year>2011</year><raw_string>[4] A. Mirhoseini, and F. Koushanfar. “HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency,” Proc. of DATE, Mar. 2011.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of DATE</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>A Mirhoseini</rft:au><rft:au>F Koushanfar</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Khaligh</author><author>Z Li</author><author>“Battery ultracapacitor</author></authors><title>fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art</title><journal>IEEE TVT</journal><volume>59</volume><number>6</number><year>2010</year><raw_string>[5] A. Khaligh, and Z. Li, “Battery, ultracapacitor, fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art,” IEEE TVT, Vol. 59, No. 6, 2010.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>6</rft:quarter><rft:atitle>fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art</rft:atitle><rft:date>2010</rft:date><rft:jtitle>IEEE TVT</rft:jtitle><rft:genre>article</rft:genre><rft:volume>59</rft:volume><rft:au>A Khaligh</rft:au><rft:au>Z Li</rft:au><rft:au>“Battery ultracapacitor</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Khaligh</author></authors><title>Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply</title><journal>IEEE TVT</journal><volume>56</volume><number>6</number><year>2007</year><raw_string>[6] A. Khaligh, et al., “Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply,” IEEE TVT, Vol. 56, No. 6, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>6</rft:quarter><rft:atitle>Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply</rft:atitle><rft:date>2007</rft:date><rft:jtitle>IEEE TVT</rft:jtitle><rft:genre>article</rft:genre><rft:volume>56</rft:volume><rft:au>A Khaligh</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Q Xie</author></authors><title>Charge allocation for hybrid electrical energy storage systems</title><booktitle>Proc. of CODES</booktitle><year>2011</year><raw_string>[7] Q. Xie, et al, “Charge allocation for hybrid electrical energy storage systems,” Proc. of CODES, Oct. 2011.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Charge allocation for hybrid electrical energy storage systems</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of CODES</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Q Xie</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Y Wang</author><author>Y Kim</author><author>Q Xie</author><author>N Chang</author><author>M Pedram</author></authors><title>Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems</title><booktitle>Proc. of ISLPED</booktitle><year>2011</year><raw_string>[8] Y. Wang, Y. Kim, Q. Xie, N. Chang, and M. Pedram, “Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems,” Proc. of ISLPED, 2011.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of ISLPED</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Y Wang</rft:au><rft:au>Y Kim</rft:au><rft:au>Q Xie</rft:au><rft:au>N Chang</rft:au><rft:au>M Pedram</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Y Wang</author></authors><title>Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems</title><booktitle>Proc. of DATE</booktitle><year>2012</year><raw_string>[9] Y. Wang, et al, “Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems,” Proc. of DATE, Mar. 2012.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:54-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems</rft:atitle><rft:date>2012</rft:date><rft:btitle>Proc. of DATE</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Y Wang</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Q Xie</author></authors><title>Charge replacement in hybrid electrical energy storage systems</title><booktitle>Proc. of ASP-DAC</booktitle><year>2012</year><raw_string>[10] Q. Xie, et al, “Charge replacement in hybrid electrical energy storage systems,” Proc. of ASP-DAC, Jan. 2012.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Charge replacement in hybrid electrical energy storage systems</rft:atitle><rft:date>2012</rft:date><rft:btitle>Proc. of ASP-DAC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Q Xie</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>D Zhu</author></authors><title>Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System</title><booktitle>Proc. of ASP-DAC</booktitle><year>2013</year><raw_string>[11] D. Zhu, et al, “Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System,” Proc. of ASP-DAC, Jan.  2013.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System</rft:atitle><rft:date>2013</rft:date><rft:btitle>Proc. of ASP-DAC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>D Zhu</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>D Shin</author><author>Y Wang</author><author>N Chang</author><author>M Pedram</author></authors><title>Battery-supercapacitor hybrid system for high-rate pulsed load applications</title><booktitle>Proc. of DATE</booktitle><year>2011</year><raw_string>[12] D. Shin, Y. Wang, N. Chang, and M. Pedram, “Battery-supercapacitor hybrid system for high-rate pulsed load applications,” Proc. of DATE, Mar. 2011.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Battery-supercapacitor hybrid system for high-rate pulsed load applications</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of DATE</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>D Shin</rft:au><rft:au>Y Wang</rft:au><rft:au>N Chang</rft:au><rft:au>M Pedram</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>F Koushanfar</author><author>A Mirhoseini</author></authors><title>Hybrid heterogeneous energy supply networks</title><booktitle>Proc. of ISCAS</booktitle><year>2011</year><raw_string>[13] F. Koushanfar, and A. Mirhoseini. “Hybrid heterogeneous energy supply networks,” Proc. of ISCAS, May. 2011.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Hybrid heterogeneous energy supply networks</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of ISCAS</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>F Koushanfar</rft:au><rft:au>A Mirhoseini</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Q Xie</author></authors><title>State of health aware charge management in hybrid electrical energy storage systems</title><booktitle>Proc. of DATE</booktitle><year>2012</year><raw_string>[14] Q. Xie, et al, “State of health aware charge management in hybrid electrical energy storage systems,” Proc. of DATE, Mar. 2012.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>State of health aware charge management in hybrid electrical energy storage systems</rft:atitle><rft:date>2012</rft:date><rft:btitle>Proc. of DATE</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Q Xie</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>LTC3789 Datasheet http www linear comproductLTC3789</author></authors><raw_string>[15] LTC3789 Datasheet: http://www.linear.com/product/LTC3789.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Mirhoseini</author><author>F Koushanfar</author></authors><title>Learning to manage combined energy supply systems</title><booktitle>Proc. of ISLPED</booktitle><year>2011</year><raw_string>[16] A. Mirhoseini, and F. Koushanfar “Learning to manage combined energy supply systems,” Proc. of ISLPED, Aug. 2011</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Learning to manage combined energy supply systems</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of ISLPED</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>A Mirhoseini</rft:au><rft:au>F Koushanfar</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>R K Sharma</author><author>K Kudo</author></authors><title>Integrated management of energy storage for sustainable operation of energy microgrids</title><booktitle>Proc. of the ASME 2011 IMECE</booktitle><year>2011</year><raw_string>[17] R. K. Sharma, and K. Kudo “Integrated management of energy storage for sustainable operation of energy microgrids”. Proc. of the ASME 2011 IMECE, Nov. 2011</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Integrated management of energy storage for sustainable operation of energy microgrids</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of the ASME 2011 IMECE</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>R K Sharma</rft:au><rft:au>K Kudo</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Cao</author><author>A Emadi</author></authors><title>A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles</title><booktitle>Proc. of VPPC</booktitle><year>2009</year><raw_string>[18] J. Cao, and A. Emadi, “A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles,” Proc. of VPPC, Sep. 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles</rft:atitle><rft:date>2009</rft:date><rft:btitle>Proc. of VPPC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>J Cao</rft:au><rft:au>A Emadi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Y Kim</author></authors><title>Networked architecture for hybrid electrical energy storage systems</title><booktitle>Proc. of DAC</booktitle><year>2012</year><raw_string>[19] Y. Kim, et al, “Networked architecture for hybrid electrical energy storage systems,” Proc. of DAC, Jun. 2012.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Networked architecture for hybrid electrical energy storage systems</rft:atitle><rft:date>2012</rft:date><rft:btitle>Proc. of DAC</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Y Kim</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>D Linden</author><author>T B Reddy</author></authors><title>Handbook of Batteries</title><publisher>McGrew-Hill Professional</publisher><year>2001</year><raw_string>[20] D. Linden and T. B. Reddy, Handbook of Batteries. McGrew-Hill Professional, 2001.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>E M Lightner</author><author>S E Widergren</author></authors><title>An orderly transition to a transformed electricity system</title><journal>IEEE TSG</journal><volume>1</volume><number>1</number><year>2010</year><raw_string>[21] E. M. Lightner, and S. E. Widergren, “An orderly transition to a transformed electricity system,” IEEE TSG, Vol. 1, No. 1, 2010.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1</rft:quarter><rft:atitle>An orderly transition to a transformed electricity system</rft:atitle><rft:date>2010</rft:date><rft:jtitle>IEEE TSG</rft:jtitle><rft:genre>article</rft:genre><rft:volume>1</rft:volume><rft:au>E M Lightner</rft:au><rft:au>S E Widergren</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>S Yue</author><author>J Chen</author><author>Y Gu</author><author>C Wu</author><author>Y Shi</author></authors><title>Dual-pricing policy for controller-side strategies in demand side management</title><booktitle>Proc. of SmartGridComm</booktitle><year>2011</year><raw_string>[22] S. Yue, J. Chen, Y. Gu, C. Wu, and Y. Shi, “Dual-pricing policy for controller-side strategies in demand side management,” Proc. of SmartGridComm, Dec. 2011.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Dual-pricing policy for controller-side strategies in demand side management</rft:atitle><rft:date>2011</rft:date><rft:btitle>Proc. of SmartGridComm</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>S Yue</rft:au><rft:au>J Chen</rft:au><rft:au>Y Gu</rft:au><rft:au>C Wu</rft:au><rft:au>Y Shi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>N S Wade</author><author>P C Taylor</author><author>P D Lang</author><author>P R Jones</author></authors><title>Evaluating the benefits of an electrical energy storage system in a future smart grid,” Energy policy</title><volume>38</volume><number>11</number><year>2010</year><raw_string>[23] N. S. Wade, P. C. Taylor, P. D. Lang, and P. R. Jones, “Evaluating the benefits of an electrical energy storage system in a future smart grid,” Energy policy, Vol. 38, No. 11, 2010.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors/><note>24] http://www.panasonic.com/industrial/includes/pdf/Panasonic_VRLA_ LC-R123R4P.pdf</note><raw_string>[24] http://www.panasonic.com/industrial/includes/pdf/Panasonic_VRLA_ LC-R123R4P.pdf</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors/><note>25] http://www.grinninglizard.com/tinyxml</note><raw_string>[25] http://www.grinninglizard.com/tinyxml/</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors/><note>26] http://qt-project.org</note><raw_string>[26] http://qt-project.org/</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors/><note>27] http://www.workslikeclockwork.com/index.php/components/qtplotting-widget</note><raw_string>[27] http://www.workslikeclockwork.com/index.php/components/qtplotting-widget/</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:55-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
-
+  <citation valid="true">
+    <authors>
+      <author>H T Odum</author>
+    </authors>
+    <title>Energy quality and carrying capacity of the earth,&#x201D;Tropical Ecology</title>
+    <year>1976</year>
+    <raw_string>[1] H. T. Odum, &#x201C;Energy quality and carrying capacity of the earth,&#x201D;Tropical Ecology, 1976.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Pedram</author>
+      <author>N Chang</author>
+      <author>Y Kim</author>
+      <author>Y Wang</author>
+    </authors>
+    <title>Hybrid electrical energy storage systems</title>
+    <booktitle>Proc. of ISLPED</booktitle>
+    <year>2010</year>
+    <raw_string>[2] M. Pedram, N. Chang, Y. Kim, and Y. Wang, &#x201C;Hybrid electrical energy storage systems,&#x201D; Proc. of ISLPED, Aug. 2010.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Hybrid electrical energy storage systems</rft:atitle>
+              <rft:date>2010</rft:date>
+              <rft:btitle>Proc. of ISLPED</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>M Pedram</rft:au>
+              <rft:au>N Chang</rft:au>
+              <rft:au>Y Kim</rft:au>
+              <rft:au>Y Wang</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>F Koushanfar</author>
+    </authors>
+    <title>Hierarchical hybrid power supply networks</title>
+    <booktitle>Proc. of DAC</booktitle>
+    <year>2010</year>
+    <raw_string>[3] F. Koushanfar, &#x201C;Hierarchical hybrid power supply networks,&#x201D; Proc. of DAC, Jun. 2010.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Hierarchical hybrid power supply networks</rft:atitle>
+              <rft:date>2010</rft:date>
+              <rft:btitle>Proc. of DAC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>F Koushanfar</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Mirhoseini</author>
+      <author>F Koushanfar</author>
+    </authors>
+    <title>HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency</title>
+    <booktitle>Proc. of DATE</booktitle>
+    <year>2011</year>
+    <raw_string>[4] A. Mirhoseini, and F. Koushanfar. &#x201C;HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency,&#x201D; Proc. of DATE, Mar. 2011.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of DATE</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>A Mirhoseini</rft:au>
+              <rft:au>F Koushanfar</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Khaligh</author>
+      <author>Z Li</author>
+      <author>&#x201C;Battery ultracapacitor</author>
+    </authors>
+    <title>fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art</title>
+    <journal>IEEE TVT</journal>
+    <volume>59</volume>
+    <number>6</number>
+    <year>2010</year>
+    <raw_string>[5] A. Khaligh, and Z. Li, &#x201C;Battery, ultracapacitor, fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art,&#x201D; IEEE TVT, Vol. 59, No. 6, 2010.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>6</rft:quarter>
+              <rft:atitle>fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art</rft:atitle>
+              <rft:date>2010</rft:date>
+              <rft:jtitle>IEEE TVT</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>59</rft:volume>
+              <rft:au>A Khaligh</rft:au>
+              <rft:au>Z Li</rft:au>
+              <rft:au>&#x201C;Battery ultracapacitor</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Khaligh</author>
+    </authors>
+    <title>Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply</title>
+    <journal>IEEE TVT</journal>
+    <volume>56</volume>
+    <number>6</number>
+    <year>2007</year>
+    <raw_string>[6] A. Khaligh, et al., &#x201C;Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply,&#x201D; IEEE TVT, Vol. 56, No. 6, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>6</rft:quarter>
+              <rft:atitle>Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:jtitle>IEEE TVT</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>56</rft:volume>
+              <rft:au>A Khaligh</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Q Xie</author>
+    </authors>
+    <title>Charge allocation for hybrid electrical energy storage systems</title>
+    <booktitle>Proc. of CODES</booktitle>
+    <year>2011</year>
+    <raw_string>[7] Q. Xie, et al, &#x201C;Charge allocation for hybrid electrical energy storage systems,&#x201D; Proc. of CODES, Oct. 2011.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Charge allocation for hybrid electrical energy storage systems</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of CODES</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Q Xie</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Wang</author>
+      <author>Y Kim</author>
+      <author>Q Xie</author>
+      <author>N Chang</author>
+      <author>M Pedram</author>
+    </authors>
+    <title>Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems</title>
+    <booktitle>Proc. of ISLPED</booktitle>
+    <year>2011</year>
+    <raw_string>[8] Y. Wang, Y. Kim, Q. Xie, N. Chang, and M. Pedram, &#x201C;Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems,&#x201D; Proc. of ISLPED, 2011.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of ISLPED</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Y Wang</rft:au>
+              <rft:au>Y Kim</rft:au>
+              <rft:au>Q Xie</rft:au>
+              <rft:au>N Chang</rft:au>
+              <rft:au>M Pedram</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Wang</author>
+    </authors>
+    <title>Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems</title>
+    <booktitle>Proc. of DATE</booktitle>
+    <year>2012</year>
+    <raw_string>[9] Y. Wang, et al, &#x201C;Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems,&#x201D; Proc. of DATE, Mar. 2012.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:54-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems</rft:atitle>
+              <rft:date>2012</rft:date>
+              <rft:btitle>Proc. of DATE</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Y Wang</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Q Xie</author>
+    </authors>
+    <title>Charge replacement in hybrid electrical energy storage systems</title>
+    <booktitle>Proc. of ASP-DAC</booktitle>
+    <year>2012</year>
+    <raw_string>[10] Q. Xie, et al, &#x201C;Charge replacement in hybrid electrical energy storage systems,&#x201D; Proc. of ASP-DAC, Jan. 2012.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Charge replacement in hybrid electrical energy storage systems</rft:atitle>
+              <rft:date>2012</rft:date>
+              <rft:btitle>Proc. of ASP-DAC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Q Xie</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Zhu</author>
+    </authors>
+    <title>Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System</title>
+    <booktitle>Proc. of ASP-DAC</booktitle>
+    <year>2013</year>
+    <raw_string>[11] D. Zhu, et al, &#x201C;Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System,&#x201D; Proc. of ASP-DAC, Jan.  2013.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System</rft:atitle>
+              <rft:date>2013</rft:date>
+              <rft:btitle>Proc. of ASP-DAC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>D Zhu</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Shin</author>
+      <author>Y Wang</author>
+      <author>N Chang</author>
+      <author>M Pedram</author>
+    </authors>
+    <title>Battery-supercapacitor hybrid system for high-rate pulsed load applications</title>
+    <booktitle>Proc. of DATE</booktitle>
+    <year>2011</year>
+    <raw_string>[12] D. Shin, Y. Wang, N. Chang, and M. Pedram, &#x201C;Battery-supercapacitor hybrid system for high-rate pulsed load applications,&#x201D; Proc. of DATE, Mar. 2011.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Battery-supercapacitor hybrid system for high-rate pulsed load applications</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of DATE</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>D Shin</rft:au>
+              <rft:au>Y Wang</rft:au>
+              <rft:au>N Chang</rft:au>
+              <rft:au>M Pedram</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>F Koushanfar</author>
+      <author>A Mirhoseini</author>
+    </authors>
+    <title>Hybrid heterogeneous energy supply networks</title>
+    <booktitle>Proc. of ISCAS</booktitle>
+    <year>2011</year>
+    <raw_string>[13] F. Koushanfar, and A. Mirhoseini. &#x201C;Hybrid heterogeneous energy supply networks,&#x201D; Proc. of ISCAS, May. 2011.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Hybrid heterogeneous energy supply networks</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of ISCAS</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>F Koushanfar</rft:au>
+              <rft:au>A Mirhoseini</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Q Xie</author>
+    </authors>
+    <title>State of health aware charge management in hybrid electrical energy storage systems</title>
+    <booktitle>Proc. of DATE</booktitle>
+    <year>2012</year>
+    <raw_string>[14] Q. Xie, et al, &#x201C;State of health aware charge management in hybrid electrical energy storage systems,&#x201D; Proc. of DATE, Mar. 2012.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>State of health aware charge management in hybrid electrical energy storage systems</rft:atitle>
+              <rft:date>2012</rft:date>
+              <rft:btitle>Proc. of DATE</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Q Xie</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>LTC3789 Datasheet http www linear comproductLTC3789</author>
+    </authors>
+    <raw_string>[15] LTC3789 Datasheet: http://www.linear.com/product/LTC3789.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Mirhoseini</author>
+      <author>F Koushanfar</author>
+    </authors>
+    <title>Learning to manage combined energy supply systems</title>
+    <booktitle>Proc. of ISLPED</booktitle>
+    <year>2011</year>
+    <raw_string>[16] A. Mirhoseini, and F. Koushanfar &#x201C;Learning to manage combined energy supply systems,&#x201D; Proc. of ISLPED, Aug. 2011</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Learning to manage combined energy supply systems</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of ISLPED</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>A Mirhoseini</rft:au>
+              <rft:au>F Koushanfar</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R K Sharma</author>
+      <author>K Kudo</author>
+    </authors>
+    <title>Integrated management of energy storage for sustainable operation of energy microgrids</title>
+    <booktitle>Proc. of the ASME 2011 IMECE</booktitle>
+    <year>2011</year>
+    <raw_string>[17] R. K. Sharma, and K. Kudo &#x201C;Integrated management of energy storage for sustainable operation of energy microgrids&#x201D;. Proc. of the ASME 2011 IMECE, Nov. 2011</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Integrated management of energy storage for sustainable operation of energy microgrids</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of the ASME 2011 IMECE</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>R K Sharma</rft:au>
+              <rft:au>K Kudo</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Cao</author>
+      <author>A Emadi</author>
+    </authors>
+    <title>A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles</title>
+    <booktitle>Proc. of VPPC</booktitle>
+    <year>2009</year>
+    <raw_string>[18] J. Cao, and A. Emadi, &#x201C;A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles,&#x201D; Proc. of VPPC, Sep. 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles</rft:atitle>
+              <rft:date>2009</rft:date>
+              <rft:btitle>Proc. of VPPC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>J Cao</rft:au>
+              <rft:au>A Emadi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Kim</author>
+    </authors>
+    <title>Networked architecture for hybrid electrical energy storage systems</title>
+    <booktitle>Proc. of DAC</booktitle>
+    <year>2012</year>
+    <raw_string>[19] Y. Kim, et al, &#x201C;Networked architecture for hybrid electrical energy storage systems,&#x201D; Proc. of DAC, Jun. 2012.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Networked architecture for hybrid electrical energy storage systems</rft:atitle>
+              <rft:date>2012</rft:date>
+              <rft:btitle>Proc. of DAC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Y Kim</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Linden</author>
+      <author>T B Reddy</author>
+    </authors>
+    <title>Handbook of Batteries</title>
+    <publisher>McGrew-Hill Professional</publisher>
+    <year>2001</year>
+    <raw_string>[20] D. Linden and T. B. Reddy, Handbook of Batteries. McGrew-Hill Professional, 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>E M Lightner</author>
+      <author>S E Widergren</author>
+    </authors>
+    <title>An orderly transition to a transformed electricity system</title>
+    <journal>IEEE TSG</journal>
+    <volume>1</volume>
+    <number>1</number>
+    <year>2010</year>
+    <raw_string>[21] E. M. Lightner, and S. E. Widergren, &#x201C;An orderly transition to a transformed electricity system,&#x201D; IEEE TSG, Vol. 1, No. 1, 2010.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1</rft:quarter>
+              <rft:atitle>An orderly transition to a transformed electricity system</rft:atitle>
+              <rft:date>2010</rft:date>
+              <rft:jtitle>IEEE TSG</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>1</rft:volume>
+              <rft:au>E M Lightner</rft:au>
+              <rft:au>S E Widergren</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Yue</author>
+      <author>J Chen</author>
+      <author>Y Gu</author>
+      <author>C Wu</author>
+      <author>Y Shi</author>
+    </authors>
+    <title>Dual-pricing policy for controller-side strategies in demand side management</title>
+    <booktitle>Proc. of SmartGridComm</booktitle>
+    <year>2011</year>
+    <raw_string>[22] S. Yue, J. Chen, Y. Gu, C. Wu, and Y. Shi, &#x201C;Dual-pricing policy for controller-side strategies in demand side management,&#x201D; Proc. of SmartGridComm, Dec. 2011.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Dual-pricing policy for controller-side strategies in demand side management</rft:atitle>
+              <rft:date>2011</rft:date>
+              <rft:btitle>Proc. of SmartGridComm</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>S Yue</rft:au>
+              <rft:au>J Chen</rft:au>
+              <rft:au>Y Gu</rft:au>
+              <rft:au>C Wu</rft:au>
+              <rft:au>Y Shi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>N S Wade</author>
+      <author>P C Taylor</author>
+      <author>P D Lang</author>
+      <author>P R Jones</author>
+    </authors>
+    <title>Evaluating the benefits of an electrical energy storage system in a future smart grid,&#x201D; Energy policy</title>
+    <volume>38</volume>
+    <number>11</number>
+    <year>2010</year>
+    <raw_string>[23] N. S. Wade, P. C. Taylor, P. D. Lang, and P. R. Jones, &#x201C;Evaluating the benefits of an electrical energy storage system in a future smart grid,&#x201D; Energy policy, Vol. 38, No. 11, 2010.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors/>
+    <note>24] http://www.panasonic.com/industrial/includes/pdf/Panasonic_VRLA_ LC-R123R4P.pdf</note>
+    <raw_string>[24] http://www.panasonic.com/industrial/includes/pdf/Panasonic_VRLA_ LC-R123R4P.pdf</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors/>
+    <note>25] http://www.grinninglizard.com/tinyxml</note>
+    <raw_string>[25] http://www.grinninglizard.com/tinyxml/</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors/>
+    <note>26] http://qt-project.org</note>
+    <raw_string>[26] http://qt-project.org/</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors/>
+    <note>27] http://www.workslikeclockwork.com/index.php/components/qtplotting-widget</note>
+    <raw_string>[27] http://www.workslikeclockwork.com/index.php/components/qtplotting-widget/</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:55-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

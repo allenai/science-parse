@@ -1,84 +1,1548 @@
+<?xml version="1.0"?>
 <citations>
-<citation valid='true'><authors><author>A Al-Azzawi</author></authors><title>Photonics: Principles and Practices</title><publisher>CRC Press</publisher><year>2007</year><raw_string>[1] A. Al-Azzawi. Photonics: Principles and Practices. CRC Press, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>V Almeida</author><author>C Barrios</author><author>R Panepucci</author><author>M Lipson</author><author>M Foster</author><author>D Ouzounov</author><author>A Gaeta</author></authors><title>All-optical switching on a silicon chip</title><journal>Optics Letters</journal><volume>29</volume><number>2867</number><year>2004</year><raw_string>[2] V. Almeida, C. Barrios, R. Panepucci, M. Lipson, M. Foster, D. Ouzounov, and A. Gaeta. All-optical switching on a silicon chip. Optics Letters, 29:2867–2869, 2004.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>2867</rft:quarter><rft:atitle>All-optical switching on a silicon chip</rft:atitle><rft:date>2004</rft:date><rft:jtitle>Optics Letters</rft:jtitle><rft:genre>article</rft:genre><rft:volume>29</rft:volume><rft:au>V Almeida</rft:au><rft:au>C Barrios</rft:au><rft:au>R Panepucci</rft:au><rft:au>M Lipson</rft:au><rft:au>M Foster</rft:au><rft:au>D Ouzounov</rft:au><rft:au>A Gaeta</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Balfour</author><author>W J Dally</author></authors><title>Design tradeoffs for tiled CMP on-chip networks</title><booktitle>In Proc. of the International Conference on Supercomputing (ICS</booktitle><location>Carns, Queensland, Australia</location><pages>187--198</pages><year>2006</year><raw_string>[3] J. Balfour and W. J. Dally. Design tradeoffs for tiled CMP on-chip networks. In Proc. of the International Conference on Supercomputing (ICS), pages 187–198, Carns, Queensland, Australia, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Carns, Queensland, Australia</rft:place><rft:atitle>Design tradeoffs for tiled CMP on-chip networks</rft:atitle><rft:spage>187</rft:spage><rft:date>2006</rft:date><rft:btitle>In Proc. of the International Conference on Supercomputing (ICS</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>198</rft:epage><rft:au>J Balfour</rft:au><rft:au>W J Dally</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C A Barrios</author><author>V R Almeida</author><author>M Lipson</author></authors><title>Low-power-consumption short-length and high-modulation-depth silicon electro-optic modulator</title><journal>Journal of Lightwave Technology</journal><volume>21</volume><number>4</number><year>2003</year><raw_string>[4] C. A. Barrios, V. R. Almeida, and M. Lipson. Low-power-consumption short-length and high-modulation-depth silicon electro-optic modulator. Journal of Lightwave Technology, 21(4):1089–1098, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>4</rft:quarter><rft:atitle>Low-power-consumption short-length and high-modulation-depth silicon electro-optic modulator</rft:atitle><rft:date>2003</rft:date><rft:stitle>Journal of Lightwave Technology</rft:stitle><rft:genre>article</rft:genre><rft:volume>21</rft:volume><rft:au>C A Barrios</rft:au><rft:au>V R Almeida</rft:au><rft:au>M Lipson</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C Batten</author><author>A Joshi</author><author>J Orcutt</author><author>A Khilo</author><author>B Moss</author><author>C Holzwarth</author><author>M Popovic</author><author>H Li</author><author>H Smith</author><author>J Hoyt</author><author>F Kartner</author><author>R Ram</author><author>V Stojanovic</author><author>K Asanovic</author></authors><title>Building manycore processor-to-dram networks with monolithic silicon photonics</title><booktitle>In Proc. of Hot Interconnects</booktitle><location>Stanford, CA</location><pages>21--30</pages><year>2008</year><raw_string>[5] C. Batten, A. Joshi, J. Orcutt, A. Khilo, B. Moss, C. Holzwarth, M. Popovic, H. Li, H. Smith, J. Hoyt, F. Kartner, R. Ram, V. Stojanovic, and K. Asanovic. Building manycore processor-to-dram networks with monolithic silicon photonics. In Proc. of Hot Interconnects, pages 21–30, Stanford, CA, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Stanford, CA</rft:place><rft:atitle>Building manycore processor-to-dram networks with monolithic silicon photonics</rft:atitle><rft:spage>21</rft:spage><rft:date>2008</rft:date><rft:btitle>In Proc. of Hot Interconnects</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>30</rft:epage><rft:au>C Batten</rft:au><rft:au>A Joshi</rft:au><rft:au>J Orcutt</rft:au><rft:au>A Khilo</rft:au><rft:au>B Moss</rft:au><rft:au>C Holzwarth</rft:au><rft:au>M Popovic</rft:au><rft:au>H Li</rft:au><rft:au>H Smith</rft:au><rft:au>J Hoyt</rft:au><rft:au>F Kartner</rft:au><rft:au>R Ram</rft:au><rft:au>V Stojanovic</rft:au><rft:au>K Asanovic</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>S Bell</author><author>B Edwards</author><author>J Amann</author><author>R Conlin</author><author>K Joyce</author><author>V Leung</author><author>J Mackay</author><author>M Reif</author><author>L Bao</author><author>J Brown</author><author>M Mattina</author><author>C-C Miao</author><author>C Ramey</author><author>D Wentzlaff</author><author>W Anderson</author><author>E Berger</author><author>N Fairbanks</author><author>D Khan</author><author>F Montenegro</author><author>J Stickney</author><author>J Zook</author></authors><title>Tile64 processor: A 64-core soc with mesh interconnect</title><booktitle>In Solid-State Circuits Conference, 2008. ISSCC 2008. Digest of Technical Papers. IEEE International</booktitle><pages>88--598</pages><year>2008</year><raw_string>[6] S. Bell, B. Edwards, J. Amann, R. Conlin, K. Joyce, V. Leung, J. Mackay, M. Reif, L. Bao, J. Brown, M. Mattina, C.-C. Miao, C. Ramey, D. Wentzlaff, W. Anderson, E. Berger, N. Fairbanks, D. Khan, F. Montenegro, J. Stickney, and J. Zook. Tile64 processor: A 64-core soc with mesh interconnect. In Solid-State Circuits Conference, 2008. ISSCC 2008. Digest of Technical Papers. IEEE International, pages 88–598, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Tile64 processor: A 64-core soc with mesh interconnect</rft:atitle><rft:spage>88</rft:spage><rft:date>2008</rft:date><rft:btitle>In Solid-State Circuits Conference, 2008. ISSCC 2008. Digest of Technical Papers. IEEE International</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>598</rft:epage><rft:au>S Bell</rft:au><rft:au>B Edwards</rft:au><rft:au>J Amann</rft:au><rft:au>R Conlin</rft:au><rft:au>K Joyce</rft:au><rft:au>V Leung</rft:au><rft:au>J Mackay</rft:au><rft:au>M Reif</rft:au><rft:au>L Bao</rft:au><rft:au>J Brown</rft:au><rft:au>M Mattina</rft:au><rft:au>C-C Miao</rft:au><rft:au>C Ramey</rft:au><rft:au>D Wentzlaff</rft:au><rft:au>W Anderson</rft:au><rft:au>E Berger</rft:au><rft:au>N Fairbanks</rft:au><rft:au>D Khan</rft:au><rft:au>F Montenegro</rft:au><rft:au>J Stickney</rft:au><rft:au>J Zook</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>N Binkert</author></authors><year>2008</year><tech>Personal communication</tech><raw_string>[7] N. Binkert. Personal communication, Aug. 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>R D Chamberlain</author><author>M A Franklin</author><author>C S Baw</author></authors><title>Gemini: An optical interconnection network for parallel processing</title><journal>IEEE Trans. on Parallel and Distributed Systems</journal><volume>13</volume><number>1038</number><year>2002</year><raw_string>[8] R. D. Chamberlain, M. A. Franklin, and C. S. Baw.  Gemini: An optical interconnection network for parallel processing. IEEE Trans. on Parallel and Distributed Systems, 13:1038–1055, 2002.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1038</rft:quarter><rft:atitle>Gemini: An optical interconnection network for parallel processing</rft:atitle><rft:date>2002</rft:date><rft:stitle>IEEE Trans. on Parallel and Distributed Systems</rft:stitle><rft:genre>article</rft:genre><rft:volume>13</rft:volume><rft:au>R D Chamberlain</rft:au><rft:au>M A Franklin</rft:au><rft:au>C S Baw</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Chang</author><author>J Cong</author><author>A Kaplan</author><author>M Naik</author><author>G Reinman</author><author>E Socher</author><author>S-W Tam</author></authors><title>CMP network-on-chip overlaid with multi-band rf-interconnect</title><booktitle>In International Symposium on High-Performance Computer Architecture (HPCA</booktitle><pages>pages </pages><year>2008</year><raw_string>[9] M. Chang, J. Cong, A. Kaplan, M. Naik, G. Reinman, E. Socher, and S.-W. Tam. CMP network-on-chip overlaid with multi-band rf-interconnect. In International Symposium on High-Performance Computer Architecture (HPCA), pages 191–202, Feb. 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>CMP network-on-chip overlaid with multi-band rf-interconnect</rft:atitle><rft:date>2008</rft:date><rft:btitle>In International Symposium on High-Performance Computer Architecture (HPCA</rft:btitle><rft:genre>bookitem</rft:genre><rft:pages>pages </rft:pages><rft:au>M Chang</rft:au><rft:au>J Cong</rft:au><rft:au>A Kaplan</rft:au><rft:au>M Naik</rft:au><rft:au>G Reinman</rft:au><rft:au>E Socher</rft:au><rft:au>S-W Tam</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>G Chen</author><author>H Chen</author><author>M Haurylau</author><author>N Nelson</author><author>P M Fauchet</author><author>E Friedman</author><author>D Albonesi</author></authors><title>Predictions of cmoscompatible on-chip optical interconnect</title><booktitle>In 7th International Workshop on System-Level Interconnect Prediction (SLIP</booktitle><location>San Francisco, CA</location><pages>13--20</pages><year>2005</year><raw_string>[10] G. Chen, H. Chen, M. Haurylau, N. Nelson, P. M. Fauchet, E. Friedman, and D. Albonesi. Predictions of cmoscompatible on-chip optical interconnect. In 7th International Workshop on System-Level Interconnect Prediction (SLIP), pages 13–20, San Francisco, CA, 2005.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>San Francisco, CA</rft:place><rft:atitle>Predictions of cmoscompatible on-chip optical interconnect</rft:atitle><rft:spage>13</rft:spage><rft:date>2005</rft:date><rft:btitle>In 7th International Workshop on System-Level Interconnect Prediction (SLIP</rft:btitle><rft:genre>bookitem</rft:genre><rft:epage>20</rft:epage><rft:au>G Chen</rft:au><rft:au>H Chen</rft:au><rft:au>M Haurylau</rft:au><rft:au>N Nelson</rft:au><rft:au>P M Fauchet</rft:au><rft:au>E Friedman</rft:au><rft:au>D Albonesi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>W J Dally</author><author>T B</author></authors><title>Principles and Practices of Interconnection Networks</title><publisher>Morgan Kaufmann Publishing Inc</publisher><year>2004</year><raw_string>[11] W. J. Dally and T. B. Principles and Practices of Interconnection Networks. Morgan Kaufmann Publishing Inc., 2004.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>W J Dally</author><author>B Towles</author></authors><title>Route packets, not wires: on-chip inteconnection networks</title><booktitle>In Proc. of Design Automation Conference (DAC), pages 684–689, Las Vegas</booktitle><location>NV</location><year>2001</year><raw_string>[12] W. J. Dally and B. Towles. Route packets, not wires: on-chip inteconnection networks. In Proc. of Design Automation Conference (DAC), pages 684–689, Las Vegas, NV, Jun 2001.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>NV</rft:place><rft:atitle>Route packets, not wires: on-chip inteconnection networks</rft:atitle><rft:date>2001</rft:date><rft:btitle>In Proc. of Design Automation Conference (DAC), pages 684–689, Las Vegas</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>W J Dally</rft:au><rft:au>B Towles</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>R Das</author><author>S Eachempati</author><author>A Mishra</author><author>V Narayanan</author><author>C Das</author></authors><title>Design and evaluation of a hierarchical on-chip interconnect for next-generation CMPs</title><booktitle>In International Symposium on High-Performance Computer Architecture (HPCA</booktitle><location>Raleigh, NC, USA</location><pages>175--186</pages><year>2009</year><raw_string>[13] R. Das, S. Eachempati, A. Mishra, V. Narayanan, and C. Das. Design and evaluation of a hierarchical on-chip interconnect for next-generation CMPs. In International Symposium on High-Performance Computer Architecture (HPCA), pages 175–186, Raleigh, NC, USA, Feb. 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Raleigh, NC, USA</rft:place><rft:atitle>Design and evaluation of a hierarchical on-chip interconnect for next-generation CMPs</rft:atitle><rft:spage>175</rft:spage><rft:date>2009</rft:date><rft:btitle>In International Symposium on High-Performance Computer Architecture (HPCA</rft:btitle><rft:genre>bookitem</rft:genre><rft:epage>186</rft:epage><rft:au>R Das</rft:au><rft:au>S Eachempati</rft:au><rft:au>A Mishra</rft:au><rft:au>V Narayanan</rft:au><rft:au>C Das</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Gratz</author><author>C Kim</author><author>R McDonald</author><author>S Keckler</author><author>D Burger</author></authors><title>Implementation and evaluation of on-chip network architectures</title><booktitle>In International Conference on Computer Design (ICCD</booktitle><location>San Jose, CA</location><pages>477--484</pages><year>2006</year><raw_string>[14] P. Gratz, C. Kim, R. McDonald, S. Keckler, and D. Burger. Implementation and evaluation of on-chip network architectures. In International Conference on Computer Design (ICCD), pages 477–484, San Jose, CA, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>San Jose, CA</rft:place><rft:atitle>Implementation and evaluation of on-chip network architectures</rft:atitle><rft:spage>477</rft:spage><rft:date>2006</rft:date><rft:btitle>In International Conference on Computer Design (ICCD</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>484</rft:epage><rft:au>P Gratz</rft:au><rft:au>C Kim</rft:au><rft:au>R McDonald</rft:au><rft:au>S Keckler</rft:au><rft:au>D Burger</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Gubenko</author><author>I Krestnikov</author><author>D Livshtis</author><author>S Mikhrin</author><author>A Kovsh</author><author>L West</author><author>C Bornholdt</author><author>N Grote</author><author>A Zhukov</author></authors><title>Error-free 10 gbit/s transmission using individual fabry-perot modes of low-noise quantum-dot laser</title><journal>Electronic Letters</journal><volume>43</volume><number>25</number><year>2007</year><raw_string>[15] A. Gubenko, I. Krestnikov, D. Livshtis, S. Mikhrin, A. Kovsh, L. West, C. Bornholdt, N. Grote, and A. Zhukov. Error-free 10 gbit/s transmission using individual fabry-perot modes of low-noise quantum-dot laser. Electronic Letters, 43(25):1430–1431, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>25</rft:quarter><rft:atitle>Error-free 10 gbit/s transmission using individual fabry-perot modes of low-noise quantum-dot laser</rft:atitle><rft:date>2007</rft:date><rft:jtitle>Electronic Letters</rft:jtitle><rft:genre>article</rft:genre><rft:volume>43</rft:volume><rft:au>A Gubenko</rft:au><rft:au>I Krestnikov</rft:au><rft:au>D Livshtis</rft:au><rft:au>S Mikhrin</rft:au><rft:au>A Kovsh</rft:au><rft:au>L West</rft:au><rft:au>C Bornholdt</rft:au><rft:au>N Grote</rft:au><rft:au>A Zhukov</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>N Jiang</author><author>J Kim</author><author>W J Dally</author></authors><title>Indirect adaptive routing on large scale interconnection networks</title><booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle><location>Austin, TX</location><year>2009</year><raw_string>[16] N. Jiang, J. Kim, and W. J. Dally. Indirect adaptive routing on large scale interconnection networks. In Proc. of the International Symposium on Computer Architecture (ISCA), Austin, TX, 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Austin, TX</rft:place><rft:atitle>Indirect adaptive routing on large scale interconnection networks</rft:atitle><rft:date>2009</rft:date><rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>N Jiang</rft:au><rft:au>J Kim</rft:au><rft:au>W J Dally</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Jose</author><author>K Shepard</author></authors><title>Distributed loss-compensation techniques for energy-efficient low-latency on-chip communication. Solid-State Circuits</title><journal>IEEE Journal of</journal><volume>42</volume><number>6</number><year>2007</year><raw_string>[17] A. Jose and K. Shepard. Distributed loss-compensation techniques for energy-efficient low-latency on-chip communication. Solid-State Circuits, IEEE Journal of, 42(6):1415–1424, June 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:46-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>6</rft:quarter><rft:atitle>Distributed loss-compensation techniques for energy-efficient low-latency on-chip communication. Solid-State Circuits</rft:atitle><rft:date>2007</rft:date><rft:stitle>IEEE Journal of</rft:stitle><rft:genre>article</rft:genre><rft:volume>42</rft:volume><rft:au>A Jose</rft:au><rft:au>K Shepard</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Kapur</author><author>K C Saraswat</author></authors><title>Comparisons between electrical and optical interconnects for on-chip signaling</title><booktitle>In International Interconnect Technology Conference</booktitle><location>Burlingame, CA</location><pages>89--91</pages><year>2002</year><raw_string>[18] P. Kapur and K. C. Saraswat. Comparisons between electrical and optical interconnects for on-chip signaling. In International Interconnect Technology Conference, pages 89–91, Burlingame, CA, Jun. 2002.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Burlingame, CA</rft:place><rft:atitle>Comparisons between electrical and optical interconnects for on-chip signaling</rft:atitle><rft:spage>89</rft:spage><rft:date>2002</rft:date><rft:btitle>In International Interconnect Technology Conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>91</rft:epage><rft:au>P Kapur</rft:au><rft:au>K C Saraswat</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Kermani</author><author>L Kleinrock</author></authors><title>Virtual cut-through: A new computer communication switching technique</title><journal>Computer Networks</journal><volume>3</volume><number>267</number><year>1979</year><raw_string>[19] P. Kermani and L. Kleinrock. Virtual cut-through: A new computer communication switching technique. Computer Networks, 3:267–286, 1979.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>267</rft:quarter><rft:atitle>Virtual cut-through: A new computer communication switching technique</rft:atitle><rft:date>1979</rft:date><rft:jtitle>Computer Networks</rft:jtitle><rft:genre>article</rft:genre><rft:volume>3</rft:volume><rft:au>P Kermani</rft:au><rft:au>L Kleinrock</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Kim</author><author>J Balfour</author><author>W J Dally</author></authors><title>Flattened butterfly topology for on-chip networks</title><booktitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</booktitle><location>Chicago, Illinois</location><year>2007</year><raw_string>[20] J. Kim, J. Balfour, and W. J. Dally. Flattened butterfly topology for on-chip networks. In IEEE/ACM International Symposium on Microarchitecture (MICRO), Chicago, Illinois, Dec. 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Chicago, Illinois</rft:place><rft:atitle>Flattened butterfly topology for on-chip networks</rft:atitle><rft:date>2007</rft:date><rft:btitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>J Kim</rft:au><rft:au>J Balfour</rft:au><rft:au>W J Dally</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Kim</author><author>W J Dally</author><author>S Scott</author><author>D Abts Technology-driven</author></authors><title>highly-scalable dragonfly network</title><booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle><location>Beijing, China</location><year>2008</year><raw_string>[21] J. Kim, W. J. Dally, S. Scott, and D. Abts. Technology-driven, highly-scalable dragonfly network. In Proc. of the International Symposium on Computer Architecture (ISCA), Beijing, China, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Beijing, China</rft:place><rft:atitle>highly-scalable dragonfly network</rft:atitle><rft:date>2008</rft:date><rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>J Kim</rft:au><rft:au>W J Dally</rft:au><rft:au>S Scott</rft:au><rft:au>D Abts Technology-driven</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Kim</author><author>W J Dally</author><author>S Scott</author><author>D Abts</author></authors><title>Cost-efficient dragonfly topology for large-scale system</title><booktitle>In Micro’s Top Picks in Computer Architecture Conferences</booktitle><volume>29</volume><pages>33--40</pages><year>2009</year><raw_string>[22] J. Kim, W. J. Dally, S. Scott, and D. Abts. Cost-efficient dragonfly topology for large-scale system. In Micro’s Top Picks in Computer Architecture Conferences, volume 29, pages 33–40, 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Cost-efficient dragonfly topology for large-scale system</rft:atitle><rft:spage>33</rft:spage><rft:date>2009</rft:date><rft:btitle>In Micro’s Top Picks in Computer Architecture Conferences</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>40</rft:epage><rft:au>J Kim</rft:au><rft:au>W J Dally</rft:au><rft:au>S Scott</rft:au><rft:au>D Abts</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Kim</author><author>W J Dally</author><author>B Towles</author><author>A Gupta</author></authors><title>Microarchitecture of a high-radix router</title><booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle><location>Madison, WI</location><year>2005</year><raw_string>[23] J. Kim, W. J. Dally, B. Towles, and A. Gupta. Microarchitecture of a high-radix router. In Proc. of the International Symposium on Computer Architecture (ISCA), Madison, WI, Jun. 2005.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Madison, WI</rft:place><rft:atitle>Microarchitecture of a high-radix router</rft:atitle><rft:date>2005</rft:date><rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>J Kim</rft:au><rft:au>W J Dally</rft:au><rft:au>B Towles</rft:au><rft:au>A Gupta</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>N Kirman</author><author>M Kirman</author><author>R K Dokania</author><author>J F Martinez</author><author>A B Apsel</author><author>M A Watkins</author><author>D H Albonesi</author></authors><title>Leveraging optical technology in future bus-based chip multiprocessors</title><booktitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</booktitle><location>Orlando, FL</location><pages>492--503</pages><year>2006</year><raw_string>[24] N. Kirman, M. Kirman, R. K. Dokania, J. F. Martinez, A. B. Apsel, M. A. Watkins, and D. H. Albonesi. Leveraging optical technology in future bus-based chip multiprocessors. In IEEE/ACM International Symposium on Microarchitecture (MICRO), pages 492–503, Orlando, FL, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Orlando, FL</rft:place><rft:atitle>Leveraging optical technology in future bus-based chip multiprocessors</rft:atitle><rft:spage>492</rft:spage><rft:date>2006</rft:date><rft:btitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</rft:btitle><rft:genre>bookitem</rft:genre><rft:epage>503</rft:epage><rft:au>N Kirman</rft:au><rft:au>M Kirman</rft:au><rft:au>R K Dokania</rft:au><rft:au>J F Martinez</rft:au><rft:au>A B Apsel</rft:au><rft:au>M A Watkins</rft:au><rft:au>D H Albonesi</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Kovsh</author><author>I Krestnikov</author><author>D Livshits</author><author>S Mikhrin</author><author>J Weimert</author><author>A Zhukov</author></authors><title>Quantum dot laser with 75nm broad spectrum of emission</title><journal>Optics Letters</journal><volume>32</volume><number>7</number><year>2007</year><raw_string>[25] A. Kovsh, I. Krestnikov, D. Livshits, S. Mikhrin, J. Weimert, and A. Zhukov. Quantum dot laser with 75nm broad spectrum of emission. Optics Letters, 32(7):793–795, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>7</rft:quarter><rft:atitle>Quantum dot laser with 75nm broad spectrum of emission</rft:atitle><rft:date>2007</rft:date><rft:jtitle>Optics Letters</rft:jtitle><rft:genre>article</rft:genre><rft:volume>32</rft:volume><rft:au>A Kovsh</rft:au><rft:au>I Krestnikov</rft:au><rft:au>D Livshits</rft:au><rft:au>S Mikhrin</rft:au><rft:au>J Weimert</rft:au><rft:au>A Zhukov</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Krishna</author><author>A Kumar</author><author>P Chiang</author><author>M Erez</author><author>L-S Peh</author></authors><title>Noc with near-ideal express virtual channels using global-line communication</title><booktitle>In Proc. of Hot Interconnects</booktitle><location>Stanford, CA</location><pages>11--20</pages><year>2008</year><raw_string>[26] T. Krishna, A. Kumar, P. Chiang, M. Erez, and L.-S. Peh. Noc with near-ideal express virtual channels using global-line communication. In Proc. of Hot Interconnects, pages 11–20, Stanford, CA, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Stanford, CA</rft:place><rft:atitle>Noc with near-ideal express virtual channels using global-line communication</rft:atitle><rft:spage>11</rft:spage><rft:date>2008</rft:date><rft:btitle>In Proc. of Hot Interconnects</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>20</rft:epage><rft:au>T Krishna</rft:au><rft:au>A Kumar</rft:au><rft:au>P Chiang</rft:au><rft:au>M Erez</rft:au><rft:au>L-S Peh</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Kumar</author><author>P Kundu</author><author>A P Singh</author><author>L-S Peh</author><author>N K Jha</author></authors><title>A 4.6tbits/s 3.6ghz single-cycle NoC router with a novel switch allocator in 65nm CMOS</title><booktitle>In International Conference on Computer Design (ICCD</booktitle><location>Lake Tahoe, CA</location><pages>63--70</pages><year>2007</year><raw_string>[27] A. Kumar, P. Kundu, A. P. Singh, L.-S. Peh, and N. K. Jha. A 4.6tbits/s 3.6ghz single-cycle NoC router with a novel switch allocator in 65nm CMOS. In International Conference on Computer Design (ICCD), pages 63–70, Lake Tahoe, CA, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Lake Tahoe, CA</rft:place><rft:atitle>A 4.6tbits/s 3.6ghz single-cycle NoC router with a novel switch allocator in 65nm CMOS</rft:atitle><rft:spage>63</rft:spage><rft:date>2007</rft:date><rft:btitle>In International Conference on Computer Design (ICCD</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>70</rft:epage><rft:au>A Kumar</rft:au><rft:au>P Kundu</rft:au><rft:au>A P Singh</rft:au><rft:au>L-S Peh</rft:au><rft:au>N K Jha</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>P Kumar</author><author>Y Pan</author><author>J Kim</author><author>G Memik</author><author>A Choudhary</author></authors><title>Exploring concentration and channel slicing in on-chip network router</title><booktitle>In IEEE International Symposium on Network-on-Chip (NOCS</booktitle><location>San Diego, CA</location><year>2009</year><raw_string>[28] P. Kumar, Y. Pan, J. Kim, G. Memik, and A. Choudhary.  Exploring concentration and channel slicing in on-chip network router. In IEEE International Symposium on Network-on-Chip (NOCS), San Diego, CA, 2009.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>San Diego, CA</rft:place><rft:atitle>Exploring concentration and channel slicing in on-chip network router</rft:atitle><rft:date>2009</rft:date><rft:btitle>In IEEE International Symposium on Network-on-Chip (NOCS</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>P Kumar</rft:au><rft:au>Y Pan</rft:au><rft:au>J Kim</rft:au><rft:au>G Memik</rft:au><rft:au>A Choudhary</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Louri</author><author>A K Kodi</author></authors><title>An optical interconnection network and a modified snooping protocol for the design of large-scale symmetric multiprocessors (smps</title><journal>IEEE Trans. on Parallel and Distributed Systems</journal><volume>15</volume><number>12</number><year>2004</year><raw_string>[29] A. Louri and A. K. Kodi. An optical interconnection network and a modified snooping protocol for the design of large-scale symmetric multiprocessors (smps). IEEE Trans. on Parallel and Distributed Systems, 15(12):1093–1104, Dec. 2004.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>12</rft:quarter><rft:atitle>An optical interconnection network and a modified snooping protocol for the design of large-scale symmetric multiprocessors (smps</rft:atitle><rft:date>2004</rft:date><rft:stitle>IEEE Trans. on Parallel and Distributed Systems</rft:stitle><rft:genre>article</rft:genre><rft:volume>15</rft:volume><rft:au>A Louri</rft:au><rft:au>A K Kodi</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>R Narayanan</author><author>B Ozisikyilmaz</author><author>J Zambreno</author><author>G Memik</author><author>A Choudhary</author></authors><title>Minebench: A benchmark suite for data mining workloads</title><booktitle>In IEEE International Symposium on Workload Characterization (IISCW</booktitle><location>San Jose, CA</location><pages>182--188</pages><year>2006</year><raw_string>[30] R. Narayanan, B. Ozisikyilmaz, J. Zambreno, G. Memik, and A. Choudhary. Minebench: A benchmark suite for data mining workloads. In IEEE International Symposium on Workload Characterization (IISCW), pages 182–188, San Jose, CA, 2006.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>San Jose, CA</rft:place><rft:atitle>Minebench: A benchmark suite for data mining workloads</rft:atitle><rft:spage>182</rft:spage><rft:date>2006</rft:date><rft:btitle>In IEEE International Symposium on Workload Characterization (IISCW</rft:btitle><rft:genre>bookitem</rft:genre><rft:epage>188</rft:epage><rft:au>R Narayanan</rft:au><rft:au>B Ozisikyilmaz</rft:au><rft:au>J Zambreno</rft:au><rft:au>G Memik</rft:au><rft:au>A Choudhary</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>O I Dosunmu M K Emsley</author><author>M S Unlu</author><author>D DCannon</author><author>L C Kimerling</author></authors><title>High speed resonant cavity enhanced ge photodetectors on si reflecting substrates for 1550 nm operation</title><journal>In IEEE International Topical Meeting on Microwave Photonics</journal><volume>2004</volume><location>Ogunquit, ME</location><pages>266--268</pages><year>2004</year><raw_string>[31] O.I.Dosunmu, M. K. Emsley, M. S. Unlu, D. DCannon, and L. C. Kimerling. High speed resonant cavity enhanced ge photodetectors on si reflecting substrates for 1550 nm operation. In IEEE International Topical Meeting on Microwave Photonics, 2004., pages 266–268, Ogunquit, ME, 2004.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>High speed resonant cavity enhanced ge photodetectors on si reflecting substrates for 1550 nm operation</rft:atitle><rft:spage>266</rft:spage><rft:date>2004</rft:date><rft:stitle>In IEEE International Topical Meeting on Microwave Photonics</rft:stitle><rft:genre>article</rft:genre><rft:volume>2004</rft:volume><rft:epage>268</rft:epage><rft:au>O I Dosunmu M K Emsley</rft:au><rft:au>M S Unlu</rft:au><rft:au>D DCannon</rft:au><rft:au>L C Kimerling</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>L Pavesi</author><author>D J Lockwood Silicon photonics</author><author>2004</author></authors><title>Photonic networks-on-chip: Opportunities and challenges</title><location>Seattle, WA</location><pages>2789--2792</pages><year>2008</year><raw_string>[32] L. Pavesi and D. J. Lockwood. Silicon photonics, 2004. [33] M. Petracca, K. Bergman, and L. Carloni. Photonic networks-on-chip: Opportunities and challenges. pages 2789–2792, Seattle, WA, May 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Pinkston</author></authors><title>Design considerations for optical interconnects in parallel computers</title><booktitle>In Proc. of the First International Workshop on Massively Parallel Processing Using Optical Interconnections</booktitle><location>Cancun, Mexico</location><pages>306--322</pages><year>1994</year><raw_string>[34] T. Pinkston. Design considerations for optical interconnects in parallel computers. In Proc. of the First International Workshop on Massively Parallel Processing Using Optical Interconnections, pages 306–322, Cancun, Mexico, Apr. 1994.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Cancun, Mexico</rft:place><rft:atitle>Design considerations for optical interconnects in parallel computers</rft:atitle><rft:spage>306</rft:spage><rft:date>1994</rft:date><rft:btitle>In Proc. of the First International Workshop on Massively Parallel Processing Using Optical Interconnections</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>322</rft:epage><rft:au>T Pinkston</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>A Shacham</author><author>K Bergman</author><author>L P Carloni</author></authors><title>The case for low-power photonic networks-on-chip</title><booktitle>In Proc. of Design Automation Conference (DAC</booktitle><location>San Diego, CA</location><pages>132--135</pages><year>2007</year><raw_string>[35] A. Shacham, K. Bergman, and L. P. Carloni. The case for low-power photonic networks-on-chip. In Proc. of Design Automation Conference (DAC), pages 132–135, San Diego, CA, 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>San Diego, CA</rft:place><rft:atitle>The case for low-power photonic networks-on-chip</rft:atitle><rft:spage>132</rft:spage><rft:date>2007</rft:date><rft:btitle>In Proc. of Design Automation Conference (DAC</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>135</rft:epage><rft:au>A Shacham</rft:au><rft:au>K Bergman</rft:au><rft:au>L P Carloni</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>J Tatum</author></authors><title>Vcsels for 10 gb/s optical interconnects</title><booktitle>In IEEE Emerging Technologies Symposium on BroadBand Communications for the Internet Era</booktitle><location>Richardson, TX</location><pages>58--61</pages><year>2001</year><raw_string>[36] J. Tatum. Vcsels for 10 gb/s optical interconnects. In IEEE Emerging Technologies Symposium on BroadBand Communications for the Internet Era, pages 58–61, Richardson, TX, 2001.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Richardson, TX</rft:place><rft:atitle>Vcsels for 10 gb/s optical interconnects</rft:atitle><rft:spage>58</rft:spage><rft:date>2001</rft:date><rft:btitle>In IEEE Emerging Technologies Symposium on BroadBand Communications for the Internet Era</rft:btitle><rft:genre>bookitem</rft:genre><rft:epage>61</rft:epage><rft:au>J Tatum</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>S R Vangal</author><author>J Howard</author><author>G Ruhl</author><author>S Dighe</author><author>H Wilson</author><author>J Tschanz</author><author>D Finan</author><author>A Singh</author><author>T Jacob</author><author>S Jain</author><author>V Erraguntla</author><author>C Roberts</author><author>Y Hoskote</author><author>N Borkar</author><author>S Borkar</author></authors><title>An 80-Tile sub-100-w teraflops processor in 65-nm cmos</title><journal>Solid-State Circuits, IEEE Journal of</journal><volume>43</volume><number>1</number><year>2008</year><raw_string>[37] S. R. Vangal, J. Howard, G. Ruhl, S. Dighe, H. Wilson, J. Tschanz, D. Finan, A. Singh, T. Jacob, S. Jain, V. Erraguntla, C. Roberts, Y. Hoskote, N. Borkar, and S. Borkar. An 80-Tile sub-100-w teraflops processor in 65-nm cmos. Solid-State Circuits, IEEE Journal of, 43(1):29–41, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>1</rft:quarter><rft:atitle>An 80-Tile sub-100-w teraflops processor in 65-nm cmos</rft:atitle><rft:date>2008</rft:date><rft:stitle>Solid-State Circuits, IEEE Journal of</rft:stitle><rft:genre>article</rft:genre><rft:volume>43</rft:volume><rft:au>S R Vangal</rft:au><rft:au>J Howard</rft:au><rft:au>G Ruhl</rft:au><rft:au>S Dighe</rft:au><rft:au>H Wilson</rft:au><rft:au>J Tschanz</rft:au><rft:au>D Finan</rft:au><rft:au>A Singh</rft:au><rft:au>T Jacob</rft:au><rft:au>S Jain</rft:au><rft:au>V Erraguntla</rft:au><rft:au>C Roberts</rft:au><rft:au>Y Hoskote</rft:au><rft:au>N Borkar</rft:au><rft:au>S Borkar</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>D Vantrease</author><author>R Schreiber</author><author>M Monchiero</author><author>M McLaren</author><author>N P Jouppi</author><author>M Fiorentino</author><author>A Davis</author><author>N L Binkert</author><author>R G Beausoleil</author><author>J H Ahn</author></authors><title>Corona: System implications of emerging nanophotonic technology</title><booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle><location>Beijing, China</location><pages>153--164</pages><year>2008</year><raw_string>[38] D. Vantrease, R. Schreiber, M. Monchiero, M. McLaren, N. P. Jouppi, M. Fiorentino, A. Davis, N. L. Binkert, R. G. Beausoleil, and J. H. Ahn. Corona: System implications of emerging nanophotonic technology. In Proc. of the International Symposium on Computer Architecture (ISCA), pages 153–164, Beijing, China, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Beijing, China</rft:place><rft:atitle>Corona: System implications of emerging nanophotonic technology</rft:atitle><rft:spage>153</rft:spage><rft:date>2008</rft:date><rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>164</rft:epage><rft:au>D Vantrease</rft:au><rft:au>R Schreiber</rft:au><rft:au>M Monchiero</rft:au><rft:au>M McLaren</rft:au><rft:au>N P Jouppi</rft:au><rft:au>M Fiorentino</rft:au><rft:au>A Davis</rft:au><rft:au>N L Binkert</rft:au><rft:au>R G Beausoleil</rft:au><rft:au>J H Ahn</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Y Vlasov</author><author>S McNab</author></authors><title>Losses in single-mode silicon-on-insulator strip waveguides and bends</title><journal>Optics Express</journal><volume>12</volume><number>8</number><year>2004</year><raw_string>[39] Y. Vlasov and S. McNab. Losses in single-mode silicon-on-insulator strip waveguides and bends. Optics Express, 12(8):1622–1631, 2004.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>8</rft:quarter><rft:atitle>Losses in single-mode silicon-on-insulator strip waveguides and bends</rft:atitle><rft:date>2004</rft:date><rft:stitle>Optics Express</rft:stitle><rft:genre>article</rft:genre><rft:volume>12</rft:volume><rft:au>Y Vlasov</rft:au><rft:au>S McNab</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>S Woo</author><author>M Ohara</author><author>E Torrie</author><author>J Singh</author><author>A Gupta</author></authors><title>The SPLASH-2 programs: Characterization and methodological considerations</title><booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle><location>Santa Margherita Ligure, Italy</location><pages>24--36</pages><year>1995</year><raw_string>[40] S. Woo, M. Ohara, E. Torrie, J. Singh, and A. Gupta. The SPLASH-2 programs: Characterization and methodological considerations. In Proc. of the International Symposium on Computer Architecture (ISCA), pages 24–36, Santa Margherita Ligure, Italy, Jun. 1995.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Santa Margherita Ligure, Italy</rft:place><rft:atitle>The SPLASH-2 programs: Characterization and methodological considerations</rft:atitle><rft:spage>24</rft:spage><rft:date>1995</rft:date><rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>36</rft:epage><rft:au>S Woo</rft:au><rft:au>M Ohara</rft:au><rft:au>E Torrie</rft:au><rft:au>J Singh</rft:au><rft:au>A Gupta</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Q Xu</author><author>S Manipatruni</author><author>B Schmidt</author><author>J Shakya</author><author>M Lipson</author></authors><title>12.5 gbit/s carrier-injection-based silicon micro-ring silicon modulators</title><journal>Opt. Express</journal><volume>15</volume><number>2</number><year>2007</year><raw_string>[41] Q. Xu, S. Manipatruni, B. Schmidt, J. Shakya, and M. Lipson. 12.5 gbit/s carrier-injection-based silicon micro-ring silicon modulators. Opt. Express, 15(2):430–436, Jan. 2007.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>2</rft:quarter><rft:atitle>12.5 gbit/s carrier-injection-based silicon micro-ring silicon modulators</rft:atitle><rft:date>2007</rft:date><rft:stitle>Opt. Express</rft:stitle><rft:genre>article</rft:genre><rft:volume>15</rft:volume><rft:au>Q Xu</rft:au><rft:au>S Manipatruni</rft:au><rft:au>B Schmidt</rft:au><rft:au>J Shakya</rft:au><rft:au>M Lipson</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>T Yin</author><author>R Cohen</author><author>M M Morse</author><author>G Sarid</author><author>Y Chetrit</author><author>D Rubin</author><author>M J Paniccia</author></authors><title>40gb/s ge-on-soi waveguide photodetectors by selective ge growth</title><booktitle>In Conference on Optical Fiber communication/National Fiber Optic Engineers Conference (OFC/NFOEC</booktitle><location>San Diego, CA</location><pages>24--28</pages><year>2008</year><raw_string>[42] T. Yin, R. Cohen, M. M. Morse, G. Sarid, Y. Chetrit, D. Rubin, and M. J. Paniccia. 40gb/s ge-on-soi waveguide photodetectors by selective ge growth. In Conference on Optical Fiber communication/National Fiber Optic Engineers Conference (OFC/NFOEC), pages 24–28, San Diego, CA, 2008.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:47-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>San Diego, CA</rft:place><rft:atitle>40gb/s ge-on-soi waveguide photodetectors by selective ge growth</rft:atitle><rft:spage>24</rft:spage><rft:date>2008</rft:date><rft:btitle>In Conference on Optical Fiber communication/National Fiber Optic Engineers Conference (OFC/NFOEC</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>28</rft:epage><rft:au>T Yin</rft:au><rft:au>R Cohen</rft:au><rft:au>M M Morse</rft:au><rft:au>G Sarid</rft:au><rft:au>Y Chetrit</rft:au><rft:au>D Rubin</rft:au><rft:au>M J Paniccia</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
-
+  <citation valid="true">
+    <authors>
+      <author>A Al-Azzawi</author>
+    </authors>
+    <title>Photonics: Principles and Practices</title>
+    <publisher>CRC Press</publisher>
+    <year>2007</year>
+    <raw_string>[1] A. Al-Azzawi. Photonics: Principles and Practices. CRC Press, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>V Almeida</author>
+      <author>C Barrios</author>
+      <author>R Panepucci</author>
+      <author>M Lipson</author>
+      <author>M Foster</author>
+      <author>D Ouzounov</author>
+      <author>A Gaeta</author>
+    </authors>
+    <title>All-optical switching on a silicon chip</title>
+    <journal>Optics Letters</journal>
+    <volume>29</volume>
+    <number>2867</number>
+    <year>2004</year>
+    <raw_string>[2] V. Almeida, C. Barrios, R. Panepucci, M. Lipson, M. Foster, D. Ouzounov, and A. Gaeta. All-optical switching on a silicon chip. Optics Letters, 29:2867&#x2013;2869, 2004.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>2867</rft:quarter>
+              <rft:atitle>All-optical switching on a silicon chip</rft:atitle>
+              <rft:date>2004</rft:date>
+              <rft:jtitle>Optics Letters</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>29</rft:volume>
+              <rft:au>V Almeida</rft:au>
+              <rft:au>C Barrios</rft:au>
+              <rft:au>R Panepucci</rft:au>
+              <rft:au>M Lipson</rft:au>
+              <rft:au>M Foster</rft:au>
+              <rft:au>D Ouzounov</rft:au>
+              <rft:au>A Gaeta</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Balfour</author>
+      <author>W J Dally</author>
+    </authors>
+    <title>Design tradeoffs for tiled CMP on-chip networks</title>
+    <booktitle>In Proc. of the International Conference on Supercomputing (ICS</booktitle>
+    <location>Carns, Queensland, Australia</location>
+    <pages>187--198</pages>
+    <year>2006</year>
+    <raw_string>[3] J. Balfour and W. J. Dally. Design tradeoffs for tiled CMP on-chip networks. In Proc. of the International Conference on Supercomputing (ICS), pages 187&#x2013;198, Carns, Queensland, Australia, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Carns, Queensland, Australia</rft:place>
+              <rft:atitle>Design tradeoffs for tiled CMP on-chip networks</rft:atitle>
+              <rft:spage>187</rft:spage>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In Proc. of the International Conference on Supercomputing (ICS</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>198</rft:epage>
+              <rft:au>J Balfour</rft:au>
+              <rft:au>W J Dally</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C A Barrios</author>
+      <author>V R Almeida</author>
+      <author>M Lipson</author>
+    </authors>
+    <title>Low-power-consumption short-length and high-modulation-depth silicon electro-optic modulator</title>
+    <journal>Journal of Lightwave Technology</journal>
+    <volume>21</volume>
+    <number>4</number>
+    <year>2003</year>
+    <raw_string>[4] C. A. Barrios, V. R. Almeida, and M. Lipson. Low-power-consumption short-length and high-modulation-depth silicon electro-optic modulator. Journal of Lightwave Technology, 21(4):1089&#x2013;1098, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>4</rft:quarter>
+              <rft:atitle>Low-power-consumption short-length and high-modulation-depth silicon electro-optic modulator</rft:atitle>
+              <rft:date>2003</rft:date>
+              <rft:stitle>Journal of Lightwave Technology</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>21</rft:volume>
+              <rft:au>C A Barrios</rft:au>
+              <rft:au>V R Almeida</rft:au>
+              <rft:au>M Lipson</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C Batten</author>
+      <author>A Joshi</author>
+      <author>J Orcutt</author>
+      <author>A Khilo</author>
+      <author>B Moss</author>
+      <author>C Holzwarth</author>
+      <author>M Popovic</author>
+      <author>H Li</author>
+      <author>H Smith</author>
+      <author>J Hoyt</author>
+      <author>F Kartner</author>
+      <author>R Ram</author>
+      <author>V Stojanovic</author>
+      <author>K Asanovic</author>
+    </authors>
+    <title>Building manycore processor-to-dram networks with monolithic silicon photonics</title>
+    <booktitle>In Proc. of Hot Interconnects</booktitle>
+    <location>Stanford, CA</location>
+    <pages>21--30</pages>
+    <year>2008</year>
+    <raw_string>[5] C. Batten, A. Joshi, J. Orcutt, A. Khilo, B. Moss, C. Holzwarth, M. Popovic, H. Li, H. Smith, J. Hoyt, F. Kartner, R. Ram, V. Stojanovic, and K. Asanovic. Building manycore processor-to-dram networks with monolithic silicon photonics. In Proc. of Hot Interconnects, pages 21&#x2013;30, Stanford, CA, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Stanford, CA</rft:place>
+              <rft:atitle>Building manycore processor-to-dram networks with monolithic silicon photonics</rft:atitle>
+              <rft:spage>21</rft:spage>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Proc. of Hot Interconnects</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>30</rft:epage>
+              <rft:au>C Batten</rft:au>
+              <rft:au>A Joshi</rft:au>
+              <rft:au>J Orcutt</rft:au>
+              <rft:au>A Khilo</rft:au>
+              <rft:au>B Moss</rft:au>
+              <rft:au>C Holzwarth</rft:au>
+              <rft:au>M Popovic</rft:au>
+              <rft:au>H Li</rft:au>
+              <rft:au>H Smith</rft:au>
+              <rft:au>J Hoyt</rft:au>
+              <rft:au>F Kartner</rft:au>
+              <rft:au>R Ram</rft:au>
+              <rft:au>V Stojanovic</rft:au>
+              <rft:au>K Asanovic</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Bell</author>
+      <author>B Edwards</author>
+      <author>J Amann</author>
+      <author>R Conlin</author>
+      <author>K Joyce</author>
+      <author>V Leung</author>
+      <author>J Mackay</author>
+      <author>M Reif</author>
+      <author>L Bao</author>
+      <author>J Brown</author>
+      <author>M Mattina</author>
+      <author>C-C Miao</author>
+      <author>C Ramey</author>
+      <author>D Wentzlaff</author>
+      <author>W Anderson</author>
+      <author>E Berger</author>
+      <author>N Fairbanks</author>
+      <author>D Khan</author>
+      <author>F Montenegro</author>
+      <author>J Stickney</author>
+      <author>J Zook</author>
+    </authors>
+    <title>Tile64 processor: A 64-core soc with mesh interconnect</title>
+    <booktitle>In Solid-State Circuits Conference, 2008. ISSCC 2008. Digest of Technical Papers. IEEE International</booktitle>
+    <pages>88--598</pages>
+    <year>2008</year>
+    <raw_string>[6] S. Bell, B. Edwards, J. Amann, R. Conlin, K. Joyce, V. Leung, J. Mackay, M. Reif, L. Bao, J. Brown, M. Mattina, C.-C. Miao, C. Ramey, D. Wentzlaff, W. Anderson, E. Berger, N. Fairbanks, D. Khan, F. Montenegro, J. Stickney, and J. Zook. Tile64 processor: A 64-core soc with mesh interconnect. In Solid-State Circuits Conference, 2008. ISSCC 2008. Digest of Technical Papers. IEEE International, pages 88&#x2013;598, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Tile64 processor: A 64-core soc with mesh interconnect</rft:atitle>
+              <rft:spage>88</rft:spage>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Solid-State Circuits Conference, 2008. ISSCC 2008. Digest of Technical Papers. IEEE International</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>598</rft:epage>
+              <rft:au>S Bell</rft:au>
+              <rft:au>B Edwards</rft:au>
+              <rft:au>J Amann</rft:au>
+              <rft:au>R Conlin</rft:au>
+              <rft:au>K Joyce</rft:au>
+              <rft:au>V Leung</rft:au>
+              <rft:au>J Mackay</rft:au>
+              <rft:au>M Reif</rft:au>
+              <rft:au>L Bao</rft:au>
+              <rft:au>J Brown</rft:au>
+              <rft:au>M Mattina</rft:au>
+              <rft:au>C-C Miao</rft:au>
+              <rft:au>C Ramey</rft:au>
+              <rft:au>D Wentzlaff</rft:au>
+              <rft:au>W Anderson</rft:au>
+              <rft:au>E Berger</rft:au>
+              <rft:au>N Fairbanks</rft:au>
+              <rft:au>D Khan</rft:au>
+              <rft:au>F Montenegro</rft:au>
+              <rft:au>J Stickney</rft:au>
+              <rft:au>J Zook</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>N Binkert</author>
+    </authors>
+    <year>2008</year>
+    <tech>Personal communication</tech>
+    <raw_string>[7] N. Binkert. Personal communication, Aug. 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R D Chamberlain</author>
+      <author>M A Franklin</author>
+      <author>C S Baw</author>
+    </authors>
+    <title>Gemini: An optical interconnection network for parallel processing</title>
+    <journal>IEEE Trans. on Parallel and Distributed Systems</journal>
+    <volume>13</volume>
+    <number>1038</number>
+    <year>2002</year>
+    <raw_string>[8] R. D. Chamberlain, M. A. Franklin, and C. S. Baw.  Gemini: An optical interconnection network for parallel processing. IEEE Trans. on Parallel and Distributed Systems, 13:1038&#x2013;1055, 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1038</rft:quarter>
+              <rft:atitle>Gemini: An optical interconnection network for parallel processing</rft:atitle>
+              <rft:date>2002</rft:date>
+              <rft:stitle>IEEE Trans. on Parallel and Distributed Systems</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>13</rft:volume>
+              <rft:au>R D Chamberlain</rft:au>
+              <rft:au>M A Franklin</rft:au>
+              <rft:au>C S Baw</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Chang</author>
+      <author>J Cong</author>
+      <author>A Kaplan</author>
+      <author>M Naik</author>
+      <author>G Reinman</author>
+      <author>E Socher</author>
+      <author>S-W Tam</author>
+    </authors>
+    <title>CMP network-on-chip overlaid with multi-band rf-interconnect</title>
+    <booktitle>In International Symposium on High-Performance Computer Architecture (HPCA</booktitle>
+    <pages>pages </pages>
+    <year>2008</year>
+    <raw_string>[9] M. Chang, J. Cong, A. Kaplan, M. Naik, G. Reinman, E. Socher, and S.-W. Tam. CMP network-on-chip overlaid with multi-band rf-interconnect. In International Symposium on High-Performance Computer Architecture (HPCA), pages 191&#x2013;202, Feb. 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>CMP network-on-chip overlaid with multi-band rf-interconnect</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In International Symposium on High-Performance Computer Architecture (HPCA</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:pages>pages </rft:pages>
+              <rft:au>M Chang</rft:au>
+              <rft:au>J Cong</rft:au>
+              <rft:au>A Kaplan</rft:au>
+              <rft:au>M Naik</rft:au>
+              <rft:au>G Reinman</rft:au>
+              <rft:au>E Socher</rft:au>
+              <rft:au>S-W Tam</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>G Chen</author>
+      <author>H Chen</author>
+      <author>M Haurylau</author>
+      <author>N Nelson</author>
+      <author>P M Fauchet</author>
+      <author>E Friedman</author>
+      <author>D Albonesi</author>
+    </authors>
+    <title>Predictions of cmoscompatible on-chip optical interconnect</title>
+    <booktitle>In 7th International Workshop on System-Level Interconnect Prediction (SLIP</booktitle>
+    <location>San Francisco, CA</location>
+    <pages>13--20</pages>
+    <year>2005</year>
+    <raw_string>[10] G. Chen, H. Chen, M. Haurylau, N. Nelson, P. M. Fauchet, E. Friedman, and D. Albonesi. Predictions of cmoscompatible on-chip optical interconnect. In 7th International Workshop on System-Level Interconnect Prediction (SLIP), pages 13&#x2013;20, San Francisco, CA, 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>San Francisco, CA</rft:place>
+              <rft:atitle>Predictions of cmoscompatible on-chip optical interconnect</rft:atitle>
+              <rft:spage>13</rft:spage>
+              <rft:date>2005</rft:date>
+              <rft:btitle>In 7th International Workshop on System-Level Interconnect Prediction (SLIP</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:epage>20</rft:epage>
+              <rft:au>G Chen</rft:au>
+              <rft:au>H Chen</rft:au>
+              <rft:au>M Haurylau</rft:au>
+              <rft:au>N Nelson</rft:au>
+              <rft:au>P M Fauchet</rft:au>
+              <rft:au>E Friedman</rft:au>
+              <rft:au>D Albonesi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>W J Dally</author>
+      <author>T B</author>
+    </authors>
+    <title>Principles and Practices of Interconnection Networks</title>
+    <publisher>Morgan Kaufmann Publishing Inc</publisher>
+    <year>2004</year>
+    <raw_string>[11] W. J. Dally and T. B. Principles and Practices of Interconnection Networks. Morgan Kaufmann Publishing Inc., 2004.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>W J Dally</author>
+      <author>B Towles</author>
+    </authors>
+    <title>Route packets, not wires: on-chip inteconnection networks</title>
+    <booktitle>In Proc. of Design Automation Conference (DAC), pages 684&#x2013;689, Las Vegas</booktitle>
+    <location>NV</location>
+    <year>2001</year>
+    <raw_string>[12] W. J. Dally and B. Towles. Route packets, not wires: on-chip inteconnection networks. In Proc. of Design Automation Conference (DAC), pages 684&#x2013;689, Las Vegas, NV, Jun 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>NV</rft:place>
+              <rft:atitle>Route packets, not wires: on-chip inteconnection networks</rft:atitle>
+              <rft:date>2001</rft:date>
+              <rft:btitle>In Proc. of Design Automation Conference (DAC), pages 684&#x2013;689, Las Vegas</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>W J Dally</rft:au>
+              <rft:au>B Towles</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R Das</author>
+      <author>S Eachempati</author>
+      <author>A Mishra</author>
+      <author>V Narayanan</author>
+      <author>C Das</author>
+    </authors>
+    <title>Design and evaluation of a hierarchical on-chip interconnect for next-generation CMPs</title>
+    <booktitle>In International Symposium on High-Performance Computer Architecture (HPCA</booktitle>
+    <location>Raleigh, NC, USA</location>
+    <pages>175--186</pages>
+    <year>2009</year>
+    <raw_string>[13] R. Das, S. Eachempati, A. Mishra, V. Narayanan, and C. Das. Design and evaluation of a hierarchical on-chip interconnect for next-generation CMPs. In International Symposium on High-Performance Computer Architecture (HPCA), pages 175&#x2013;186, Raleigh, NC, USA, Feb. 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Raleigh, NC, USA</rft:place>
+              <rft:atitle>Design and evaluation of a hierarchical on-chip interconnect for next-generation CMPs</rft:atitle>
+              <rft:spage>175</rft:spage>
+              <rft:date>2009</rft:date>
+              <rft:btitle>In International Symposium on High-Performance Computer Architecture (HPCA</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:epage>186</rft:epage>
+              <rft:au>R Das</rft:au>
+              <rft:au>S Eachempati</rft:au>
+              <rft:au>A Mishra</rft:au>
+              <rft:au>V Narayanan</rft:au>
+              <rft:au>C Das</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Gratz</author>
+      <author>C Kim</author>
+      <author>R McDonald</author>
+      <author>S Keckler</author>
+      <author>D Burger</author>
+    </authors>
+    <title>Implementation and evaluation of on-chip network architectures</title>
+    <booktitle>In International Conference on Computer Design (ICCD</booktitle>
+    <location>San Jose, CA</location>
+    <pages>477--484</pages>
+    <year>2006</year>
+    <raw_string>[14] P. Gratz, C. Kim, R. McDonald, S. Keckler, and D. Burger. Implementation and evaluation of on-chip network architectures. In International Conference on Computer Design (ICCD), pages 477&#x2013;484, San Jose, CA, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>San Jose, CA</rft:place>
+              <rft:atitle>Implementation and evaluation of on-chip network architectures</rft:atitle>
+              <rft:spage>477</rft:spage>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In International Conference on Computer Design (ICCD</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>484</rft:epage>
+              <rft:au>P Gratz</rft:au>
+              <rft:au>C Kim</rft:au>
+              <rft:au>R McDonald</rft:au>
+              <rft:au>S Keckler</rft:au>
+              <rft:au>D Burger</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Gubenko</author>
+      <author>I Krestnikov</author>
+      <author>D Livshtis</author>
+      <author>S Mikhrin</author>
+      <author>A Kovsh</author>
+      <author>L West</author>
+      <author>C Bornholdt</author>
+      <author>N Grote</author>
+      <author>A Zhukov</author>
+    </authors>
+    <title>Error-free 10 gbit/s transmission using individual fabry-perot modes of low-noise quantum-dot laser</title>
+    <journal>Electronic Letters</journal>
+    <volume>43</volume>
+    <number>25</number>
+    <year>2007</year>
+    <raw_string>[15] A. Gubenko, I. Krestnikov, D. Livshtis, S. Mikhrin, A. Kovsh, L. West, C. Bornholdt, N. Grote, and A. Zhukov. Error-free 10 gbit/s transmission using individual fabry-perot modes of low-noise quantum-dot laser. Electronic Letters, 43(25):1430&#x2013;1431, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>25</rft:quarter>
+              <rft:atitle>Error-free 10 gbit/s transmission using individual fabry-perot modes of low-noise quantum-dot laser</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:jtitle>Electronic Letters</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>43</rft:volume>
+              <rft:au>A Gubenko</rft:au>
+              <rft:au>I Krestnikov</rft:au>
+              <rft:au>D Livshtis</rft:au>
+              <rft:au>S Mikhrin</rft:au>
+              <rft:au>A Kovsh</rft:au>
+              <rft:au>L West</rft:au>
+              <rft:au>C Bornholdt</rft:au>
+              <rft:au>N Grote</rft:au>
+              <rft:au>A Zhukov</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>N Jiang</author>
+      <author>J Kim</author>
+      <author>W J Dally</author>
+    </authors>
+    <title>Indirect adaptive routing on large scale interconnection networks</title>
+    <booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle>
+    <location>Austin, TX</location>
+    <year>2009</year>
+    <raw_string>[16] N. Jiang, J. Kim, and W. J. Dally. Indirect adaptive routing on large scale interconnection networks. In Proc. of the International Symposium on Computer Architecture (ISCA), Austin, TX, 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Austin, TX</rft:place>
+              <rft:atitle>Indirect adaptive routing on large scale interconnection networks</rft:atitle>
+              <rft:date>2009</rft:date>
+              <rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>N Jiang</rft:au>
+              <rft:au>J Kim</rft:au>
+              <rft:au>W J Dally</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Jose</author>
+      <author>K Shepard</author>
+    </authors>
+    <title>Distributed loss-compensation techniques for energy-efficient low-latency on-chip communication. Solid-State Circuits</title>
+    <journal>IEEE Journal of</journal>
+    <volume>42</volume>
+    <number>6</number>
+    <year>2007</year>
+    <raw_string>[17] A. Jose and K. Shepard. Distributed loss-compensation techniques for energy-efficient low-latency on-chip communication. Solid-State Circuits, IEEE Journal of, 42(6):1415&#x2013;1424, June 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:46-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>6</rft:quarter>
+              <rft:atitle>Distributed loss-compensation techniques for energy-efficient low-latency on-chip communication. Solid-State Circuits</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:stitle>IEEE Journal of</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>42</rft:volume>
+              <rft:au>A Jose</rft:au>
+              <rft:au>K Shepard</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Kapur</author>
+      <author>K C Saraswat</author>
+    </authors>
+    <title>Comparisons between electrical and optical interconnects for on-chip signaling</title>
+    <booktitle>In International Interconnect Technology Conference</booktitle>
+    <location>Burlingame, CA</location>
+    <pages>89--91</pages>
+    <year>2002</year>
+    <raw_string>[18] P. Kapur and K. C. Saraswat. Comparisons between electrical and optical interconnects for on-chip signaling. In International Interconnect Technology Conference, pages 89&#x2013;91, Burlingame, CA, Jun. 2002.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Burlingame, CA</rft:place>
+              <rft:atitle>Comparisons between electrical and optical interconnects for on-chip signaling</rft:atitle>
+              <rft:spage>89</rft:spage>
+              <rft:date>2002</rft:date>
+              <rft:btitle>In International Interconnect Technology Conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>91</rft:epage>
+              <rft:au>P Kapur</rft:au>
+              <rft:au>K C Saraswat</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Kermani</author>
+      <author>L Kleinrock</author>
+    </authors>
+    <title>Virtual cut-through: A new computer communication switching technique</title>
+    <journal>Computer Networks</journal>
+    <volume>3</volume>
+    <number>267</number>
+    <year>1979</year>
+    <raw_string>[19] P. Kermani and L. Kleinrock. Virtual cut-through: A new computer communication switching technique. Computer Networks, 3:267&#x2013;286, 1979.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>267</rft:quarter>
+              <rft:atitle>Virtual cut-through: A new computer communication switching technique</rft:atitle>
+              <rft:date>1979</rft:date>
+              <rft:jtitle>Computer Networks</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>3</rft:volume>
+              <rft:au>P Kermani</rft:au>
+              <rft:au>L Kleinrock</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Kim</author>
+      <author>J Balfour</author>
+      <author>W J Dally</author>
+    </authors>
+    <title>Flattened butterfly topology for on-chip networks</title>
+    <booktitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</booktitle>
+    <location>Chicago, Illinois</location>
+    <year>2007</year>
+    <raw_string>[20] J. Kim, J. Balfour, and W. J. Dally. Flattened butterfly topology for on-chip networks. In IEEE/ACM International Symposium on Microarchitecture (MICRO), Chicago, Illinois, Dec. 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Chicago, Illinois</rft:place>
+              <rft:atitle>Flattened butterfly topology for on-chip networks</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>J Kim</rft:au>
+              <rft:au>J Balfour</rft:au>
+              <rft:au>W J Dally</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Kim</author>
+      <author>W J Dally</author>
+      <author>S Scott</author>
+      <author>D Abts Technology-driven</author>
+    </authors>
+    <title>highly-scalable dragonfly network</title>
+    <booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle>
+    <location>Beijing, China</location>
+    <year>2008</year>
+    <raw_string>[21] J. Kim, W. J. Dally, S. Scott, and D. Abts. Technology-driven, highly-scalable dragonfly network. In Proc. of the International Symposium on Computer Architecture (ISCA), Beijing, China, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Beijing, China</rft:place>
+              <rft:atitle>highly-scalable dragonfly network</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>J Kim</rft:au>
+              <rft:au>W J Dally</rft:au>
+              <rft:au>S Scott</rft:au>
+              <rft:au>D Abts Technology-driven</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Kim</author>
+      <author>W J Dally</author>
+      <author>S Scott</author>
+      <author>D Abts</author>
+    </authors>
+    <title>Cost-efficient dragonfly topology for large-scale system</title>
+    <booktitle>In Micro&#x2019;s Top Picks in Computer Architecture Conferences</booktitle>
+    <volume>29</volume>
+    <pages>33--40</pages>
+    <year>2009</year>
+    <raw_string>[22] J. Kim, W. J. Dally, S. Scott, and D. Abts. Cost-efficient dragonfly topology for large-scale system. In Micro&#x2019;s Top Picks in Computer Architecture Conferences, volume 29, pages 33&#x2013;40, 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Cost-efficient dragonfly topology for large-scale system</rft:atitle>
+              <rft:spage>33</rft:spage>
+              <rft:date>2009</rft:date>
+              <rft:btitle>In Micro&#x2019;s Top Picks in Computer Architecture Conferences</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>40</rft:epage>
+              <rft:au>J Kim</rft:au>
+              <rft:au>W J Dally</rft:au>
+              <rft:au>S Scott</rft:au>
+              <rft:au>D Abts</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Kim</author>
+      <author>W J Dally</author>
+      <author>B Towles</author>
+      <author>A Gupta</author>
+    </authors>
+    <title>Microarchitecture of a high-radix router</title>
+    <booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle>
+    <location>Madison, WI</location>
+    <year>2005</year>
+    <raw_string>[23] J. Kim, W. J. Dally, B. Towles, and A. Gupta. Microarchitecture of a high-radix router. In Proc. of the International Symposium on Computer Architecture (ISCA), Madison, WI, Jun. 2005.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Madison, WI</rft:place>
+              <rft:atitle>Microarchitecture of a high-radix router</rft:atitle>
+              <rft:date>2005</rft:date>
+              <rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>J Kim</rft:au>
+              <rft:au>W J Dally</rft:au>
+              <rft:au>B Towles</rft:au>
+              <rft:au>A Gupta</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>N Kirman</author>
+      <author>M Kirman</author>
+      <author>R K Dokania</author>
+      <author>J F Martinez</author>
+      <author>A B Apsel</author>
+      <author>M A Watkins</author>
+      <author>D H Albonesi</author>
+    </authors>
+    <title>Leveraging optical technology in future bus-based chip multiprocessors</title>
+    <booktitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</booktitle>
+    <location>Orlando, FL</location>
+    <pages>492--503</pages>
+    <year>2006</year>
+    <raw_string>[24] N. Kirman, M. Kirman, R. K. Dokania, J. F. Martinez, A. B. Apsel, M. A. Watkins, and D. H. Albonesi. Leveraging optical technology in future bus-based chip multiprocessors. In IEEE/ACM International Symposium on Microarchitecture (MICRO), pages 492&#x2013;503, Orlando, FL, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Orlando, FL</rft:place>
+              <rft:atitle>Leveraging optical technology in future bus-based chip multiprocessors</rft:atitle>
+              <rft:spage>492</rft:spage>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In IEEE/ACM International Symposium on Microarchitecture (MICRO</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:epage>503</rft:epage>
+              <rft:au>N Kirman</rft:au>
+              <rft:au>M Kirman</rft:au>
+              <rft:au>R K Dokania</rft:au>
+              <rft:au>J F Martinez</rft:au>
+              <rft:au>A B Apsel</rft:au>
+              <rft:au>M A Watkins</rft:au>
+              <rft:au>D H Albonesi</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Kovsh</author>
+      <author>I Krestnikov</author>
+      <author>D Livshits</author>
+      <author>S Mikhrin</author>
+      <author>J Weimert</author>
+      <author>A Zhukov</author>
+    </authors>
+    <title>Quantum dot laser with 75nm broad spectrum of emission</title>
+    <journal>Optics Letters</journal>
+    <volume>32</volume>
+    <number>7</number>
+    <year>2007</year>
+    <raw_string>[25] A. Kovsh, I. Krestnikov, D. Livshits, S. Mikhrin, J. Weimert, and A. Zhukov. Quantum dot laser with 75nm broad spectrum of emission. Optics Letters, 32(7):793&#x2013;795, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>7</rft:quarter>
+              <rft:atitle>Quantum dot laser with 75nm broad spectrum of emission</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:jtitle>Optics Letters</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>32</rft:volume>
+              <rft:au>A Kovsh</rft:au>
+              <rft:au>I Krestnikov</rft:au>
+              <rft:au>D Livshits</rft:au>
+              <rft:au>S Mikhrin</rft:au>
+              <rft:au>J Weimert</rft:au>
+              <rft:au>A Zhukov</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Krishna</author>
+      <author>A Kumar</author>
+      <author>P Chiang</author>
+      <author>M Erez</author>
+      <author>L-S Peh</author>
+    </authors>
+    <title>Noc with near-ideal express virtual channels using global-line communication</title>
+    <booktitle>In Proc. of Hot Interconnects</booktitle>
+    <location>Stanford, CA</location>
+    <pages>11--20</pages>
+    <year>2008</year>
+    <raw_string>[26] T. Krishna, A. Kumar, P. Chiang, M. Erez, and L.-S. Peh. Noc with near-ideal express virtual channels using global-line communication. In Proc. of Hot Interconnects, pages 11&#x2013;20, Stanford, CA, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Stanford, CA</rft:place>
+              <rft:atitle>Noc with near-ideal express virtual channels using global-line communication</rft:atitle>
+              <rft:spage>11</rft:spage>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Proc. of Hot Interconnects</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>20</rft:epage>
+              <rft:au>T Krishna</rft:au>
+              <rft:au>A Kumar</rft:au>
+              <rft:au>P Chiang</rft:au>
+              <rft:au>M Erez</rft:au>
+              <rft:au>L-S Peh</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Kumar</author>
+      <author>P Kundu</author>
+      <author>A P Singh</author>
+      <author>L-S Peh</author>
+      <author>N K Jha</author>
+    </authors>
+    <title>A 4.6tbits/s 3.6ghz single-cycle NoC router with a novel switch allocator in 65nm CMOS</title>
+    <booktitle>In International Conference on Computer Design (ICCD</booktitle>
+    <location>Lake Tahoe, CA</location>
+    <pages>63--70</pages>
+    <year>2007</year>
+    <raw_string>[27] A. Kumar, P. Kundu, A. P. Singh, L.-S. Peh, and N. K. Jha. A 4.6tbits/s 3.6ghz single-cycle NoC router with a novel switch allocator in 65nm CMOS. In International Conference on Computer Design (ICCD), pages 63&#x2013;70, Lake Tahoe, CA, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Lake Tahoe, CA</rft:place>
+              <rft:atitle>A 4.6tbits/s 3.6ghz single-cycle NoC router with a novel switch allocator in 65nm CMOS</rft:atitle>
+              <rft:spage>63</rft:spage>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In International Conference on Computer Design (ICCD</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>70</rft:epage>
+              <rft:au>A Kumar</rft:au>
+              <rft:au>P Kundu</rft:au>
+              <rft:au>A P Singh</rft:au>
+              <rft:au>L-S Peh</rft:au>
+              <rft:au>N K Jha</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>P Kumar</author>
+      <author>Y Pan</author>
+      <author>J Kim</author>
+      <author>G Memik</author>
+      <author>A Choudhary</author>
+    </authors>
+    <title>Exploring concentration and channel slicing in on-chip network router</title>
+    <booktitle>In IEEE International Symposium on Network-on-Chip (NOCS</booktitle>
+    <location>San Diego, CA</location>
+    <year>2009</year>
+    <raw_string>[28] P. Kumar, Y. Pan, J. Kim, G. Memik, and A. Choudhary.  Exploring concentration and channel slicing in on-chip network router. In IEEE International Symposium on Network-on-Chip (NOCS), San Diego, CA, 2009.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>San Diego, CA</rft:place>
+              <rft:atitle>Exploring concentration and channel slicing in on-chip network router</rft:atitle>
+              <rft:date>2009</rft:date>
+              <rft:btitle>In IEEE International Symposium on Network-on-Chip (NOCS</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>P Kumar</rft:au>
+              <rft:au>Y Pan</rft:au>
+              <rft:au>J Kim</rft:au>
+              <rft:au>G Memik</rft:au>
+              <rft:au>A Choudhary</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Louri</author>
+      <author>A K Kodi</author>
+    </authors>
+    <title>An optical interconnection network and a modified snooping protocol for the design of large-scale symmetric multiprocessors (smps</title>
+    <journal>IEEE Trans. on Parallel and Distributed Systems</journal>
+    <volume>15</volume>
+    <number>12</number>
+    <year>2004</year>
+    <raw_string>[29] A. Louri and A. K. Kodi. An optical interconnection network and a modified snooping protocol for the design of large-scale symmetric multiprocessors (smps). IEEE Trans. on Parallel and Distributed Systems, 15(12):1093&#x2013;1104, Dec. 2004.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>12</rft:quarter>
+              <rft:atitle>An optical interconnection network and a modified snooping protocol for the design of large-scale symmetric multiprocessors (smps</rft:atitle>
+              <rft:date>2004</rft:date>
+              <rft:stitle>IEEE Trans. on Parallel and Distributed Systems</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>15</rft:volume>
+              <rft:au>A Louri</rft:au>
+              <rft:au>A K Kodi</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R Narayanan</author>
+      <author>B Ozisikyilmaz</author>
+      <author>J Zambreno</author>
+      <author>G Memik</author>
+      <author>A Choudhary</author>
+    </authors>
+    <title>Minebench: A benchmark suite for data mining workloads</title>
+    <booktitle>In IEEE International Symposium on Workload Characterization (IISCW</booktitle>
+    <location>San Jose, CA</location>
+    <pages>182--188</pages>
+    <year>2006</year>
+    <raw_string>[30] R. Narayanan, B. Ozisikyilmaz, J. Zambreno, G. Memik, and A. Choudhary. Minebench: A benchmark suite for data mining workloads. In IEEE International Symposium on Workload Characterization (IISCW), pages 182&#x2013;188, San Jose, CA, 2006.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>San Jose, CA</rft:place>
+              <rft:atitle>Minebench: A benchmark suite for data mining workloads</rft:atitle>
+              <rft:spage>182</rft:spage>
+              <rft:date>2006</rft:date>
+              <rft:btitle>In IEEE International Symposium on Workload Characterization (IISCW</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:epage>188</rft:epage>
+              <rft:au>R Narayanan</rft:au>
+              <rft:au>B Ozisikyilmaz</rft:au>
+              <rft:au>J Zambreno</rft:au>
+              <rft:au>G Memik</rft:au>
+              <rft:au>A Choudhary</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>O I Dosunmu M K Emsley</author>
+      <author>M S Unlu</author>
+      <author>D DCannon</author>
+      <author>L C Kimerling</author>
+    </authors>
+    <title>High speed resonant cavity enhanced ge photodetectors on si reflecting substrates for 1550 nm operation</title>
+    <journal>In IEEE International Topical Meeting on Microwave Photonics</journal>
+    <volume>2004</volume>
+    <location>Ogunquit, ME</location>
+    <pages>266--268</pages>
+    <year>2004</year>
+    <raw_string>[31] O.I.Dosunmu, M. K. Emsley, M. S. Unlu, D. DCannon, and L. C. Kimerling. High speed resonant cavity enhanced ge photodetectors on si reflecting substrates for 1550 nm operation. In IEEE International Topical Meeting on Microwave Photonics, 2004., pages 266&#x2013;268, Ogunquit, ME, 2004.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>High speed resonant cavity enhanced ge photodetectors on si reflecting substrates for 1550 nm operation</rft:atitle>
+              <rft:spage>266</rft:spage>
+              <rft:date>2004</rft:date>
+              <rft:stitle>In IEEE International Topical Meeting on Microwave Photonics</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>2004</rft:volume>
+              <rft:epage>268</rft:epage>
+              <rft:au>O I Dosunmu M K Emsley</rft:au>
+              <rft:au>M S Unlu</rft:au>
+              <rft:au>D DCannon</rft:au>
+              <rft:au>L C Kimerling</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>L Pavesi</author>
+      <author>D J Lockwood Silicon photonics</author>
+      <author>2004</author>
+    </authors>
+    <title>Photonic networks-on-chip: Opportunities and challenges</title>
+    <location>Seattle, WA</location>
+    <pages>2789--2792</pages>
+    <year>2008</year>
+    <raw_string>[32] L. Pavesi and D. J. Lockwood. Silicon photonics, 2004. [33] M. Petracca, K. Bergman, and L. Carloni. Photonic networks-on-chip: Opportunities and challenges. pages 2789&#x2013;2792, Seattle, WA, May 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Pinkston</author>
+    </authors>
+    <title>Design considerations for optical interconnects in parallel computers</title>
+    <booktitle>In Proc. of the First International Workshop on Massively Parallel Processing Using Optical Interconnections</booktitle>
+    <location>Cancun, Mexico</location>
+    <pages>306--322</pages>
+    <year>1994</year>
+    <raw_string>[34] T. Pinkston. Design considerations for optical interconnects in parallel computers. In Proc. of the First International Workshop on Massively Parallel Processing Using Optical Interconnections, pages 306&#x2013;322, Cancun, Mexico, Apr. 1994.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Cancun, Mexico</rft:place>
+              <rft:atitle>Design considerations for optical interconnects in parallel computers</rft:atitle>
+              <rft:spage>306</rft:spage>
+              <rft:date>1994</rft:date>
+              <rft:btitle>In Proc. of the First International Workshop on Massively Parallel Processing Using Optical Interconnections</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>322</rft:epage>
+              <rft:au>T Pinkston</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Shacham</author>
+      <author>K Bergman</author>
+      <author>L P Carloni</author>
+    </authors>
+    <title>The case for low-power photonic networks-on-chip</title>
+    <booktitle>In Proc. of Design Automation Conference (DAC</booktitle>
+    <location>San Diego, CA</location>
+    <pages>132--135</pages>
+    <year>2007</year>
+    <raw_string>[35] A. Shacham, K. Bergman, and L. P. Carloni. The case for low-power photonic networks-on-chip. In Proc. of Design Automation Conference (DAC), pages 132&#x2013;135, San Diego, CA, 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>San Diego, CA</rft:place>
+              <rft:atitle>The case for low-power photonic networks-on-chip</rft:atitle>
+              <rft:spage>132</rft:spage>
+              <rft:date>2007</rft:date>
+              <rft:btitle>In Proc. of Design Automation Conference (DAC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>135</rft:epage>
+              <rft:au>A Shacham</rft:au>
+              <rft:au>K Bergman</rft:au>
+              <rft:au>L P Carloni</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Tatum</author>
+    </authors>
+    <title>Vcsels for 10 gb/s optical interconnects</title>
+    <booktitle>In IEEE Emerging Technologies Symposium on BroadBand Communications for the Internet Era</booktitle>
+    <location>Richardson, TX</location>
+    <pages>58--61</pages>
+    <year>2001</year>
+    <raw_string>[36] J. Tatum. Vcsels for 10 gb/s optical interconnects. In IEEE Emerging Technologies Symposium on BroadBand Communications for the Internet Era, pages 58&#x2013;61, Richardson, TX, 2001.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Richardson, TX</rft:place>
+              <rft:atitle>Vcsels for 10 gb/s optical interconnects</rft:atitle>
+              <rft:spage>58</rft:spage>
+              <rft:date>2001</rft:date>
+              <rft:btitle>In IEEE Emerging Technologies Symposium on BroadBand Communications for the Internet Era</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:epage>61</rft:epage>
+              <rft:au>J Tatum</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S R Vangal</author>
+      <author>J Howard</author>
+      <author>G Ruhl</author>
+      <author>S Dighe</author>
+      <author>H Wilson</author>
+      <author>J Tschanz</author>
+      <author>D Finan</author>
+      <author>A Singh</author>
+      <author>T Jacob</author>
+      <author>S Jain</author>
+      <author>V Erraguntla</author>
+      <author>C Roberts</author>
+      <author>Y Hoskote</author>
+      <author>N Borkar</author>
+      <author>S Borkar</author>
+    </authors>
+    <title>An 80-Tile sub-100-w teraflops processor in 65-nm cmos</title>
+    <journal>Solid-State Circuits, IEEE Journal of</journal>
+    <volume>43</volume>
+    <number>1</number>
+    <year>2008</year>
+    <raw_string>[37] S. R. Vangal, J. Howard, G. Ruhl, S. Dighe, H. Wilson, J. Tschanz, D. Finan, A. Singh, T. Jacob, S. Jain, V. Erraguntla, C. Roberts, Y. Hoskote, N. Borkar, and S. Borkar. An 80-Tile sub-100-w teraflops processor in 65-nm cmos. Solid-State Circuits, IEEE Journal of, 43(1):29&#x2013;41, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>1</rft:quarter>
+              <rft:atitle>An 80-Tile sub-100-w teraflops processor in 65-nm cmos</rft:atitle>
+              <rft:date>2008</rft:date>
+              <rft:stitle>Solid-State Circuits, IEEE Journal of</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>43</rft:volume>
+              <rft:au>S R Vangal</rft:au>
+              <rft:au>J Howard</rft:au>
+              <rft:au>G Ruhl</rft:au>
+              <rft:au>S Dighe</rft:au>
+              <rft:au>H Wilson</rft:au>
+              <rft:au>J Tschanz</rft:au>
+              <rft:au>D Finan</rft:au>
+              <rft:au>A Singh</rft:au>
+              <rft:au>T Jacob</rft:au>
+              <rft:au>S Jain</rft:au>
+              <rft:au>V Erraguntla</rft:au>
+              <rft:au>C Roberts</rft:au>
+              <rft:au>Y Hoskote</rft:au>
+              <rft:au>N Borkar</rft:au>
+              <rft:au>S Borkar</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>D Vantrease</author>
+      <author>R Schreiber</author>
+      <author>M Monchiero</author>
+      <author>M McLaren</author>
+      <author>N P Jouppi</author>
+      <author>M Fiorentino</author>
+      <author>A Davis</author>
+      <author>N L Binkert</author>
+      <author>R G Beausoleil</author>
+      <author>J H Ahn</author>
+    </authors>
+    <title>Corona: System implications of emerging nanophotonic technology</title>
+    <booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle>
+    <location>Beijing, China</location>
+    <pages>153--164</pages>
+    <year>2008</year>
+    <raw_string>[38] D. Vantrease, R. Schreiber, M. Monchiero, M. McLaren, N. P. Jouppi, M. Fiorentino, A. Davis, N. L. Binkert, R. G. Beausoleil, and J. H. Ahn. Corona: System implications of emerging nanophotonic technology. In Proc. of the International Symposium on Computer Architecture (ISCA), pages 153&#x2013;164, Beijing, China, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Beijing, China</rft:place>
+              <rft:atitle>Corona: System implications of emerging nanophotonic technology</rft:atitle>
+              <rft:spage>153</rft:spage>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>164</rft:epage>
+              <rft:au>D Vantrease</rft:au>
+              <rft:au>R Schreiber</rft:au>
+              <rft:au>M Monchiero</rft:au>
+              <rft:au>M McLaren</rft:au>
+              <rft:au>N P Jouppi</rft:au>
+              <rft:au>M Fiorentino</rft:au>
+              <rft:au>A Davis</rft:au>
+              <rft:au>N L Binkert</rft:au>
+              <rft:au>R G Beausoleil</rft:au>
+              <rft:au>J H Ahn</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Y Vlasov</author>
+      <author>S McNab</author>
+    </authors>
+    <title>Losses in single-mode silicon-on-insulator strip waveguides and bends</title>
+    <journal>Optics Express</journal>
+    <volume>12</volume>
+    <number>8</number>
+    <year>2004</year>
+    <raw_string>[39] Y. Vlasov and S. McNab. Losses in single-mode silicon-on-insulator strip waveguides and bends. Optics Express, 12(8):1622&#x2013;1631, 2004.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>8</rft:quarter>
+              <rft:atitle>Losses in single-mode silicon-on-insulator strip waveguides and bends</rft:atitle>
+              <rft:date>2004</rft:date>
+              <rft:stitle>Optics Express</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>12</rft:volume>
+              <rft:au>Y Vlasov</rft:au>
+              <rft:au>S McNab</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>S Woo</author>
+      <author>M Ohara</author>
+      <author>E Torrie</author>
+      <author>J Singh</author>
+      <author>A Gupta</author>
+    </authors>
+    <title>The SPLASH-2 programs: Characterization and methodological considerations</title>
+    <booktitle>In Proc. of the International Symposium on Computer Architecture (ISCA</booktitle>
+    <location>Santa Margherita Ligure, Italy</location>
+    <pages>24--36</pages>
+    <year>1995</year>
+    <raw_string>[40] S. Woo, M. Ohara, E. Torrie, J. Singh, and A. Gupta. The SPLASH-2 programs: Characterization and methodological considerations. In Proc. of the International Symposium on Computer Architecture (ISCA), pages 24&#x2013;36, Santa Margherita Ligure, Italy, Jun. 1995.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Santa Margherita Ligure, Italy</rft:place>
+              <rft:atitle>The SPLASH-2 programs: Characterization and methodological considerations</rft:atitle>
+              <rft:spage>24</rft:spage>
+              <rft:date>1995</rft:date>
+              <rft:btitle>In Proc. of the International Symposium on Computer Architecture (ISCA</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>36</rft:epage>
+              <rft:au>S Woo</rft:au>
+              <rft:au>M Ohara</rft:au>
+              <rft:au>E Torrie</rft:au>
+              <rft:au>J Singh</rft:au>
+              <rft:au>A Gupta</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Q Xu</author>
+      <author>S Manipatruni</author>
+      <author>B Schmidt</author>
+      <author>J Shakya</author>
+      <author>M Lipson</author>
+    </authors>
+    <title>12.5 gbit/s carrier-injection-based silicon micro-ring silicon modulators</title>
+    <journal>Opt. Express</journal>
+    <volume>15</volume>
+    <number>2</number>
+    <year>2007</year>
+    <raw_string>[41] Q. Xu, S. Manipatruni, B. Schmidt, J. Shakya, and M. Lipson. 12.5 gbit/s carrier-injection-based silicon micro-ring silicon modulators. Opt. Express, 15(2):430&#x2013;436, Jan. 2007.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>2</rft:quarter>
+              <rft:atitle>12.5 gbit/s carrier-injection-based silicon micro-ring silicon modulators</rft:atitle>
+              <rft:date>2007</rft:date>
+              <rft:stitle>Opt. Express</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>15</rft:volume>
+              <rft:au>Q Xu</rft:au>
+              <rft:au>S Manipatruni</rft:au>
+              <rft:au>B Schmidt</rft:au>
+              <rft:au>J Shakya</rft:au>
+              <rft:au>M Lipson</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>T Yin</author>
+      <author>R Cohen</author>
+      <author>M M Morse</author>
+      <author>G Sarid</author>
+      <author>Y Chetrit</author>
+      <author>D Rubin</author>
+      <author>M J Paniccia</author>
+    </authors>
+    <title>40gb/s ge-on-soi waveguide photodetectors by selective ge growth</title>
+    <booktitle>In Conference on Optical Fiber communication/National Fiber Optic Engineers Conference (OFC/NFOEC</booktitle>
+    <location>San Diego, CA</location>
+    <pages>24--28</pages>
+    <year>2008</year>
+    <raw_string>[42] T. Yin, R. Cohen, M. M. Morse, G. Sarid, Y. Chetrit, D. Rubin, and M. J. Paniccia. 40gb/s ge-on-soi waveguide photodetectors by selective ge growth. In Conference on Optical Fiber communication/National Fiber Optic Engineers Conference (OFC/NFOEC), pages 24&#x2013;28, San Diego, CA, 2008.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:47-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>San Diego, CA</rft:place>
+              <rft:atitle>40gb/s ge-on-soi waveguide photodetectors by selective ge growth</rft:atitle>
+              <rft:spage>24</rft:spage>
+              <rft:date>2008</rft:date>
+              <rft:btitle>In Conference on Optical Fiber communication/National Fiber Optic Engineers Conference (OFC/NFOEC</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>28</rft:epage>
+              <rft:au>T Yin</rft:au>
+              <rft:au>R Cohen</rft:au>
+              <rft:au>M M Morse</rft:au>
+              <rft:au>G Sarid</rft:au>
+              <rft:au>Y Chetrit</rft:au>
+              <rft:au>D Rubin</rft:au>
+              <rft:au>M J Paniccia</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

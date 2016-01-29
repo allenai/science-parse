@@ -1,42 +1,571 @@
+<?xml version="1.0"?>
 <citations>
-<citation valid='true'><authors><author>Sugato Basu</author><author>Arindam Banerjee</author><author>Raymond J Mooney</author></authors><title>Active semi-supervision for pair- wise constrained clustering</title><year>2003</year><note>Submitted for publication</note><raw_string>[1] Sugato Basu, Arindam Banerjee, and Raymond J. Mooney. Active semi-supervision for pair- wise constrained clustering. Submitted for publication, February, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>M Seeger</author></authors><title>Learning with labeled and unlabeled data. Technical report, Institue for Adaptive and Neural Computation</title><institution>Universiy of Edinburgh</institution><year>2000</year><raw_string>[2] M. Seeger. Learning with labeled and unlabeled data. Technical report, Institue for Adaptive and Neural Computation, Universiy of Edinburgh, 2000.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Klaus Brinker</author></authors><title>Incorporating diversity in active learning with support vector machines</title><booktitle>In Proceedings of the Twentieth International Conference on Machine Learning</booktitle><year>2003</year><raw_string>[3] Klaus Brinker. Incorporating diversity in active learning with support vector machines. In Proceedings of the Twentieth International Conference on Machine Learning, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Incorporating diversity in active learning with support vector machines</rft:atitle><rft:date>2003</rft:date><rft:btitle>In Proceedings of the Twentieth International Conference on Machine Learning</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Klaus Brinker</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>David A Cohn</author><author>Zoubin Ghahramani</author><author>Michael I Jordan</author></authors><title>Active learning with statistical models</title><booktitle>Advances in Neural Information Processing Systems</booktitle><editor>In G. Tesauro, D. Touretzky, and T. Leen, editors</editor><volume>7</volume><publisher>The MIT Press</publisher><pages>705--712</pages><year>1995</year><raw_string>[4] David A. Cohn, Zoubin Ghahramani, and Michael I. Jordan. Active learning with statistical models. In G. Tesauro, D. Touretzky, and T. Leen, editors, Advances in Neural Information Processing Systems, volume 7, pages 705–712. The MIT Press, 1995.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Active learning with statistical models</rft:atitle><rft:spage>705</rft:spage><rft:date>1995</rft:date><rft:btitle>Advances in Neural Information Processing Systems</rft:btitle><rft:genre>bookitem</rft:genre><rft:pub>The MIT Press</rft:pub><rft:epage>712</rft:epage><rft:au>David A Cohn</rft:au><rft:au>Zoubin Ghahramani</rft:au><rft:au>Michael I Jordan</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Nirmalie Wiratunga</author><author>Susan Craw</author><author>Stewart Massie</author></authors><title>Index driven selective sampling for CBR, 2003. To appear</title><booktitle>in Proceedings of the Fifth International Conference on Case-Based Reasoning</booktitle><publisher>Springer-Verlag</publisher><location>Trondheim, Norway</location><pages>23--26</pages><year>2003</year><raw_string>[5] Nirmalie Wiratunga, Susan Craw, and Stewart Massie. Index driven selective sampling for CBR, 2003. To appear in Proceedings of the Fifth International Conference on Case-Based Reasoning, Springer-Verlag, Trondheim, Norway, 23-26 June 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>Trondheim, Norway</rft:place><rft:atitle>Index driven selective sampling for CBR, 2003. To appear</rft:atitle><rft:spage>23</rft:spage><rft:date>2003</rft:date><rft:btitle>in Proceedings of the Fifth International Conference on Case-Based Reasoning</rft:btitle><rft:genre>proceeding</rft:genre><rft:pub>Springer-Verlag</rft:pub><rft:epage>26</rft:epage><rft:au>Nirmalie Wiratunga</rft:au><rft:au>Susan Craw</rft:au><rft:au>Stewart Massie</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>David Cohn</author><author>Les Atlas</author><author>Richard Ladner</author></authors><title>Improving generalization with active learning</title><booktitle>Machine Learning</booktitle><year>1994</year><raw_string>[6] David Cohn, Les Atlas, and Richard Ladner. Improving generalization with active learning. Machine Learning, 15(2):201–221, 1994.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Improving generalization with active learning</rft:atitle><rft:date>1994</rft:date><rft:btitle>Machine Learning</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>David Cohn</rft:au><rft:au>Les Atlas</rft:au><rft:au>Richard Ladner</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Mark Plutowski</author><author>Halbert White</author></authors><title>Selecting concise training sets from clean data</title><journal>IEEE Transactions on Neural Networks</journal><volume>4</volume><number>2</number><year>1993</year><raw_string>[7] Mark Plutowski and Halbert White. Selecting concise training sets from clean data. IEEE Transactions on Neural Networks, 4(2):305–318, March 1993.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>2</rft:quarter><rft:atitle>Selecting concise training sets from clean data</rft:atitle><rft:date>1993</rft:date><rft:stitle>IEEE Transactions on Neural Networks</rft:stitle><rft:genre>article</rft:genre><rft:volume>4</rft:volume><rft:au>Mark Plutowski</rft:au><rft:au>Halbert White</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Shahshashani</author><author>Landgrebe</author></authors><title>The effect of unlabeled examples in reducing the small sample size problem</title><journal>IEEE Trans Geoscience and Remote Sensing</journal><volume>32</volume><number>5</number><year>1994</year><raw_string>[8] Shahshashani and Landgrebe. The effect of unlabeled examples in reducing the small sample size problem. IEEE Trans Geoscience and Remote Sensing, 32(5):1087–1095, 1994.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>5</rft:quarter><rft:atitle>The effect of unlabeled examples in reducing the small sample size problem</rft:atitle><rft:date>1994</rft:date><rft:stitle>IEEE Trans Geoscience and Remote Sensing</rft:stitle><rft:genre>article</rft:genre><rft:volume>32</rft:volume><rft:au>Shahshashani</rft:au><rft:au>Landgrebe</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Miller</author><author>Uyar</author></authors><title>A mixture of experts classifier with learning based on both labeled and unla- belled data</title><booktitle>In NIPS-9</booktitle><year>1997</year><raw_string>[9] Miller and Uyar. A mixture of experts classifier with learning based on both labeled and unla- belled data. In NIPS-9, 1997.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>A mixture of experts classifier with learning based on both labeled and unla- belled data</rft:atitle><rft:date>1997</rft:date><rft:btitle>In NIPS-9</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>Miller</rft:au><rft:au>Uyar</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>H S Seung</author><author>Manfred Opper</author><author>Haim Sompolinsky</author></authors><title>Query by committee</title><booktitle>In Computational Learning Theory</booktitle><pages>287--294</pages><year>1992</year><raw_string>[10] H. S. Seung, Manfred Opper, and Haim Sompolinsky. Query by committee. In Computational Learning Theory, pages 287–294, 1992.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Query by committee</rft:atitle><rft:spage>287</rft:spage><rft:date>1992</rft:date><rft:btitle>In Computational Learning Theory</rft:btitle><rft:genre>bookitem</rft:genre><rft:epage>294</rft:epage><rft:au>H S Seung</rft:au><rft:au>Manfred Opper</rft:au><rft:au>Haim Sompolinsky</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>David D Lewis</author><author>Jason Catlett</author></authors><title>Heterogeneous uncertainty sampling for supervised learn- ing</title><booktitle>Proceedings of ICML-94, 11th Interna- tional Conference on Machine Learning</booktitle><editor>In William W. Cohen and Haym Hirsh, editors</editor><publisher>Morgan Kaufmann Publishers</publisher><location>New Brunswick, US, San Francisco, US</location><pages>148--156</pages><year>1994</year><raw_string>[11] David D. Lewis and Jason Catlett. Heterogeneous uncertainty sampling for supervised learn- ing. In William W. Cohen and Haym Hirsh, editors, Proceedings of ICML-94, 11th Interna- tional Conference on Machine Learning, pages 148–156, New Brunswick, US, 1994. Morgan Kaufmann Publishers, San Francisco, US.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:place>New Brunswick, US, San Francisco, US</rft:place><rft:atitle>Heterogeneous uncertainty sampling for supervised learn- ing</rft:atitle><rft:spage>148</rft:spage><rft:date>1994</rft:date><rft:btitle>Proceedings of ICML-94, 11th Interna- tional Conference on Machine Learning</rft:btitle><rft:genre>proceeding</rft:genre><rft:pub>Morgan Kaufmann Publishers</rft:pub><rft:epage>156</rft:epage><rft:au>David D Lewis</rft:au><rft:au>Jason Catlett</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='false'><authors><author>P Brazdil</author><author>J Gama StatLog</author></authors><year>1991</year><raw_string>[12] P.Brazdil and J.Gama. StatLog, 1991. http://www.liacc.up.pt/ML/statlog.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>C L Blake</author><author>C J Merz</author></authors><title>UCI repository of machine learning databases</title><year>1998</year><raw_string>[13] C.L. Blake and C.J. Merz. UCI repository of machine learning databases, 1998. http://www.ics.uci.edu/∼mlearn/MLRepository.html.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>R C Nichol</author><author>C A Collins</author><author>S L Lumsden</author></authors><title>The Edinburgh/Durham southern galaxy catalogue</title><journal>IX. Submitted to the Astrophysical Journal</journal><year>2000</year><raw_string>[14] R. C. Nichol, C. A. Collins, and S. L. Lumsden. The Edinburgh/Durham southern galaxy catalogue — IX. Submitted to the Astrophysical Journal, 2000.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>The Edinburgh/Durham southern galaxy catalogue</rft:atitle><rft:date>2000</rft:date><rft:stitle>IX. Submitted to the Astrophysical Journal</rft:stitle><rft:genre>article</rft:genre><rft:au>R C Nichol</rft:au><rft:au>C A Collins</rft:au><rft:au>S L Lumsden</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>SDSS</author></authors><title>The Sloan Digital Sky Survey</title><pages>www.sdss.org.</pages><year>1998</year><raw_string>[15] SDSS. The Sloan Digital Sky Survey, 1998. www.sdss.org.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Dan Pelleg</author></authors><title>Scalable and Practical Probability Density Estimators for Scientific Anomaly De-tection</title><institution>Carnegie-Mellon University</institution><year>2004</year><tech>PhD thesis, Tech Report CMU-CS-04-134</tech><raw_string>[16] Dan Pelleg. Scalable and Practical Probability Density Estimators for Scientific Anomaly De-tection. PhD thesis, Carnegie-Mellon University, 2004. Tech Report CMU-CS-04-134.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:dissertation</ctx:format><ctx:metadata><dissertation xmlns:rft='info:ofi/fmt:xml:xsd:dissertation' xsi:schemaLocation='info:ofi/fmt:xml:xsd:dissertation http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:dissertation'><rft:degree>PhD</rft:degree><rft:title>Scalable and Practical Probability Density Estimators for Scientific Anomaly De-tection</rft:title><rft:date>2004</rft:date><rft:inst>Carnegie-Mellon University</rft:inst><rft:au>Dan Pelleg</rft:au></dissertation></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>David MacKay</author></authors><title>Information-based objective functions for active data selection</title><journal>Neural Com-putation</journal><volume>4</volume><number>4</number><year>1992</year><raw_string>[17] David MacKay. Information-based objective functions for active data selection. Neural Com-putation, 4(4):590–604, 1992.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>4</rft:quarter><rft:atitle>Information-based objective functions for active data selection</rft:atitle><rft:date>1992</rft:date><rft:jtitle>Neural Com-putation</rft:jtitle><rft:genre>article</rft:genre><rft:volume>4</rft:volume><rft:au>David MacKay</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Fabio Gagliardi Cozman</author><author>Ira Cohen</author></authors><title>Marclo Cesar Cirelo. Semi-supervised learning of mixture models and bayesian networks</title><booktitle>In Proceedings of the Twentieth International Confer- ence on Machine Learning</booktitle><year>2003</year><raw_string>[18] Fabio Gagliardi Cozman, Ira Cohen, and Marclo Cesar Cirelo. Semi-supervised learning of mixture models and bayesian networks. In Proceedings of the Twentieth International Confer- ence on Machine Learning, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Marclo Cesar Cirelo. Semi-supervised learning of mixture models and bayesian networks</rft:atitle><rft:date>2003</rft:date><rft:btitle>In Proceedings of the Twentieth International Confer- ence on Machine Learning</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Fabio Gagliardi Cozman</rft:au><rft:au>Ira Cohen</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Yoram Baram</author><author>Ran El-Yaniv</author><author>Kobi Luz</author></authors><title>Online choice of active learning algorithms</title><booktitle>In Proceedings of the Twentieth International Conference on Machine Learning</booktitle><year>2003</year><raw_string>[19] Yoram Baram, Ran El-Yaniv, and Kobi Luz. Online choice of active learning algorithms. In Proceedings of the Twentieth International Conference on Machine Learning, 2003.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Online choice of active learning algorithms</rft:atitle><rft:date>2003</rft:date><rft:btitle>In Proceedings of the Twentieth International Conference on Machine Learning</rft:btitle><rft:genre>proceeding</rft:genre><rft:au>Yoram Baram</rft:au><rft:au>Ran El-Yaniv</rft:au><rft:au>Kobi Luz</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects>
-<citation valid='true'><authors><author>Sanjoy Dasgupta</author></authors><title>Analysis of a greedy active learning strategy</title><booktitle>In Advances in Neural Infor-mation Processing Systems 18</booktitle><year>2004</year><raw_string>[20] Sanjoy Dasgupta. Analysis of a greedy active learning strategy. In Advances in Neural Infor-mation Processing Systems 18, 2004.</raw_string></citation>
-<ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:27:58-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Analysis of a greedy active learning strategy</rft:atitle><rft:date>2004</rft:date><rft:btitle>In Advances in Neural Infor-mation Processing Systems 18</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>Sanjoy Dasgupta</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
-
+  <citation valid="true">
+    <authors>
+      <author>Sugato Basu</author>
+      <author>Arindam Banerjee</author>
+      <author>Raymond J Mooney</author>
+    </authors>
+    <title>Active semi-supervision for pair- wise constrained clustering</title>
+    <year>2003</year>
+    <note>Submitted for publication</note>
+    <raw_string>[1] Sugato Basu, Arindam Banerjee, and Raymond J. Mooney. Active semi-supervision for pair- wise constrained clustering. Submitted for publication, February, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M Seeger</author>
+    </authors>
+    <title>Learning with labeled and unlabeled data. Technical report, Institue for Adaptive and Neural Computation</title>
+    <institution>Universiy of Edinburgh</institution>
+    <year>2000</year>
+    <raw_string>[2] M. Seeger. Learning with labeled and unlabeled data. Technical report, Institue for Adaptive and Neural Computation, Universiy of Edinburgh, 2000.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Klaus Brinker</author>
+    </authors>
+    <title>Incorporating diversity in active learning with support vector machines</title>
+    <booktitle>In Proceedings of the Twentieth International Conference on Machine Learning</booktitle>
+    <year>2003</year>
+    <raw_string>[3] Klaus Brinker. Incorporating diversity in active learning with support vector machines. In Proceedings of the Twentieth International Conference on Machine Learning, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Incorporating diversity in active learning with support vector machines</rft:atitle>
+              <rft:date>2003</rft:date>
+              <rft:btitle>In Proceedings of the Twentieth International Conference on Machine Learning</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Klaus Brinker</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>David A Cohn</author>
+      <author>Zoubin Ghahramani</author>
+      <author>Michael I Jordan</author>
+    </authors>
+    <title>Active learning with statistical models</title>
+    <booktitle>Advances in Neural Information Processing Systems</booktitle>
+    <editor>In G. Tesauro, D. Touretzky, and T. Leen, editors</editor>
+    <volume>7</volume>
+    <publisher>The MIT Press</publisher>
+    <pages>705--712</pages>
+    <year>1995</year>
+    <raw_string>[4] David A. Cohn, Zoubin Ghahramani, and Michael I. Jordan. Active learning with statistical models. In G. Tesauro, D. Touretzky, and T. Leen, editors, Advances in Neural Information Processing Systems, volume 7, pages 705&#x2013;712. The MIT Press, 1995.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Active learning with statistical models</rft:atitle>
+              <rft:spage>705</rft:spage>
+              <rft:date>1995</rft:date>
+              <rft:btitle>Advances in Neural Information Processing Systems</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:pub>The MIT Press</rft:pub>
+              <rft:epage>712</rft:epage>
+              <rft:au>David A Cohn</rft:au>
+              <rft:au>Zoubin Ghahramani</rft:au>
+              <rft:au>Michael I Jordan</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Nirmalie Wiratunga</author>
+      <author>Susan Craw</author>
+      <author>Stewart Massie</author>
+    </authors>
+    <title>Index driven selective sampling for CBR, 2003. To appear</title>
+    <booktitle>in Proceedings of the Fifth International Conference on Case-Based Reasoning</booktitle>
+    <publisher>Springer-Verlag</publisher>
+    <location>Trondheim, Norway</location>
+    <pages>23--26</pages>
+    <year>2003</year>
+    <raw_string>[5] Nirmalie Wiratunga, Susan Craw, and Stewart Massie. Index driven selective sampling for CBR, 2003. To appear in Proceedings of the Fifth International Conference on Case-Based Reasoning, Springer-Verlag, Trondheim, Norway, 23-26 June 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>Trondheim, Norway</rft:place>
+              <rft:atitle>Index driven selective sampling for CBR, 2003. To appear</rft:atitle>
+              <rft:spage>23</rft:spage>
+              <rft:date>2003</rft:date>
+              <rft:btitle>in Proceedings of the Fifth International Conference on Case-Based Reasoning</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:pub>Springer-Verlag</rft:pub>
+              <rft:epage>26</rft:epage>
+              <rft:au>Nirmalie Wiratunga</rft:au>
+              <rft:au>Susan Craw</rft:au>
+              <rft:au>Stewart Massie</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>David Cohn</author>
+      <author>Les Atlas</author>
+      <author>Richard Ladner</author>
+    </authors>
+    <title>Improving generalization with active learning</title>
+    <booktitle>Machine Learning</booktitle>
+    <year>1994</year>
+    <raw_string>[6] David Cohn, Les Atlas, and Richard Ladner. Improving generalization with active learning. Machine Learning, 15(2):201&#x2013;221, 1994.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Improving generalization with active learning</rft:atitle>
+              <rft:date>1994</rft:date>
+              <rft:btitle>Machine Learning</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>David Cohn</rft:au>
+              <rft:au>Les Atlas</rft:au>
+              <rft:au>Richard Ladner</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Mark Plutowski</author>
+      <author>Halbert White</author>
+    </authors>
+    <title>Selecting concise training sets from clean data</title>
+    <journal>IEEE Transactions on Neural Networks</journal>
+    <volume>4</volume>
+    <number>2</number>
+    <year>1993</year>
+    <raw_string>[7] Mark Plutowski and Halbert White. Selecting concise training sets from clean data. IEEE Transactions on Neural Networks, 4(2):305&#x2013;318, March 1993.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>2</rft:quarter>
+              <rft:atitle>Selecting concise training sets from clean data</rft:atitle>
+              <rft:date>1993</rft:date>
+              <rft:stitle>IEEE Transactions on Neural Networks</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>4</rft:volume>
+              <rft:au>Mark Plutowski</rft:au>
+              <rft:au>Halbert White</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Shahshashani</author>
+      <author>Landgrebe</author>
+    </authors>
+    <title>The effect of unlabeled examples in reducing the small sample size problem</title>
+    <journal>IEEE Trans Geoscience and Remote Sensing</journal>
+    <volume>32</volume>
+    <number>5</number>
+    <year>1994</year>
+    <raw_string>[8] Shahshashani and Landgrebe. The effect of unlabeled examples in reducing the small sample size problem. IEEE Trans Geoscience and Remote Sensing, 32(5):1087&#x2013;1095, 1994.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>5</rft:quarter>
+              <rft:atitle>The effect of unlabeled examples in reducing the small sample size problem</rft:atitle>
+              <rft:date>1994</rft:date>
+              <rft:stitle>IEEE Trans Geoscience and Remote Sensing</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>32</rft:volume>
+              <rft:au>Shahshashani</rft:au>
+              <rft:au>Landgrebe</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Miller</author>
+      <author>Uyar</author>
+    </authors>
+    <title>A mixture of experts classifier with learning based on both labeled and unla- belled data</title>
+    <booktitle>In NIPS-9</booktitle>
+    <year>1997</year>
+    <raw_string>[9] Miller and Uyar. A mixture of experts classifier with learning based on both labeled and unla- belled data. In NIPS-9, 1997.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>A mixture of experts classifier with learning based on both labeled and unla- belled data</rft:atitle>
+              <rft:date>1997</rft:date>
+              <rft:btitle>In NIPS-9</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>Miller</rft:au>
+              <rft:au>Uyar</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>H S Seung</author>
+      <author>Manfred Opper</author>
+      <author>Haim Sompolinsky</author>
+    </authors>
+    <title>Query by committee</title>
+    <booktitle>In Computational Learning Theory</booktitle>
+    <pages>287--294</pages>
+    <year>1992</year>
+    <raw_string>[10] H. S. Seung, Manfred Opper, and Haim Sompolinsky. Query by committee. In Computational Learning Theory, pages 287&#x2013;294, 1992.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Query by committee</rft:atitle>
+              <rft:spage>287</rft:spage>
+              <rft:date>1992</rft:date>
+              <rft:btitle>In Computational Learning Theory</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:epage>294</rft:epage>
+              <rft:au>H S Seung</rft:au>
+              <rft:au>Manfred Opper</rft:au>
+              <rft:au>Haim Sompolinsky</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>David D Lewis</author>
+      <author>Jason Catlett</author>
+    </authors>
+    <title>Heterogeneous uncertainty sampling for supervised learn- ing</title>
+    <booktitle>Proceedings of ICML-94, 11th Interna- tional Conference on Machine Learning</booktitle>
+    <editor>In William W. Cohen and Haym Hirsh, editors</editor>
+    <publisher>Morgan Kaufmann Publishers</publisher>
+    <location>New Brunswick, US, San Francisco, US</location>
+    <pages>148--156</pages>
+    <year>1994</year>
+    <raw_string>[11] David D. Lewis and Jason Catlett. Heterogeneous uncertainty sampling for supervised learn- ing. In William W. Cohen and Haym Hirsh, editors, Proceedings of ICML-94, 11th Interna- tional Conference on Machine Learning, pages 148&#x2013;156, New Brunswick, US, 1994. Morgan Kaufmann Publishers, San Francisco, US.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:place>New Brunswick, US, San Francisco, US</rft:place>
+              <rft:atitle>Heterogeneous uncertainty sampling for supervised learn- ing</rft:atitle>
+              <rft:spage>148</rft:spage>
+              <rft:date>1994</rft:date>
+              <rft:btitle>Proceedings of ICML-94, 11th Interna- tional Conference on Machine Learning</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:pub>Morgan Kaufmann Publishers</rft:pub>
+              <rft:epage>156</rft:epage>
+              <rft:au>David D Lewis</rft:au>
+              <rft:au>Jason Catlett</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="false">
+    <authors>
+      <author>P Brazdil</author>
+      <author>J Gama StatLog</author>
+    </authors>
+    <year>1991</year>
+    <raw_string>[12] P.Brazdil and J.Gama. StatLog, 1991. http://www.liacc.up.pt/ML/statlog.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>C L Blake</author>
+      <author>C J Merz</author>
+    </authors>
+    <title>UCI repository of machine learning databases</title>
+    <year>1998</year>
+    <raw_string>[13] C.L. Blake and C.J. Merz. UCI repository of machine learning databases, 1998. http://www.ics.uci.edu/&#x223C;mlearn/MLRepository.html.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R C Nichol</author>
+      <author>C A Collins</author>
+      <author>S L Lumsden</author>
+    </authors>
+    <title>The Edinburgh/Durham southern galaxy catalogue</title>
+    <journal>IX. Submitted to the Astrophysical Journal</journal>
+    <year>2000</year>
+    <raw_string>[14] R. C. Nichol, C. A. Collins, and S. L. Lumsden. The Edinburgh/Durham southern galaxy catalogue &#x2014; IX. Submitted to the Astrophysical Journal, 2000.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>The Edinburgh/Durham southern galaxy catalogue</rft:atitle>
+              <rft:date>2000</rft:date>
+              <rft:stitle>IX. Submitted to the Astrophysical Journal</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:au>R C Nichol</rft:au>
+              <rft:au>C A Collins</rft:au>
+              <rft:au>S L Lumsden</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>SDSS</author>
+    </authors>
+    <title>The Sloan Digital Sky Survey</title>
+    <pages>www.sdss.org.</pages>
+    <year>1998</year>
+    <raw_string>[15] SDSS. The Sloan Digital Sky Survey, 1998. www.sdss.org.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Dan Pelleg</author>
+    </authors>
+    <title>Scalable and Practical Probability Density Estimators for Scientific Anomaly De-tection</title>
+    <institution>Carnegie-Mellon University</institution>
+    <year>2004</year>
+    <tech>PhD thesis, Tech Report CMU-CS-04-134</tech>
+    <raw_string>[16] Dan Pelleg. Scalable and Practical Probability Density Estimators for Scientific Anomaly De-tection. PhD thesis, Carnegie-Mellon University, 2004. Tech Report CMU-CS-04-134.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:dissertation</ctx:format>
+          <ctx:metadata>
+            <dissertation xmlns:rft="info:ofi/fmt:xml:xsd:dissertation" xsi:schemaLocation="info:ofi/fmt:xml:xsd:dissertation http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:dissertation">
+              <rft:degree>PhD</rft:degree>
+              <rft:title>Scalable and Practical Probability Density Estimators for Scientific Anomaly De-tection</rft:title>
+              <rft:date>2004</rft:date>
+              <rft:inst>Carnegie-Mellon University</rft:inst>
+              <rft:au>Dan Pelleg</rft:au>
+            </dissertation>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>David MacKay</author>
+    </authors>
+    <title>Information-based objective functions for active data selection</title>
+    <journal>Neural Com-putation</journal>
+    <volume>4</volume>
+    <number>4</number>
+    <year>1992</year>
+    <raw_string>[17] David MacKay. Information-based objective functions for active data selection. Neural Com-putation, 4(4):590&#x2013;604, 1992.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>4</rft:quarter>
+              <rft:atitle>Information-based objective functions for active data selection</rft:atitle>
+              <rft:date>1992</rft:date>
+              <rft:jtitle>Neural Com-putation</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>4</rft:volume>
+              <rft:au>David MacKay</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Fabio Gagliardi Cozman</author>
+      <author>Ira Cohen</author>
+    </authors>
+    <title>Marclo Cesar Cirelo. Semi-supervised learning of mixture models and bayesian networks</title>
+    <booktitle>In Proceedings of the Twentieth International Confer- ence on Machine Learning</booktitle>
+    <year>2003</year>
+    <raw_string>[18] Fabio Gagliardi Cozman, Ira Cohen, and Marclo Cesar Cirelo. Semi-supervised learning of mixture models and bayesian networks. In Proceedings of the Twentieth International Confer- ence on Machine Learning, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Marclo Cesar Cirelo. Semi-supervised learning of mixture models and bayesian networks</rft:atitle>
+              <rft:date>2003</rft:date>
+              <rft:btitle>In Proceedings of the Twentieth International Confer- ence on Machine Learning</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Fabio Gagliardi Cozman</rft:au>
+              <rft:au>Ira Cohen</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Yoram Baram</author>
+      <author>Ran El-Yaniv</author>
+      <author>Kobi Luz</author>
+    </authors>
+    <title>Online choice of active learning algorithms</title>
+    <booktitle>In Proceedings of the Twentieth International Conference on Machine Learning</booktitle>
+    <year>2003</year>
+    <raw_string>[19] Yoram Baram, Ran El-Yaniv, and Kobi Luz. Online choice of active learning algorithms. In Proceedings of the Twentieth International Conference on Machine Learning, 2003.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Online choice of active learning algorithms</rft:atitle>
+              <rft:date>2003</rft:date>
+              <rft:btitle>In Proceedings of the Twentieth International Conference on Machine Learning</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:au>Yoram Baram</rft:au>
+              <rft:au>Ran El-Yaniv</rft:au>
+              <rft:au>Kobi Luz</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Sanjoy Dasgupta</author>
+    </authors>
+    <title>Analysis of a greedy active learning strategy</title>
+    <booktitle>In Advances in Neural Infor-mation Processing Systems 18</booktitle>
+    <year>2004</year>
+    <raw_string>[20] Sanjoy Dasgupta. Analysis of a greedy active learning strategy. In Advances in Neural Infor-mation Processing Systems 18, 2004.</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:27:58-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Analysis of a greedy active learning strategy</rft:atitle>
+              <rft:date>2004</rft:date>
+              <rft:btitle>In Advances in Neural Infor-mation Processing Systems 18</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>Sanjoy Dasgupta</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>

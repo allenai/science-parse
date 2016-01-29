@@ -1,1 +1,307 @@
-<citations><citation valid='true'><authors><author>J Serra</author></authors><title>Image Analysis and Mathematical Morphology Volume 2: Theoretical Advances</title><publisher>Academic Press</publisher><location>London</location><year>1988</year><raw_string>1. Serra, J.: Image Analysis and Mathematical Morphology Volume 2: Theoretical Advances. London: Academic Press (1988)</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>V Barnett</author></authors><title>The ordering of multivariate data</title><journal>Journal of the Royal Society A, vol</journal><volume>139</volume><pages>318--355</pages><year>1976</year><raw_string>2. Barnett, V.: The ordering of multivariate data. Journal of the Royal Society A, vol 139 (1976) 318-355</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:atitle>The ordering of multivariate data</rft:atitle><rft:spage>318</rft:spage><rft:date>1976</rft:date><rft:stitle>Journal of the Royal Society A, vol</rft:stitle><rft:genre>article</rft:genre><rft:volume>139</rft:volume><rft:epage>355</rft:epage><rft:au>V Barnett</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>M L Comer</author><author>Delp</author></authors><title>E.J.: Morphological Operations for Color Image Processing</title><journal>Journal of Electronic Imaging</journal><volume>8</volume><number>3</number><pages>279--289</pages><year>1999</year><raw_string>3. Comer, M.L., Delp, E.J.: Morphological Operations for Color Image Processing. Journal of Electronic Imaging, Vol. 8, No. 3 (1999) 279-289</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>3</rft:quarter><rft:atitle>E.J.: Morphological Operations for Color Image Processing</rft:atitle><rft:spage>279</rft:spage><rft:date>1999</rft:date><rft:stitle>Journal of Electronic Imaging</rft:stitle><rft:genre>article</rft:genre><rft:volume>8</rft:volume><rft:epage>289</rft:epage><rft:au>M L Comer</rft:au><rft:au>Delp</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>J Chanussot</author><author>P Lambert</author></authors><title>Total ordering based on space filling curves for multivalued morphology</title><booktitle>In Proceedings of the International Symposium on Mathematical Morphology (ISMM’98</booktitle><pages>51--58</pages><year>1998</year><raw_string>4. Chanussot, J., Lambert, P.: Total ordering based on space filling curves for multivalued morphology. In Proceedings of the International Symposium on Mathematical Morphology (ISMM’98) (1998) 51-58</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Total ordering based on space filling curves for multivalued morphology</rft:atitle><rft:spage>51</rft:spage><rft:date>1998</rft:date><rft:btitle>In Proceedings of the International Symposium on Mathematical Morphology (ISMM’98</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>58</rft:epage><rft:au>J Chanussot</rft:au><rft:au>P Lambert</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>R A Peters</author></authors><title>Mathematical morphology for angle-valued images</title><booktitle>In Non-Linear Image Processing VIII. SPIE</booktitle><volume>3026</volume><year>1997</year><raw_string>5. Peters II, R.A.: Mathematical morphology for angle-valued images. In Non-Linear Image Processing VIII. SPIE volume 3026 (1997)</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Mathematical morphology for angle-valued images</rft:atitle><rft:date>1997</rft:date><rft:btitle>In Non-Linear Image Processing VIII. SPIE</rft:btitle><rft:genre>bookitem</rft:genre><rft:au>R A Peters</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>A Hanbury</author><author>J Serra</author></authors><title>Mathematical Morphology in the HLS Colour Space</title><booktitle>In Proceedings of the 12th British Machine Vision Conference</booktitle><pages>451--460</pages><year>2001</year><raw_string>6. Hanbury, A., Serra, J.: Mathematical Morphology in the HLS Colour Space. In Proceedings of the 12th British Machine Vision Conference (2001) 451-460</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format><ctx:metadata><book xmlns:rft='info:ofi/fmt:xml:xsd:book' xsi:schemaLocation='info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book'><rft:atitle>Mathematical Morphology in the HLS Colour Space</rft:atitle><rft:spage>451</rft:spage><rft:date>2001</rft:date><rft:btitle>In Proceedings of the 12th British Machine Vision Conference</rft:btitle><rft:genre>proceeding</rft:genre><rft:epage>460</rft:epage><rft:au>A Hanbury</rft:au><rft:au>J Serra</rft:au></book></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>B Fritzke</author></authors><title>Some Competitive Learning Methods</title><year>1997</year><tech>Draft Paper</tech><raw_string>7. Fritzke, B.: Some Competitive Learning Methods. Draft Paper (1997)</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:22-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Kohonen</author></authors><title>T.: Self-organizing maps</title><publisher>Springer</publisher><year>1995</year><raw_string>8. Kohonen, T.: Self-organizing maps. Springer (1995)</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:23-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>B Fritzke</author></authors><title>Growing Cell Structures – A Self-organizing Network for Unsupervised and Supervised Learning</title><journal>Neural Networks</journal><volume>7</volume><number>9</number><pages>1441--1460</pages><year>1994</year><raw_string>9. Fritzke, B.: Growing Cell Structures – A Self-organizing Network for Unsupervised and Supervised Learning. Neural Networks, Vol. 7, No. 9 (1994) 1441-1460</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:23-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>9</rft:quarter><rft:atitle>Growing Cell Structures – A Self-organizing Network for Unsupervised and Supervised Learning</rft:atitle><rft:spage>1441</rft:spage><rft:date>1994</rft:date><rft:jtitle>Neural Networks</rft:jtitle><rft:genre>article</rft:genre><rft:volume>7</rft:volume><rft:epage>1460</rft:epage><rft:au>B Fritzke</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>Ortiz</author></authors><title>F.G.: Procesamiento morfológico de imágenes en color. Aplicación a la reconstrucción geodésica</title><institution>Universidad de Alicante</institution><year>2002</year><tech>Ph. D. Thesis</tech><raw_string>10. Ortiz, F.G.: Procesamiento morfológico de imágenes en color. Aplicación a la reconstrucción geodésica. Ph. D. Thesis, Universidad de Alicante (2002)</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:23-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects><citation valid='true'><authors><author>H-U Bauer</author><author>Pawelzik</author></authors><title>K.R.: Quantifying the Neighborhood Preservation of Self-Organizing Feature Maps</title><journal>IEEE Transactions on Neural Networks</journal><volume>3</volume><number>4</number><pages>570--578</pages><year>1992</year><raw_string>11. Bauer, H.-U., Pawelzik, K.R.: Quantifying the Neighborhood Preservation of Self-Organizing Feature Maps. IEEE Transactions on Neural Networks, 3(4) (1992) 570-578</raw_string></citation><ctx:context-objects xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx' xmlns:ctx='info:ofi/fmt:xml:xsd:ctx'><ctx:context-object timestamp='2016-01-25T18:16:23-05:00' encoding='info:ofi/enc:UTF-8' version='Z39.88-2004' identifier=''><ctx:referent><ctx:metadata-by-val><ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format><ctx:metadata><journal xmlns:rft='info:ofi/fmt:xml:xsd:journal' xsi:schemaLocation='info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal'><rft:quarter>4</rft:quarter><rft:atitle>K.R.: Quantifying the Neighborhood Preservation of Self-Organizing Feature Maps</rft:atitle><rft:spage>570</rft:spage><rft:date>1992</rft:date><rft:stitle>IEEE Transactions on Neural Networks</rft:stitle><rft:genre>article</rft:genre><rft:volume>3</rft:volume><rft:epage>578</rft:epage><rft:au>H-U Bauer</rft:au><rft:au>Pawelzik</rft:au></journal></ctx:metadata></ctx:metadata-by-val></ctx:referent></ctx:context-object></ctx:context-objects></citations>
+<?xml version="1.0"?>
+<citations>
+  <citation valid="true">
+    <authors>
+      <author>J Serra</author>
+    </authors>
+    <title>Image Analysis and Mathematical Morphology Volume 2: Theoretical Advances</title>
+    <publisher>Academic Press</publisher>
+    <location>London</location>
+    <year>1988</year>
+    <raw_string>1. Serra, J.: Image Analysis and Mathematical Morphology Volume 2: Theoretical Advances. London: Academic Press (1988)</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>V Barnett</author>
+    </authors>
+    <title>The ordering of multivariate data</title>
+    <journal>Journal of the Royal Society A, vol</journal>
+    <volume>139</volume>
+    <pages>318--355</pages>
+    <year>1976</year>
+    <raw_string>2. Barnett, V.: The ordering of multivariate data. Journal of the Royal Society A, vol 139 (1976) 318-355</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:atitle>The ordering of multivariate data</rft:atitle>
+              <rft:spage>318</rft:spage>
+              <rft:date>1976</rft:date>
+              <rft:stitle>Journal of the Royal Society A, vol</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>139</rft:volume>
+              <rft:epage>355</rft:epage>
+              <rft:au>V Barnett</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>M L Comer</author>
+      <author>Delp</author>
+    </authors>
+    <title>E.J.: Morphological Operations for Color Image Processing</title>
+    <journal>Journal of Electronic Imaging</journal>
+    <volume>8</volume>
+    <number>3</number>
+    <pages>279--289</pages>
+    <year>1999</year>
+    <raw_string>3. Comer, M.L., Delp, E.J.: Morphological Operations for Color Image Processing. Journal of Electronic Imaging, Vol. 8, No. 3 (1999) 279-289</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>3</rft:quarter>
+              <rft:atitle>E.J.: Morphological Operations for Color Image Processing</rft:atitle>
+              <rft:spage>279</rft:spage>
+              <rft:date>1999</rft:date>
+              <rft:stitle>Journal of Electronic Imaging</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>8</rft:volume>
+              <rft:epage>289</rft:epage>
+              <rft:au>M L Comer</rft:au>
+              <rft:au>Delp</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>J Chanussot</author>
+      <author>P Lambert</author>
+    </authors>
+    <title>Total ordering based on space filling curves for multivalued morphology</title>
+    <booktitle>In Proceedings of the International Symposium on Mathematical Morphology (ISMM&#x2019;98</booktitle>
+    <pages>51--58</pages>
+    <year>1998</year>
+    <raw_string>4. Chanussot, J., Lambert, P.: Total ordering based on space filling curves for multivalued morphology. In Proceedings of the International Symposium on Mathematical Morphology (ISMM&#x2019;98) (1998) 51-58</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Total ordering based on space filling curves for multivalued morphology</rft:atitle>
+              <rft:spage>51</rft:spage>
+              <rft:date>1998</rft:date>
+              <rft:btitle>In Proceedings of the International Symposium on Mathematical Morphology (ISMM&#x2019;98</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>58</rft:epage>
+              <rft:au>J Chanussot</rft:au>
+              <rft:au>P Lambert</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>R A Peters</author>
+    </authors>
+    <title>Mathematical morphology for angle-valued images</title>
+    <booktitle>In Non-Linear Image Processing VIII. SPIE</booktitle>
+    <volume>3026</volume>
+    <year>1997</year>
+    <raw_string>5. Peters II, R.A.: Mathematical morphology for angle-valued images. In Non-Linear Image Processing VIII. SPIE volume 3026 (1997)</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Mathematical morphology for angle-valued images</rft:atitle>
+              <rft:date>1997</rft:date>
+              <rft:btitle>In Non-Linear Image Processing VIII. SPIE</rft:btitle>
+              <rft:genre>bookitem</rft:genre>
+              <rft:au>R A Peters</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>A Hanbury</author>
+      <author>J Serra</author>
+    </authors>
+    <title>Mathematical Morphology in the HLS Colour Space</title>
+    <booktitle>In Proceedings of the 12th British Machine Vision Conference</booktitle>
+    <pages>451--460</pages>
+    <year>2001</year>
+    <raw_string>6. Hanbury, A., Serra, J.: Mathematical Morphology in the HLS Colour Space. In Proceedings of the 12th British Machine Vision Conference (2001) 451-460</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:book</ctx:format>
+          <ctx:metadata>
+            <book xmlns:rft="info:ofi/fmt:xml:xsd:book" xsi:schemaLocation="info:ofi/fmt:xml:xsd:book http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:book">
+              <rft:atitle>Mathematical Morphology in the HLS Colour Space</rft:atitle>
+              <rft:spage>451</rft:spage>
+              <rft:date>2001</rft:date>
+              <rft:btitle>In Proceedings of the 12th British Machine Vision Conference</rft:btitle>
+              <rft:genre>proceeding</rft:genre>
+              <rft:epage>460</rft:epage>
+              <rft:au>A Hanbury</rft:au>
+              <rft:au>J Serra</rft:au>
+            </book>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>B Fritzke</author>
+    </authors>
+    <title>Some Competitive Learning Methods</title>
+    <year>1997</year>
+    <tech>Draft Paper</tech>
+    <raw_string>7. Fritzke, B.: Some Competitive Learning Methods. Draft Paper (1997)</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:22-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Kohonen</author>
+    </authors>
+    <title>T.: Self-organizing maps</title>
+    <publisher>Springer</publisher>
+    <year>1995</year>
+    <raw_string>8. Kohonen, T.: Self-organizing maps. Springer (1995)</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:23-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>B Fritzke</author>
+    </authors>
+    <title>Growing Cell Structures &#x2013; A Self-organizing Network for Unsupervised and Supervised Learning</title>
+    <journal>Neural Networks</journal>
+    <volume>7</volume>
+    <number>9</number>
+    <pages>1441--1460</pages>
+    <year>1994</year>
+    <raw_string>9. Fritzke, B.: Growing Cell Structures &#x2013; A Self-organizing Network for Unsupervised and Supervised Learning. Neural Networks, Vol. 7, No. 9 (1994) 1441-1460</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:23-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>9</rft:quarter>
+              <rft:atitle>Growing Cell Structures &#x2013; A Self-organizing Network for Unsupervised and Supervised Learning</rft:atitle>
+              <rft:spage>1441</rft:spage>
+              <rft:date>1994</rft:date>
+              <rft:jtitle>Neural Networks</rft:jtitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>7</rft:volume>
+              <rft:epage>1460</rft:epage>
+              <rft:au>B Fritzke</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>Ortiz</author>
+    </authors>
+    <title>F.G.: Procesamiento morfolo&#x301;gico de ima&#x301;genes en color. Aplicacio&#x301;n a la reconstruccio&#x301;n geode&#x301;sica</title>
+    <institution>Universidad de Alicante</institution>
+    <year>2002</year>
+    <tech>Ph. D. Thesis</tech>
+    <raw_string>10. Ortiz, F.G.: Procesamiento morfolo&#x301;gico de ima&#x301;genes en color. Aplicacio&#x301;n a la reconstruccio&#x301;n geode&#x301;sica. Ph. D. Thesis, Universidad de Alicante (2002)</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:23-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:unknown</ctx:format>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+  <citation valid="true">
+    <authors>
+      <author>H-U Bauer</author>
+      <author>Pawelzik</author>
+    </authors>
+    <title>K.R.: Quantifying the Neighborhood Preservation of Self-Organizing Feature Maps</title>
+    <journal>IEEE Transactions on Neural Networks</journal>
+    <volume>3</volume>
+    <number>4</number>
+    <pages>570--578</pages>
+    <year>1992</year>
+    <raw_string>11. Bauer, H.-U., Pawelzik, K.R.: Quantifying the Neighborhood Preservation of Self-Organizing Feature Maps. IEEE Transactions on Neural Networks, 3(4) (1992) 570-578</raw_string>
+  </citation>
+  <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
+    <ctx:context-object timestamp="2016-01-25T18:16:23-05:00" encoding="info:ofi/enc:UTF-8" version="Z39.88-2004" identifier="">
+      <ctx:referent>
+        <ctx:metadata-by-val>
+          <ctx:format>info:ofi/fmt:xml:xsd:journal</ctx:format>
+          <ctx:metadata>
+            <journal xmlns:rft="info:ofi/fmt:xml:xsd:journal" xsi:schemaLocation="info:ofi/fmt:xml:xsd:journal http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:journal">
+              <rft:quarter>4</rft:quarter>
+              <rft:atitle>K.R.: Quantifying the Neighborhood Preservation of Self-Organizing Feature Maps</rft:atitle>
+              <rft:spage>570</rft:spage>
+              <rft:date>1992</rft:date>
+              <rft:stitle>IEEE Transactions on Neural Networks</rft:stitle>
+              <rft:genre>article</rft:genre>
+              <rft:volume>3</rft:volume>
+              <rft:epage>578</rft:epage>
+              <rft:au>H-U Bauer</rft:au>
+              <rft:au>Pawelzik</rft:au>
+            </journal>
+          </ctx:metadata>
+        </ctx:metadata-by-val>
+      </ctx:referent>
+    </ctx:context-object>
+  </ctx:context-objects>
+</citations>
