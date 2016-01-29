@@ -27,8 +27,8 @@ object Box {
   }
 
   /** @return Box contained by `box` that has been cropped to `boxes`, meaning it has been shrunk
-    *   as much as possible providing it still intersects `boxes` in the same places as before,
-    *   returns None if `box` did not contain any box in `boxes`
+    * as much as possible providing it still intersects `boxes` in the same places as before,
+    * returns None if `box` did not contain any box in `boxes`
     */
   def crop(box: Box, boxes: Iterable[Box], tol: Double = 0): Option[Box] = {
     var shrinkLeft = box.width
@@ -61,7 +61,7 @@ object Box {
     *
     * @param boxes to merge
     * @param tol to use when calculating intersections, returned boxes will be at least `tol`
-    *            manhattan distance from each other, can be negative.
+    *           manhattan distance from each other, can be negative.
     */
   def mergeBoxes(boxes: List[Box], tol: Double): List[Box] = {
     if (boxes.isEmpty) {
@@ -96,8 +96,8 @@ object Box {
   }
 
   /** @return all Boxes that can built such that they have the same x1 and x2 as `box`, they are
-    *   contained within `box`, and do not intersect any box in `contents`. Returned boxes
-    *   are maximally expanded, therefore they will not intersect or have overlapping borders
+    * contained within `box`, and do not intersect any box in `contents`. Returned boxes
+    * are maximally expanded, therefore they will not intersect or have overlapping borders
     */
   def findEmptyHorizontalBlocks(box: Box, contents: Seq[Box]): Seq[Box] = {
     // We keep a list of empty horizontal boxes starting with `box` itself, and for each

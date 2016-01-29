@@ -8,7 +8,7 @@ object RegionClassifier extends Logging {
   private abstract class TextClassifier() {
 
     /** @return return Some(true) iff `paragraph` appears to be figure text, Some(false) if it is
-      *          body text, or None if unsure
+      *         body text, or None if unsure
       */
     def isBodyText(paragraph: Paragraph): Option[Boolean]
   }

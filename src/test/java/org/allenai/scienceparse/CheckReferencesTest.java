@@ -10,7 +10,6 @@ import java.util.Arrays;
 @Test
 @Slf4j
 public class CheckReferencesTest {
-
   public void smallTest() throws IOException {
     String jsonFile = Parser.getDefaultGazetteer().toString();
     CheckReferences cr = new CheckReferences(jsonFile);
@@ -36,7 +35,5 @@ public class CheckReferencesTest {
       Arrays.asList("Captain Bananas",
         "David Newman",
         "Padhraic Smyth"), 2013, "KDD"));
-
   }
-
 }
