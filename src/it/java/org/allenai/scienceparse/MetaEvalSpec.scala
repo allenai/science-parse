@@ -5,6 +5,8 @@ import org.allenai.common.testkit.UnitSpec
 import org.allenai.common.StringUtils._
 import org.allenai.datastore.Datastores
 
+import scala.xml.XML
+import scala.collection.JavaConverters._
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
 import scala.io.Source
@@ -21,7 +23,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def normalize(s: String) = s.replaceFancyUnicodeChars.removeUnprintable.normalize
 
-    def calculatePR(goldData: Set[String], extractedData: Set[String]) = {
+    def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
       if(extractedData.isEmpty) {
         (0.0, 0.0)
       } else {
@@ -59,6 +61,24 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map(normalize), (Set(extractedMetadata.getTitle) - null).map(normalize))
 
+    def getBibGold(id: String): Set[BibRecord] = {
+      val filename = s"/golddata/bibliography/$id.xml"
+      val xmlStr = Source.fromInputStream(getClass.getResourceAsStream(filename)).mkString
+      val xml = XML.loadString(xmlStr)
+      (xml \ "citation").map { citation =>
+        new BibRecord(
+          (citation \ "title").text,
+          (citation \ "authors").map(a => (a \ "author").text).asJava,
+          (citation \ "journal").text,
+          null, null,
+          (citation \ "year").text.toInt
+        )
+      }.toSet
+    }
+
+    def bibliographyEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      calculatePR(getBibGold(goldData.head), extractedMetadata.references.asScala.toSet)
+
     def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String], normalizer: String => String = identity[String]) = {
       if (extractedMetadata.abstractText == null) {
         (0.0, 0.0)
@@ -92,7 +112,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("title", "/golddata/dblp/title.tsv", titleEvaluator),
       Metric("titleNormalized", "/golddata/dblp/title.tsv", titleNormalizedEvaluator),
       Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
-      Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator)
+      Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
+      // ls *.txt | awk -F'[_.]' '{print $1"\t"$1}' > pdfs.tsv
+      Metric("bibliography", "/golddata/bibliography/pdfs.tsv", bibliographyEvaluator)
     )
 
 

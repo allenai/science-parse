@@ -1,12 +1,13 @@
 package org.allenai.scienceparse;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Data
+@Data @EqualsAndHashCode(exclude={"citeRegEx", "shortCiteRegEx"})
 public class BibRecord {
   public static final int MINYEAR = 1800;
   public static final int MAXYEAR = Calendar.getInstance().get(Calendar.YEAR) + 10;
