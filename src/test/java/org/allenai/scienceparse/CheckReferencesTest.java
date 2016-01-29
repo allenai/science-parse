@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class CheckReferencesTest {
 
   public void smallTest() throws IOException {
-    String jsonFile = ParserTest.filePathOfResource("/referencesGroundTruth.json");
+    String jsonFile = Parser.getDefaultGazetteer().toString();
     CheckReferences cr = new CheckReferences(jsonFile);
     log.info("num hashes: " + cr.getHashSize());
     Assert.assertEquals(cr.getHashSize(), 13579);

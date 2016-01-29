@@ -2,11 +2,14 @@ package org.allenai.scienceparse;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.allenai.datastore.Datastore;
 import org.allenai.pdfbox.io.IOUtils;
 import org.testng.annotations.Test;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,21 +83,12 @@ public class HeaderIntegrationTest {
         final Parser result;
         try(
           val modelStream = new FileInputStream(tempModelFile);
-          val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
+          val gazetteerStream = Files.newInputStream(Parser.getDefaultGazetteer())
         ){
           result = new Parser(modelStream, gazetteerStream);
         }
         tempModelFile.delete();
         return result;
-    }
-
-    public Parser loadProductionParser() throws Exception {
-        try(
-          val modelStream = new FileInputStream("models/model-production_12_1_15.dat");
-          val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
-        ){
-          return new Parser(modelStream, gazetteerStream);
-        }
     }
 
     public static HashSet<String> authorSet(Iterable<String> authors) {
@@ -176,11 +170,11 @@ public class HeaderIntegrationTest {
 
     public void testAuthorAndTitleExtraction() throws Exception {
         ParserGroundTruth pgt = new ParserGroundTruth(
-                HeaderIntegrationTest.class.getResourceAsStream("/referencesGroundTruth.json"));
+          Files.newInputStream(Parser.getDefaultGazetteer()));
 
         // TODO (build and train a classifier at test time).
         //        Parser parser = trainParser(pgt);
-        Parser parser = loadProductionParser();
+        Parser parser = new Parser();
 
         ArrayList<ParserGroundTruth.Paper> sampledPapers = new ArrayList<>();
 

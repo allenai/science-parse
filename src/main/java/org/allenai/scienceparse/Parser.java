@@ -5,6 +5,7 @@ import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
 import lombok.val;
+import org.allenai.datastore.Datastore;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -59,6 +60,18 @@ public class Parser {
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
+
+  private static final Datastore datastore = Datastore.apply();
+  public static Path getDefaultProductionModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 1);
+  }
+  public static Path getDefaultGazetteer() {
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
+  }
+
+  public Parser() throws Exception {
+    this(getDefaultProductionModel(), getDefaultGazetteer());
+  }
 
   public Parser(final String modelFile, final String gazetteerFile) throws Exception {
     this(new File(modelFile), new File(gazetteerFile));

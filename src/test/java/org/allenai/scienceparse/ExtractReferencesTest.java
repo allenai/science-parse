@@ -80,7 +80,7 @@ public class ExtractReferencesTest {
   }
 
   public void testFindReferencesAndCitations() throws Exception {
-    ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
+    ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString());
 
     File paper1 = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));
     File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
