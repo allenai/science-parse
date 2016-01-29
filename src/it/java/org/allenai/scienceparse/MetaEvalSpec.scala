@@ -24,11 +24,14 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def normalize(s: String) = s.replaceFancyUnicodeChars.removeUnprintable.normalize
 
     def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
-      if(extractedData.isEmpty) {
+      if (goldData.isEmpty) {
+        (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
+      } else if (extractedData.isEmpty) {
         (0.0, 0.0)
       } else {
         val precision = extractedData.count(goldData.contains).toDouble / extractedData.size
         val recall = goldData.count(extractedData.contains).toDouble / goldData.size
+        extractedData.filter(!goldData.contains(_)).foreach(println(_))
         (precision, recall)
       }
     }
@@ -192,6 +195,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     logger.info("Evaluation results:")
     val prResults = allGoldData.map { case (metric, docid, goldData) =>
+      if (metric.name == "gold bibliography") {
+        println(s"EVALUATING $docid BIB!")
+      }
       extractions(docid) match {
         case Failure(_) => (metric, (0.0, 0.0))
         case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
