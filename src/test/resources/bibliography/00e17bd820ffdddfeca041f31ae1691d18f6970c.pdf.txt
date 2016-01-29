@@ -1,0 +1,30 @@
+[1] Data driven healthcare. MIT Technology Review Business Report, 117(5):1–19, 2014.
+[2] Shiyu Chang, Charu C Aggarwal, and Thomas S Huang. Learning local semantic distances with limited supervision. In ICDM, 2014.
+[3] John W Dean and Max J Lab. Arrhythmia in heart failure: role of mechanically induced changes in electrophysiology. The Lancet, 333(8650), 1989.
+[4] David Gotz, Fei Wang, and Adam Perer. A methodology for interactive mining and visual analysis of clinical event patterns using electronic health record data. Journal of biomedical informatics, 48, 2014.
+[5] Joyce C Ho, Joydeep Ghosh, Steve R Steinhubl, Walter F Stewart, Joshua C Denny, Bradley A Malin, and Jimeng Sun. Limestone: High-throughput candidate phenotype generation via tensor factorization. Journal of biomedical informatics, 52: 199–211, 2014.
+[6] Joyce C Ho, Joydeep Ghosh, and Jimeng Sun. Marble: high-throughput phenotyping from electronic health records via sparse nonnegative tensor factorization. In KDD, 2014.
+[7] George Hripcsak and David J Albers. Next-generation phenotyping of electronic health records. Journal of the American Medical Informatics Association, 20(1): 117–121, 2013.
+[8] Peter B Jensen, Lars J Jensen, and Søren Brunak. Mining electronic health records: towards better research applications and clinical care. Nature Reviews Genetics, 13(6):395–405, 2012.
+[9] David Kale, Zhengping Che, and Yan Liu. Computational discovery of physiomes in critically ill children using deep learning. In Workshop DMMI in AMIA, 2014.
+[10] Eamonn Keogh, Kaushik Chakrabarti, Sharad Mehrotra, and Michael Pazzani. Locally adaptive dimensionality reduction for indexing large time series databases. In SIGMOD, 2001.
+[11] Eamonn Keogh, Kaushik Chakrabarti, Michael Pazzani, and Sharad Mehrotra. Dimensionality reduction for fast similarity search in large time series databases. Knowledge and information Systems, 3(3): 263–286, 2001.
+[12] Eamonn Keogh, Selina Chu, David Hart, and Michael Pazzani. An online algorithm for segmenting time series. In ICDM, 2001.
+[13] Thomas A Lasko, Joshua C Denny, and Mia A Levy. Computational phenotype discovery using unsupervised feature learning over noisy, sparse, and irregular clinical data. PloS one, 8(6):e66341, 2013.
+[14] Daniel Levy, Martin G Larson, Ramachandran S Vasan, William B Kannel, and Kalon KL Ho. The progression from hypertension to congestive heart failure. Jama, 275(20):1557–1562, 1996.
+[15] Chih-Jen Lin. Projected gradient methods for nonnegative matrix factorization. Neural computation, 19(10):2756–2779, 2007.
+[16] Jessica Lin, Eamonn Keogh, Stefano Lonardi, and Bill Chiu. A symbolic representation of time series, with implications for streaming algorithms. In SIGMOD workshop on Research issues in DMKD, 2003.
+[17] Chuanren Liu, Kai Zhang, Hui Xiong, Geoff Jiang, and Qiang Yang. Temporal skeletonization on sequential data: Patterns, categorization, and visualization. In KDD, 2014.
+[18] Laura B. Madsen. Data-Driven Healthcare: How Analytics and BI are Transforming the Industry. Wiley, 2014.
+[19] Fabian Mo ̈rchen and Dmitriy Fradkin. Robust mining of time intervals with semi-interval partial order patterns. In SDM, 2010.
+[20] Fabian Mo ̈rchen and Alfred Ultsch. Efficient mining of understandable patterns from multivariate interval time series. Data Mining and Knowledge Discovery, 15 (2):181–215, 2007.
+[21] Robert Moskovitch and Yuval Shahar. Medical temporal-knowledge discovery via temporal abstraction. In AMIA, 2009.
+[22] Jyotishman Pathak, Abel N Kho, and Joshua C Denny. Electronic health records-driven phenotyping: challenges, recent advances, and perspectives. Journal of the American Medical Informatics Association, 20 (e2):e206–e211, 2013.
+[23] Adam Perer and Fei Wang. Frequence: interactive mining and visualization of temporal frequent event sequences. In IUI, 2014.
+[24] Yuval Shahar and Mark A Musen. Knowledge-based temporal abstraction in clinical domains. Artificial intelligence in medicine, 8(3):267–298, 1996.
+[25] Michael Stacey and Carolyn McGregor. Temporal abstraction in intelligent clinical data analysis: A survey. Artificial intelligence in medicine, 39(1), 2007.
+[26] Gregor Stiglic, Nigam H. Shah, Niels Peek, and Fei Wang. Workshop at amia on data mining for medical informatics: Electronic phenotyping. Nov 15, 2014.
+[27] Stephan von Haehling, Wolfram Doehner, and
+Stefan D Anker. Nutrition, metabolism, and the complex pathophysiology of cachexia in chronic heart failure. Cardiovascular research, 73(2):298–309, 2007.
+[28] Fei Wang, Noah Lee, Jianying Hu, Jimeng Sun, Shahram Ebadollahi, and Andrew F Laine. A framework for mining signatures from event sequences and its applications in healthcare data. IEEE TPAMI on, 35(2):272–285, 2013.
+[29] Jiayu Zhou, Fei Wang, Jianying Hu, and Jieping Ye. From micro to macro: Data driven phenotyping by densification of longitudinal electronic medical records. In KDD, 2014.

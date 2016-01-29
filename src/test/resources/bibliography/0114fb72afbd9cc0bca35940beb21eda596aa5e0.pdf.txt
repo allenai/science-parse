@@ -1,0 +1,41 @@
+[1] AMD Accelerated Parallel Processing SDK V2.3, 2011
+[2] AMD Accelerated Processing Units, 2011.
+[3] A. Bakhoda, et al., Analyzing CUDA workloads using a detailed GPU simulator, ISPASS, 2009.
+[4] R. Balasubramonian, et al., Dynamically allocating processor resources between nearby and distant ILP, ISCA, 2001.
+[5] S. Che, et al., Rodinia: A Benchmark Suite for Heterogeneous Computing, IISWC, 2009.
+[6] S. Collange, et al., Dynamic detection of uniform and affine vectors in GPGPU computations, Euro-Par, 2009
+[7] J. D. Collins, et al., Speculative precomputation: long range prefetching of delinquent loads, ISCA, 2001
+[8] CUDSEG, http://code.google.com/p/cudaseg/
+[9] R. Espasa, et al., Tarantula: a vector extension to the alpha architecture, ISCA, 2002.
+[10] R. Espasa, et al., Decoupled vector architectures, HPCA,1996.
+[11] R. Espasa, et al., Out-of-order vector architectures, MICRO,1997.
+[12] W. Fung, et al., Thread block compaction for efficient SIMT control flow, HPCA 2011.
+[13] W. Fung, et al., Dynamic warp formation and scheduling for efficient GPU control flow, MICRO, 2007.
+[14] N. Goswami, A. Verma, and T. Li, GPU-PowerSim, 2012.
+[15] N. Govindaraju, et al., High performance discrete Fourier transforms on graphics processors, SC, 2008.
+[16] GT 640, http://www.geforce.com/hardware/desktop-gpus/geforce-gt- 640-oem/specifications
+[17] S. Hong, et al., Accelerating CUDA graph algorithms at maximum warp, PPoPP, 2011.
+[18] A. Jog, et al., Orchestrated Scheduling and Prefetching for GPGPUs, ISCA, 2013.
+[19] A. Jog, et al., OWL: Cooperative Thread Array Aware Scheduling Techniques for Improving GPGPU performance, ASPLOS, 2013.
+[20] D. Kim and D. Yeung, Design and evaluation of compiler algorithms for pre-execution, ASPLOS, 2002.
+[21] C. Kozyrakis and D. Patterson, Vector vs. superscalar and VLIW architectures for embedded multimedia benchmarks, ISCA, 2002.
+[22] C. Kozyrakis and D. Patterson, Overcoming the limitations of conventional vector processors, ISCA, 2003.
+[23] R. Krashinsky, et al., The Vector-Thread Architecture,ISCA,2004.
+[24] J. Lee, et al., Many-thread aware prefetching mechanisms for gpgpu applications, MICRO, 2010.
+[25] S. I. Lee, et al., Cetus – an extensible compiler infrastructure for source-to-source transformation, LCPC, 2003
+[26] Y. Lee, et al., Exploring the tradeoffs between programmability and efficiency in data parallel accelerators, ISCA 2011
+[27] Y. Lee, et al. Convergence and Scalarization for Data-Parallel Architectures. CGO 2013.
+[28] S. Li, et al., McPAT: an integrated power, area, and timing modeling framework for multicore and manycore architectures, MICRO, 2009.
+[29] C. K. Luk, Tolerating memory latency through soft-ware-controlled pre-execution in simultaneous multithreading processors, ISCA,2001.
+[30] J. Meng, et al., Dynamic warp subdivision for integrated branch and memory divergence tolerance, ISCA, 2010.
+[31] NVIDIA GPU Computing SDK 3.1 2011.
+[32] M. Rhu, et al., Maximizing SIMD Resource Utilization in GPGPUs with SIMD Lane Permutation, ISCA, 2013.
+[33] J. E. Smith, et al., Vector Instruction Set Support for Conditional Operations, ISCA, 2000
+[34] Y. Solihin, et al., Using a user-level memory thread for correlation prefetching, ISCA, 2002
+[35] M. Steffen, et al., Dynamic Thread Creation for Improving Processor Utilization on SIMT Streaming Processor Architectures, MICRO, 2010.
+[36] Visual Molecular Dynamics, http://www.ks.uiuc.edu/Research/vmd/
+[37] J. Wawrzynek, et al., Spert-II: A vector Microprocessor System, IEEE Computer, 1996.
+[38] D. H. Woo, et al., COMPASS: a programmable data prefetcher using idle GPU shaders, ASPLOS, 2010.
+[39] P. Xiang, et al., Warp-Level Divergence in GPUs: Characterization, Impact and Mitigation, HPCA, 2014.
+[40] Y. Yang, et al., CPU-Assisted GPGPU on Fused CPU-GPU Architectures, HPCA, 2012.
+[41] E. Z. Zhang, et al., Streamlining GPU Applications On the Fly, ICS, 2010.

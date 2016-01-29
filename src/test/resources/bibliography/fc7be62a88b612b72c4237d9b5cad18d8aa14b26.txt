@@ -1,0 +1,22 @@
+[1] Y. Bengio. Learning deep architectures for ai. Foundations and Trends in Machine Learning, 2009.
+[2] S. Bickel and T. Scheffer. Multi-view clustering. In International Conference on Data Mining, 2004.
+[3] L. Ge, J. Gao, X. Yu, W. Fan, and A. Zhang. Estimating local information trustworthiness via multi-source joint matrix factorization. In International Conference on Data Mining, 2012.
+[4] G. Hinton. Training products of experts by minimizing contrastive divergence. Neural Computation, 2002.
+[5] G. Hinton. A practical guide to training restricted boltzmann machines. Technical report, The Unversity of Toronto, 2010.
+[6] G. Hinton, S. Osindero, and W. Teh. A fast learning algorithm for deep belief netts. Neural Computation, 2006.
+[7] N. Jindal and B. Liu. Opinion spam and analysis. In International Conference on Web Search and Data Mining, 2008.
+[8] Y. Kang and S. Choi. Restricted deep belief networks for multi-view learning. In European Conference on Machine Learning and Principles and Practice of Knowledge Discovery in Databases, 2011.
+[9] S. Lam and J. Riedl. Shilling recommender systems for fun and profit. In International World Wide Web Conference, 2004.
+[10] K. Lee, J. Caverlee, and S. Webb. Uncovering social spammers: Social honeypots+machine learning. In International Conference on Information Retrieval, 2010.
+[11] X. Li, X. L. Dong, K. B. Lyons, W. Meng, and D. Sirvastava. Truth finding on the deep web: Is the problem solved? PVLDB, 2013.
+[12] E. Lim, V. Nguyen, N. Jindal, B. Liu, and H. Lauw. Detecting product review spammers using rating behaviors. In International Conference on Information and Knowledge Management, 2010.
+[13] B. Mehta. Unsupervised shilling detection for collaborative filtering. In Advancement of Artificial Intelligence, 2007.
+[14] A. Mohamed, G. Dahl, and G. Hinton. Deep belief networks for phone recognition. In Advances in Neural Information Processing Systems workshop, 2009.
+[15] J. Ngiam, A. Khosla, M. Kim, J. Nam, H. Lee, and A. Ng. Multimodal deep learning. In International Conference on Machine Learning, 2011.
+[16] S. Pandit, D. H. Chau, S. Wang, and C. Faloutsos. Netprobe: A fast and scalable system for fraud detection in online auction networks. In International World Wide Web Conference, 2007.
+[17] J. Pasternack and D. Roth. Making better informed trust decisions with generalized fact-finding. In International Joint Conference on Aritifical Intelligence, 2011.
+[18] R. Salakhutdinov and G. Hinton. Replicated softmax: An undirected topic model. In Advances in Neural Information Processing Systems, 2009.
+[19] R. Salakhutdinov, A. Mnih, and G. Hinton. Restricted boltzmann machines for collaborative filtering. In International Conference on Machine Learning, 2007.
+[20] N. Sirvastava and R. Salakhutdinov. Multimodal learning with deep boltzmann machines. In Advances in Neural Information Processing Systems, 2012.
+[21] X. Su and T. M. Khoshgoftaar. A survey of collaborative filtering techniques. In Advancement of Artificial Intelligence, 2009.
+[22] X. Yin, J. Han, and P. Yu. Truth discovery with multiple conflicting information providers on the web. IEEE Transactions on Knowledge and Data Engineering, 2008.

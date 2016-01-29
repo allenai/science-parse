@@ -1,0 +1,27 @@
+[1] H. T. Odum, “Energy quality and carrying capacity of the earth,”Tropical Ecology, 1976.
+[2] M. Pedram, N. Chang, Y. Kim, and Y. Wang, “Hybrid electrical energy storage systems,” Proc. of ISLPED, Aug. 2010.
+[3] F. Koushanfar, “Hierarchical hybrid power supply networks,” Proc. of DAC, Jun. 2010.
+[4] A. Mirhoseini, and F. Koushanfar. “HypoEnergy: Hybrid supercapacitor-battery power-supply optimization for Energy efficiency,” Proc. of DATE, Mar. 2011.
+[5] A. Khaligh, and Z. Li, “Battery, ultracapacitor, fuel cell, and hybrid energy storage systems for electric, hybrid electric, fuel cell, and plugin hybrid electric vehicles: State of the art,” IEEE TVT, Vol. 59, No. 6, 2010.
+[6] A. Khaligh, et al., “Digital control of an isolated active hybrid fuel cell/Li-ion battery power supply,” IEEE TVT, Vol. 56, No. 6, 2007.
+[7] Q. Xie, et al, “Charge allocation for hybrid electrical energy storage systems,” Proc. of CODES, Oct. 2011.
+[8] Y. Wang, Y. Kim, Q. Xie, N. Chang, and M. Pedram, “Charge migration efficiency optimization in hybrid electrical energy storage (HEES) systems,” Proc. of ISLPED, 2011.
+[9] Y. Wang, et al, “Multiple-source and multiple-destination charge migration in hybrid electrical energy storage systems,” Proc. of DATE, Mar. 2012.
+[10] Q. Xie, et al, “Charge replacement in hybrid electrical energy storage systems,” Proc. of ASP-DAC, Jan. 2012.
+[11] D. Zhu, et al, “Maximizing Return on Investment of a Grid-Connected Hybrid Electrical Energy Storage System,” Proc. of ASP-DAC, Jan.  2013.
+[12] D. Shin, Y. Wang, N. Chang, and M. Pedram, “Battery-supercapacitor hybrid system for high-rate pulsed load applications,” Proc. of DATE, Mar. 2011.
+[13] F. Koushanfar, and A. Mirhoseini. “Hybrid heterogeneous energy supply networks,” Proc. of ISCAS, May. 2011.
+[14] Q. Xie, et al, “State of health aware charge management in hybrid electrical energy storage systems,” Proc. of DATE, Mar. 2012.
+[15] LTC3789 Datasheet: http://www.linear.com/product/LTC3789.
+[16] A. Mirhoseini, and F. Koushanfar “Learning to manage combined energy supply systems,” Proc. of ISLPED, Aug. 2011
+[17] R. K. Sharma, and K. Kudo “Integrated management of energy storage for sustainable operation of energy microgrids”. Proc. of the ASME 2011 IMECE, Nov. 2011
+[18] J. Cao, and A. Emadi, “A new battery/ultra-capacitor hybrid energy storage system for electric, hybrid and plug-in hybrid electric vehicles,” Proc. of VPPC, Sep. 2009.
+[19] Y. Kim, et al, “Networked architecture for hybrid electrical energy storage systems,” Proc. of DAC, Jun. 2012.
+[20] D. Linden and T. B. Reddy, Handbook of Batteries. McGrew-Hill Professional, 2001.
+[21] E. M. Lightner, and S. E. Widergren, “An orderly transition to a transformed electricity system,” IEEE TSG, Vol. 1, No. 1, 2010.
+[22] S. Yue, J. Chen, Y. Gu, C. Wu, and Y. Shi, “Dual-pricing policy for controller-side strategies in demand side management,” Proc. of SmartGridComm, Dec. 2011.
+[23] N. S. Wade, P. C. Taylor, P. D. Lang, and P. R. Jones, “Evaluating the benefits of an electrical energy storage system in a future smart grid,” Energy policy, Vol. 38, No. 11, 2010.
+[24] http://www.panasonic.com/industrial/includes/pdf/Panasonic_VRLA_ LC-R123R4P.pdf
+[25] http://www.grinninglizard.com/tinyxml/
+[26] http://qt-project.org/
+[27] http://www.workslikeclockwork.com/index.php/components/qtplotting-widget/
