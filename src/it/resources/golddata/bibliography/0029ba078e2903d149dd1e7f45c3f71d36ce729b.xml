@@ -63,10 +63,10 @@
       <author>R L Braynard</author>
       <author>technologies ser</author>
     </authors>
-    <title>Networking named content,&#x201D; in Proceedings of the 5th international conference on Emerging networking experiments</title>
-    <journal>CoNEXT &#x2019;09. ACM</journal>
-    <volume>2009</volume>
+    <title>Networking named content</title>
+    <journal>CoNEXT</journal>
     <pages>1--12</pages>
+    <year>2009</year>
     <raw_string>[3] V. Jacobson, D. K. Smetters, J. D. Thornton, M. F. Plass, N. H. Briggs, and R. L. Braynard, &#x201C;Networking named content,&#x201D; in Proceedings of the 5th international conference on Emerging networking experiments and technologies, ser. CoNEXT &#x2019;09. ACM, 2009, pp. 1&#x2013;12.</raw_string>
   </citation>
   <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
@@ -217,8 +217,8 @@
       <author>C L Williamson</author>
     </authors>
     <title>Simulation evaluation of a heterogeneous web proxy caching hierarchy,&#x201D; in MASCOTS</title>
-    <journal>IEEE Computer Society</journal>
-    <volume>2001</volume>
+    <journal>MASCOTS</journal>
+    <year>2001</year>
     <pages>379--388</pages>
     <raw_string>[7] M. Busari and C. L. Williamson, &#x201C;Simulation evaluation of a heterogeneous web proxy caching hierarchy,&#x201D; in MASCOTS. IEEE Computer Society, 2001, pp. 379&#x2013;388.</raw_string>
   </citation>
@@ -284,8 +284,9 @@
     <authors>
       <author>G Peng</author>
     </authors>
-    <title>Cdn: Content distribution network,&#x201D; 2004</title>
-    <publisher>Online]. Available: http://arxiv.org/abs/cs/0411069</publisher>
+    <title>Cdn: Content distribution network</title>
+    <publisher></publisher>
+    <year>2004</year>
     <raw_string>[9] G. Peng, &#x201C;Cdn: Content distribution network,&#x201D; 2004. [Online]. Available: http://arxiv.org/abs/cs/0411069</raw_string>
   </citation>
   <ctx:context-objects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ctx="info:ofi/fmt:xml:xsd:ctx" xsi:schemaLocation="info:ofi/fmt:xml:xsd:ctx http://www.openurl.info/registry/docs/info:ofi/fmt:xml:xsd:ctx">
@@ -560,9 +561,9 @@
       <author>W Phillips</author>
       <author>J Ilow</author>
     </authors>
-    <title>Network calculus based modeling of anomaly detection,&#x201D; in Performance Evaluation of Computer and Telecommunication</title>
-    <journal>Systems (SPECTS), 2010 International Symposium on. IEEE</journal>
-    <volume>2010</volume>
+    <title>Network calculus based modeling of anomaly detection</title>
+    <journal>Performance Evaluation of Computer and Telecommunication Systems (SPECTS)</journal>
+    <year>2010</year>
     <pages>416--421</pages>
     <raw_string>[18] M. Raza, B. Robertson, W. Phillips, and J. Ilow, &#x201C;Network calculus based modeling of anomaly detection,&#x201D; in Performance Evaluation of Computer and Telecommunication Systems (SPECTS), 2010 International Symposium on. IEEE, 2010, pp. 416&#x2013;421.</raw_string>
   </citation>
