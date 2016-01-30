@@ -28,7 +28,13 @@ public class ExtractedMetadata {
 
   transient private static Pattern emailDelimitersRegex = Pattern.compile(",|\\||;");
 
-  public String source;
+  public enum Source {
+    INVALID,
+    CRF,
+    META
+  }
+
+  public Source source;
   public String title;
   public List<String> authors;
   public List<String> emails; //extracted by special (non-CRF) heuristic process

@@ -600,7 +600,7 @@ public class Parser {
           int tempTP = scoreAuthors(authExpected, authGuessed);
           double prec = ((double) tempTP) / ((double) authGuessed.size() + 0.000000001);
           double rec = ((double) tempTP) / ((double) authExpected.length);
-          if (em.source.equals("CRF")) {
+          if (em.source == ExtractedMetadata.Source.CRF) {
             crfPrecision += prec;
             crfRecall += rec;
             crfTotal += 1.0;
@@ -615,12 +615,12 @@ public class Parser {
             logger.info(f.getName());
           }
           if (procExpected.equals(procGuessed))
-            if (em.source.equals("CRF"))
+            if (em.source == ExtractedMetadata.Source.CRF)
               crfTruePos++;
             else
               metaTruePos++;
           else {
-            if (em.source.equals("CRF"))
+            if (em.source == ExtractedMetadata.Source.CRF)
               crfFalsePos++;
             else
               metaFalsePos++;
@@ -746,10 +746,10 @@ public class Parser {
         //the output tag sequence will not include the start/stop states!
         outSeq = PDFToCRFInput.padTagSequence(outSeq);
         em = new ExtractedMetadata(seq, outSeq);
-        em.source = "CRF";
+        em.source = ExtractedMetadata.Source.CRF;
       } else {
         em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-        em.source = "META";
+        em.source = ExtractedMetadata.Source.META;
       }
       if (doc.meta.createDate != null)
         em.setYearFromDate(doc.meta.createDate);
