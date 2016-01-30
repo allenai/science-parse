@@ -43,6 +43,7 @@ public class ExtractedMetadata {
   public List<CitationRecord> referenceMentions;
   public int year;
   public String abstractText;
+  public String creator; // program that created the PDF, i.e. LaTeX or PowerPoint or something else
 
   /**
    * Constructs ExtractedMetadata from given text and labels

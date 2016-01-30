@@ -755,6 +755,7 @@ public class Parser {
         em.setYearFromDate(doc.meta.createDate);
       clean(em);
       em.raw = PDFToCRFInput.getRaw(doc);
+      em.creator = doc.meta.creator;
 
       // extract references
       final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
