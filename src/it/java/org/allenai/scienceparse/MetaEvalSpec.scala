@@ -105,7 +105,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibVenuesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.venue).toList
 
-    def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.venue).toList
+    def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.year.toString).toList
 
     case class Metric(
       name: String,
