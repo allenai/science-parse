@@ -23,6 +23,15 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def normalize(s: String) = s.replaceFancyUnicodeChars.removeUnprintable.normalize
 
+    def normalizeBR(bibRecord: BibRecord) = new BibRecord(
+      normalize(bibRecord.title),
+      bibRecord.author.asScala.map(normalize).asJava,
+      normalize(bibRecord.venue),
+      bibRecord.citeRegEx,
+      bibRecord.shortCiteRegEx,
+      bibRecord.year
+      )
+
     def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
       if (goldData.isEmpty) {
         (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
@@ -31,7 +40,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       } else {
         val precision = extractedData.count(goldData.contains).toDouble / extractedData.size
         val recall = goldData.count(extractedData.contains).toDouble / goldData.size
-        extractedData.filter(!goldData.contains(_)).foreach(println(_))
         (precision, recall)
       }
     }
@@ -64,13 +72,19 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       calculatePR(goldData.map(normalize), (Set(extractedMetadata.getTitle) - null).map(normalize))
 
-    def bibliographyEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+    def bibliographyEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String], normalizer: BibRecord => BibRecord) =
       calculatePR(goldData.map { ref =>
         val Array(title, year, venue, authors) = ref.split("\\|", -1)
-        new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt)
-      }, extractedMetadata.references.asScala.toSet)
+        normalizer(new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt))
+      }, extractedMetadata.references.asScala.toSet.map(normalizer))
 
-    def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String], normalizer: String => String = identity[String]) = {
+    def bibliographyUnnormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      bibliographyEvaluator(extractedMetadata, goldData, identity)
+
+    def bibliographyNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
+      bibliographyEvaluator(extractedMetadata, goldData, normalizeBR)
+
+    def abstractEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String], normalizer: String => String) = {
       if (extractedMetadata.abstractText == null) {
         (0.0, 0.0)
       } else {
@@ -85,7 +99,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     }
 
     def abstractUnnormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
-      abstractEvaluator(extractedMetadata, goldData)
+      abstractEvaluator(extractedMetadata, goldData, identity)
 
     def abstractNormalizedEvaluator(extractedMetadata: ExtractedMetadata, goldData: Set[String]) =
       abstractEvaluator(extractedMetadata, goldData, normalize)
@@ -105,7 +119,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("abstract", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
       Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", abstractUnnormalizedEvaluator),
       // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
-      Metric("gold bibliography", "/golddata/isaac/bibliographies.tsv", bibliographyEvaluator)
+      Metric("bibliography", "/golddata/isaac/bibliographies.tsv", bibliographyUnnormalizedEvaluator),
+      Metric("bibliographyNormalized", "/golddata/isaac/bibliographies.tsv", bibliographyNormalizedEvaluator)
     )
 
 
@@ -195,9 +210,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     logger.info("Evaluation results:")
     val prResults = allGoldData.map { case (metric, docid, goldData) =>
-      if (metric.name == "gold bibliography") {
-        println(s"EVALUATING $docid BIB!")
-      }
       extractions(docid) match {
         case Failure(_) => (metric, (0.0, 0.0))
         case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
