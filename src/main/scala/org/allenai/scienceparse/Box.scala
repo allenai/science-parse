@@ -61,7 +61,7 @@ object Box {
     *
     * @param boxes to merge
     * @param tol to use when calculating intersections, returned boxes will be at least `tol`
-    *           manhattan distance from each other, can be negative.
+    *          manhattan distance from each other, can be negative.
     */
   def mergeBoxes(boxes: List[Box], tol: Double): List[Box] = {
     if (boxes.isEmpty) {
