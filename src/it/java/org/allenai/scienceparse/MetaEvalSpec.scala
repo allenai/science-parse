@@ -119,13 +119,13 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      specializedEvaluator[String](abstractExtractor, goldAbstractExtractor, normalize, abstractPR)),
       Metric("bibliography",             "/golddata/isaac/bibliographies.tsv", specializedEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
       Metric("bibliographyNormalized",   "/golddata/isaac/bibliographies.tsv", specializedEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
-      Metric("bib-authors",              "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[String](bibAuthorsExtractor, goldBibAuthorsExtractor, identity, calculatePR)),
-      Metric("bib-authors-normalized",   "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[String](bibAuthorsExtractor, goldBibAuthorsExtractor, normalize, calculatePR)),
-      Metric("bib-titles",               "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor)),
-      Metric("bib-titles-normalized",    "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor, normalize)),
-      Metric("bib-venues",               "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor)),
-      Metric("bib-venues-normalized",    "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor, normalize)),
-      Metric("bib-years",                "/golddata/isaac/bib-years.tsv",      genericEvaluator(bibYearsExtractor))
+      Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[String](bibAuthorsExtractor, goldBibAuthorsExtractor, identity, calculatePR)),
+      Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[String](bibAuthorsExtractor, goldBibAuthorsExtractor, normalize, calculatePR)),
+      Metric("bibTitles",                "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor)),
+      Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor, normalize)),
+      Metric("bibVenues",                "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor)),
+      Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor, normalize)),
+      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      genericEvaluator(bibYearsExtractor))
     )
 
 
