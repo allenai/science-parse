@@ -93,12 +93,18 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def goldBibAuthorsExtractor(authors: String) = authors.split(":").toList
 
-    def authorsPR(gold: List[List[String]], extracted: List[List[String]]) = {
-      val (p, r) = gold.zip(extracted).map { case (goldRef, extractedRef) =>
-        calculatePR(goldRef, extractedRef)
-      }.unzip
-      val size = gold.size
-      (p.sum / size, r.sum / size)
+    def bibAuthorsPR(gold: List[List[String]], extracted: List[List[String]]) = {
+      if (gold.isEmpty) {
+        (if (extracted.isEmpty) 1.0 else 0.0, 1.0)
+      } else if (extracted.isEmpty) {
+        (0.0, 0.0)
+      } else {
+        val (p, r) = gold.zip(extracted).map { case (goldRef, extractedRef) =>
+          calculatePR(goldRef, extractedRef)
+        }.unzip
+        val size = gold.size
+        (p.sum / size, r.sum / size)
+      }
     }
 
     def bibTitlesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.title).toList
@@ -116,15 +122,15 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("authorFullName",           "/golddata/dblp/authorFullName.tsv",  genericEvaluator(fullNameExtractor)),
       Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv",  genericEvaluator(fullNameExtractor, normalize)),
       Metric("authorLastName",           "/golddata/dblp/authorLastName.tsv",  genericEvaluator(lastNameExtractor)),
-      Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv",  genericEvaluator(fullNameExtractor, normalize)),
+      Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv",  genericEvaluator(lastNameExtractor, normalize)),
       Metric("title",                    "/golddata/dblp/title.tsv",           genericEvaluator(titleExtractor)),
       Metric("titleNormalized",          "/golddata/dblp/title.tsv",           genericEvaluator(titleExtractor, normalize)),
       Metric("abstract",                 "/golddata/isaac/abstracts.tsv",      specializedEvaluator[List[String]](abstractExtractor, goldAbstractExtractor, identity, abstractPR)),
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      specializedEvaluator[List[String]](abstractExtractor, goldAbstractExtractor, normalizeList, abstractPR)),
       Metric("bibliography",             "/golddata/isaac/bibliographies.tsv", specializedEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
       Metric("bibliographyNormalized",   "/golddata/isaac/bibliographies.tsv", specializedEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
-      Metric("bib-authors",              "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[List[String]](bibAuthorsExtractor, goldBibAuthorsExtractor, identity, authorsPR)),
-      Metric("bib-authors-normalized",   "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[List[String]](bibAuthorsExtractor, goldBibAuthorsExtractor, normalizeList, authorsPR)),
+      Metric("bib-authors",              "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[List[String]](bibAuthorsExtractor, goldBibAuthorsExtractor, identity, bibAuthorsPR)),
+      Metric("bib-authors-normalized",   "/golddata/isaac/bib-authors.tsv",    specializedEvaluator[List[String]](bibAuthorsExtractor, goldBibAuthorsExtractor, normalizeList, bibAuthorsPR)),
       Metric("bib-titles",               "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor)),
       Metric("bib-titles-normalized",    "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor, normalize)),
       Metric("bib-venues",               "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor)),
