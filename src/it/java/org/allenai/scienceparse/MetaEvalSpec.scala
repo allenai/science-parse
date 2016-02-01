@@ -48,9 +48,11 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       }
     }
 
-    def genericEvaluator(extract: ExtractedMetadata => List[String], normalizer: String => String = identity) =
+    def genericEvaluator(extract: ExtractedMetadata => List[String], normalizer: String => String = identity,
+                         disallow: Set[String] = Set("")) =
       (metadata: ExtractedMetadata, gold: List[String]) => {
-        calculatePR(multiSet(gold.map(normalizer)), multiSet(extract(metadata).map(normalizer)))
+        calculatePR(multiSet(gold.map(normalizer).filter(!disallow.contains(_))),
+          multiSet(extract(metadata).map(normalizer)))
       }
 
     def specializedEvaluator[T](extract: ExtractedMetadata => List[T], extractGold: List[String] => List[T],
@@ -126,7 +128,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     genericEvaluator(bibTitlesExtractor, normalize)),
       Metric("bibVenues",                "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor)),
       Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     genericEvaluator(bibVenuesExtractor, normalize)),
-      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      genericEvaluator(bibYearsExtractor))
+      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      genericEvaluator(bibYearsExtractor, disallow = Set("0")))
     )
 
 
