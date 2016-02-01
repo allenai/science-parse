@@ -66,9 +66,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def titleExtractor(metadata: ExtractedMetadata) = (Set(metadata.title) - null).toList
 
     def abstractExtractor(metadata: ExtractedMetadata) =
-      if (metadata.abstractText == null) List(List()) else List(metadata.abstractText.split(" ").toList)
+      if (metadata.abstractText == null) List(List()) else List(metadata.abstractText.split("\\s+").toList)
 
-    def goldAbstractExtractor(abs: String) = abs.split(" ").toList
+    def goldAbstractExtractor(abs: String) = abs.split("\\s+").toList
 
     def abstractPR(gold: List[List[String]], extracted: List[List[String]]) = {
       val goldAbs = gold.head
