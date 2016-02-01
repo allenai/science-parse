@@ -35,7 +35,10 @@ libraryDependencies ++= Seq(
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
   "com.github.scopt" %% "scopt" % "3.3.0",
-  "org.allenai" %% "datastore" % "1.0.2",
+  "org.allenai" %% "datastore" % "1.0.2" excludeAll(
+    ExclusionRule(organization = "com.amazonaws")
+  ),
+  "com.amazonaws" % "aws-java-sdk" % "1.7.4",
   "org.bouncycastle" % "bcprov-jdk16" % "1.46",
   "org.bouncycastle" % "bcmail-jdk16" % "1.46"
 )
