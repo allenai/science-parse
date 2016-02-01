@@ -34,13 +34,14 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       bibRecord.year
       )
 
-    def calculatePR[T](goldDataList: List[T], extractedData: List[T]) = {
+    def calculatePR[T](goldDataList: List[T], extractedDataList: List[T]) = {
       if (goldDataList.isEmpty) {
-        (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
-      } else if (extractedData.isEmpty) {
+        (if (extractedDataList.isEmpty) 1.0 else 0.0, 1.0)
+      } else if (extractedDataList.isEmpty) {
         (0.0, 0.0)
       } else {
         val goldData = goldDataList.toSet
+        val extractedData = extractedDataList.toSet
         val precision = extractedData.count(goldData.contains).toDouble / extractedData.size
         val recall = goldData.count(extractedData.contains).toDouble / goldData.size
         (precision, recall)
@@ -49,7 +50,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def genericEvaluator(extract: ExtractedMetadata => List[String], normalizer: String => String = identity) =
       (metadata: ExtractedMetadata, gold: List[String]) => {
-        calculatePR(gold.map(normalizer), extract(metadata).map(normalizer))
+        calculatePR(multiSet(gold.map(normalizer)), multiSet(extract(metadata).map(normalizer)))
       }
 
     def specializedEvaluator[T](extract: ExtractedMetadata => List[T], extractGold: List[String] => List[T],
