@@ -87,23 +87,15 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt)
     }
 
-    def bibAuthorsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.flatMap(_.author.asScala.toList).toList
+    /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get three, that’s prec=1.0
+      * but rec=0.6. Just add index # to name for simplicity */
+    def multiSet(refs: List[String]) = refs.groupBy(identity).values.flatMap(_.zipWithIndex.map { case (ref, i) =>
+      ref + i.toString
+    }).toList
 
-    def goldBibAuthorsExtractor(bibAuthors: List[String]) = bibAuthors.flatMap(_.split(":").toList)
+    def bibAuthorsExtractor(metadata: ExtractedMetadata) = multiSet(metadata.references.asScala.flatMap(_.author.asScala.toList).toList)
 
-    def bibAuthorsPR(gold: List[List[String]], extracted: List[List[String]]) = {
-      if (gold.isEmpty) {
-        (if (extracted.isEmpty) 1.0 else 0.0, 1.0)
-      } else if (extracted.isEmpty) {
-        (0.0, 0.0)
-      } else {
-        val (p, r) = gold.zip(extracted).map { case (goldRef, extractedRef) =>
-          calculatePR(goldRef, extractedRef)
-        }.unzip
-        val size = gold.size
-        (p.sum / size, r.sum / size)
-      }
-    }
+    def goldBibAuthorsExtractor(bibAuthors: List[String]) = multiSet(bibAuthors.flatMap(_.split(":").toList))
 
     def bibTitlesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.title).toList
 
