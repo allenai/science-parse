@@ -234,7 +234,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val (ps, rs) = prs.map(_._2).unzip
       (ps.sum / ps.size, rs.sum / rs.size)
     }.toArray.sortBy(_._1.name).foreach { case (metric, (p, r)) =>
-      logger.info(f"${metric.name}\t$p%.3f\t$r%.3f")
+      logger.info(f"${metric.name}%-30s\t$p%.3f\t$r%.3f")
     }
   }
 }
