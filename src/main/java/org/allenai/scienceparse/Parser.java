@@ -709,11 +709,9 @@ public class Parser {
     { // Get abstract from figure extraction.
       final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
       if (doc.abstractText().isDefined()) {
-        final String stripPrefix = "abstract";
-        final String result = doc.abstractText().get().text().trim();
-        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
         Pattern p = Pattern.compile("^(abstract)?[^a-z]*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-        abstractText = p.matcher(result).replaceFirst("");
+        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
+        abstractText = p.matcher(doc.abstractText().get().text().trim()).replaceFirst("");
       } else {
         abstractText = null;
       }
@@ -757,6 +755,9 @@ public class Parser {
       em.abstractText = abstractText;
     }
 
+    // remove keywords from abstract
+    Pattern p2 = Pattern.compile("key ?word.*$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    em.abstractText = p2.matcher(em.abstractText).replaceFirst("");
     return em;
   }
 
