@@ -741,17 +741,22 @@ public class Parser {
       if (doc.meta.createDate != null)
         em.setYearFromDate(doc.meta.createDate);
       clean(em);
-      em.raw = PDFToCRFInput.getRaw(doc);
+      em.raw = PDFDocToPartitionedText.getRaw(doc);
 
       // extract references
-      final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
+      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
       final Pair<List<BibRecord>, List<CitationRecord>> pair =
         getReferences(em.raw, rawReferences, referenceExtractor);
       em.references = pair.getOne();
       em.referenceMentions = pair.getTwo();
+      
+      //extract Abstract
+//      logger.info("SP abstract:" + PDFDocToPartitionedText.getAbstract(em.raw));
+//      logger.info("old abstract:" + abstractText);
+      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
     }
 
-    em.abstractText = abstractText;
+    //em.abstractText = abstractText;
 
     return em;
   }
