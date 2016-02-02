@@ -749,14 +749,13 @@ public class Parser {
         getReferences(em.raw, rawReferences, referenceExtractor);
       em.references = pair.getOne();
       em.referenceMentions = pair.getTwo();
-      
-      //extract Abstract
-//      logger.info("SP abstract:" + PDFDocToPartitionedText.getAbstract(em.raw));
-//      logger.info("old abstract:" + abstractText);
+
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
     }
 
-    //em.abstractText = abstractText;
+    if (abstractText != null && !abstractText.isEmpty()) {
+      em.abstractText = abstractText;
+    }
 
     return em;
   }

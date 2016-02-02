@@ -106,7 +106,7 @@ public class PDFDocToPartitionedText {
           linesAdded++;
         }
       }
-      if(s.endsWith("Abstract") && s.length() < 10) {
+      if(s.toLowerCase().contains("abstract") && s.length() < 10) {
         inAbstract = true;
       }
     }
