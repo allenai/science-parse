@@ -48,6 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -710,10 +711,9 @@ public class Parser {
       if (doc.abstractText().isDefined()) {
         final String stripPrefix = "abstract";
         final String result = doc.abstractText().get().text().trim();
-        if(result.substring(0, stripPrefix.length()).toLowerCase().equals(stripPrefix))
-          abstractText = result.substring(stripPrefix.length()).trim();
-        else
-          abstractText = result;
+        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
+        Pattern p = Pattern.compile("^(abstract)?[^a-z]*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        abstractText = p.matcher(result).replaceFirst("");
       } else {
         abstractText = null;
       }
