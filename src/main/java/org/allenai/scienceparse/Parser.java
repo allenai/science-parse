@@ -713,7 +713,7 @@ public class Parser {
         // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
         abstractText = p.matcher(doc.abstractText().get().text().trim()).replaceFirst("");
       } else {
-        abstractText = null;
+        abstractText = "";
       }
     }
 
@@ -751,7 +751,7 @@ public class Parser {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
     }
 
-    if (abstractText != null && !abstractText.isEmpty()) {
+    if (abstractText.length() > em.abstractText.length()) {
       em.abstractText = abstractText;
     }
 
