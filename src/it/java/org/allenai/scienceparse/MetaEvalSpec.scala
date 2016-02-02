@@ -9,7 +9,7 @@ import scala.xml.XML
 import scala.collection.JavaConverters._
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
-import scala.io.Source
+import scala.io.{Codec, Source}
 import scala.util.{Success, Failure, Try}
 import scala.collection.JavaConverters._
 
@@ -143,7 +143,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     val allGoldData = metrics.flatMap { metric =>
-      Resource.using(Source.fromInputStream(getClass.getResourceAsStream(metric.goldFile))) { source =>
+      Resource.using(Source.fromInputStream(getClass.getResourceAsStream(metric.goldFile))(Codec.UTF8)) { source =>
         source.getLines().take(maxDocumentCount).map { line =>
           val fields = line.trim.split("\t").map(_.trim)
           (metric, fields.head, fields.tail.toList)
