@@ -44,6 +44,10 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       }
     }
 
+    /** Just count the number of bib entries we're getting */
+    def bibCounter(goldData: Set[BibRecord], extractedData: Set[BibRecord]) =
+      (1.0, extractedData.size.toDouble / goldData.size) // since we're not doing matching, just assume 100% precision
+
     /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get three, that’s prec=1.0
       * but rec=0.6. Just add index # to name for simplicity. This is redundant when everything is already unique, so
       * you can basically always apply it
@@ -128,6 +132,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
       Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
       Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
+      Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
       Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
       Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, normalize)),
       Metric("bibTitles",                "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor)),
