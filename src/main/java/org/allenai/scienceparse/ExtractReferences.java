@@ -86,6 +86,10 @@ public class ExtractReferences {
       public CharSequence subSequence(int start, int end) {
         return new TimeoutCharSequence(inner.subSequence(start, end), abortTime);
       }
+
+      public String toString() {
+        return inner.toString();
+      }
     }
 
     return pattern.matcher(new TimeoutCharSequence(string, System.currentTimeMillis() + timeout));
