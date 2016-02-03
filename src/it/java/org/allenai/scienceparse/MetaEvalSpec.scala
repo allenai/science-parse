@@ -9,7 +9,7 @@ import scala.xml.XML
 import scala.collection.JavaConverters._
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
-import scala.io.Source
+import scala.io.{Codec, Source}
 import scala.util.{Success, Failure, Try}
 import scala.collection.JavaConverters._
 
@@ -43,6 +43,10 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         (precision, recall)
       }
     }
+
+    /** Just count the number of bib entries we're getting */
+    def bibCounter(goldData: Set[BibRecord], extractedData: Set[BibRecord]) =
+      (1.0, extractedData.size.toDouble / goldData.size) // since we're not doing matching, just assume 100% precision
 
     /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get three, that’s prec=1.0
       * but rec=0.6. Just add index # to name for simplicity. This is redundant when everything is already unique, so
@@ -128,6 +132,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
       Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
       Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
+      Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
       Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
       Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, normalize)),
       Metric("bibTitles",                "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor)),
@@ -143,7 +148,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     val allGoldData = metrics.flatMap { metric =>
-      Resource.using(Source.fromInputStream(getClass.getResourceAsStream(metric.goldFile))) { source =>
+      Resource.using(Source.fromInputStream(getClass.getResourceAsStream(metric.goldFile))(Codec.UTF8)) { source =>
         source.getLines().take(maxDocumentCount).map { line =>
           val fields = line.trim.split("\t").map(_.trim)
           (metric, fields.head, fields.tail.toList)
@@ -222,7 +227,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // calculate precision and recall for all metrics
     //
 
-    logger.info("Evaluation results:")
+    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%10s\t${"RECALL"}%10s""")
     val prResults = allGoldData.map { case (metric, docid, goldData) =>
       extractions(docid) match {
         case Failure(_) => (metric, (0.0, 0.0))
@@ -233,7 +238,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val (ps, rs) = prs.map(_._2).unzip
       (ps.sum / ps.size, rs.sum / rs.size)
     }.toArray.sortBy(_._1.name).foreach { case (metric, (p, r)) =>
-      logger.info(f"${metric.name}%-30s\t$p%.3f\t$r%.3f")
+      println(f"${metric.name}%-30s\t$p%10.3f\t$r%10.3f")
     }
   }
 }
