@@ -222,7 +222,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // calculate precision and recall for all metrics
     //
 
-    logger.info("Evaluation results:")
+    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%10s\t${"RECALL"}%10s""")
     val prResults = allGoldData.map { case (metric, docid, goldData) =>
       extractions(docid) match {
         case Failure(_) => (metric, (0.0, 0.0))
@@ -233,7 +233,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val (ps, rs) = prs.map(_._2).unzip
       (ps.sum / ps.size, rs.sum / rs.size)
     }.toArray.sortBy(_._1.name).foreach { case (metric, (p, r)) =>
-      logger.info(f"${metric.name}%-30s\t$p%.3f\t$r%.3f")
+      println(f"${metric.name}%-30s\t$p%10.3f\t$r%10.3f")
     }
   }
 }
