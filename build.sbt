@@ -37,5 +37,6 @@ libraryDependencies ++= Seq(
   "com.github.scopt" %% "scopt" % "3.3.0",
   "org.allenai" %% "datastore" % "1.0.2" % Test,
   "org.bouncycastle" % "bcprov-jdk16" % "1.46",
-  "org.bouncycastle" % "bcmail-jdk16" % "1.46"
+  "org.bouncycastle" % "bcmail-jdk16" % "1.46",
+  "org.jsoup" % "jsoup" % "1.8.1"
 )
