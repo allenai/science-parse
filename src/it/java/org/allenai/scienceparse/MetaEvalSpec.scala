@@ -256,10 +256,10 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     val spPR = getPR(scienceParseExtractions)
     val grobidPR = getPR(grobidExtractions)
-    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%16s\t${"RECALL"}%16s""")
-    println(f"""${""}%-30s\t${"SP/Grobid"}%16s\t${"SP/Grobid"}%16s""")
+    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%23s${"RECALL"}%23s""")
+    println(f"""${""}%-30s\t${"SP /Grobid/ diff"}%23s${"SP /Grobid/ diff"}%23s""")
     spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
-      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f\t$spR%10.3f/$grobidR%.3f")
+      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f/${spP - grobidP}%+.3f$spR%10.3f/$grobidR%.3f/${spR - grobidR}%+.3f")
     }
   }
 }
