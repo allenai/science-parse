@@ -21,9 +21,7 @@ object GrobidParser {
   }
 
   def extractTitle(doc: Element): String = {
-    val raw = doc.findText("teiHeader>fileDesc>titleStmt>title")
-    val dropOneWordTitles = if (StringUtils.whiteSpaceRegex.findFirstMatchIn(raw).nonEmpty) raw else ""
-    dropOneWordTitles.titleCase()
+    doc.findText("teiHeader>fileDesc>titleStmt>title").titleCase()
   }
 
   def toTitle(s: String) = {
