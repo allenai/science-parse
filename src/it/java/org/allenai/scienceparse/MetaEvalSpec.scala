@@ -13,6 +13,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{ TextNode, Element }
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.parallel.ParMap
 import scala.io.{Codec, Source}
 import scala.util.{Success, Failure, Try}
 import scala.collection.JavaConverters._
@@ -21,11 +22,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
   "MetaEval" should "produce good P/R numbers" in {
     val maxDocumentCount = 1000 // set this to something low for testing, set it high before committing
     val evaluateGrobid = true // get numbers for Grobid instead
-
-    def extractYear(str: String): Int = "\\d{4}".r.findFirstIn(str) match {
-      case Some(y) => y.toInt
-      case None => 0
-    }
 
     //
     // define metrics
@@ -172,119 +168,72 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // download the documents and run extraction
     //
 
-    def addDot(x: String) = if (x.length == 1) s"$x." else x
-
-    def author(e: Element): String =  {
-      val first = List(e.findText("persName>forename[type=first]"))
-      val mids = e.select("persName>forename[type=middle]").asScala.map(_.text).toList
-      val last = List(e.findText("persName>surname"))
-      (first ++ mids ++ last).filter(!_.isEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
+    val grobidExtractions = {
+      val grobidExtractionsDirectory = publicDirectory("GrobidExtractions", 1)
+      docIds.par.map { docid =>
+        val grobidExtraction = grobidExtractionsDirectory.resolve(s"$docid.xml")
+        docid -> Success(GrobidParser.parseGrobidXml(grobidExtraction))
+      }.toMap
     }
 
-    def extractTitle(doc: Element): String = {
-      val raw = doc.findText("teiHeader>fileDesc>titleStmt>title")
-      val dropOneWordTitles = if (StringUtils.whiteSpaceRegex.findFirstMatchIn(raw).nonEmpty) raw else ""
-      dropOneWordTitles.titleCase()
-    }
-
-    def toTitle(s: String) = {
-      s.trimChars(",.").find(c => Character.isAlphabetic(c)) match {
-        case None => ""
-        case Some(_) => s
+    val scienceParseExtractions = {
+      val parser = Resource.using2(
+        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
+        getClass.getResourceAsStream("/referencesGroundTruth.json")
+      ) { case (modelIs, gazetteerIs) =>
+        new Parser(modelIs, gazetteerIs)
       }
-    }
+      val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
-    def extractBibEntriesWithId(doc: Element) =
-      for {
-        bib <- doc.select("listBibl>biblStruct").asScala
-      } yield {
-        val title = toTitle(bib.findText("analytic>title[type=main]")) match {
-          case "" => bib.findText("monogr>title")
-          case s => s
+      val documentCount = docIds.size
+      logger.info(s"Running on $documentCount documents")
+
+      val totalDocumentsDone = new AtomicInteger()
+      val startTime = System.currentTimeMillis()
+
+      val result = docIds.par.map { docid =>
+        val pdf = pdfDirectory.resolve(s"$docid.pdf")
+        val result = Resource.using(Files.newInputStream(pdf)) { is =>
+          docid -> Try(parser.doParse(is))
         }
-        val authors = bib.select("analytic>author").asScala.map(author).toList match {
-          case List() => bib.select("monogr>author").asScala.map(author).toList
-          case l => l
-        }
-        val venue = bib.findText("monogr>title")
-        val yr = extractYear(bib.findAttributeValue("monogr>imprint>date[type=published]", "when"))
-        new BibRecord(title, authors.asJava, venue, null, null, yr)
-      }
 
-    val extractions = {
-      if (evaluateGrobid) {
-        val grobidExtractionsDirectory = publicDirectory("GrobidExtractions", 1)
-        docIds.par.map { docid =>
-          val grobidExtraction = grobidExtractionsDirectory.resolve(s"$docid.xml")
-          val doc = Jsoup.parse(grobidExtraction.toFile, "UTF-8")
-          val year = extractYear(doc.findAttributeValue("teiHeader>fileDesc>sourceDesc>biblStruct>monogr>imprint>date[type=published]", "when"))
-          val calendar = Calendar.getInstance()
-          calendar.set(Calendar.YEAR, year)
-          val em = new ExtractedMetadata(extractTitle(doc), doc.select("teiHeader>fileDesc>sourceDesc>biblStruct>analytic>author").asScala.map(author).asJava, calendar.getTime)
-          em.year = year
-          em.references = extractBibEntriesWithId(doc).asJava
-          em.abstractText = doc.select("teiHeader>profileDesc>abstract").asScala.headOption.map(_.text).getOrElse("")
-          docid -> Success(em)
-        }.toMap
-      } else {
-        val parser = Resource.using2(
-          Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
-          getClass.getResourceAsStream("/referencesGroundTruth.json")
-        ) { case (modelIs, gazetteerIs) =>
-          new Parser(modelIs, gazetteerIs)
-        }
-        val pdfDirectory = publicDirectory("PapersTestSet", 3)
-
-        val documentCount = docIds.size
-        logger.info(s"Running on $documentCount documents")
-
-        val totalDocumentsDone = new AtomicInteger()
-        val startTime = System.currentTimeMillis()
-
-        val result = docIds.par.map { docid =>
-          val pdf = pdfDirectory.resolve(s"$docid.pdf")
-          val result = Resource.using(Files.newInputStream(pdf)) { is =>
-            docid -> Try(parser.doParse(is))
-          }
-
-          val documentsDone = totalDocumentsDone.incrementAndGet()
-          if (documentsDone % 50 == 0) {
-            val timeSpent = System.currentTimeMillis() - startTime
-            val speed = 1000.0 * documentsDone / timeSpent
-            val completion = 100.0 * documentsDone / documentCount
-            logger.info(f"Finished $documentsDone documents ($completion%.0f%%, $speed%.2f dps) ...")
-          }
-
-          result
-        }.toMap
-
-        val finishTime = System.currentTimeMillis()
-
-        // final report
-        val dps = 1000.0 * documentCount / (finishTime - startTime)
-        logger.info(f"Finished $documentCount documents at $dps%.2f documents per second")
-        assert(dps > 1.0)
-
-        // error report
-        val failures = result.values.collect { case Failure(e) => e }
-        val errorRate = 100.0 * failures.size / documentCount
-        logger.info(f"Failed ${failures.size} times ($errorRate%.2f%%)")
-        if (failures.nonEmpty) {
-          logger.info("Top errors:")
-          failures.
-            groupBy(_.getClass.getName).
-            mapValues(_.size).
-            toArray.
-            sortBy(-_._2).
-            take(10).
-            foreach { case (error, count) =>
-              logger.info(s"$count\t$error")
-            }
-          assert(errorRate < 5.0)
+        val documentsDone = totalDocumentsDone.incrementAndGet()
+        if (documentsDone % 50 == 0) {
+          val timeSpent = System.currentTimeMillis() - startTime
+          val speed = 1000.0 * documentsDone / timeSpent
+          val completion = 100.0 * documentsDone / documentCount
+          logger.info(f"Finished $documentsDone documents ($completion%.0f%%, $speed%.2f dps) ...")
         }
 
         result
+      }.toMap
+
+      val finishTime = System.currentTimeMillis()
+
+      // final report
+      val dps = 1000.0 * documentCount / (finishTime - startTime)
+      logger.info(f"Finished $documentCount documents at $dps%.2f documents per second")
+      assert(dps > 1.0)
+
+      // error report
+      val failures = result.values.collect { case Failure(e) => e }
+      val errorRate = 100.0 * failures.size / documentCount
+      logger.info(f"Failed ${failures.size} times ($errorRate%.2f%%)")
+      if (failures.nonEmpty) {
+        logger.info("Top errors:")
+        failures.
+          groupBy(_.getClass.getName).
+          mapValues(_.size).
+          toArray.
+          sortBy(-_._2).
+          take(10).
+          foreach { case (error, count) =>
+            logger.info(s"$count\t$error")
+          }
+        assert(errorRate < 5.0)
       }
+
+      result
     }
 
 
@@ -292,18 +241,25 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // calculate precision and recall for all metrics
     //
 
-    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%10s\t${"RECALL"}%10s""")
-    val prResults = allGoldData.map { case (metric, docid, goldData) =>
-      extractions(docid) match {
-        case Failure(_) => (metric, (0.0, 0.0))
-        case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
+    def getPR(extractions: ParMap[String, Try[ExtractedMetadata]]) = {
+      val prResults = allGoldData.map { case (metric, docid, goldData) =>
+        extractions(docid) match {
+          case Failure(_) => (metric, (0.0, 0.0))
+          case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
+        }
       }
+      prResults.groupBy(_._1).mapValues { prs =>
+        val (ps, rs) = prs.map(_._2).unzip
+        (ps.sum / ps.size, rs.sum / rs.size)
+      }.toList.sortBy(_._1.name)
     }
-    prResults.groupBy(_._1).mapValues { prs =>
-      val (ps, rs) = prs.map(_._2).unzip
-      (ps.sum / ps.size, rs.sum / rs.size)
-    }.toArray.sortBy(_._1.name).foreach { case (metric, (p, r)) =>
-      println(f"${metric.name}%-30s\t$p%10.3f\t$r%10.3f")
+
+    val spPR = getPR(scienceParseExtractions)
+    val grobidPR = getPR(grobidExtractions)
+    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%16s\t${"RECALL"}%16s""")
+    println(f"""${""}%-30s\t${"SP/Grobid"}%16s\t${"SP/Grobid"}%16s""")
+    spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
+      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f\t$spR%10.3f/$grobidR%.3f")
     }
   }
 }

@@ -1,5 +1,9 @@
 package org.allenai.scienceparse
 
+import java.nio.file.Path
+import java.util.Calendar
+
+import org.allenai.common.StringUtils
 import org.allenai.common.StringUtils.StringExtras
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{ TextNode, Element }
@@ -7,6 +11,62 @@ import org.jsoup.select.Elements
 import scala.collection.JavaConverters._
 
 object GrobidParser {
+  def addDot(x: String) = if (x.length == 1) s"$x." else x
+
+  def author(e: Element): String =  {
+    val first = List(e.findText("persName>forename[type=first]"))
+    val mids = e.select("persName>forename[type=middle]").asScala.map(_.text).toList
+    val last = List(e.findText("persName>surname"))
+    (first ++ mids ++ last).filter(!_.isEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
+  }
+
+  def extractTitle(doc: Element): String = {
+    val raw = doc.findText("teiHeader>fileDesc>titleStmt>title")
+    val dropOneWordTitles = if (StringUtils.whiteSpaceRegex.findFirstMatchIn(raw).nonEmpty) raw else ""
+    dropOneWordTitles.titleCase()
+  }
+
+  def toTitle(s: String) = {
+    s.trimChars(",.").find(c => Character.isAlphabetic(c)) match {
+      case None => ""
+      case Some(_) => s
+    }
+  }
+
+  def extractYear(str: String): Int = "\\d{4}".r.findFirstIn(str) match {
+    case Some(y) => y.toInt
+    case None => 0
+  }
+
+  def extractBibEntriesWithId(doc: Element) =
+    for {
+      bib <- doc.select("listBibl>biblStruct").asScala
+    } yield {
+      val title = toTitle(bib.findText("analytic>title[type=main]")) match {
+        case "" => bib.findText("monogr>title")
+        case s => s
+      }
+      val authors = bib.select("analytic>author").asScala.map(author).toList match {
+        case List() => bib.select("monogr>author").asScala.map(author).toList
+        case l => l
+      }
+      val venue = bib.findText("monogr>title")
+      val yr = extractYear(bib.findAttributeValue("monogr>imprint>date[type=published]", "when"))
+      new BibRecord(title, authors.asJava, venue, null, null, yr)
+    }
+
+  def parseGrobidXml(grobidExtraction: Path): ExtractedMetadata = {
+    val doc = Jsoup.parse(grobidExtraction.toFile, "UTF-8")
+    val year = extractYear(doc.findAttributeValue("teiHeader>fileDesc>sourceDesc>biblStruct>monogr>imprint>date[type=published]", "when"))
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.YEAR, year)
+    val em = new ExtractedMetadata(extractTitle(doc), doc.select("teiHeader>fileDesc>sourceDesc>biblStruct>analytic>author").asScala.map(author).asJava, calendar.getTime)
+    em.year = year
+    em.references = extractBibEntriesWithId(doc).asJava
+    em.abstractText = doc.select("teiHeader>profileDesc>abstract").asScala.headOption.map(_.text).getOrElse("")
+    em
+  }
+
   implicit class JsoupElementsImplicits(e: Element) {
 
     def findText(path: String): String =
