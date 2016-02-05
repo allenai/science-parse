@@ -38,6 +38,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -459,7 +460,19 @@ public class Parser {
       opts.minYear = 2008;
       trainParser(null, pgt, args[3], opts, args[6]);
     } else if (args[0].equalsIgnoreCase("parse")) {
-      Parser p = new Parser(args[2], args[4]);
+      final Path modelFile;
+      if(args[2].equals("-"))
+        modelFile = Parser.getDefaultProductionModel();
+      else
+        modelFile = Paths.get(args[2]);
+
+      final Path gazetteerFile;
+      if(args[4].equals("-"))
+        gazetteerFile = Parser.getDefaultGazetteer();
+      else
+        gazetteerFile = Paths.get(args[4]);
+
+      Parser p = new Parser(modelFile, gazetteerFile);
       File input = new File(args[1]);
       File outDir = new File(args[3]);
       final List<File> inFiles;
@@ -482,78 +495,6 @@ public class Parser {
         fis.close();
         //Object to JSON in file
         mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
-      }
-    } else if (args[0].equalsIgnoreCase("metaEval")) {
-      Parser p = new Parser(args[2], args[4]);
-      File inDir = new File(args[1]);
-      File outDir = new File(args[3]);
-      List<File> inFiles = Arrays.asList(inDir.listFiles());
-      ObjectMapper mapper = new ObjectMapper();
-
-      final ExecutorService e =
-        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-      try (
-        final PrintWriter authorFullNameExact = new PrintWriter(new File(outDir, "authorFullNameExact.tsv"), "UTF-8");
-        final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8")
-      ) {
-        final long start = System.currentTimeMillis();
-        val paperCount = new AtomicInteger();
-        val papersSucceeded = new AtomicInteger();
-
-        for (File f : inFiles) {
-          if (!f.getName().endsWith(".pdf"))
-            continue;
-
-          e.execute(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                paperCount.incrementAndGet();
-                val fis = new FileInputStream(f);
-                ExtractedMetadata em = null;
-                try {
-                  em = p.doParse(fis, MAXHEADERWORDS);
-                } catch (final Exception e) {
-                  logExceptionShort(e, "Parse error", f.getName());
-                  return;
-                }
-                fis.close();
-
-                final String paperId =
-                  f.getName().substring(0, f.getName().length() - 4);
-
-                synchronized (authorFullNameExact) {
-                  authorFullNameExact.write(paperId);
-                  for (String author : em.authors) {
-                    authorFullNameExact.write('\t');
-                    authorFullNameExact.write(author);
-                  }
-                  authorFullNameExact.write('\n');
-                }
-
-                synchronized (titleExact) {
-                  titleExact.write(paperId);
-                  titleExact.write('\t');
-                  if (em.getTitle() != null)
-                    titleExact.write(em.getTitle());
-                  titleExact.write('\n');
-                }
-
-                papersSucceeded.incrementAndGet();
-              } catch (final IOException e) {
-                logExceptionShort(e, "IO error", f.getName());
-              }
-            }
-          });
-        }
-
-        e.shutdown();
-        e.awaitTermination(60, TimeUnit.HOURS);
-
-        final long end = System.currentTimeMillis();
-        System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount.get(), end - start));
-        System.out.println(String.format("%d ms per paper", (end - start) / paperCount.get()));
-        System.out.println(String.format("%d failures (%f%%)", (paperCount.get() - papersSucceeded.get()), 100.0f * (paperCount.get() - papersSucceeded.get()) / paperCount.get()));
       }
     } else if (args[0].equalsIgnoreCase("parseAndScore")) {
       Parser p = new Parser(args[2], args[4]);
