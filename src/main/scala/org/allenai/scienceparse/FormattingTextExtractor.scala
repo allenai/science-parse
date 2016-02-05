@@ -97,8 +97,8 @@ object FormattingTextExtractor extends Logging {
     *
     * @param textPages to look for headers in
     * @param minConsistentHeaders minim number of headers to return, if we can't find consistent
-    *                             headers for at least `minConsistentHeaders` page empty sequences
-    *                             are returned
+    *                            headers for at least `minConsistentHeaders` page empty sequences
+    *                            are returned
     * @return the headers per each page in `textPages`
     */
   def findHeaders(
@@ -155,7 +155,7 @@ object FormattingTextExtractor extends Logging {
     *
     * @param textPages pages to search
     * @param minConsistentPageNumbers minimum number of page numbers to return, if fewer than this
-    *                               number of page numbers are found only None is returned
+    *                              number of page numbers are found only None is returned
     * @return Lines with pages numbers in each `textPage`
     */
   def findPageNumber(

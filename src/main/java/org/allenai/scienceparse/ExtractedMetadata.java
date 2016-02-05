@@ -28,7 +28,13 @@ public class ExtractedMetadata {
 
   transient private static Pattern emailDelimitersRegex = Pattern.compile(",|\\||;");
 
-  public String source;
+  public enum Source {
+    INVALID,
+    CRF,
+    META
+  }
+
+  public Source source;
   public String title;
   public List<String> authors;
   public List<String> emails; //extracted by special (non-CRF) heuristic process
@@ -37,6 +43,7 @@ public class ExtractedMetadata {
   public List<CitationRecord> referenceMentions;
   public int year;
   public String abstractText;
+  public String creator; // program that created the PDF, i.e. LaTeX or PowerPoint or something else
 
   /**
    * Constructs ExtractedMetadata from given text and labels

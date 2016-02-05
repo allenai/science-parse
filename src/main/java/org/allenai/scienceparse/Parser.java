@@ -5,6 +5,7 @@ import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
 import lombok.val;
+import org.allenai.datastore.Datastore;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -59,6 +60,18 @@ public class Parser {
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
+
+  private static final Datastore datastore = Datastore.apply();
+  public static Path getDefaultProductionModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 1);
+  }
+  public static Path getDefaultGazetteer() {
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
+  }
+
+  public Parser() throws Exception {
+    this(getDefaultProductionModel(), getDefaultGazetteer());
+  }
 
   public Parser(final String modelFile, final String gazetteerFile) throws Exception {
     this(new File(modelFile), new File(gazetteerFile));
@@ -587,7 +600,7 @@ public class Parser {
           int tempTP = scoreAuthors(authExpected, authGuessed);
           double prec = ((double) tempTP) / ((double) authGuessed.size() + 0.000000001);
           double rec = ((double) tempTP) / ((double) authExpected.length);
-          if (em.source.equals("CRF")) {
+          if (em.source == ExtractedMetadata.Source.CRF) {
             crfPrecision += prec;
             crfRecall += rec;
             crfTotal += 1.0;
@@ -602,12 +615,12 @@ public class Parser {
             logger.info(f.getName());
           }
           if (procExpected.equals(procGuessed))
-            if (em.source.equals("CRF"))
+            if (em.source == ExtractedMetadata.Source.CRF)
               crfTruePos++;
             else
               metaTruePos++;
           else {
-            if (em.source.equals("CRF"))
+            if (em.source == ExtractedMetadata.Source.CRF)
               crfFalsePos++;
             else
               metaFalsePos++;
@@ -733,15 +746,16 @@ public class Parser {
         //the output tag sequence will not include the start/stop states!
         outSeq = PDFToCRFInput.padTagSequence(outSeq);
         em = new ExtractedMetadata(seq, outSeq);
-        em.source = "CRF";
+        em.source = ExtractedMetadata.Source.CRF;
       } else {
         em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-        em.source = "META";
+        em.source = ExtractedMetadata.Source.META;
       }
       if (doc.meta.createDate != null)
         em.setYearFromDate(doc.meta.createDate);
       clean(em);
       em.raw = PDFToCRFInput.getRaw(doc);
+      em.creator = doc.meta.creator;
 
       // extract references
       final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);

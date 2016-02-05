@@ -74,14 +74,14 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         // function to clean up both gold and extracted data before we pass it in
         val clean = (x: List[String]) => multiSet(x.map(normalizer).filter(!disallow.contains(_)))
         prCalculator(clean(extractGold(gold)), clean(extract(metadata)))
-      }
+    }
 
     def genericEvaluator[T](extract: ExtractedMetadata => List[T], extractGold: List[String] => List[T],
                                 normalizer: T => T,
                                 prCalculator: (Set[T], Set[T]) => (Double, Double)) =
       (metadata: ExtractedMetadata, gold: List[String]) => {
         prCalculator(extractGold(gold).map(normalizer).toSet, extract(metadata).map(normalizer).toSet)
-      }
+    }
 
     def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.asScala.toList
 
@@ -163,12 +163,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     val extractions = {
-      val parser = Resource.using2(
-        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
-        getClass.getResourceAsStream("/referencesGroundTruth.json")
-      ) { case (modelIs, gazetteerIs) =>
-        new Parser(modelIs, gazetteerIs)
-      }
+      val parser = new Parser()
       val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
       val documentCount = docIds.size
