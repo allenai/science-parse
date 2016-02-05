@@ -40,5 +40,6 @@ libraryDependencies ++= Seq(
   ),
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",
   "org.bouncycastle" % "bcprov-jdk16" % "1.46",
-  "org.bouncycastle" % "bcmail-jdk16" % "1.46"
+  "org.bouncycastle" % "bcmail-jdk16" % "1.46",
+  "org.jsoup" % "jsoup" % "1.8.1"
 )
