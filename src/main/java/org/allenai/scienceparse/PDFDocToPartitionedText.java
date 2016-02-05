@@ -9,8 +9,6 @@ import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 
-import com.sun.media.jfxmedia.logging.Logger;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,7 +24,7 @@ public class PDFDocToPartitionedText {
     ArrayList<String> out = new ArrayList<>();
 
     //log.info("median line break: " + qLineBreak);
-    StringBuffer s = new StringBuffer();
+    StringBuilder s = new StringBuilder();
     PDFLine prevLine = null;
     double qLineBreak = getRawBlockLineBreak(pdf);
     for (PDFPage p : pdf.getPages()) {
@@ -36,7 +34,7 @@ public class PDFDocToPartitionedText {
           if (sAdd.endsWith("<lb>"))
             sAdd = sAdd.substring(0, sAdd.length() - 4);
           out.add(sAdd);
-          s = new StringBuffer();
+          s = new StringBuilder();
         }
         String sAdd = lineToString(l);
         if (sAdd.length() > 0) {
@@ -51,7 +49,7 @@ public class PDFDocToPartitionedText {
         if (sAdd.endsWith("<lb>"))
           sAdd = sAdd.substring(0, sAdd.length() - 4);
         out.add(sAdd);
-        s = new StringBuffer();
+        s = new StringBuilder();
       }
     }
     return out;
@@ -107,7 +105,19 @@ public class PDFDocToPartitionedText {
       s = s.replaceAll("  ", " ");
     return s;
   }
-  
+
+  private final static Pattern inLineAbstractPattern =
+    Pattern.compile("^abstract(:|\\.| )", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+
+  private final static Pattern abstractCleaner2 =
+    Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+  private final static Pattern abstractCleaner3 =
+    Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+  private final static Pattern abstractCleaner4 =
+    Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE);
+  private final static Pattern abstractCleaner5 =
+    Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE);
+
   public static String getAbstract(List<String> raw) {
     boolean inAbstract = false;
     StringBuilder out = new StringBuilder();
@@ -120,15 +130,15 @@ public class PDFDocToPartitionedText {
           out.append(s.trim());
         }
       }
-      Pattern inLineAbstractPattern = Pattern.compile("^abstract(:|\\.| )", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+
       if(s.toLowerCase().contains("abstract") && s.length() < 10) {
         inAbstract = true;
       }
       else if(s.toLowerCase().contains("a b s t r a c t")) {
         inAbstract = true;
       }
-      else if(inLineAbstractPattern.matcher(s).find()) {
-        out.append(inLineAbstractPattern.matcher(s).replaceFirst(""));
+      else if(RegexWithTimeout.matcher(inLineAbstractPattern, s).find()) {
+        out.append(RegexWithTimeout.matcher(inLineAbstractPattern, s).replaceFirst(""));
         inAbstract = true;
       }
 //      else if(!inAbstract)
@@ -146,16 +156,12 @@ public class PDFDocToPartitionedText {
     }
     
     // remove keywords, intro from abstract
-    Pattern p2 = Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
-    abs = p2.matcher(abs).replaceFirst("");
-    Pattern p3 = Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
-    abs = p3.matcher(abs).replaceFirst("");
-    Pattern p4 = Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE);
-    abs = p4.matcher(abs).replaceFirst("");
+    abs = RegexWithTimeout.matcher(abstractCleaner2, abs).replaceFirst("");
+    abs = RegexWithTimeout.matcher(abstractCleaner3, abs).replaceFirst("");
+    abs = RegexWithTimeout.matcher(abstractCleaner4, abs).replaceFirst("");
     
     //copyright statement:
-    Pattern p5 = Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE);
-    abs = p5.matcher(abs).replaceFirst("");
+    abs = RegexWithTimeout.matcher(abstractCleaner5, abs).replaceFirst("");
     
     return abs;
   }
@@ -171,7 +177,7 @@ public class PDFDocToPartitionedText {
     PDFLine prevLine = null;
     boolean inRefs = false;
     double qLineBreak = getTopQuartileLineBreak(pdf);
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (PDFPage p : pdf.getPages()) {
       double farLeft = Double.MAX_VALUE; //of current column
       double farRight = -1.0; //of current column
@@ -202,7 +208,7 @@ public class PDFDocToPartitionedText {
             }
             if (br) {
               out.add(cleanLine(sb.toString()));
-              sb = new StringBuffer(sAdd);
+              sb = new StringBuilder(sAdd);
             } else {
               sb.append("<lb>");
               sb.append(sAdd);
@@ -217,7 +223,7 @@ public class PDFDocToPartitionedText {
         if (sAdd.endsWith("<lb>"))
           sAdd = sAdd.substring(0, sAdd.length() - 4);
         out.add(cleanLine(sAdd));
-        sb = new StringBuffer();
+        sb = new StringBuilder();
       }
     }
     return out;
