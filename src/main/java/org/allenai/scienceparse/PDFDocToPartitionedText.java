@@ -3,6 +3,7 @@ package org.allenai.scienceparse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFLine;
@@ -25,7 +26,7 @@ public class PDFDocToPartitionedText {
     //log.info("median line break: " + qLineBreak);
     StringBuffer s = new StringBuffer();
     PDFLine prevLine = null;
-    double qLineBreak = getTopQuartileLineBreak(pdf);
+    double qLineBreak = getRawBlockLineBreak(pdf);
     for (PDFPage p : pdf.getPages()) {
       for (PDFLine l : p.getLines()) {
         if (breakSize(l, prevLine) > qLineBreak) {
@@ -62,8 +63,7 @@ public class PDFDocToPartitionedText {
     return (PDFToCRFInput.getY(l2, true) - PDFToCRFInput.getY(l1, false)) / Math.min(h1, h2);
   }
 
-  
-  public static double getTopQuartileLineBreak(PDFDoc pdf) {
+  private static ArrayList<Double> getBreaks(PDFDoc pdf) {
     ArrayList<Double> breaks = new ArrayList<>();
     PDFLine prevLine = null;
     for (PDFPage p : pdf.getPages()) {
@@ -76,9 +76,22 @@ public class PDFDocToPartitionedText {
       }
     }
     breaks.sort((d1, d2) -> Double.compare(d1, d2));
+    return breaks;
+  }
+  
+  public static double getTopQuartileLineBreak(PDFDoc pdf) {
+    ArrayList<Double> breaks = getBreaks(pdf); 
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking references
     return breaks.get(idx);
   }
+  
+  public static double getRawBlockLineBreak(PDFDoc pdf) {
+    ArrayList<Double> breaks = getBreaks(pdf); 
+    int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking abstracts
+    return breaks.get(idx);
+  }
+  
+  
 
   private static String lineToString(PDFLine l) {
     StringBuilder sb = new StringBuilder();
@@ -95,20 +108,33 @@ public class PDFDocToPartitionedText {
   
   public static String getAbstract(List<String> raw) {
     boolean inAbstract = false;
-    int linesAdded = 0;
     StringBuffer out = new StringBuffer();
     for(String s : raw) {
       if(inAbstract) {
-        if(s.length() < 20 || linesAdded > 2)
-          return out.toString();
+        if(s.length() < 20)
+          return out.toString().trim();
         else {
-          out.append(s);
-          linesAdded++;
+          out.append(" " + s.trim());
         }
       }
+      Pattern inLineAbstractPattern = Pattern.compile("^abstract(:|\\.| )", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
       if(s.toLowerCase().contains("abstract") && s.length() < 10) {
         inAbstract = true;
       }
+      else if(s.toLowerCase().contains("a b s t r a c t")) {
+        inAbstract = true;
+      }
+      else if(inLineAbstractPattern.matcher(s).find()) {
+        out.append(inLineAbstractPattern.matcher(s).replaceFirst(""));
+        inAbstract = true;
+      }
+//      else if(!inAbstract)
+//        log.info("ignoring " + s.substring(0, Math.min(20, s.length())) + " ...");
+    }
+    //we didn't find an abstract.  Pull out the first paragraph-looking thing.
+    for(String s: raw) {
+      if(s.length() > 250)
+        return s.trim();
     }
     return "";
   }

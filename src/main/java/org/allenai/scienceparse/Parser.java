@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
+
 import lombok.val;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
@@ -72,7 +73,7 @@ public class Parser {
   public Parser(final File modelFile, final File gazetteerFile) throws Exception {
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
-      final InputStream gazetteerIs = new FileInputStream(gazetteerFile)
+      final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
     ) {
       model = loadModel(modelIs);
       referenceExtractor = new ExtractReferences(gazetteerIs);
@@ -644,6 +645,7 @@ public class Parser {
       ObjectMapper mapper = new ObjectMapper();
       int totalRefs = 0;
       int totalCites = 0;
+      int blankAbstracts =0;
       for (File f : inFiles) {
         if (!f.getName().endsWith(".pdf"))
           continue;
@@ -652,6 +654,13 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
+          if(em.abstractText==null || em.abstractText.length()==0) {
+            logger.info("abstract blank!");
+            blankAbstracts++;
+          }
+          else {
+            logger.info("abstract: " + em.abstractText);
+          }
           final List<BibRecord> br = em.references;
           final List<CitationRecord> cr = em.referenceMentions;
           if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
@@ -678,6 +687,7 @@ public class Parser {
       logger.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");
       logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
+      logger.info("blank abstracts: " + blankAbstracts);
     }
   }
 
@@ -705,17 +715,17 @@ public class Parser {
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final PDDocument pdDoc = PDDocument.load(is);
 
-    final String abstractText;
-    { // Get abstract from figure extraction.
-      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
-      if (doc.abstractText().isDefined()) {
-        Pattern p = Pattern.compile("^(abstract)?[^a-z]*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
-        abstractText = p.matcher(doc.abstractText().get().text().trim()).replaceFirst("");
-      } else {
-        abstractText = "";
-      }
-    }
+    final String abstractText = "";
+//    { // Get abstract from figure extraction.
+//      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
+//      if (doc.abstractText().isDefined()) {
+//        Pattern p = Pattern.compile("^(abstract)?[^a-z]*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+//        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
+//        abstractText = p.matcher(doc.abstractText().get().text().trim()).replaceFirst("");
+//      } else {
+//        abstractText = "";
+//      }
+//    }
 
     final ExtractedMetadata em;
     {
@@ -755,8 +765,10 @@ public class Parser {
       em.abstractText = abstractText;
     }
 
+    
+    
     // remove keywords from abstract
-    Pattern p2 = Pattern.compile("key ?word.*$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    Pattern p2 = Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
     em.abstractText = p2.matcher(em.abstractText).replaceFirst("");
     return em;
   }
