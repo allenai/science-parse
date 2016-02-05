@@ -38,6 +38,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -459,7 +460,19 @@ public class Parser {
       opts.minYear = 2008;
       trainParser(null, pgt, args[3], opts, args[6]);
     } else if (args[0].equalsIgnoreCase("parse")) {
-      Parser p = new Parser(args[2], args[4]);
+      final Path modelFile;
+      if(args[2].equals("-"))
+        modelFile = Parser.getDefaultProductionModel();
+      else
+        modelFile = Paths.get(args[2]);
+
+      final Path gazetteerFile;
+      if(args[4].equals("-"))
+        gazetteerFile = Parser.getDefaultGazetteer();
+      else
+        gazetteerFile = Paths.get(args[4]);
+
+      Parser p = new Parser(modelFile, gazetteerFile);
       File input = new File(args[1]);
       File outDir = new File(args[3]);
       final List<File> inFiles;
