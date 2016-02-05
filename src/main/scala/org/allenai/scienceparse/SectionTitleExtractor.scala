@@ -16,7 +16,7 @@ object SectionTitleExtractor extends Logging {
   private val RomanNumeralsRegex = """^[IVX]+.?$""".r
 
   /** @return whether `line` is "prefixed", meaning it starts with some kind of numbering or list
-    *         indicator, followed by the text of the title
+    *        indicator, followed by the text of the title
     */
   def lineIsPrefixed(line: Line): Boolean = {
     if (line.words.size == 1) {

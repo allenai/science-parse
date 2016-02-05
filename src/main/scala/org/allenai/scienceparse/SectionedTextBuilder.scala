@@ -29,7 +29,7 @@ object SectionedTextBuilder {
   /** Section of a scholarly document
     *
     * @param title section title, None if the text appeared in the document before any section
-    *              title was found
+    *             title was found
     * @param paragraphs section text broken up into paragraphs
     */
   case class DocumentSection(title: Option[PdfText], paragraphs: Seq[PdfText])

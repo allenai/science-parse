@@ -34,7 +34,7 @@ class CoraExtractionSpec extends UnitSpec {
   )
 
   val refs = new ArrayBuffer[Reference]()
-  val extractor = new ExtractReferences(getClass.getResource("/referencesGroundTruth.json").getPath)
+  val extractor = new ExtractReferences(Parser.getDefaultGazetteer.toString)
 
   Resource.using(
     Source.fromInputStream(getClass.getResourceAsStream("/tagged_references.txt"))
