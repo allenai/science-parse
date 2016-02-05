@@ -9,6 +9,8 @@ import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 
+import com.sun.media.jfxmedia.logging.Logger;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -112,7 +114,7 @@ public class PDFDocToPartitionedText {
     for(String s : raw) {
       if(inAbstract) {
         if(s.length() < 20)
-          return out.toString().trim();
+          break;
         else {
           out.append(" " + s.trim());
         }
@@ -131,12 +133,30 @@ public class PDFDocToPartitionedText {
 //      else if(!inAbstract)
 //        log.info("ignoring " + s.substring(0, Math.min(20, s.length())) + " ...");
     }
-    //we didn't find an abstract.  Pull out the first paragraph-looking thing.
-    for(String s: raw) {
-      if(s.length() > 250)
-        return s.trim();
+    String abs = out.toString().trim();
+    if(abs.length()==0) {
+      //we didn't find an abstract.  Pull out the first paragraph-looking thing.
+      for(String s: raw) {
+        if(s.length() > 250) {
+          abs = s.trim();
+          break;
+        }
+      }
     }
-    return "";
+    
+    // remove keywords, intro from abstract
+    Pattern p2 = Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+    abs = p2.matcher(abs).replaceFirst("");
+    Pattern p3 = Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+    abs = p3.matcher(abs).replaceFirst("");
+    Pattern p4 = Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE);
+    abs = p4.matcher(abs).replaceFirst("");
+    
+    //copyright statement:
+    Pattern p5 = Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE);
+    abs = p5.matcher(abs).replaceFirst("");
+    
+    return abs;
   }
   
   /**

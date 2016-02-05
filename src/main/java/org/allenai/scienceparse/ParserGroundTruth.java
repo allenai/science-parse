@@ -35,7 +35,6 @@ public class ParserGroundTruth {
     ObjectMapper om = new ObjectMapper();
     ObjectReader r = om.reader(new TypeReference<List<Paper>>() {});
 
-    //isr.mark(10);
 //    int c = isr.read();
 //    if(c != 0xfeff) {
 //      isr.reset();

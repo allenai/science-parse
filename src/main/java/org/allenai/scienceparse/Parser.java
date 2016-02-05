@@ -760,16 +760,6 @@ public class Parser {
 
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
     }
-
-    if (abstractText.length() > em.abstractText.length()) {
-      em.abstractText = abstractText;
-    }
-
-    
-    
-    // remove keywords from abstract
-    Pattern p2 = Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
-    em.abstractText = p2.matcher(em.abstractText).replaceFirst("");
     return em;
   }
 
