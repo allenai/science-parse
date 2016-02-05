@@ -77,7 +77,7 @@ public class PDFDocToPartitionedText {
         prevLine = l;
       }
     }
-    breaks.sort((d1, d2) -> Double.compare(d1, d2));
+    breaks.sort(Double::compare);
     return breaks;
   }
   
@@ -97,7 +97,7 @@ public class PDFDocToPartitionedText {
 
   private static String lineToString(PDFLine l) {
     StringBuilder sb = new StringBuilder();
-    l.tokens.forEach(t -> sb.append(t.token + " "));
+    l.tokens.forEach(t -> { sb.append(t.token); sb.append(' '); } );
     return sb.toString().trim();
   }
 
@@ -110,13 +110,14 @@ public class PDFDocToPartitionedText {
   
   public static String getAbstract(List<String> raw) {
     boolean inAbstract = false;
-    StringBuffer out = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     for(String s : raw) {
       if(inAbstract) {
         if(s.length() < 20)
           break;
         else {
-          out.append(" " + s.trim());
+          out.append(' ');
+          out.append(s.trim());
         }
       }
       Pattern inLineAbstractPattern = Pattern.compile("^abstract(:|\\.| )", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
@@ -162,9 +163,6 @@ public class PDFDocToPartitionedText {
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
-   *
-   * @param pdf
-   * @return
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
     final List<String> refTags = Arrays.asList("References", "REFERENCES", "Citations", "CITATIONS", "Bibliography",
@@ -224,6 +222,4 @@ public class PDFDocToPartitionedText {
     }
     return out;
   }
-
-  
 }
