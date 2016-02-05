@@ -13,6 +13,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.{ TextNode, Element }
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.GenMap
 import scala.collection.parallel.ParMap
 import scala.io.{Codec, Source}
 import scala.util.{Success, Failure, Try}
@@ -179,12 +180,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     }
 
     val scienceParseExtractions = {
-      val parser = Resource.using2(
-        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
-        getClass.getResourceAsStream("/referencesGroundTruth.json")
-      ) { case (modelIs, gazetteerIs) =>
-        new Parser(modelIs, gazetteerIs)
-      }
+      val parser = new Parser()
       val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
       val documentCount = docIds.size
@@ -200,7 +196,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         }
 
         val documentsDone = totalDocumentsDone.incrementAndGet()
-        if (documentsDone % 50 == 0) {
+        if(documentsDone % 50 == 0) {
           val timeSpent = System.currentTimeMillis() - startTime
           val speed = 1000.0 * documentsDone / timeSpent
           val completion = 100.0 * documentsDone / documentCount
@@ -221,7 +217,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val failures = result.values.collect { case Failure(e) => e }
       val errorRate = 100.0 * failures.size / documentCount
       logger.info(f"Failed ${failures.size} times ($errorRate%.2f%%)")
-      if (failures.nonEmpty) {
+      if(failures.nonEmpty) {
         logger.info("Top errors:")
         failures.
           groupBy(_.getClass.getName).
@@ -243,16 +239,16 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // calculate precision and recall for all metrics
     //
 
-    def getPR(extractions: ParMap[String, Try[ExtractedMetadata]]) = {
+    def getPR(extractions: GenMap[String, Try[ExtractedMetadata]]) = {
       val prResults = allGoldData.map { case (metric, docid, goldData) =>
         extractions(docid) match {
           case Failure(_) => (metric, (0.0, 0.0))
           case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
         }
-      }
-      prResults.groupBy(_._1).mapValues { prs =>
-        val (ps, rs) = prs.map(_._2).unzip
-        (ps.sum / ps.size, rs.sum / rs.size)
+    }
+    prResults.groupBy(_._1).mapValues { prs =>
+      val (ps, rs) = prs.map(_._2).unzip
+      (ps.sum / ps.size, rs.sum / rs.size)
       }.toList.sortBy(_._1.name)
     }
 
