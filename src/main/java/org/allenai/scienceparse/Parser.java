@@ -758,7 +758,7 @@ public class Parser {
       em.references = pair.getOne();
       em.referenceMentions = pair.getTwo();
 
-      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
+      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
     }
     return em;
   }

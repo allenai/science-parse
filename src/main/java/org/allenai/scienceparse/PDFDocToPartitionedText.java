@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PDFDocToPartitionedText {
   /**
-   * Returns list of strings representation of this file.  Breaks new lines when pdf line break larger than median line break.
+   * Returns list of strings representation of this file.  Breaks new lines when pdf line break larger than threshold.
    * All original line breaks indicated by <lb>
    *
    * @param pdf
@@ -64,24 +64,31 @@ public class PDFDocToPartitionedText {
     float h2 = PDFToCRFInput.getH(l2);
     return (PDFToCRFInput.getY(l2, true) - PDFToCRFInput.getY(l1, false)) / Math.min(h1, h2);
   }
-
-  private static ArrayList<Double> getBreaks(PDFDoc pdf) {
-    ArrayList<Double> breaks = new ArrayList<>();
+  
+  private static ArrayList<Double> getBreaks(PDFPage p) {
     PDFLine prevLine = null;
-    for (PDFPage p : pdf.getPages()) {
-      for (PDFLine l : p.getLines()) {
-        double bs = breakSize(l, prevLine);
-        if (bs > 0) { //<= 0 due to math, tables, new pages, should be ignored
-          breaks.add(bs);
-        }
-        prevLine = l;
+    ArrayList<Double> breaks = new ArrayList<>();
+    for (PDFLine l : p.getLines()) {
+      double bs = breakSize(l, prevLine);
+      if (bs > 0) { //<= 0 due to math, tables, new pages, should be ignored
+        breaks.add(bs);
       }
+      prevLine = l;
     }
     breaks.sort((d1, d2) -> Double.compare(d1, d2));
     return breaks;
   }
   
-  public static double getTopQuartileLineBreak(PDFDoc pdf) {
+  private static ArrayList<Double> getBreaks(PDFDoc pdf) {
+    ArrayList<Double> breaks = new ArrayList<>();
+    for (PDFPage p : pdf.getPages()) {
+      breaks.addAll(getBreaks(p));
+    }
+    breaks.sort((d1, d2) -> Double.compare(d1, d2));
+    return breaks;
+  }
+  
+  public static double getReferenceLineBreak(PDFDoc pdf) {
     ArrayList<Double> breaks = getBreaks(pdf); 
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking references
     return breaks.get(idx);
@@ -89,11 +96,16 @@ public class PDFDocToPartitionedText {
   
   public static double getRawBlockLineBreak(PDFDoc pdf) {
     ArrayList<Double> breaks = getBreaks(pdf); 
-    int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking abstracts
+    int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking papers
     return breaks.get(idx);
   }
   
-  
+  public static double getFirstPagePartitionBreak(PDFPage pdf) {
+    ArrayList<Double> breaks = getBreaks(pdf); 
+    //log.info(breaks.toString());
+    int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
+    return breaks.get(idx) + 1.00;
+  }
 
   private static String lineToString(PDFLine l) {
     StringBuilder sb = new StringBuilder();
@@ -108,7 +120,36 @@ public class PDFDocToPartitionedText {
     return s;
   }
   
-  public static String getAbstract(List<String> raw) {
+  public static String getFirstTextBlock(PDFDoc pdf) {
+    PDFPage fp = pdf.pages.get(0);
+    double fpp = getFirstPagePartitionBreak(fp);
+    StringBuffer out = new StringBuffer();
+    PDFLine prevLine = null;
+    boolean first = true;
+    for(PDFLine l : fp.lines) {
+      if(first) { first=false; //skip the first line (heuristic)
+        continue;
+      }
+      if (breakSize(l, prevLine) > fpp) {
+        if(out.length() > 400) { //hand-tuned threshold of min abstract length
+          return out.toString().trim();
+        }
+        else{
+//          log.info("big break, discarding as too small: ");
+//          log.info(out.toString());
+          out.delete(0, out.length());
+          out.append(" " + cleanLine(lineToString(l)));
+        }
+      }
+      else {
+        out.append(" " + cleanLine(lineToString(l)));
+      }
+      prevLine = l;
+    }
+    return "";
+  }
+  
+  public static String getAbstract(List<String> raw, PDFDoc pdf) {
     boolean inAbstract = false;
     StringBuffer out = new StringBuffer();
     for(String s : raw) {
@@ -119,7 +160,7 @@ public class PDFDocToPartitionedText {
           out.append(" " + s.trim());
         }
       }
-      Pattern inLineAbstractPattern = Pattern.compile("^abstract(:|\\.| )", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+      Pattern inLineAbstractPattern = Pattern.compile("^abstract(:|\\.| | ?\\-)", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
       if(s.toLowerCase().contains("abstract") && s.length() < 10) {
         inAbstract = true;
       }
@@ -136,18 +177,13 @@ public class PDFDocToPartitionedText {
     String abs = out.toString().trim();
     if(abs.length()==0) {
       //we didn't find an abstract.  Pull out the first paragraph-looking thing.
-      for(String s: raw) {
-        if(s.length() > 250) {
-          abs = s.trim();
-          break;
-        }
-      }
+      abs = getFirstTextBlock(pdf);
     }
     
     // remove keywords, intro from abstract
     Pattern p2 = Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
     abs = p2.matcher(abs).replaceFirst("");
-    Pattern p3 = Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+    Pattern p3 = Pattern.compile("(1|I)\\.? ?Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
     abs = p3.matcher(abs).replaceFirst("");
     Pattern p4 = Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE);
     abs = p4.matcher(abs).replaceFirst("");
@@ -156,6 +192,7 @@ public class PDFDocToPartitionedText {
     Pattern p5 = Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE);
     abs = p5.matcher(abs).replaceFirst("");
     
+    abs = abs.replaceAll("- ", "");
     return abs;
   }
   
@@ -172,7 +209,7 @@ public class PDFDocToPartitionedText {
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
-    double qLineBreak = getTopQuartileLineBreak(pdf);
+    double qLineBreak = getReferenceLineBreak(pdf);
     StringBuffer sb = new StringBuffer();
     for (PDFPage p : pdf.getPages()) {
       double farLeft = Double.MAX_VALUE; //of current column
