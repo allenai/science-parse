@@ -599,7 +599,7 @@ public class Parser {
       ObjectMapper mapper = new ObjectMapper();
       int totalRefs = 0;
       int totalCites = 0;
-      int blankAbstracts = 0;
+      int blankAbstracts =0;
       for (File f : inFiles) {
         if (!f.getName().endsWith(".pdf"))
           continue;
@@ -608,7 +608,7 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
-          if(em.abstractText == null || em.abstractText.length() == 0) {
+          if(em.abstractText==null || em.abstractText.length()==0) {
             logger.info("abstract blank!");
             blankAbstracts++;
           }
@@ -691,8 +691,7 @@ public class Parser {
     clean(em);
     em.raw = PDFDocToPartitionedText.getRaw(doc);
     em.creator = doc.meta.creator;
-    final String firstAbstract = PDFDocToPartitionedText.getAbstract(em.raw);
-
+      
     // extract references
     final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
     final Pair<List<BibRecord>, List<CitationRecord>> pair =
@@ -700,7 +699,7 @@ public class Parser {
     em.references = pair.getOne();
     em.referenceMentions = pair.getTwo();
 
-    em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
+    em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
 
     return em;
   }
