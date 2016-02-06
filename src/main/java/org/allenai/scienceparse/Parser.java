@@ -599,7 +599,7 @@ public class Parser {
       ObjectMapper mapper = new ObjectMapper();
       int totalRefs = 0;
       int totalCites = 0;
-      int blankAbstracts =0;
+      int blankAbstracts = 0;
       for (File f : inFiles) {
         if (!f.getName().endsWith(".pdf"))
           continue;
@@ -608,7 +608,7 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
-          if(em.abstractText==null || em.abstractText.length()==0) {
+          if(em.abstractText == null || em.abstractText.length() == 0) {
             logger.info("abstract blank!");
             blankAbstracts++;
           }
@@ -667,54 +667,41 @@ public class Parser {
   }
 
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
-    final PDDocument pdDoc = PDDocument.load(is);
-
-    final String abstractText = "";
-//    { // Get abstract from figure extraction.
-//      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
-//      if (doc.abstractText().isDefined()) {
-//        Pattern p = Pattern.compile("^(abstract)?[^a-z]*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-//        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
-//        abstractText = p.matcher(doc.abstractText().get().text().trim()).replaceFirst("");
-//      } else {
-//        abstractText = "";
-//      }
-//    }
-
     final ExtractedMetadata em;
-    {
-      // extract everything but references
-      PDFExtractor ext = new PDFExtractor();
-      PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
-      seq = seq.subList(0, Math.min(seq.size(), headerMax));
-      seq = PDFToCRFInput.padSequence(seq);
 
-      if (doc.meta == null || doc.meta.title == null) { //use the model
-        List<String> outSeq = model.bestGuess(seq);
-        //the output tag sequence will not include the start/stop states!
-        outSeq = PDFToCRFInput.padTagSequence(outSeq);
-        em = new ExtractedMetadata(seq, outSeq);
-        em.source = ExtractedMetadata.Source.CRF;
-      } else {
-        em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-        em.source = ExtractedMetadata.Source.META;
-      }
-      if (doc.meta.createDate != null)
-        em.setYearFromDate(doc.meta.createDate);
-      clean(em);
-      em.raw = PDFDocToPartitionedText.getRaw(doc);
-      em.creator = doc.meta.creator;
-      
-      // extract references
-      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
-      final Pair<List<BibRecord>, List<CitationRecord>> pair =
-        getReferences(em.raw, rawReferences, referenceExtractor);
-      em.references = pair.getOne();
-      em.referenceMentions = pair.getTwo();
+    // extract everything but references
+    PDFExtractor ext = new PDFExtractor();
+    PDFDoc doc = ext.extractFromInputStream(is);
+    List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+    seq = seq.subList(0, Math.min(seq.size(), headerMax));
+    seq = PDFToCRFInput.padSequence(seq);
 
-      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
+    if (doc.meta == null || doc.meta.title == null) { //use the model
+      List<String> outSeq = model.bestGuess(seq);
+      //the output tag sequence will not include the start/stop states!
+      outSeq = PDFToCRFInput.padTagSequence(outSeq);
+      em = new ExtractedMetadata(seq, outSeq);
+      em.source = ExtractedMetadata.Source.CRF;
+    } else {
+      em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+      em.source = ExtractedMetadata.Source.META;
     }
+    if (doc.meta.createDate != null)
+      em.setYearFromDate(doc.meta.createDate);
+    clean(em);
+    em.raw = PDFDocToPartitionedText.getRaw(doc);
+    em.creator = doc.meta.creator;
+    final String firstAbstract = PDFDocToPartitionedText.getAbstract(em.raw);
+
+    // extract references
+    final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+    final Pair<List<BibRecord>, List<CitationRecord>> pair =
+      getReferences(em.raw, rawReferences, referenceExtractor);
+    em.references = pair.getOne();
+    em.referenceMentions = pair.getTwo();
+
+    em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw);
+
     return em;
   }
 
