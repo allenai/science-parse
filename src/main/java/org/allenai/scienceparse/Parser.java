@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
+
 import lombok.val;
 import org.allenai.datastore.Datastore;
 import org.allenai.ml.linalg.DenseVector;
@@ -50,6 +51,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -85,7 +87,7 @@ public class Parser {
   public Parser(final File modelFile, final File gazetteerFile) throws Exception {
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
-      final InputStream gazetteerIs = new FileInputStream(gazetteerFile)
+      final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
     ) {
       model = loadModel(modelIs);
       referenceExtractor = new ExtractReferences(gazetteerIs);
@@ -597,6 +599,7 @@ public class Parser {
       ObjectMapper mapper = new ObjectMapper();
       int totalRefs = 0;
       int totalCites = 0;
+      int blankAbstracts =0;
       for (File f : inFiles) {
         if (!f.getName().endsWith(".pdf"))
           continue;
@@ -605,6 +608,13 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
+          if(em.abstractText==null || em.abstractText.length()==0) {
+            logger.info("abstract blank!");
+            blankAbstracts++;
+          }
+          else {
+            logger.info("abstract: " + em.abstractText);
+          }
           final List<BibRecord> br = em.references;
           final List<CitationRecord> cr = em.referenceMentions;
           if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
@@ -631,6 +641,7 @@ public class Parser {
       logger.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");
       logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
+      logger.info("blank abstracts: " + blankAbstracts);
     }
   }
 
@@ -658,20 +669,17 @@ public class Parser {
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final PDDocument pdDoc = PDDocument.load(is);
 
-    final String abstractText;
-    { // Get abstract from figure extraction.
-      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
-      if (doc.abstractText().isDefined()) {
-        final String stripPrefix = "abstract";
-        final String result = doc.abstractText().get().text().trim();
-        if(result.substring(0, stripPrefix.length()).toLowerCase().equals(stripPrefix))
-          abstractText = result.substring(stripPrefix.length()).trim();
-        else
-          abstractText = result;
-      } else {
-        abstractText = null;
-      }
-    }
+    final String abstractText = "";
+//    { // Get abstract from figure extraction.
+//      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
+//      if (doc.abstractText().isDefined()) {
+//        Pattern p = Pattern.compile("^(abstract)?[^a-z]*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+//        // remove ABSTRACT and any non-letter characters (such as periods or spaces) in the beginning
+//        abstractText = p.matcher(doc.abstractText().get().text().trim()).replaceFirst("");
+//      } else {
+//        abstractText = "";
+//      }
+//    }
 
     final ExtractedMetadata em;
     {
@@ -695,19 +703,18 @@ public class Parser {
       if (doc.meta.createDate != null)
         em.setYearFromDate(doc.meta.createDate);
       clean(em);
-      em.raw = PDFToCRFInput.getRaw(doc);
+      em.raw = PDFDocToPartitionedText.getRaw(doc);
       em.creator = doc.meta.creator;
-
+      
       // extract references
-      final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
+      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
       final Pair<List<BibRecord>, List<CitationRecord>> pair =
         getReferences(em.raw, rawReferences, referenceExtractor);
       em.references = pair.getOne();
       em.referenceMentions = pair.getTwo();
+
+      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
     }
-
-    em.abstractText = abstractText;
-
     return em;
   }
 

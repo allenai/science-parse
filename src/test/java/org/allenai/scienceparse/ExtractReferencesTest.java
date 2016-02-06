@@ -74,8 +74,8 @@ public class ExtractReferencesTest {
     }
     val ext = new PDFExtractor();
     final PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-    final List<String> raw = PDFToCRFInput.getRaw(doc);
-    final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
+    final List<String> raw = PDFDocToPartitionedText.getRaw(doc);
+    final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
     return Tuples.pair(raw, rawReferences);
   }
 

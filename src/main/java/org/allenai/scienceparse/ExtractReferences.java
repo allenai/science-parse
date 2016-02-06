@@ -58,43 +58,6 @@ public class ExtractReferences {
     return Pattern.compile(s, Pattern.CASE_INSENSITIVE);
   }
 
-  private static class RegexTimeout extends RuntimeException { }
-  private static Matcher matcherWithTimeout(final Pattern pattern, final CharSequence string) {
-    final long timeout = 1000; //ms
-
-    class TimeoutCharSequence implements CharSequence {
-      private CharSequence inner;
-      private long abortTime;
-
-      public TimeoutCharSequence(final CharSequence inner, final long abortTime) {
-        super();
-        this.inner = inner;
-        this.abortTime = abortTime;
-      }
-
-      public char charAt(int index) {
-        if(System.currentTimeMillis() >= abortTime)
-          throw new RegexTimeout();
-
-        return inner.charAt(index);
-      }
-
-      public int length() {
-        return inner.length();
-      }
-
-      public CharSequence subSequence(int start, int end) {
-        return new TimeoutCharSequence(inner.subSequence(start, end), abortTime);
-      }
-
-      public String toString() {
-        return inner.toString();
-      }
-    }
-
-    return pattern.matcher(new TimeoutCharSequence(string, System.currentTimeMillis() + timeout));
-  }
-
   //returns pattern-ready form of author
   private static String cleanAuthString(String s) {
     return s.replaceAll("\\p{P}", ".");//allow anything for any punctuation
@@ -102,7 +65,7 @@ public class ExtractReferences {
 
   private static final Pattern yearPattern = Pattern.compile("[1-2][0-9][0-9][0-9]");
   private static int extractRefYear(String sYear) {
-    final Matcher mYear = matcherWithTimeout(yearPattern, sYear);
+    final Matcher mYear = RegexWithTimeout.matcher(yearPattern, sYear);
     int a = 0;
     while (mYear.find()) {
       try {
@@ -132,7 +95,7 @@ public class ExtractReferences {
     //figure out whether M. Johnson or Johnson, M.:
     boolean firstLast = false;
     List<String> out = new ArrayList<>();
-    if (matcherWithTimeout(authorStringToListPattern, authString).matches()) {
+    if (RegexWithTimeout.matcher(authorStringToListPattern, authString).matches()) {
       firstLast = true;
     }
     String[] names;
@@ -200,7 +163,7 @@ public class ExtractReferences {
 	  int idx = -1;
 	  int ct = 0;
 	  for(BibRecord br : bib) {
-		 Matcher m = matcherWithTimeout(br.shortCiteRegEx, s);
+		 Matcher m = RegexWithTimeout.matcher(br.shortCiteRegEx, s);
 		 if(m.find()) {
 			 //TODO: handle multiple matches
 			 if(m.start() > yearPos)
@@ -226,7 +189,7 @@ public class ExtractReferences {
     for (int i = 0; i < stop; i++) {
       String s = paper.get(i).replaceAll("-<lb>", "").replaceAll("<lb>", " ");
       paper.set(i, s);
-      Matcher m = matcherWithTimeout(p, s);
+      Matcher m = RegexWithTimeout.matcher(p, s);
       while (m.find()) {
         String[] citations = m.group(1).split(bs.getCiteDelimiter());
         for (final String citation : citations) {
@@ -239,7 +202,7 @@ public class ExtractReferences {
       //short-cites are assumed to be e.g.: Etzioni et al. (2005)
       if(bs.getShortCiteRegex() != null) {
     	  Pattern p2 = Pattern.compile(bs.getShortCiteRegex());
-    	  Matcher m2 = matcherWithTimeout(p2, s);
+    	  Matcher m2 = RegexWithTimeout.matcher(p2, s);
     	  while(m2.find()) {
     		  Pair<Integer, Integer> shct =
             shortCiteSearch(m2.start(), Integer.parseInt(m2.group(1).substring(0, 4)), s, bib);
@@ -344,7 +307,7 @@ public class ExtractReferences {
     //+ "arrays," in IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
     //+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221."
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         return new BibRecord(
           m.group(3),
@@ -369,7 +332,7 @@ public class ExtractReferences {
     //example:
     //TODO
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         return new BibRecord(
           m.group(3),
@@ -395,7 +358,7 @@ public class ExtractReferences {
     //1. Jones, C. M.; Henry, E. R.; Hu, Y.; Chan C. K; Luck S. D.; Bhuyan, A.; Roder, H.; Hofrichter, J.;
     //Eaton, W. A. Proc Natl Acad Sci USA 1993, 90, 11860.
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         return new BibRecord(
           "",
@@ -420,7 +383,7 @@ public class ExtractReferences {
     //example:
     //TODO
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         return new BibRecord(
           m.group(3),
@@ -445,7 +408,7 @@ public class ExtractReferences {
     //example:
     //TODO
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         return new BibRecord(
           m.group(3),
@@ -470,7 +433,7 @@ public class ExtractReferences {
     //example:
     //STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         final List<String> authors = authorStringToList(m.group(1));
         final int year = Integer.parseInt(m.group(2).substring(0, 4));
@@ -495,7 +458,7 @@ public class ExtractReferences {
     //example:
     //STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
       if (m.matches()) {
         List<String> authors = authorStringToList(m.group(1));
         int year = Integer.parseInt(m.group(2).substring(0, 4));
@@ -523,8 +486,8 @@ public class ExtractReferences {
     // [1] S. Abiteboul, H. Kaplan, and T. Milo, Compact labeling schemes for ancestor queries. Proc. 12th Ann. ACM-SIAM Symp.
     // on Discrete Algorithms (SODA 2001), 547-556.
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern1, line.trim());
-      Matcher m2 = matcherWithTimeout(pattern2, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern1, line.trim());
+      Matcher m2 = RegexWithTimeout.matcher(pattern2, line.trim());
       if (m.matches()) {
         return new BibRecord(
           m.group(3),
@@ -561,8 +524,8 @@ public class ExtractReferences {
     // H. Tanev. Is it the right answer? exploiting web redundancy
     //   for answer validation. In ACL, 2002.
     public BibRecord parseRecord(String line) {
-      Matcher m = matcherWithTimeout(pattern1, line.trim());
-      Matcher m2 = matcherWithTimeout(pattern2, line.trim());
+      Matcher m = RegexWithTimeout.matcher(pattern1, line.trim());
+      Matcher m2 = RegexWithTimeout.matcher(pattern2, line.trim());
       if (m.matches()) {
         if (m.group(1).matches("[0-9]+")) //don't override BracketNumber
           return null;
