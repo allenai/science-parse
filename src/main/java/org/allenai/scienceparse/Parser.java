@@ -599,7 +599,7 @@ public class Parser {
       ObjectMapper mapper = new ObjectMapper();
       int totalRefs = 0;
       int totalCites = 0;
-      int blankAbstracts =0;
+      int blankAbstracts = 0;
       for (File f : inFiles) {
         if (!f.getName().endsWith(".pdf"))
           continue;
@@ -608,7 +608,7 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
-          if(em.abstractText==null || em.abstractText.length()==0) {
+          if(em.abstractText == null || em.abstractText.length() == 0) {
             logger.info("abstract blank!");
             blankAbstracts++;
           }
