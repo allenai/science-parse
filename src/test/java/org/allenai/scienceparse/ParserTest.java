@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,13 +107,7 @@ public class ParserTest {
     File f = new File(opts.modelFile);
     f.deleteOnExit();
     Parser.trainParser(resolveKeys(pdfKeys), null, null, opts, null);
-    final Parser p;
-    try(
-      val modelStream = new FileInputStream(opts.modelFile);
-      val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
-    ) {
-      p = new Parser(modelStream, gazetteerStream);
-    }
+    final Parser p = new Parser(testModelFile, Parser.getDefaultGazetteer().toFile());
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;
@@ -150,13 +145,7 @@ public class ParserTest {
     f.deleteOnExit();
     ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
     Parser.trainParser(null, pgt, resourceDirectory("/groundTruth.json"), opts, null); //assumes pdfs in same dir as groundTruth
-    final Parser p;
-    try(
-      val modelStream = new FileInputStream(opts.modelFile);
-      val gazetteerStream = getClass().getResourceAsStream("/referencesGroundTruth.json")
-    ) {
-      p = new Parser(modelStream, gazetteerStream);
-    }
+    final Parser p = new Parser(testModelFile, Parser.getDefaultGazetteer().toFile());
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;

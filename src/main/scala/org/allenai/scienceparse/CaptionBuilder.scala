@@ -47,7 +47,7 @@ object CaptionBuilder extends Logging {
     * follows them. In these cases we use a few additional heuristics:
     *
     * 1: If the caption is right justified we stop adding lines if the previous line breaks that
-    *    justification
+    *   justification
     * 2: The next line starts a new, large paragraph
     *
     * @param candidates Captions start to turn into captions

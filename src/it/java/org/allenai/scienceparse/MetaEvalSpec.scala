@@ -1,14 +1,20 @@
 package org.allenai.scienceparse
 
-import org.allenai.common.{Logging, Resource}
+import java.time.LocalDate
+import java.util.{Calendar, Date}
+
+import org.allenai.common.{StringUtils, Logging, Resource}
 import org.allenai.common.testkit.UnitSpec
 import org.allenai.common.StringUtils._
+import org.allenai.scienceparse.GrobidParser.JsoupElementsImplicits
 import org.allenai.datastore.Datastores
 
-import scala.xml.XML
-import scala.collection.JavaConverters._
+import org.jsoup.Jsoup
+import org.jsoup.nodes.{ TextNode, Element }
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.GenMap
+import scala.collection.parallel.ParMap
 import scala.io.{Codec, Source}
 import scala.util.{Success, Failure, Try}
 import scala.collection.JavaConverters._
@@ -16,6 +22,7 @@ import scala.collection.JavaConverters._
 class MetaEvalSpec extends UnitSpec with Datastores with Logging {
   "MetaEval" should "produce good P/R numbers" in {
     val maxDocumentCount = 1000 // set this to something low for testing, set it high before committing
+    val evaluateGrobid = true // get numbers for Grobid instead
 
     //
     // define metrics
@@ -121,6 +128,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       goldFile: String,
       // get P/R values for each individual paper. values will be averaged later across all papers
       evaluator: (ExtractedMetadata, List[String]) => (Double, Double))
+    // to get a new version of Isaac's gold data into this format, run src/it/resources/golddata/isaac/import_bib_gold.py
+    // inside the right scholar directory
     val metrics = Seq(
       Metric("authorFullName",           "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor)),
       Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor, normalizer = normalize)),
@@ -130,7 +139,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("titleNormalized",          "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor, normalizer = normalize)),
       Metric("abstract",                 "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor)),
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
-      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
+      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from
       Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
       Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
       Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
@@ -162,13 +171,16 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // download the documents and run extraction
     //
 
-    val extractions = {
-      val parser = Resource.using2(
-        Files.newInputStream(publicFile("integrationTestModel.dat", 1)),
-        getClass.getResourceAsStream("/referencesGroundTruth.json")
-      ) { case (modelIs, gazetteerIs) =>
-        new Parser(modelIs, gazetteerIs)
-      }
+    val grobidExtractions = {
+      val grobidExtractionsDirectory = publicDirectory("GrobidExtractions", 1)
+      docIds.par.map { docid =>
+        val grobidExtraction = grobidExtractionsDirectory.resolve(s"$docid.xml")
+        docid -> Success(GrobidParser.parseGrobidXml(grobidExtraction))
+      }.toMap
+    }
+
+    val scienceParseExtractions = {
+      val parser = new Parser()
       val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
       val documentCount = docIds.size
@@ -227,18 +239,25 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // calculate precision and recall for all metrics
     //
 
-    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%10s\t${"RECALL"}%10s""")
-    val prResults = allGoldData.map { case (metric, docid, goldData) =>
-      extractions(docid) match {
-        case Failure(_) => (metric, (0.0, 0.0))
-        case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
-      }
+    def getPR(extractions: GenMap[String, Try[ExtractedMetadata]]) = {
+      val prResults = allGoldData.map { case (metric, docid, goldData) =>
+        extractions(docid) match {
+          case Failure(_) => (metric, (0.0, 0.0))
+          case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
+        }
     }
     prResults.groupBy(_._1).mapValues { prs =>
       val (ps, rs) = prs.map(_._2).unzip
       (ps.sum / ps.size, rs.sum / rs.size)
-    }.toArray.sortBy(_._1.name).foreach { case (metric, (p, r)) =>
-      println(f"${metric.name}%-30s\t$p%10.3f\t$r%10.3f")
+      }.toList.sortBy(_._1.name)
+    }
+
+    val spPR = getPR(scienceParseExtractions)
+    val grobidPR = getPR(grobidExtractions)
+    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%23s${"RECALL"}%23s""")
+    println(f"""${""}%-30s\t${"SP /Grobid/ diff"}%23s${"SP /Grobid/ diff"}%23s""")
+    spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
+      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f/${spP - grobidP}%+.3f$spR%10.3f/$grobidR%.3f/${spR - grobidR}%+.3f")
     }
   }
 }
