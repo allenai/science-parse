@@ -100,7 +100,7 @@ public class PDFDocToPartitionedText {
   
   public static double getFirstPagePartitionBreak(PDFPage pdf) {
     ArrayList<Double> breaks = getBreaks(pdf); 
-    //log.info(breaks.toString());
+//    log.info(breaks.toString());
     int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
     return breaks.get(idx) + 1.00;
   }
@@ -125,7 +125,9 @@ public class PDFDocToPartitionedText {
     PDFLine prevLine = null;
     boolean first = true;
     for(PDFLine l : fp.lines) {
-      if(first) { first=false; //skip the first line (heuristic)
+//      log.info(lineToString(l));
+      if(first) { 
+        first=false; //skip the first line (heuristic)
         continue;
       }
       if (breakSize(l, prevLine) > fpp) {
@@ -149,8 +151,9 @@ public class PDFDocToPartitionedText {
 
 
   private final static Pattern inLineAbstractPattern =
-    Pattern.compile("^abstract(:|\\.| )", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+    Pattern.compile("^abstract ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
 
+  //TODO: consider array...
   private final static Pattern abstractCleaner2 =
     Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
   private final static Pattern abstractCleaner3 =
@@ -159,6 +162,8 @@ public class PDFDocToPartitionedText {
     Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE);
   private final static Pattern abstractCleaner5 =
     Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE);
+  private final static Pattern abstractCleaner6 = 
+      Pattern.compile("^summary ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
 
   public static String getAbstract(List<String> raw, PDFDoc pdf) {
     boolean inAbstract = false;
@@ -190,6 +195,7 @@ public class PDFDocToPartitionedText {
     if(abs.length()==0) {
       //we didn't find an abstract.  Pull out the first paragraph-looking thing.
       abs = getFirstTextBlock(pdf);
+      abs = RegexWithTimeout.matcher(abstractCleaner6, abs).replaceFirst("");
     }
     
     // remove keywords, intro from abstract
