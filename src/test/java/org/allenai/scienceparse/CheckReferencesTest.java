@@ -10,9 +10,8 @@ import java.util.Arrays;
 @Test
 @Slf4j
 public class CheckReferencesTest {
-
   public void smallTest() throws IOException {
-    String jsonFile = ParserTest.filePathOfResource("/referencesGroundTruth.json");
+    String jsonFile = Parser.getDefaultGazetteer().toString();
     CheckReferences cr = new CheckReferences(jsonFile);
     log.info("num hashes: " + cr.getHashSize());
     Assert.assertEquals(cr.getHashSize(), 13579);
@@ -36,7 +35,5 @@ public class CheckReferencesTest {
       Arrays.asList("Captain Bananas",
         "David Newman",
         "Padhraic Smyth"), 2013, "KDD"));
-
   }
-
 }

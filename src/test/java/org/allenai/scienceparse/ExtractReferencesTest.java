@@ -74,13 +74,13 @@ public class ExtractReferencesTest {
     }
     val ext = new PDFExtractor();
     final PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-    final List<String> raw = PDFToCRFInput.getRaw(doc);
-    final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
+    final List<String> raw = PDFDocToPartitionedText.getRaw(doc);
+    final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
     return Tuples.pair(raw, rawReferences);
   }
 
   public void testFindReferencesAndCitations() throws Exception {
-    ExtractReferences er = new ExtractReferences(filePathOfResource("/referencesGroundTruth.json"));
+    ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString());
 
     File paper1 = new File(filePathOfResource("/4230b5328df3f8125da9b84a82d92b46a240.pdf"));
     File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));

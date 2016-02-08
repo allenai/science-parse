@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
+
 import lombok.val;
+import org.allenai.datastore.Datastore;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -37,6 +39,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +51,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -60,6 +64,18 @@ public class Parser {
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
 
+  private static final Datastore datastore = Datastore.apply();
+  public static Path getDefaultProductionModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 1);
+  }
+  public static Path getDefaultGazetteer() {
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
+  }
+
+  public Parser() throws Exception {
+    this(getDefaultProductionModel(), getDefaultGazetteer());
+  }
+
   public Parser(final String modelFile, final String gazetteerFile) throws Exception {
     this(new File(modelFile), new File(gazetteerFile));
   }
@@ -71,7 +87,7 @@ public class Parser {
   public Parser(final File modelFile, final File gazetteerFile) throws Exception {
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
-      final InputStream gazetteerIs = new FileInputStream(gazetteerFile)
+      final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
     ) {
       model = loadModel(modelIs);
       referenceExtractor = new ExtractReferences(gazetteerIs);
@@ -446,7 +462,19 @@ public class Parser {
       opts.minYear = 2008;
       trainParser(null, pgt, args[3], opts, args[6]);
     } else if (args[0].equalsIgnoreCase("parse")) {
-      Parser p = new Parser(args[2], args[4]);
+      final Path modelFile;
+      if(args[2].equals("-"))
+        modelFile = Parser.getDefaultProductionModel();
+      else
+        modelFile = Paths.get(args[2]);
+
+      final Path gazetteerFile;
+      if(args[4].equals("-"))
+        gazetteerFile = Parser.getDefaultGazetteer();
+      else
+        gazetteerFile = Paths.get(args[4]);
+
+      Parser p = new Parser(modelFile, gazetteerFile);
       File input = new File(args[1]);
       File outDir = new File(args[3]);
       final List<File> inFiles;
@@ -469,78 +497,6 @@ public class Parser {
         fis.close();
         //Object to JSON in file
         mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
-      }
-    } else if (args[0].equalsIgnoreCase("metaEval")) {
-      Parser p = new Parser(args[2], args[4]);
-      File inDir = new File(args[1]);
-      File outDir = new File(args[3]);
-      List<File> inFiles = Arrays.asList(inDir.listFiles());
-      ObjectMapper mapper = new ObjectMapper();
-
-      final ExecutorService e =
-        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-      try (
-        final PrintWriter authorFullNameExact = new PrintWriter(new File(outDir, "authorFullNameExact.tsv"), "UTF-8");
-        final PrintWriter titleExact = new PrintWriter(new File(outDir, "titleExact.tsv"), "UTF-8")
-      ) {
-        final long start = System.currentTimeMillis();
-        val paperCount = new AtomicInteger();
-        val papersSucceeded = new AtomicInteger();
-
-        for (File f : inFiles) {
-          if (!f.getName().endsWith(".pdf"))
-            continue;
-
-          e.execute(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                paperCount.incrementAndGet();
-                val fis = new FileInputStream(f);
-                ExtractedMetadata em = null;
-                try {
-                  em = p.doParse(fis, MAXHEADERWORDS);
-                } catch (final Exception e) {
-                  logExceptionShort(e, "Parse error", f.getName());
-                  return;
-                }
-                fis.close();
-
-                final String paperId =
-                  f.getName().substring(0, f.getName().length() - 4);
-
-                synchronized (authorFullNameExact) {
-                  authorFullNameExact.write(paperId);
-                  for (String author : em.authors) {
-                    authorFullNameExact.write('\t');
-                    authorFullNameExact.write(author);
-                  }
-                  authorFullNameExact.write('\n');
-                }
-
-                synchronized (titleExact) {
-                  titleExact.write(paperId);
-                  titleExact.write('\t');
-                  if (em.getTitle() != null)
-                    titleExact.write(em.getTitle());
-                  titleExact.write('\n');
-                }
-
-                papersSucceeded.incrementAndGet();
-              } catch (final IOException e) {
-                logExceptionShort(e, "IO error", f.getName());
-              }
-            }
-          });
-        }
-
-        e.shutdown();
-        e.awaitTermination(60, TimeUnit.HOURS);
-
-        final long end = System.currentTimeMillis();
-        System.out.println(String.format("Processed %d papers in %d milliseconds.", paperCount.get(), end - start));
-        System.out.println(String.format("%d ms per paper", (end - start) / paperCount.get()));
-        System.out.println(String.format("%d failures (%f%%)", (paperCount.get() - papersSucceeded.get()), 100.0f * (paperCount.get() - papersSucceeded.get()) / paperCount.get()));
       }
     } else if (args[0].equalsIgnoreCase("parseAndScore")) {
       Parser p = new Parser(args[2], args[4]);
@@ -587,7 +543,7 @@ public class Parser {
           int tempTP = scoreAuthors(authExpected, authGuessed);
           double prec = ((double) tempTP) / ((double) authGuessed.size() + 0.000000001);
           double rec = ((double) tempTP) / ((double) authExpected.length);
-          if (em.source.equals("CRF")) {
+          if (em.source == ExtractedMetadata.Source.CRF) {
             crfPrecision += prec;
             crfRecall += rec;
             crfTotal += 1.0;
@@ -602,12 +558,12 @@ public class Parser {
             logger.info(f.getName());
           }
           if (procExpected.equals(procGuessed))
-            if (em.source.equals("CRF"))
+            if (em.source == ExtractedMetadata.Source.CRF)
               crfTruePos++;
             else
               metaTruePos++;
           else {
-            if (em.source.equals("CRF"))
+            if (em.source == ExtractedMetadata.Source.CRF)
               crfFalsePos++;
             else
               metaFalsePos++;
@@ -643,6 +599,7 @@ public class Parser {
       ObjectMapper mapper = new ObjectMapper();
       int totalRefs = 0;
       int totalCites = 0;
+      int blankAbstracts = 0;
       for (File f : inFiles) {
         if (!f.getName().endsWith(".pdf"))
           continue;
@@ -651,6 +608,13 @@ public class Parser {
         try {
           logger.info(f.getName());
           em = p.doParse(fis, MAXHEADERWORDS);
+          if(em.abstractText == null || em.abstractText.length() == 0) {
+            logger.info("abstract blank!");
+            blankAbstracts++;
+          }
+          else {
+            logger.info("abstract: " + em.abstractText);
+          }
           final List<BibRecord> br = em.references;
           final List<CitationRecord> cr = em.referenceMentions;
           if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
@@ -677,6 +641,7 @@ public class Parser {
       logger.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");
       logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
+      logger.info("blank abstracts: " + blankAbstracts);
     }
   }
 
@@ -702,56 +667,39 @@ public class Parser {
   }
 
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
-    final PDDocument pdDoc = PDDocument.load(is);
-
-    final String abstractText;
-    { // Get abstract from figure extraction.
-      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
-      if (doc.abstractText().isDefined()) {
-        final String stripPrefix = "abstract";
-        final String result = doc.abstractText().get().text().trim();
-        if(result.substring(0, stripPrefix.length()).toLowerCase().equals(stripPrefix))
-          abstractText = result.substring(stripPrefix.length()).trim();
-        else
-          abstractText = result;
-      } else {
-        abstractText = null;
-      }
-    }
-
     final ExtractedMetadata em;
-    {
-      // extract everything but references
-      PDFExtractor ext = new PDFExtractor();
-      PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
-      seq = seq.subList(0, Math.min(seq.size(), headerMax));
-      seq = PDFToCRFInput.padSequence(seq);
 
-      if (doc.meta == null || doc.meta.title == null) { //use the model
-        List<String> outSeq = model.bestGuess(seq);
-        //the output tag sequence will not include the start/stop states!
-        outSeq = PDFToCRFInput.padTagSequence(outSeq);
-        em = new ExtractedMetadata(seq, outSeq);
-        em.source = "CRF";
-      } else {
-        em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-        em.source = "META";
-      }
-      if (doc.meta.createDate != null)
-        em.setYearFromDate(doc.meta.createDate);
-      clean(em);
-      em.raw = PDFToCRFInput.getRaw(doc);
+    // extract everything but references
+    PDFExtractor ext = new PDFExtractor();
+    PDFDoc doc = ext.extractFromInputStream(is);
+    List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+    seq = seq.subList(0, Math.min(seq.size(), headerMax));
+    seq = PDFToCRFInput.padSequence(seq);
 
-      // extract references
-      final List<String> rawReferences = PDFToCRFInput.getRawReferences(doc);
-      final Pair<List<BibRecord>, List<CitationRecord>> pair =
-        getReferences(em.raw, rawReferences, referenceExtractor);
-      em.references = pair.getOne();
-      em.referenceMentions = pair.getTwo();
+    if (doc.meta == null || doc.meta.title == null) { //use the model
+      List<String> outSeq = model.bestGuess(seq);
+      //the output tag sequence will not include the start/stop states!
+      outSeq = PDFToCRFInput.padTagSequence(outSeq);
+      em = new ExtractedMetadata(seq, outSeq);
+      em.source = ExtractedMetadata.Source.CRF;
+    } else {
+      em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+      em.source = ExtractedMetadata.Source.META;
     }
+    if (doc.meta.createDate != null)
+      em.setYearFromDate(doc.meta.createDate);
+    clean(em);
+    em.raw = PDFDocToPartitionedText.getRaw(doc);
+    em.creator = doc.meta.creator;
+      
+    // extract references
+    final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+    final Pair<List<BibRecord>, List<CitationRecord>> pair =
+      getReferences(em.raw, rawReferences, referenceExtractor);
+    em.references = pair.getOne();
+    em.referenceMentions = pair.getTwo();
 
-    em.abstractText = abstractText;
+    em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
 
     return em;
   }

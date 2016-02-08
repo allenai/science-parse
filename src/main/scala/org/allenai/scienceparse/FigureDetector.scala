@@ -98,7 +98,7 @@ object FigureDetector {
     * @param proposalRegion to split
     * @param content bounding regions of the content of the page
     * @return None if no split was found, else
-    *         Some((upperRegion, lowerRegion, seperatingWhitespace))
+    *        Some((upperRegion, lowerRegion, seperatingWhitespace))
     */
   private def splitRegionHorizontally(
     proposalRegion: Box,
