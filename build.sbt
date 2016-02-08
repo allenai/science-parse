@@ -30,6 +30,8 @@ pomIncludeRepository := { _ => false }
 
 resolvers += Resolver.bintrayRepo("allenai", "maven")
 
+publishTo := Some(Resolver.bintrayRepo("allenai", "maven"))
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
