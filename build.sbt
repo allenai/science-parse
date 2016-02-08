@@ -28,9 +28,7 @@ publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
 
-resolvers += Resolver.bintrayRepo("allenai", "maven")
-
-publishTo := Some(Resolver.bintrayRepo("allenai", "maven"))
+enablePlugins(LibraryPlugin)
 
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
