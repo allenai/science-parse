@@ -1,4 +1,4 @@
-lazy val ai2PluginsVersion = "1.0.1"
+lazy val ai2PluginsVersion = "1.1.1"
 
 addSbtPlugin("org.allenai.plugins" % "allenai-sbt-plugins" % ai2PluginsVersion)
 
