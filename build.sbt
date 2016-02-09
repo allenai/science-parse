@@ -14,7 +14,17 @@ mainClass in assembly := Some("org.allenai.scienceparse.FigureExtractorBatchCli"
 
 bintrayPackage := s"${organization.value}:${name.value}_${scalaBinaryVersion.value}"
 
-resolvers += Resolver.bintrayRepo("allenai", "maven")
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+
+homepage := Some(url("https://github.com/allenai/science-parse"))
+
+scmInfo := Some(ScmInfo(
+  url("https://github.com/allenai/science-parse"),
+  "https://github.com/allenai/science-parse.git"))
+
+bintrayRepository := "private"
+
+enablePlugins(LibraryPlugin)
 
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
