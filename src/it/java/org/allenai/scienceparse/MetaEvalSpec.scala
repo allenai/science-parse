@@ -123,6 +123,11 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.year.toString).toList
 
+    def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.asScala.map { r =>
+      val context = r.context
+      s"$context|${context.substring(r.startOffset, r.endOffset)}"
+    }.toList
+
     case class Metric(
       name: String,
       goldFile: String,
@@ -148,7 +153,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor, normalizer = normalize)),
       Metric("bibVenues",                "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor)),
       Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
-      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0")))
+      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
+      Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
+      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = normalize))
     )
 
 

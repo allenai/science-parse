@@ -61,6 +61,7 @@ object GrobidParser {
     val em = new ExtractedMetadata(extractTitle(doc), doc.select("teiHeader>fileDesc>sourceDesc>biblStruct>analytic>author").asScala.map(author).asJava, calendar.getTime)
     em.year = year
     em.references = extractBibEntriesWithId(doc).asJava
+    em.referenceMentions = List[CitationRecord]().asJava
     em.abstractText = doc.select("teiHeader>profileDesc>abstract").asScala.headOption.map(_.text).getOrElse("")
     em
   }
