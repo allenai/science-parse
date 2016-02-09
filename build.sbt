@@ -22,11 +22,7 @@ scmInfo := Some(ScmInfo(
   url("https://github.com/allenai/science-parse"),
   "https://github.com/allenai/science-parse.git"))
 
-publishMavenStyle := true
-
-publishArtifact in Test := false
-
-pomIncludeRepository := { _ => false }
+bintrayRepository := "private"
 
 enablePlugins(LibraryPlugin)
 
