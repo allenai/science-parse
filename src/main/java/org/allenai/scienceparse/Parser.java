@@ -49,6 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -762,7 +763,20 @@ public class Parser {
       final Pair<List<BibRecord>, List<CitationRecord>> pair =
         getReferences(em.raw, rawReferences, referenceExtractor);
       em.references = pair.getOne();
-      em.referenceMentions = pair.getTwo();
+      List<CitationRecord> crs = new ArrayList<>();
+      for (CitationRecord cr: pair.getTwo()) {
+        int sentenceStart = cr.context.substring(0, cr.startOffset).lastIndexOf('.') + 1;
+        int crSentenceEnd = cr.endOffset + cr.context.substring(cr.endOffset).indexOf('.') + 1;
+        if (crSentenceEnd == cr.endOffset) {
+          crSentenceEnd = cr.context.length();
+        }
+        String contextSentenceUntrimmed = cr.context.substring(sentenceStart, crSentenceEnd);
+        String contextSentence = contextSentenceUntrimmed.trim();
+        sentenceStart += contextSentenceUntrimmed.indexOf(contextSentence);
+        crs.add(new CitationRecord(cr.referenceID, contextSentence, cr.startOffset - sentenceStart,
+                cr.endOffset - sentenceStart));
+      }
+      em.referenceMentions = crs;
     }
 
     em.abstractText = abstractText;
