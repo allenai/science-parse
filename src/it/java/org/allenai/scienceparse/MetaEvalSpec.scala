@@ -125,7 +125,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.asScala.map { r =>
       val context = r.context
-      s"$context|${context.substring(r.startOffset, r.endOffset)}"
+      s"$context|${context.substring(r.startOffset, r.endOffset).replaceAll("[()]", "")}"
     }.toList
 
     case class Metric(

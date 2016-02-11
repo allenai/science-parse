@@ -14,7 +14,7 @@ with open('mentions-filled.tsv') as mentions, open('mentions.tsv', 'w') as gold_
 		cleaned_context = re.sub(r'\s+', ' ', context.strip())
 		if not cleaned_context:
 			continue
-		gold[paper].append("{0}|{1}".format(cleaned_context, mention))
+		gold[paper].append("{0}|{1}".format(cleaned_context, re.sub(r'[()]', '', mention)))
 	for paper, bib_entries in gold.iteritems():
 		if len(bib_entries) > 0:
 			gold_writer.writerow([paper] + bib_entries)

@@ -715,6 +715,19 @@ public class Parser {
     return doParse(is, MAXHEADERWORDS);
   }
 
+  public static CitationRecord getNaiveCitationRecord(int referenceID, String context, int begin, int end) {
+    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1;
+    int crSentenceEnd = end + context.substring(end).indexOf('.') + 1;
+    if (crSentenceEnd == end) {
+      crSentenceEnd = context.length();
+    }
+    String contextSentenceUntrimmed = context.substring(sentenceStart, crSentenceEnd);
+    String contextSentence = contextSentenceUntrimmed.trim();
+    sentenceStart += contextSentenceUntrimmed.indexOf(contextSentence);
+    return new CitationRecord(referenceID, contextSentence, begin - sentenceStart,
+            end - sentenceStart);
+  }
+
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final PDDocument pdDoc = PDDocument.load(is);
 
@@ -765,16 +778,7 @@ public class Parser {
       em.references = pair.getOne();
       List<CitationRecord> crs = new ArrayList<>();
       for (CitationRecord cr: pair.getTwo()) {
-        int sentenceStart = cr.context.substring(0, cr.startOffset).lastIndexOf('.') + 1;
-        int crSentenceEnd = cr.endOffset + cr.context.substring(cr.endOffset).indexOf('.') + 1;
-        if (crSentenceEnd == cr.endOffset) {
-          crSentenceEnd = cr.context.length();
-        }
-        String contextSentenceUntrimmed = cr.context.substring(sentenceStart, crSentenceEnd);
-        String contextSentence = contextSentenceUntrimmed.trim();
-        sentenceStart += contextSentenceUntrimmed.indexOf(contextSentence);
-        crs.add(new CitationRecord(cr.referenceID, contextSentence, cr.startOffset - sentenceStart,
-                cr.endOffset - sentenceStart));
+        crs.add(getNaiveCitationRecord(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
       }
       em.referenceMentions = crs;
     }
