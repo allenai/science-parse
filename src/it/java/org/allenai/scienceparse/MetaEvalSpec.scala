@@ -39,6 +39,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       bibRecord.year
       )
 
+    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z]", "")
+
     def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
       if (goldData.isEmpty) {
         (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
@@ -155,7 +157,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
       Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
       Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
-      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = normalize))
+      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = strictNormalize))
     )
 
 
