@@ -268,10 +268,13 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     val spPR = getPR(scienceParseExtractions)
     val grobidPR = getPR(grobidExtractions)
-    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%23s${"RECALL"}%23s""")
-    println(f"""${""}%-30s\t${"SP /Grobid/ diff"}%23s${"SP /Grobid/ diff"}%23s""")
+    println(f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%27s${"RECALL"}%27s""")
+    println(f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s""")
+    println("-----------------------------------------+--------+-----------------+--------+------")
     spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
-      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f/${spP - grobidP}%+.3f$spR%10.3f/$grobidR%.3f/${spR - grobidR}%+.3f")
+      val pDiff = (spP - grobidP) * 100 / grobidP
+      val rDiff = (spR - grobidR) * 100 / grobidR
+      println(f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+4.0f%%$spR%10.3f | $grobidR%6.3f | $rDiff%+4.0f%%")
     }
   }
 }
