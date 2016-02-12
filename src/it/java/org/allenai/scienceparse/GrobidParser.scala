@@ -76,8 +76,6 @@ object GrobidParser {
     (div, bodyPlusHeaderText, bodyTextOffset, section)
   }
 
-  case class Mention(sentence: String, begin: Int, end: Int)
-
   def extractReferenceMentions(doc: Element): List[CitationRecord] = {
     val sectionInfo = doc.select("text>div").asScala.map(extractSectionInfo)
     val bibMentions =
