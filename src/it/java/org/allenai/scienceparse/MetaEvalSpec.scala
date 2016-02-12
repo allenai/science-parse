@@ -151,7 +151,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("titleNormalized",          "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor, normalizer = normalize)),
       Metric("abstract",                 "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor)),
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
-      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from
+      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
       Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
       Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
       Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
