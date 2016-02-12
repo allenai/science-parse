@@ -18,7 +18,6 @@ import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
-import org.allenai.pdfbox.pdmodel.PDDocument;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -47,11 +45,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -666,7 +659,12 @@ public class Parser {
     return doParse(is, MAXHEADERWORDS);
   }
 
-  public static CitationRecord getNaiveCitationRecord(int referenceID, String context, int begin, int end) {
+  /**
+   * Given a body of text (e.g. an entire section of a paper) within which a citation is mentioned, extracts a
+   * single-sentence context from that larger body of text. Used both here for Science Parse extraction and in
+   * GrobidParser for evaluation of Grobid citation mention extraction.
+   */
+  public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
     int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1;
     int crSentenceEnd = end + context.substring(end).indexOf('.') + 1;
     if (crSentenceEnd == end) {
@@ -711,7 +709,7 @@ public class Parser {
     em.references = pair.getOne();
     List<CitationRecord> crs = new ArrayList<>();
     for (CitationRecord cr: pair.getTwo()) {
-      crs.add(getNaiveCitationRecord(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+      crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
     }
     em.referenceMentions = crs;
 

@@ -89,7 +89,7 @@ object GrobidParser {
         val id = ref.attr("target").dropWhile(_ == '#')
         val begin = ref.textOffset(div) - offset
         val end = begin + ref.text.length
-        Parser.getNaiveCitationRecord(0, fullText, begin, end)
+        Parser.extractContext(0, fullText, begin, end)
       }
     bibMentions.toList
   }
