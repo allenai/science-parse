@@ -1,13 +1,18 @@
-#!/usr/bin/python
-#
-# This script converts bibliography data into an empty TSV file for annotators to fill in with citation mention data
+#!/usr/local/bin/python3
 
 import csv
+import argparse
 
+parser = argparse.ArgumentParser(description='Convert bibliography data into an empty TSV file for annotators to fill '
+											 'in with citation mention data')
 # bibliographies.tsv is the file inside this very directory containing high quality human-annotated bibliography data
 # Note that bibliographies.tsv itself is generated from the scholar project:
 #  scholar-project/pipeline/src/main/resources/ground-truths/bibliographies.json
-with open('bibliographies.tsv') as bibs, open('mentions-blank.tsv', 'w') as mentions:
+parser.add_argument('-i', metavar='INPUT.TSV', default='bibliographies.tsv', help='Filename for bibliography TSV data')
+parser.add_argument('-o', metavar='OUTPUT.TSV', default='mentions-blank.tsv', help='Filename for empty TSV')
+args = parser.parse_args()
+
+with open(args.i) as bibs, open(args.o, 'w') as mentions:
 	bibs = csv.reader(bibs, delimiter='\t')
 	mentions = csv.writer(mentions, delimiter='\t')
 	mentions.writerow(["Paper ID", "URL", "Bib Entry", "Context", "Context Reference"])
