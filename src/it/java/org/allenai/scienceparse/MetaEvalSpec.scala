@@ -39,7 +39,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       bibRecord.year
       )
 
-    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-6]", "")
+    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
 
     // Strip everything except for text and numbers out so that minor differences in whitespace/mathematical equations
     // won't affect results much
