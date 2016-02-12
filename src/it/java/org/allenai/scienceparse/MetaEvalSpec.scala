@@ -39,7 +39,11 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       bibRecord.year
       )
 
-    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z]", "")
+    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-6]", "")
+
+    // Strip everything except for text and numbers out so that minor differences in whitespace/mathematical equations
+    // won't affect results much
+    def mentionNormalize(s: String) = s.split("\\|").map(strictNormalize).mkString("|")
 
     def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
       if (goldData.isEmpty) {
@@ -127,7 +131,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.asScala.map { r =>
       val context = r.context
-      s"$context|${context.substring(r.startOffset, r.endOffset).replaceAll("[()]", "")}"
+      val mention = context.substring(r.startOffset, r.endOffset).replaceAll("[()]", "")
+      s"$context|$mention"
     }.toList
 
     case class Metric(
@@ -157,7 +162,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
       Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
       Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
-      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = strictNormalize))
+      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))
     )
 
 
