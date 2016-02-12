@@ -268,13 +268,16 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     val spPR = getPR(scienceParseExtractions)
     val grobidPR = getPR(grobidExtractions)
-    println(f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%27s${"RECALL"}%27s""")
-    println(f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s""")
-    println("-----------------------------------------+--------+-----------------+--------+------")
+    // buffer output so that console formatting doesn't get messed up
+    val output = scala.collection.mutable.ArrayBuffer.empty[String]
+    output += f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%27s${"RECALL"}%27s"""
+    output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s"""
+    output += "-----------------------------------------+--------+-----------------+--------+------"
     spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
       val pDiff = (spP - grobidP) * 100 / grobidP
       val rDiff = (spR - grobidR) * 100 / grobidR
-      println(f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+4.0f%%$spR%10.3f | $grobidR%6.3f | $rDiff%+4.0f%%")
+      output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+4.0f%%$spR%10.3f | $grobidR%6.3f | $rDiff%+4.0f%%"
     }
+    println(output.mkString("\n"))
   }
 }
