@@ -1,23 +1,16 @@
 package org.allenai.scienceparse
 
-import java.time.LocalDate
-import java.util.{Calendar, Date}
-
-import org.allenai.common.{StringUtils, Logging, Resource}
-import org.allenai.common.testkit.UnitSpec
 import org.allenai.common.StringUtils._
-import org.allenai.scienceparse.GrobidParser.JsoupElementsImplicits
+import org.allenai.common.testkit.UnitSpec
+import org.allenai.common.{Logging, Resource}
 import org.allenai.datastore.Datastores
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.{ TextNode, Element }
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.GenMap
-import scala.collection.parallel.ParMap
-import scala.io.{Codec, Source}
-import scala.util.{Success, Failure, Try}
 import scala.collection.JavaConverters._
+import scala.io.{Codec, Source}
+import scala.util.{Failure, Success, Try}
 
 class MetaEvalSpec extends UnitSpec with Datastores with Logging {
   "MetaEval" should "produce good P/R numbers" in {
