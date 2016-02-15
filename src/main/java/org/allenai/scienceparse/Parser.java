@@ -146,8 +146,14 @@ public class Parser {
     return getPaperLabels(pdf, p, ext, heuristicHeader, headerMax, false);
   }
 
-  public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
-                                                              int headerMax, boolean checkAuthors) throws IOException {
+  public static List<Pair<PaperToken, String>> getPaperLabels(
+          File pdf,
+          Paper p,
+          PDFExtractor ext,
+          boolean heuristicHeader,
+          int headerMax,
+          boolean checkAuthors
+  ) throws IOException {
 
     PDFDoc doc = null;
     try {
@@ -240,9 +246,13 @@ public class Parser {
   }
 
   //borrowing heavily from conll.Trainer
-  public static void trainParser(List<File> files, ParserGroundTruth pgt, String paperDir, ParseOpts opts,
-                                 String excludeIDsFile)
-    throws IOException {
+  public static void trainParser(
+          List<File> files,
+          ParserGroundTruth pgt,
+          String paperDir,
+          ParseOpts opts,
+          String excludeIDsFile
+  ) throws IOException {
     UnifiedSet<String> excludeIDs = new UnifiedSet<String>();
     if (excludeIDsFile != null)
       excludeIDs = readSet(excludeIDsFile);
