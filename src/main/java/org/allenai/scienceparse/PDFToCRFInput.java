@@ -241,16 +241,23 @@ public class PDFToCRFInput {
    * @param labelStem
    * @return True if target was found in seq, false otherwise
    */
-  public static boolean findAndLabelWith(List<PaperToken> seq, List<Pair<PaperToken, String>> seqLabeled,
-                                         String target, String labelStem, boolean isAuthor) {
+  public static boolean findAndLabelWith(
+          final String paperId,
+          final List<PaperToken> seq,
+          final List<Pair<PaperToken, String>> seqLabeled,
+          final String target,
+          final String labelStem,
+          final boolean isAuthor
+  ) {
     Pair<Integer, Integer> loc = null;
     if (isAuthor)
       loc = findAuthor(asStringList(seq), target);
     else
       loc = findString(asStringList(seq), target);
-    if (loc == null)
+    if (loc == null) {
+      log.warn("{}: could not find {} string {} in paper.", paperId, labelStem, target);
       return false;
-    else {
+    } else {
       if (loc.getOne() == loc.getTwo() - 1) {
         Pair<PaperToken, String> t = seqLabeled.get(loc.getOne());
         seqLabeled.set(loc.getOne(), Tuples.pair(t.getOne(), "W_" + labelStem));
@@ -263,7 +270,6 @@ public class PDFToCRFInput {
       }
       return true;
     }
-
   }
 
   /**
@@ -277,13 +283,17 @@ public class PDFToCRFInput {
    * @param truth
    * @return
    */
-  public static List<Pair<PaperToken, String>> labelMetadata(List<PaperToken> toks, ExtractedMetadata truth) {
+  public static List<Pair<PaperToken, String>> labelMetadata(
+          final String paperId,
+          final List<PaperToken> toks,
+          final ExtractedMetadata truth
+  ) {
     val outTmp = new ArrayList<Pair<PaperToken, String>>();
     for (PaperToken t : toks) {
       outTmp.add(Tuples.pair(t, "O"));
     }
-    truth.authors.forEach((String s) -> findAndLabelWith(toks, outTmp, s, ExtractedMetadata.authorTag, true));
-    if (!findAndLabelWith(toks, outTmp, truth.title, ExtractedMetadata.titleTag, false)) //must have title to be valid
+    truth.authors.forEach((String s) -> findAndLabelWith(paperId, toks, outTmp, s, ExtractedMetadata.authorTag, true));
+    if (!findAndLabelWith(paperId, toks, outTmp, truth.title, ExtractedMetadata.titleTag, false)) //must have title to be valid
       return null;
     val out = new ArrayList<Pair<PaperToken, String>>();
     out.add(Tuples.pair(PaperToken.generateStartStopToken(), "<S>"));
