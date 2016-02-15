@@ -1,5 +1,6 @@
 package org.allenai.scienceparse
 
+import java.io.{File, PrintWriter}
 import java.time.LocalDate
 import java.util.{Calendar, Date}
 
@@ -24,6 +25,15 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     val maxDocumentCount = 1000 // set this to something low for testing, set it high before committing
     val evaluateGrobid = true // get numbers for Grobid instead
 
+    val errorWriter = new PrintWriter(new File("MetaEvalErrors.tsv" ))
+    errorWriter.println("Metric\tError type\tPaper ID\tItem")
+
+    // Information about what we're evaluating
+    case class EvaluationInfo(metric: Metric, paperId: String) {
+      def error[T](errorType: String, item: T) = errorWriter.println(s"${metric.name}\t$errorType\t$paperId\t$item")
+      def errors[T](errorType: String, items: Set[T]) = items.foreach(error(errorType, _))
+    }
+
     //
     // define metrics
     //
@@ -39,12 +49,20 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       bibRecord.year
       )
 
-    def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
+    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
+
+    // Strip everything except for text and numbers out so that minor differences in whitespace/mathematical equations
+    // won't affect results much
+    def mentionNormalize(s: String) = s.split("\\|").map(strictNormalize).mkString("|")
+
+    def calculatePR[T](eval: EvaluationInfo, goldData: Set[T], extractedData: Set[T]) = {
       if (goldData.isEmpty) {
         (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
       } else if (extractedData.isEmpty) {
         (0.0, 0.0)
       } else {
+        eval.errors("recall",    goldData.diff(extractedData))
+        eval.errors("precision", extractedData.diff(goldData))
         val precision = extractedData.count(goldData.contains).toDouble / extractedData.size
         val recall = goldData.count(extractedData.contains).toDouble / goldData.size
         (precision, recall)
@@ -52,7 +70,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     }
 
     /** Just count the number of bib entries we're getting */
-    def bibCounter(goldData: Set[BibRecord], extractedData: Set[BibRecord]) =
+    def bibCounter(eval: EvaluationInfo, goldData: Set[BibRecord], extractedData: Set[BibRecord]) =
       (1.0, extractedData.size.toDouble / goldData.size) // since we're not doing matching, just assume 100% precision
 
     /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get three, that’s prec=1.0
@@ -76,18 +94,18 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       */
     def stringEvaluator(extract: ExtractedMetadata => List[String], extractGold: List[String] => List[String] = identity,
                         normalizer: String => String = identity, disallow: Set[String] = Set(""),
-                        prCalculator: (Set[String], Set[String]) => (Double, Double) = calculatePR) =
-      (metadata: ExtractedMetadata, gold: List[String]) => {
+                        prCalculator: (EvaluationInfo, Set[String], Set[String]) => (Double, Double) = calculatePR) =
+      (eval: EvaluationInfo, metadata: ExtractedMetadata, gold: List[String]) => {
         // function to clean up both gold and extracted data before we pass it in
         val clean = (x: List[String]) => multiSet(x.map(normalizer).filter(!disallow.contains(_)))
-        prCalculator(clean(extractGold(gold)), clean(extract(metadata)))
+        prCalculator(eval, clean(extractGold(gold)), clean(extract(metadata)))
       }
 
     def genericEvaluator[T](extract: ExtractedMetadata => List[T], extractGold: List[String] => List[T],
                                 normalizer: T => T,
-                                prCalculator: (Set[T], Set[T]) => (Double, Double)) =
-      (metadata: ExtractedMetadata, gold: List[String]) => {
-        prCalculator(extractGold(gold).map(normalizer).toSet, extract(metadata).map(normalizer).toSet)
+                                prCalculator: (EvaluationInfo, Set[T], Set[T]) => (Double, Double)) =
+      (eval: EvaluationInfo, metadata: ExtractedMetadata, gold: List[String]) => {
+        prCalculator(eval, extractGold(gold).map(normalizer).toSet, extract(metadata).map(normalizer).toSet)
       }
 
     def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.asScala.toList
@@ -123,11 +141,17 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.year.toString).toList
 
+    def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.asScala.map { r =>
+      val context = r.context
+      val mention = context.substring(r.startOffset, r.endOffset).replaceAll("[()]", "")
+      s"$context|$mention"
+    }.toList
+
     case class Metric(
       name: String,
       goldFile: String,
       // get P/R values for each individual paper. values will be averaged later across all papers
-      evaluator: (ExtractedMetadata, List[String]) => (Double, Double))
+      evaluator: (EvaluationInfo, ExtractedMetadata, List[String]) => (Double, Double))
     // to get a new version of Isaac's gold data into this format, run src/it/resources/golddata/isaac/import_bib_gold.py
     // inside the right scholar directory
     val metrics = Seq(
@@ -139,7 +163,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("titleNormalized",          "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor, normalizer = normalize)),
       Metric("abstract",                 "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor)),
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
-      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from
+      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
       Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
       Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
       Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
@@ -148,9 +172,10 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor, normalizer = normalize)),
       Metric("bibVenues",                "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor)),
       Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
-      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0")))
+      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
+      Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
+      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))
     )
-
 
     //
     // read gold data
@@ -240,10 +265,11 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     //
 
     def getPR(extractions: GenMap[String, Try[ExtractedMetadata]]) = {
-      val prResults = allGoldData.map { case (metric, docid, goldData) =>
-        extractions(docid) match {
+      val prResults = allGoldData.map { case (metric, docId, goldData) =>
+        extractions(docId) match {
           case Failure(_) => (metric, (0.0, 0.0))
-          case Success(extractedMetadata) => (metric, metric.evaluator(extractedMetadata, goldData))
+          case Success(extractedMetadata) =>
+            (metric, metric.evaluator(EvaluationInfo(metric, docId), extractedMetadata, goldData))
         }
     }
     prResults.groupBy(_._1).mapValues { prs =>
@@ -254,10 +280,18 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     val spPR = getPR(scienceParseExtractions)
     val grobidPR = getPR(grobidExtractions)
-    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%23s${"RECALL"}%23s""")
-    println(f"""${""}%-30s\t${"SP /Grobid/ diff"}%23s${"SP /Grobid/ diff"}%23s""")
+    // buffer output so that console formatting doesn't get messed up
+    val output = scala.collection.mutable.ArrayBuffer.empty[String]
+    output += f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%27s${"RECALL"}%27s"""
+    output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s"""
+    output += "-----------------------------------------+--------+-----------------+--------+------"
     spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
-      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f/${spP - grobidP}%+.3f$spR%10.3f/$grobidR%.3f/${spR - grobidR}%+.3f")
+      val pDiff = (spP - grobidP) * 100 / grobidP
+      val rDiff = (spR - grobidR) * 100 / grobidR
+      output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+4.0f%%$spR%10.3f | $grobidR%6.3f | $rDiff%+4.0f%%"
     }
+    println(output.mkString("\n"))
+
+    errorWriter.close()
   }
 }
