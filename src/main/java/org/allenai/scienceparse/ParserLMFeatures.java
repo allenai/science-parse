@@ -33,10 +33,14 @@ public class ParserLMFeatures implements Serializable {
   }
 
   //paperDirectory must contain pdf docs to use as background language model
-  public ParserLMFeatures(List<Paper> ps, UnifiedSet<String> idsToExclude, int stIdx, int endIdx, File paperDirectory, int approxNumBackgroundDocs) throws IOException {
+  public ParserLMFeatures(
+          List<Paper> ps,
+          UnifiedSet<String> idsToExclude,
+          File paperDirectory,
+          int approxNumBackgroundDocs
+  ) throws IOException {
     log.info("excluding " + idsToExclude.size() + " paper ids from lm features.");
-    for (int i = stIdx; i < endIdx; i++) {
-      Paper p = ps.get(i);
+    for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
         fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
         for (String a : p.authors)
@@ -61,8 +65,13 @@ public class ParserLMFeatures implements Serializable {
     log.info("Gazetteer loaded with " + ct + " tokens.");
   }
 
-  public int fillBow(ObjectDoubleHashMap<String> hm, String s, ObjectDoubleHashMap<String> firstHM, ObjectDoubleHashMap<String> lastHM,
-                     boolean doTrim) {
+  public int fillBow(
+          ObjectDoubleHashMap<String> hm,
+          String s,
+          ObjectDoubleHashMap<String> firstHM,
+          ObjectDoubleHashMap<String> lastHM,
+          boolean doTrim
+  ) {
     int ct = 0;
     if (s != null) {
       String[] toks = s.split("( |,)");  //not great
