@@ -153,16 +153,16 @@ public class PDFDocToPartitionedText {
   private final static Pattern inLineAbstractPattern =
     Pattern.compile("^abstract ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
 
-  //TODO: consider array...
-  private final static Pattern abstractCleaner2 =
-    Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
-  private final static Pattern abstractCleaner3 =
-    Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
-  private final static Pattern abstractCleaner4 =
-    Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE);
-  private final static Pattern abstractCleaner5 =
-    Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE);
-  private final static Pattern abstractCleaner6 = 
+  private final static Pattern [] generalAbstractCleaners = new Pattern [] 
+      {
+        Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
+        Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
+        Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE),
+        Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE),
+        Pattern.compile("Contents.*$", Pattern.UNICODE_CASE),
+        Pattern.compile("Index terms\\p{P}.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
+      };
+  private final static Pattern paragraphAbstractCleaner =
       Pattern.compile("^summary ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
 
   public static String getAbstract(List<String> raw, PDFDoc pdf) {
@@ -195,17 +195,14 @@ public class PDFDocToPartitionedText {
     if(abs.length()==0) {
       //we didn't find an abstract.  Pull out the first paragraph-looking thing.
       abs = getFirstTextBlock(pdf);
-      abs = RegexWithTimeout.matcher(abstractCleaner6, abs).replaceFirst("");
+      abs = RegexWithTimeout.matcher(paragraphAbstractCleaner, abs).replaceFirst("");
     }
     
     // remove keywords, intro from abstract
-    abs = RegexWithTimeout.matcher(abstractCleaner2, abs).replaceFirst("");
-    abs = RegexWithTimeout.matcher(abstractCleaner3, abs).replaceFirst("");
-    abs = RegexWithTimeout.matcher(abstractCleaner4, abs).replaceFirst("");
+    for(Pattern p : generalAbstractCleaners) {
+      abs = RegexWithTimeout.matcher(p, abs).replaceFirst("");
+    }
 
-    //copyright statement:
-    abs = RegexWithTimeout.matcher(abstractCleaner5, abs).replaceFirst("");
-    
     abs = abs.replaceAll("- ", "");
     return abs;
   }
