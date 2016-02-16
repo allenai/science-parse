@@ -26,6 +26,13 @@ bintrayRepository := "private"
 
 enablePlugins(LibraryPlugin)
 
+resolvers ++= Seq(
+  "AllenAI ThirdParty" at "http://utility.allenai.org:8081/nexus/content/repositories/thirdparty",
+  "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
+  "AllenAi Bintray Private" at "http://dl.bintray.com/allenai/private",
+  Resolver.jcenterRepo
+)
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
