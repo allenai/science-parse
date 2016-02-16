@@ -102,7 +102,9 @@ public class PDFDocToPartitionedText {
     ArrayList<Double> breaks = getBreaks(pdf); 
 //    log.info(breaks.toString());
     int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
-    return breaks.get(idx) + 1.00;
+    if(breaks.size()==0)
+      return 1.0;
+    return breaks.get(idx) + 0.50;
   }
 
   private static String lineToString(PDFLine l) {
@@ -155,7 +157,9 @@ public class PDFDocToPartitionedText {
 
   private final static Pattern [] generalAbstractCleaners = new Pattern [] 
       {
-        Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
+        Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE),
+        Pattern.compile("KEY ?WORDS(:| |\\.).*$", Pattern.UNICODE_CASE),
+        Pattern.compile("Key ?Words(:| |\\.).*$", Pattern.UNICODE_CASE),
         Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
         Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE),
         Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE),
@@ -189,7 +193,7 @@ public class PDFDocToPartitionedText {
         inAbstract = true;
       }
 //      else if(!inAbstract)
-//        log.info("ignoring " + s.substring(0, Math.min(20, s.length())) + " ...");
+//        log.info("ignoring " + s.substring(0, Math.min(20, s.length())) + "...+" + (s.length() - 20));
     }
     String abs = out.toString().trim();
     if(abs.length()==0) {
