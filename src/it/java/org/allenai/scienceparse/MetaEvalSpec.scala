@@ -36,6 +36,14 @@ object ItemToCompare {
 }
 
 class MetaEvalSpec extends UnitSpec with Datastores with Logging {
+  implicit class BufferToItemToCompareList[T](x: scala.collection.mutable.Buffer[T]) {
+    def toItemList = x.toList.toItemList
+  }
+
+  implicit class ListToItemToCompareList[T](x: List[T]) {
+    def toItemList = x.map(ItemToCompare.create)
+  }
+
   "MetaEval" should "produce good P/R numbers" in {
     val maxDocumentCount = 1000 // set this to something low for testing, set it high before committing
     val evaluateGrobid = true // get numbers for Grobid instead
@@ -129,9 +137,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         prCalculator(eval, extractGold(gold).map(_.map(normalizer)).toSet, extract(metadata).map(_.map(normalizer)).toSet)
       }
 
-    def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.asScala.toList.map(ItemToCompare.create)
+    def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.asScala.toItemList
 
-    def lastNameExtractor(metadata: ExtractedMetadata) = metadata.authors.asScala.map(_.split("\\s+").last).toList.map(ItemToCompare.create)
+    def lastNameExtractor(metadata: ExtractedMetadata) = metadata.authors.asScala.map(_.split("\\s+").last).toItemList
 
     def titleExtractor(metadata: ExtractedMetadata) = (Set(metadata.title) - null).toList.map(ItemToCompare.create)
 
@@ -145,22 +153,22 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def goldAbstractExtractor(abs: List[String]) = List(ItemToCompare(firstNLastWord(abs.head), abs.head))
 
-    def bibExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.toList.map(ItemToCompare.create)
+    def bibExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.toItemList
 
     def goldBibExtractor(refs: List[String]) = refs.map { ref =>
       val Array(title, year, venue, authors) = ref.split("\\|", -1)
       ItemToCompare(new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt), ref)
     }
 
-    def bibAuthorsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.flatMap(_.author.asScala.toList).toList.map(ItemToCompare.create)
+    def bibAuthorsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.flatMap(_.author.asScala.toList).toItemList
 
-    def goldBibAuthorsExtractor(bibAuthors: List[String]) = bibAuthors.flatMap(_.split(":").toList).map(ItemToCompare.create)
+    def goldBibAuthorsExtractor(bibAuthors: List[String]) = bibAuthors.flatMap(_.split(":").toList).toItemList
 
-    def bibTitlesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.title).toList.map(ItemToCompare.create)
+    def bibTitlesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.title).toItemList
 
-    def bibVenuesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.venue).toList.map(ItemToCompare.create)
+    def bibVenuesExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.venue).toItemList
 
-    def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.year.toString).toList.map(ItemToCompare.create)
+    def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.year.toString).toItemList
 
     def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.asScala.map { r =>
       val context = r.context
