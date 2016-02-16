@@ -174,8 +174,10 @@ public class Parser {
     seq = seq.subList(0, Math.min(seq.size(), headerMax));
     ExtractedMetadata em = null;
     if (p == null) { //bootstrap:
-      em = new ExtractedMetadata(doc.getMeta().getTitle(), doc.getMeta().getAuthors(),
-        doc.getMeta().getCreateDate());
+      em = new ExtractedMetadata(
+              doc.getMeta().getTitle(),
+              doc.getMeta().getAuthors(),
+              doc.getMeta().getCreateDate());
       if (em.title == null) {
         logger.info("{}: skipping", paperId);
         return null;
@@ -491,6 +493,7 @@ public class Parser {
       opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
       opts.threads = 4;
       trainParser(inFiles, null, null, opts, null);
+
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
       ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
       ParseOpts opts = new ParseOpts();
@@ -506,6 +509,7 @@ public class Parser {
       opts.checkAuthors = true;
       opts.minYear = 2008;
       trainParser(null, pgt, args[3], opts, args[6]);
+
     } else if (args[0].equalsIgnoreCase("parse")) {
       final Path modelFile;
       if(args[2].equals("-"))
@@ -543,6 +547,7 @@ public class Parser {
         //Object to JSON in file
         mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
       }
+
     } else if (args[0].equalsIgnoreCase("parseAndScore")) {
       Parser p = new Parser(args[2], args[4]);
       File inDir = new File(args[1]);
@@ -633,6 +638,7 @@ public class Parser {
       logger.info("overall author precision: " + (crfPrecision + metaPrecision) / (crfTotal + metaTotal));
       logger.info("overall author recall: " + (crfRecall + metaRecall) / ((double) totalFiles));
       //TODO: write output
+
     } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
       Parser p = new Parser(args[2], args[4]);
       File inDir = new File(args[1]);
