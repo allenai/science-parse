@@ -491,7 +491,7 @@ public class Parser {
       //TODO: use config file
       opts.headerMax = 100;
       opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
-      opts.threads = 4;
+      opts.threads = Runtime.getRuntime().availableProcessors();
       trainParser(inFiles, null, null, opts, null);
 
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
@@ -501,7 +501,7 @@ public class Parser {
       //TODO: use config file
       opts.headerMax = MAXHEADERWORDS;
       opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
-      opts.threads = 4;
+      opts.threads = Runtime.getRuntime().availableProcessors();
       opts.backgroundSamples = 400;
       opts.backgroundDirectory = args[5];
       opts.gazetteerFile = args[2];
