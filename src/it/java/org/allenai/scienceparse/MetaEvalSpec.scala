@@ -53,7 +53,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
   "MetaEval" should "produce good P/R numbers" in {
     val maxDocumentCount = 1000 // set this to something low for testing, set it high before committing
-    val evaluateGrobid = true // get numbers for Grobid instead
 
     val errorWriter = new PrintWriter(new File("MetaEvalErrors.tsv" ))
     errorWriter.println("Metric\tError type\tPaper ID\tItem\tOriginal")
