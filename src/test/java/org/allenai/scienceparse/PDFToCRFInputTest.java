@@ -53,7 +53,7 @@ public class PDFToCRFInputTest {
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
       Arrays.asList("Georgiana Dinu", "Marco Baroni"), new Date(1388556000000L));
-    val labeledData = PDFToCRFInput.labelMetadata(pts, em);
+    val labeledData = PDFToCRFInput.labelMetadata("P14-1059", pts, em);
     log.info(PDFToCRFInput.getLabelString(labeledData));
     log.info(pts.stream().map((PaperToken p) -> p.getPdfToken().token).collect(Collectors.toList()).toString());
     Assert.assertEquals(labeledData.get(24 + 1).getTwo(), "O");
@@ -97,7 +97,7 @@ public class PDFToCRFInputTest {
     List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
       Arrays.asList("Georgiana Dinu", "Marco C. Baroni"), new Date(1388556000000L));
-    val labeledData = PDFToCRFInput.labelMetadata(pts, em);
+    val labeledData = PDFToCRFInput.labelMetadata("P14-1059", pts, em);
     Assert.assertEquals(labeledData.get(36 + 1).getTwo(), "B_A");
     Assert.assertEquals(labeledData.get(37 + 1).getTwo(), "E_A");
     Assert.assertEquals(labeledData.get(39 + 1).getTwo(), "B_A");
