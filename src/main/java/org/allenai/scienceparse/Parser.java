@@ -296,8 +296,15 @@ public class Parser {
     if (files != null) {
       labeledData = bootstrapLabels(files, opts.headerMax, true); //don't exclude for pdf meta bootstrap
     } else {
-      labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.minYear, opts.checkAuthors,
-        excludeIDs);
+      labeledData = labelFromGroundTruth(
+              pgt,
+              paperDir,
+              opts.headerMax,
+              false,
+              pgt.papers.size(),
+              opts.minYear,
+              opts.checkAuthors,
+              excludeIDs);
     }
     ParserLMFeatures plf = null;
     if (opts.gazetteerFile != null) {
