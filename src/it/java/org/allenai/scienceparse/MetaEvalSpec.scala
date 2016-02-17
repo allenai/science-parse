@@ -24,15 +24,15 @@ import scala.collection.JavaConverters._
 /** This class saves the original representation of an item, so that even if said item is mangled into an unrecognizable
   * form for the sake of comparison, its original readable form is still available.
   */
-case class ItemToCompare[T](item: T, original: String) {
+case class ItemWithOriginal[T](item: T, original: String) {
   override def equals(o: Any) = o.equals(item)
   override def hashCode = item.hashCode
-  def map(f: T => T) = ItemToCompare(f(item), original)
+  def map(f: T => T) = ItemWithOriginal(f(item), original)
 }
 
-object ItemToCompare {
-  def create[T](item: T): ItemToCompare[T] = ItemToCompare(item, item.toString) // by default, just save original
-  def toList(items: List[String]) = items.map(ItemToCompare.create)
+object ItemWithOriginal {
+  def create[T](item: T): ItemWithOriginal[T] = ItemWithOriginal(item, item.toString) // by default, just save original
+  def toList(items: List[String]) = items.map(ItemWithOriginal.create)
 }
 
 class MetaEvalSpec extends UnitSpec with Datastores with Logging {
@@ -41,7 +41,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
   }
 
   implicit class ListToItemToCompareList[T](x: List[T]) {
-    def toItems = x.map(ItemToCompare.create)
+    def toItems = x.map(ItemWithOriginal.create)
   }
 
   implicit class UtilListToItemToCompareList[T](x: java.util.List[T]) {
@@ -59,9 +59,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     // Information about what we're evaluating
     case class EvaluationInfo(metric: Metric, paperId: String) {
-      def error[T](errorType: String, i: ItemToCompare[T]) =
+      def error[T](errorType: String, i: ItemWithOriginal[T]) =
         errorWriter.println(s"${metric.name}\t$errorType\t$paperId\t${i.item}\t${i.original}")
-      def errors[T](errorType: String, items: Set[ItemToCompare[T]]) = items.foreach(error(errorType, _))
+      def errors[T](errorType: String, items: Set[ItemWithOriginal[T]]) = items.foreach(error(errorType, _))
     }
 
     //
@@ -85,7 +85,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     // won't affect results much
     def mentionNormalize(s: String) = s.split("\\|").map(strictNormalize).mkString("|")
 
-    def calculatePR[T](eval: EvaluationInfo, goldData: Set[ItemToCompare[T]], extractedData: Set[ItemToCompare[T]]) = {
+    def calculatePR[T](eval: EvaluationInfo, goldData: Set[ItemWithOriginal[T]], extractedData: Set[ItemWithOriginal[T]]) = {
       if (goldData.isEmpty) {
         (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
       } else if (extractedData.isEmpty) {
@@ -100,19 +100,20 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     }
 
     /** Just count the number of bib entries we're getting */
-    def bibCounter(eval: EvaluationInfo, goldData: Set[ItemToCompare[BibRecord]], extractedData: Set[ItemToCompare[BibRecord]]) =
+    def bibCounter(eval: EvaluationInfo, goldData: Set[ItemWithOriginal[BibRecord]], extractedData: Set[ItemWithOriginal[BibRecord]]) =
       (1.0, extractedData.size.toDouble / goldData.size) // since we're not doing matching, just assume 100% precision
 
     /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get three, that’s prec=1.0
       * but rec=0.6. Just add index # to name for simplicity. This is redundant when everything is already unique, so
       * you can basically always apply it
       */
-    def multiSet(refs: List[ItemToCompare[String]]) = refs.groupBy(identity).values.flatMap(_.zipWithIndex.map { case (ref, i) =>
+    def multiSet(refs: List[ItemWithOriginal[String]]) = refs.groupBy(identity).values.flatMap(_.zipWithIndex.map { case (ref, i) =>
       ref.map(_ + i.toString)
     }).toSet
 
     /**
       * This generates an evaluator for string metadata
+ *
       * @param extract Given automatically ExtractedMetadata from a paper, how do we get the field we want to compare
       *                against gold data?
       * @param extractGold Given the set of tab-delimited gold data, how do we get the field we want to compare
@@ -122,13 +123,13 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       * @param prCalculator Function that calculates precision and recall of extraction against gold
       * @return A function that evaluates the quality of extracted metadata, compared to manually labeled gold metadata
       */
-    def stringEvaluator(extract: ExtractedMetadata => List[ItemToCompare[String]],
-                        extractGold: List[String] => List[ItemToCompare[String]] = ItemToCompare.toList,
+    def stringEvaluator(extract: ExtractedMetadata => List[ItemWithOriginal[String]],
+                        extractGold: List[String] => List[ItemWithOriginal[String]] = ItemWithOriginal.toList,
                         normalizer: String => String = identity, disallow: Set[String] = Set(""),
-                        prCalculator: (EvaluationInfo, Set[ItemToCompare[String]], Set[ItemToCompare[String]]) => (Double, Double) = calculatePR) =
+                        prCalculator: (EvaluationInfo, Set[ItemWithOriginal[String]], Set[ItemWithOriginal[String]]) => (Double, Double) = calculatePR) =
       (eval: EvaluationInfo, metadata: ExtractedMetadata, gold: List[String]) => {
         // function to clean up both gold and extracted data before we pass it in
-        val clean = (x: List[ItemToCompare[String]]) => {
+        val clean = (x: List[ItemWithOriginal[String]]) => {
           val normalizedItems = x.map(_.map(normalizer))
           val filteredItems = normalizedItems.filterNot(i => disallow.contains(i.item))
           multiSet(filteredItems)
@@ -136,9 +137,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         prCalculator(eval, clean(extractGold(gold)), clean(extract(metadata)))
       }
 
-    def genericEvaluator[T](extract: ExtractedMetadata => List[ItemToCompare[T]], extractGold: List[String] => List[ItemToCompare[T]],
-                                normalizer: T => T,
-                                prCalculator: (EvaluationInfo, Set[ItemToCompare[T]], Set[ItemToCompare[T]]) => (Double, Double)) =
+    def genericEvaluator[T](extract: ExtractedMetadata => List[ItemWithOriginal[T]], extractGold: List[String] => List[ItemWithOriginal[T]],
+                            normalizer: T => T,
+                            prCalculator: (EvaluationInfo, Set[ItemWithOriginal[T]], Set[ItemWithOriginal[T]]) => (Double, Double)) =
       (eval: EvaluationInfo, metadata: ExtractedMetadata, gold: List[String]) => {
         prCalculator(eval, extractGold(gold).map(_.map(normalizer)).toSet, extract(metadata).map(_.map(normalizer)).toSet)
       }
@@ -156,15 +157,15 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def abstractExtractor(metadata: ExtractedMetadata) =
       if (metadata.abstractText == null) List()
-      else List(ItemToCompare(firstNLastWord(metadata.abstractText), metadata.abstractText))
+      else List(ItemWithOriginal(firstNLastWord(metadata.abstractText), metadata.abstractText))
 
-    def goldAbstractExtractor(abs: List[String]) = List(ItemToCompare(firstNLastWord(abs.head), abs.head))
+    def goldAbstractExtractor(abs: List[String]) = List(ItemWithOriginal(firstNLastWord(abs.head), abs.head))
 
     def bibExtractor(metadata: ExtractedMetadata) = metadata.references.toItems
 
     def goldBibExtractor(refs: List[String]) = refs.map { ref =>
       val Array(title, year, venue, authors) = ref.split("\\|", -1)
-      ItemToCompare(new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt), ref)
+      ItemWithOriginal(new BibRecord(title, authors.split(":").toList.asJava, venue, null, null, year.toInt), ref)
     }
 
     def bibAuthorsExtractor(metadata: ExtractedMetadata) = metadata.references.flatMapItems(_.author.toList)
@@ -180,7 +181,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.toList.map { r =>
       val context = r.context
       val mention = context.substring(r.startOffset, r.endOffset)
-      ItemToCompare(s"""$context|${mention.replaceAll("[()]", "")}""", s"$context|$mention")
+      ItemWithOriginal(s"""$context|${mention.replaceAll("[()]", "")}""", s"$context|$mention")
     }
 
     case class Metric(
