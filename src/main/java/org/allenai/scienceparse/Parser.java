@@ -157,8 +157,8 @@ public class Parser {
 
     PDFDoc doc = null;
     try(final FileInputStream fis = new FileInputStream(pdf)) {
-      try {
-        doc = ext.extractFromInputStream(fis);
+    try {
+      doc = ext.extractFromInputStream(fis);
       } catch(final Exception e) {
         logger.warn("{} failed: {}", paperId, e.toString());
         return null;
@@ -177,7 +177,7 @@ public class Parser {
       em = new ExtractedMetadata(
               doc.getMeta().getTitle(),
               doc.getMeta().getAuthors(),
-              doc.getMeta().getCreateDate());
+        doc.getMeta().getCreateDate());
       if (em.title == null) {
         logger.info("{}: skipping", paperId);
         return null;
@@ -217,11 +217,11 @@ public class Parser {
     final ExecutorService executor =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     try {
-      for (Paper p : pgt.papers) {
-        if (minYear > 0 && p.year < minYear)
-          continue;
-        if (excludeIDs.contains(p.id))
-          continue;
+    for (Paper p : pgt.papers) {
+      if (minYear > 0 && p.year < minYear)
+        continue;
+      if (excludeIDs.contains(p.id))
+        continue;
         File f = new File(dir, p.id + ".pdf");
 
         final Future<List<Pair<PaperToken, String>>> labeledDataFuture = executor.submit(() -> {
@@ -235,17 +235,17 @@ public class Parser {
       for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
         try {
           val res = labeledDataFuture.get();
-          if (res != null)
-            labeledData.add(res);
+      if (res != null)
+        labeledData.add(res);
         } catch (final InterruptedException | ExecutionException e) {
           throw new RuntimeException(e);
         }
 
-        if (labeledData.size() >= maxFiles)
-          break;
-      }
+      if (labeledData.size() >= maxFiles)
+        break;
+    }
 
-      return labeledData;
+    return labeledData;
     } finally {
       executor.shutdown();
       try {
@@ -717,10 +717,27 @@ public class Parser {
     return doParse(is, MAXHEADERWORDS);
   }
 
+  /**
+   * Given a body of text (e.g. an entire section of a paper) within which a citation is mentioned, extracts a
+   * single-sentence context from that larger body of text. Used both here for Science Parse extraction and in
+   * GrobidParser for evaluation of Grobid citation mention extraction.
+   */
+  public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
+    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1;
+    int crSentenceEnd = end + context.substring(end).indexOf('.') + 1;
+    if (crSentenceEnd == end) {
+      crSentenceEnd = context.length();
+    }
+    String contextSentenceUntrimmed = context.substring(sentenceStart, crSentenceEnd);
+    String contextSentence = contextSentenceUntrimmed.trim();
+    sentenceStart += contextSentenceUntrimmed.indexOf(contextSentence);
+    return new CitationRecord(referenceID, contextSentence, begin - sentenceStart,
+            end - sentenceStart);
+  }
+
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final ExtractedMetadata em;
 
-    // extract everything but references
     PDFExtractor ext = new PDFExtractor();
     PDFDoc doc = ext.extractFromInputStream(is);
     List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
@@ -748,7 +765,11 @@ public class Parser {
     final Pair<List<BibRecord>, List<CitationRecord>> pair =
       getReferences(em.raw, rawReferences, referenceExtractor);
     em.references = pair.getOne();
-    em.referenceMentions = pair.getTwo();
+    List<CitationRecord> crs = new ArrayList<>();
+    for (CitationRecord cr: pair.getTwo()) {
+      crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+    }
+    em.referenceMentions = crs;
 
     em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
 

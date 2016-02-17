@@ -32,6 +32,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       bibRecord.year
       )
 
+    def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
+
+    // Strip everything except for text and numbers out so that minor differences in whitespace/mathematical equations
+    // won't affect results much
+    def mentionNormalize(s: String) = s.split("\\|").map(strictNormalize).mkString("|")
+
     def calculatePR[T](goldData: Set[T], extractedData: Set[T]) = {
       if (goldData.isEmpty) {
         (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
@@ -116,6 +122,12 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     def bibYearsExtractor(metadata: ExtractedMetadata) = metadata.references.asScala.map(_.year.toString).toList
 
+    def bibMentionsExtractor(metadata: ExtractedMetadata) = metadata.referenceMentions.asScala.map { r =>
+      val context = r.context
+      val mention = context.substring(r.startOffset, r.endOffset).replaceAll("[()]", "")
+      s"$context|$mention"
+    }.toList
+
     case class Metric(
       name: String,
       goldFile: String,
@@ -132,7 +144,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("titleNormalized",          "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor, normalizer = normalize)),
       Metric("abstract",                 "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor)),
       Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
-      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // obtained from
+      Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
       Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
       Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
       Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
@@ -141,7 +153,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor, normalizer = normalize)),
       Metric("bibVenues",                "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor)),
       Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
-      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0")))
+      Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
+      Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
+      Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))
     )
 
 
@@ -247,10 +261,16 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
     val spPR = getPR(scienceParseExtractions)
     val grobidPR = getPR(grobidExtractions)
-    println(f"""${"EVALUATION RESULTS"}%-30s\t${"PRECISION"}%23s${"RECALL"}%23s""")
-    println(f"""${""}%-30s\t${"SP /Grobid/ diff"}%23s${"SP /Grobid/ diff"}%23s""")
+    // buffer output so that console formatting doesn't get messed up
+    val output = scala.collection.mutable.ArrayBuffer.empty[String]
+    output += f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%27s${"RECALL"}%27s"""
+    output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s"""
+    output += "-----------------------------------------+--------+-----------------+--------+------"
     spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
-      println(f"${metric.name}%-30s\t$spP%10.3f/$grobidP%.3f/${spP - grobidP}%+.3f$spR%10.3f/$grobidR%.3f/${spR - grobidR}%+.3f")
+      val pDiff = (spP - grobidP) * 100 / grobidP
+      val rDiff = (spR - grobidR) * 100 / grobidR
+      output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+4.0f%%$spR%10.3f | $grobidR%6.3f | $rDiff%+4.0f%%"
     }
+    println(output.mkString("\n"))
   }
 }

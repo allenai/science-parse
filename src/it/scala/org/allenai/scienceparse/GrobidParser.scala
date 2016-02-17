@@ -52,6 +52,47 @@ object GrobidParser {
       new BibRecord(title, authors.asJava, venue, null, null, yr)
     }
 
+  def ifNonEmpty(s: String) = if (s.nonEmpty) Some(s) else None
+
+  case class Section(id: Option[String], header: Option[String], text: String)
+
+  private def extractSectionInfo(div: Element) = {
+    val bodyPlusHeaderText = div.text
+
+    val head = div.select("head").asScala.headOption
+    val (id, headerText, bodyTextOffset) = head match {
+      case Some(h) =>
+        val hText = h.text
+        (
+          ifNonEmpty(h.attr("n")),
+          Some(hText),
+          hText.size + bodyPlusHeaderText.drop(hText.size).takeWhile(_ <= ' ').size
+          )
+      case None =>
+        (None, None, 0)
+    }
+    val section = Section(id = id, text = bodyPlusHeaderText.drop(bodyTextOffset), header = head.map(_.text))
+    (div, bodyPlusHeaderText, bodyTextOffset, section)
+  }
+
+  def extractReferenceMentions(doc: Element): List[CitationRecord] = {
+    val sectionInfo = doc.select("text>div").asScala.map(extractSectionInfo)
+    val bibMentions =
+      for {
+        ref <- doc.select("ref[type=bibr").asScala
+        ((div, fullText, offset, _), sectionNumber) <- sectionInfo.zipWithIndex.find {
+          case ((div, fullText, offset, _), i) =>
+            ref.parents.contains(div)
+        }
+      } yield {
+        val id = ref.attr("target").dropWhile(_ == '#')
+        val begin = ref.textOffset(div) - offset
+        val end = begin + ref.text.length
+        Parser.extractContext(0, fullText, begin, end)
+      }
+    bibMentions.toList
+  }
+
   def parseGrobidXml(grobidExtraction: Path): ExtractedMetadata = {
     val doc = Jsoup.parse(grobidExtraction.toFile, "UTF-8")
     val year = extractYear(doc.findAttributeValue("teiHeader>fileDesc>sourceDesc>biblStruct>monogr>imprint>date[type=published]", "when"))
@@ -60,6 +101,7 @@ object GrobidParser {
     val em = new ExtractedMetadata(extractTitle(doc), doc.select("teiHeader>fileDesc>sourceDesc>biblStruct>analytic>author").asScala.map(author).asJava, calendar.getTime)
     em.year = year
     em.references = extractBibEntriesWithId(doc).asJava
+    em.referenceMentions = extractReferenceMentions(doc).asJava
     em.abstractText = doc.select("teiHeader>profileDesc>abstract").asScala.headOption.map(_.text).getOrElse("")
     em
   }
