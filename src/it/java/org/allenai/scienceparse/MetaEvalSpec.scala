@@ -129,7 +129,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
                         prCalculator: (EvaluationInfo, Set[ItemWithOriginal[String]], Set[ItemWithOriginal[String]]) => (Double, Double) = calculatePR) =
       (eval: EvaluationInfo, metadata: ExtractedMetadata, gold: List[String]) => {
         // function to clean up both gold and extracted data before we pass it in
-        val clean = (x: List[ItemWithOriginal[String]]) => {
+        def clean(x: List[ItemWithOriginal[String]]) = {
           val normalizedItems = x.map(_.map(normalizer))
           val filteredItems = normalizedItems.filterNot(i => disallow.contains(i.item))
           multiSet(filteredItems)
