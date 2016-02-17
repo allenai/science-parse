@@ -323,8 +323,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
     output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%5s"""
     output += "-----------------------------------------+--------+-----------------+--------+------"
     spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
-      val pDiff = spP - grobidP
-      val rDiff = spR - grobidR
+      val pDiff = (spP - grobidP) * 100
+      val rDiff = (spR - grobidR) * 100
       output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+4.0f%%$spR%10.3f | $grobidR%6.3f | $rDiff%+4.0f%%"
     }
     println(output.mkString("\n"))
