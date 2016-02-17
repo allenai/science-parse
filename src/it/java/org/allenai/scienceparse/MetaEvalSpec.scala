@@ -27,11 +27,11 @@ import scala.collection.JavaConverters._
 case class ItemToCompare[T](item: T, original: String) {
   override def equals(o: Any) = o.equals(item)
   override def hashCode = item.hashCode
-  def map(f: T => T) = new ItemToCompare(f(item), original)
+  def map(f: T => T) = ItemToCompare(f(item), original)
 }
 
 object ItemToCompare {
-  def create[T](item: T): ItemToCompare[T] = new ItemToCompare(item, item.toString) // by default, just save original
+  def create[T](item: T): ItemToCompare[T] = ItemToCompare(item, item.toString) // by default, just save original
   def toList(items: List[String]) = items.map(ItemToCompare.create)
 }
 
