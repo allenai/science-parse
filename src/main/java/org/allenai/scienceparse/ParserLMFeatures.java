@@ -10,6 +10,17 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ParserLMFeatures implements Serializable {
@@ -33,54 +44,122 @@ public class ParserLMFeatures implements Serializable {
   }
 
   //paperDirectory must contain pdf docs to use as background language model
-  public ParserLMFeatures(List<Paper> ps, UnifiedSet<String> idsToExclude, int stIdx, int endIdx, File paperDirectory, int approxNumBackgroundDocs) throws IOException {
+  public ParserLMFeatures(
+          List<Paper> ps,
+          UnifiedSet<String> idsToExclude,
+          File paperDirectory,
+          int approxNumBackgroundDocs
+  ) throws IOException {
     log.info("excluding " + idsToExclude.size() + " paper ids from lm features.");
-    for (int i = stIdx; i < endIdx; i++) {
-      Paper p = ps.get(i);
+    for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
         fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
         for (String a : p.authors)
           fillBow(authorBow, a, authorFirstBow, authorLastBow, true);
       }
     }
-    File[] pdfs = paperDirectory.listFiles(new FilenameFilter() {
-      @Override
-      public boolean accept(File f, String s) {
-        return s.endsWith(".pdf");
+
+    // get token statistics from the background papers
+    final ExecutorService executor =
+      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    final BlockingQueue<Future<String[]>> completionQueue = new ArrayBlockingQueue<>(16);
+    final CompletionService<String[]> completionService =
+            new ExecutorCompletionService<>(executor, completionQueue);
+    try {
+      final File[] pdfs = paperDirectory.listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File f, String s) {
+          return s.endsWith(".pdf");
+        }
+      });
+
+      // put in the paper reading and tokenization tasks
+      final double step = ((double) approxNumBackgroundDocs) / ((double) pdfs.length);
+      double value = 0;
+      int submittedPapers = 0;
+      for(File pdf: pdfs) {
+        value += step;
+        if(value >= 1.0) {
+          value -= 1.0;
+
+          completionService.submit(() -> {
+            final String paperString = Parser.paperToString(pdf);
+            if(paperString != null) {
+              return tokenize(paperString);
+            } else {
+              return null;
+            }
+          });
+
+          submittedPapers += 1;
+        }
       }
 
-      ;
-    });
-    double samp = ((double) approxNumBackgroundDocs) / ((double) pdfs.length);
-    int ct = 0;
-    for (int i = 0; i < pdfs.length; i++) {
-      if (Math.random() < samp) {
-        ct += fillBow(backgroundBow, Parser.paperToString(pdfs[i]), false);
+      // process the tokenized papers
+      int ct = 0;
+      while(submittedPapers > 0) {
+        final String[] tokens;
+        try {
+          tokens = completionService.take().get();
+        } catch(final InterruptedException|ExecutionException e) {
+          throw new RuntimeException(e);
+        }
+
+        ct += fillBow(backgroundBow, tokens, null, null, false);
+
+        submittedPapers -= 1;
+      }
+      log.info("Gazetteer loaded with " + ct + " tokens.");
+
+    } finally {
+      executor.shutdown();
+      try {
+        executor.awaitTermination(10, TimeUnit.SECONDS);
+      } catch(final InterruptedException e) {
+        // do nothing
       }
     }
-    log.info("Gazetteer loaded with " + ct + " tokens.");
   }
 
-  public int fillBow(ObjectDoubleHashMap<String> hm, String s, ObjectDoubleHashMap<String> firstHM, ObjectDoubleHashMap<String> lastHM,
-                     boolean doTrim) {
-    int ct = 0;
-    if (s != null) {
-      String[] toks = s.split("( |,)");  //not great
-      if (toks.length > 0) {
-        if (firstHM != null)
-          firstHM.addToValue(doTrim ? Parser.trimAuthor(toks[0]) : toks[0], 1.0);
-        if (lastHM != null)
-          lastHM.addToValue(doTrim ? Parser.trimAuthor(toks[toks.length - 1]) : toks[toks.length - 1], 1.0);
-      }
-      for (String t : toks) {
-        hm.addToValue(doTrim ? Parser.trimAuthor(t) : t, 1.0);
-        ct++;
-      }
-    }
-    return ct;
+  public int fillBow(
+          ObjectDoubleHashMap<String> hm,
+          String s,
+          ObjectDoubleHashMap<String> firstHM,
+          ObjectDoubleHashMap<String> lastHM,
+          boolean doTrim
+  ) {
+    if(s == null)
+      return 0;
+    else
+      return fillBow(hm, tokenize(s), firstHM, lastHM, doTrim);
   }
 
   public int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
     return fillBow(hm, s, null, null, doTrim);
+  }
+
+  private int fillBow(
+          ObjectDoubleHashMap<String> hm,
+          String[] toks,
+          ObjectDoubleHashMap<String> firstHM,
+          ObjectDoubleHashMap<String> lastHM,
+          boolean doTrim
+  ) {
+    int ct = 0;
+    if (toks.length > 0) {
+      if (firstHM != null)
+        firstHM.addToValue(doTrim ? Parser.trimAuthor(toks[0]) : toks[0], 1.0);
+      if (lastHM != null)
+        lastHM.addToValue(doTrim ? Parser.trimAuthor(toks[toks.length - 1]) : toks[toks.length - 1], 1.0);
+    }
+    for (String t : toks) {
+      hm.addToValue(doTrim ? Parser.trimAuthor(t) : t, 1.0);
+      ct++;
+    }
+    return ct;
+  }
+
+  private String[] tokenize(final String s) {
+    return s.split("( |,)");  //not great
   }
 }

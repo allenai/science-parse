@@ -1,24 +1,18 @@
 package org.allenai.scienceparse
 
-import java.io.{File, PrintWriter}
-import java.time.LocalDate
-import java.util.{Calendar, Date}
+import java.io.{PrintWriter, File}
 
-import org.allenai.common.{StringUtils, Logging, Resource}
-import org.allenai.common.testkit.UnitSpec
 import org.allenai.common.StringUtils._
-import org.allenai.scienceparse.GrobidParser.JsoupElementsImplicits
+import org.allenai.common.testkit.UnitSpec
+import org.allenai.common.{Logging, Resource}
 import org.allenai.datastore.Datastores
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.{ TextNode, Element }
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.{GenTraversableOnce, GenMap}
-import scala.collection.parallel.ParMap
-import scala.io.{Codec, Source}
-import scala.util.{Success, Failure, Try}
 import scala.collection.JavaConverters._
+import scala.io.{Codec, Source}
+import scala.util.{Failure, Success, Try}
 
 
 /** This class saves the original representation of an item, so that even if said item is mangled into an unrecognizable
