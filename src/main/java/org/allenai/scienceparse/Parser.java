@@ -235,17 +235,17 @@ public class Parser {
       for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
         try {
           val res = labeledDataFuture.get();
-      if (res != null)
-        labeledData.add(res);
+          if (res != null)
+            labeledData.add(res);
         } catch (final InterruptedException | ExecutionException e) {
           throw new RuntimeException(e);
         }
 
-      if (labeledData.size() >= maxFiles)
-        break;
-    }
+        if (labeledData.size() >= maxFiles)
+          break;
+      }
 
-    return labeledData;
+      return labeledData;
     } finally {
       executor.shutdown();
       try {
