@@ -23,7 +23,6 @@ public class PDFDocToPartitionedText {
   public static List<String> getRaw(PDFDoc pdf) {
     ArrayList<String> out = new ArrayList<>();
 
-    //log.info("median line break: " + qLineBreak);
     StringBuilder s = new StringBuilder();
     PDFLine prevLine = null;
     double qLineBreak = getRawBlockLineBreak(pdf);
@@ -100,9 +99,8 @@ public class PDFDocToPartitionedText {
   
   public static double getFirstPagePartitionBreak(PDFPage pdf) {
     ArrayList<Double> breaks = getBreaks(pdf); 
-//    log.info(breaks.toString());
     int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
-    if(breaks.size()==0)
+    if(breaks.size() == 0)
       return 1.0;
     return breaks.get(idx) + 0.50;
   }
@@ -127,18 +125,14 @@ public class PDFDocToPartitionedText {
     PDFLine prevLine = null;
     boolean first = true;
     for(PDFLine l : fp.lines) {
-//      log.info(lineToString(l));
-      if(first) { 
+      if(first) {
         first=false; //skip the first line (heuristic)
         continue;
       }
       if (breakSize(l, prevLine) > fpp) {
         if(out.length() > 400) { //hand-tuned threshold of min abstract length
           return out.toString().trim();
-        }
-        else{
-//          log.info("big break, discarding as too small: ");
-//          log.info(out.toString());
+        } else {
           out.delete(0, out.length());
           out.append(" " + cleanLine(lineToString(l)));
         }
@@ -155,19 +149,18 @@ public class PDFDocToPartitionedText {
   private final static Pattern inLineAbstractPattern =
     Pattern.compile("^abstract ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
 
-  private final static Pattern [] generalAbstractCleaners = new Pattern [] 
-      {
-        Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE),
-        Pattern.compile("KEY ?WORDS(:| |\\.).*$", Pattern.UNICODE_CASE),
-        Pattern.compile("Key ?Words(:| |\\.).*$", Pattern.UNICODE_CASE),
-        Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
-        Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE),
-        Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE),
-        Pattern.compile("Contents.*$", Pattern.UNICODE_CASE),
-        Pattern.compile("Index terms\\p{P}.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
-      };
+  private final static Pattern[] generalAbstractCleaners = new Pattern[] {
+    Pattern.compile("Key ?words(:| |\\.).*$", Pattern.UNICODE_CASE),
+    Pattern.compile("KEY ?WORDS(:| |\\.).*$", Pattern.UNICODE_CASE),
+    Pattern.compile("Key ?Words(:| |\\.).*$", Pattern.UNICODE_CASE),
+    Pattern.compile("(1|I)\\.? Introduction.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
+    Pattern.compile("Categories and Subject Descriptors.*$", Pattern.UNICODE_CASE),
+    Pattern.compile("0 [1-2][0-9]{3}.*$", Pattern.UNICODE_CASE),
+    Pattern.compile("Contents.*$", Pattern.UNICODE_CASE),
+    Pattern.compile("Index terms\\p{P}.*$", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE),
+  };
   private final static Pattern paragraphAbstractCleaner =
-      Pattern.compile("^summary ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+    Pattern.compile("^summary ?\\p{P}?", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
 
   public static String getAbstract(List<String> raw, PDFDoc pdf) {
     boolean inAbstract = false;
@@ -184,16 +177,12 @@ public class PDFDocToPartitionedText {
 
       if(s.toLowerCase().contains("abstract") && s.length() < 10) {
         inAbstract = true;
-      }
-      else if(s.toLowerCase().contains("a b s t r a c t")) {
+      } else if(s.toLowerCase().contains("a b s t r a c t")) {
         inAbstract = true;
-      }
-      else if(RegexWithTimeout.matcher(inLineAbstractPattern, s).find()) {
+      } else if(RegexWithTimeout.matcher(inLineAbstractPattern, s).find()) {
         out.append(RegexWithTimeout.matcher(inLineAbstractPattern, s).replaceFirst(""));
         inAbstract = true;
       }
-//      else if(!inAbstract)
-//        log.info("ignoring " + s.substring(0, Math.min(20, s.length())) + "...+" + (s.length() - 20));
     }
     String abs = out.toString().trim();
     if(abs.length()==0) {
