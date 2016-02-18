@@ -86,22 +86,26 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getReferenceLineBreak(PDFDoc pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf); 
+    ArrayList<Double> breaks = getBreaks(pdf);
+    if(breaks.isEmpty())
+      return 1.0;
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking references
     return breaks.get(idx);
   }
   
   public static double getRawBlockLineBreak(PDFDoc pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf); 
+    ArrayList<Double> breaks = getBreaks(pdf);
+    if(breaks.isEmpty())
+      return 1.0;
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking papers
     return breaks.get(idx);
   }
   
   public static double getFirstPagePartitionBreak(PDFPage pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf); 
-    int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
-    if(breaks.size() == 0)
+    ArrayList<Double> breaks = getBreaks(pdf);
+    if(breaks.isEmpty())
       return 1.0;
+    int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
     return breaks.get(idx) + 0.50;
   }
 
