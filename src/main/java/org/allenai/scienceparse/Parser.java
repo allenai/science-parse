@@ -724,11 +724,13 @@ public class Parser {
    * GrobidParser for evaluation of Grobid citation mention extraction.
    */
   public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
-    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1;
-    int crSentenceEnd = end + context.substring(end).indexOf('.') + 1;
-    if (crSentenceEnd == end) {
+    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
+    int crSentenceEnd = context.indexOf('.', end);
+    if(crSentenceEnd < 0)
       crSentenceEnd = context.length();
-    }
+    else
+      crSentenceEnd += 1;
+
     String contextSentenceUntrimmed = context.substring(sentenceStart, crSentenceEnd);
     String contextSentence = contextSentenceUntrimmed.trim();
     sentenceStart += contextSentenceUntrimmed.indexOf(contextSentence);
