@@ -177,7 +177,7 @@ public class Parser {
       em = new ExtractedMetadata(
               doc.getMeta().getTitle(),
               doc.getMeta().getAuthors(),
-              doc.getMeta().getCreateDate());
+        doc.getMeta().getCreateDate());
       if (em.title == null) {
         logger.info("{}: skipping", paperId);
         return null;
@@ -235,17 +235,17 @@ public class Parser {
       for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
         try {
           val res = labeledDataFuture.get();
-          if (res != null)
-            labeledData.add(res);
+      if (res != null)
+        labeledData.add(res);
         } catch (final InterruptedException | ExecutionException e) {
           throw new RuntimeException(e);
         }
 
-        if (labeledData.size() >= maxFiles)
-          break;
-      }
+      if (labeledData.size() >= maxFiles)
+        break;
+    }
 
-      return labeledData;
+    return labeledData;
     } finally {
       executor.shutdown();
       try {
@@ -495,21 +495,22 @@ public class Parser {
       trainParser(inFiles, null, null, opts, null);
 
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
-      ParserGroundTruth pgt = new ParserGroundTruth(args[1]);
+      ParserGroundTruth pgt = new ParserGroundTruth(args[1]); //holds the labeled data to be used for train, test (S2 json bib format)
       ParseOpts opts = new ParseOpts();
-      opts.modelFile = args[4];
+      opts.modelFile = args[4]; //holds the output file for the model.
       //TODO: use config file
-      opts.headerMax = MAXHEADERWORDS;
+      opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
       opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
       opts.threads = Runtime.getRuntime().availableProcessors();
-      opts.backgroundSamples = 400;
-      opts.backgroundDirectory = args[5];
-      opts.gazetteerFile = args[2];
-      opts.trainFraction = 0.9;
-      opts.checkAuthors = true;
-      opts.minYear = 2008;
-      trainParser(null, pgt, args[3], opts, args[6]);
-
+      opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
+      opts.backgroundDirectory = args[5]; //where to find the background papers
+      opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)
+      opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
+      opts.checkAuthors = true; //exclude from training papers where we don't find authors
+      opts.minYear = 2008; //discard papers from before this date
+      trainParser(null, pgt, args[3], opts, args[6]); //args[3] holds the papers in which we can find ground truth
+                //args[6] is a list of paper ids (one id per line) that we must exclude from training data and gazetteers 
+                //(because they're used for final tests)
     } else if (args[0].equalsIgnoreCase("parse")) {
       final Path modelFile;
       if(args[2].equals("-"))
