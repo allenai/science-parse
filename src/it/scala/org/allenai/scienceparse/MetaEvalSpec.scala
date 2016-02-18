@@ -307,7 +307,7 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
         }
         prResults.groupBy(_._1).mapValues { prs =>
           val (ps, rs) = prs.map(_._2).unzip
-          (ps.sum / ps.size, rs.sum / rs.size)
+          (ps.sum / ps.size, rs.sum / rs.size, ps.size)
         }.toList.sortBy(_._1.name)
       }
 
@@ -315,13 +315,13 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val grobidPR = getPR(grobidExtractions)
       // buffer output so that console formatting doesn't get messed up
       val output = scala.collection.mutable.ArrayBuffer.empty[String]
-      output += f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%28s${"RECALL"}%28s"""
-      output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s"""
-      output += "-----------------------------------------+--------+-----------------+--------+--------"
-      spPR.zip(grobidPR).foreach { case ((metric, (spP, spR)), (_, (grobidP, grobidR))) =>
-        val pDiff = (spP - grobidP)
-        val rDiff = (spR - grobidR)
-        output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+5.3f$spR%10.3f | $grobidR%6.3f | $rDiff%+5.3f"
+      output += f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%28s${"RECALL"}%28s${"SAMPLE"}%10s"""
+      output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SIZE"}%10s"""
+      output += "-----------------------------------------+--------+------------------+--------+-----------------"
+      spPR.zip(grobidPR).foreach { case ((metric, (spP, spR, size)), (_, (grobidP, grobidR, _))) =>
+        val pDiff = spP - grobidP
+        val rDiff = spR - grobidR
+        output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+5.3f$spR%10.3f | $grobidR%6.3f | $rDiff%+5.3f$size%10d"
       }
       println(output.mkString("\n"))
     }
