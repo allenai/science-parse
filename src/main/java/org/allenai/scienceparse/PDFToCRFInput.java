@@ -53,6 +53,34 @@ public class PDFToCRFInput {
 
   }
 
+  private static String seqToString(final List<String> seq) {
+    final StringBuilder b = new StringBuilder(seq.size() * 10);
+    for(final String s: seq) {
+      b.append(s);
+      b.append(' ');
+    }
+    b.setLength(b.length() - 1);
+    return b.toString();
+  }
+
+  private static String patternToString(final List<Pair<Pattern, Boolean>> pattern) {
+    final StringBuilder b = new StringBuilder(pattern.size() * 10);
+    b.append('(');
+    for(final Pair<Pattern, Boolean> p : pattern) {
+      final boolean optional = p.getTwo();
+      if(optional)
+        b.append('[');
+
+      b.append(p.getOne().pattern());
+
+      if(optional)
+        b.append(']');
+      b.append(' ');
+    }
+    b.setLength(b.length() - 1);
+    return b.toString();
+  }
+
   /**
    * Returns the index start (inclusive) and end (exclusive)
    * of first occurrence of pattern sequence in token seq, or null if not found
@@ -62,6 +90,7 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findPatternSequence(List<String> seq, List<Pair<Pattern, Boolean>> patOptional) {
+    log.debug("Finding {}\nin {}", patternToString(patOptional), seqToString(seq));
     for (int i = 0; i < seq.size(); i++) {
       int end = -1;
       if ((end = findPatternEnd(seq, patOptional, i, 0)) >= 0) {

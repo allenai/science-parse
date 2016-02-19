@@ -157,7 +157,7 @@ public class Parser {
           boolean checkAuthors
   ) throws IOException {
     final String paperId = p == null ? null : p.getId();
-    logger.info("{}: starting", paperId);
+    logger.debug("{}: starting", paperId);
 
     PDFDoc doc = null;
     try(final FileInputStream fis = new FileInputStream(pdf)) {
