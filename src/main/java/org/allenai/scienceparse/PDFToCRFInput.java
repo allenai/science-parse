@@ -108,6 +108,7 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findString(List<String> seq, String toFind) {
+    toFind = normalize(toFind);
     if (seq.size() == 0 || toFind.length() == 0)
       return null;
     String[] toks = toFind.split(" ");
@@ -116,7 +117,7 @@ public class PDFToCRFInput {
     }
     int nextToMatch = 0;
     for (int i = 0; i < seq.size(); i++) {
-      String s = seq.get(i);
+      String s = normalize(seq.get(i));
       if (toks[nextToMatch].equalsIgnoreCase(s)) {
         nextToMatch++;
       } else {
