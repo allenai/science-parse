@@ -65,7 +65,6 @@ public class PDFToCRFInput {
 
   private static String patternToString(final List<Pair<Pattern, Boolean>> pattern) {
     final StringBuilder b = new StringBuilder(pattern.size() * 10);
-    b.append('(');
     for(final Pair<Pattern, Boolean> p : pattern) {
       final boolean optional = p.getTwo();
       if(optional)
