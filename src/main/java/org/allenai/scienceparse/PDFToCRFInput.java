@@ -176,7 +176,7 @@ public class PDFToCRFInput {
         temp = temp2;
       }
       out.add(temp);
-      out.set(1, Tuples.pair(Pattern.compile("[A-Z](\\.)?"), true));
+      out.set(1, Tuples.pair(Pattern.compile("[A-Z](\\.)?", Pattern.CASE_INSENSITIVE), true));
     }
     return out;
   }
