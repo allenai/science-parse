@@ -56,7 +56,7 @@ import static java.util.stream.Collectors.toList;
 
 public class Parser {
 
-  public static final int MAXHEADERWORDS = 1000; //set to something high for author/title parsing
+  public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
   public static final String DATA_VERSION = "0.1";
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
