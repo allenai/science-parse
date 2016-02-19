@@ -11,15 +11,12 @@ import org.allenai.scienceparse.pdfapi.PDFToken;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class PDFToCRFInput {
-
-
   /**
    * Returns the index start (inclusive) and end (exclusive)
    * of end of pattern sequence in token seq, starting from startposes.  Returns -1 if not found
@@ -317,8 +314,7 @@ public class PDFToCRFInput {
     return sb.toString().trim();
   }
 
-
   public static String getLabelString(List<Pair<PaperToken, String>> seq) {
-    return seq.stream().map((Pair<PaperToken, String> a) -> a.getTwo()).collect(Collectors.toList()).toString();
+    return seq.stream().map(Pair::getTwo).collect(Collectors.toList()).toString();
   }
 }

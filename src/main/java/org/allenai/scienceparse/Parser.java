@@ -139,8 +139,12 @@ public class Parser {
     return Tuples.pair(first, second);
   }
 
-  public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
-                                                              int headerMax) throws IOException {
+  public static List<Pair<PaperToken, String>> getPaperLabels(
+          File pdf,
+          Paper p,
+          PDFExtractor ext,
+          boolean heuristicHeader,
+          int headerMax) throws IOException {
     return getPaperLabels(pdf, p, ext, heuristicHeader, headerMax, false);
   }
 
@@ -217,11 +221,11 @@ public class Parser {
     final ExecutorService executor =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     try {
-    for (Paper p : pgt.papers) {
-      if (minYear > 0 && p.year < minYear)
-        continue;
-      if (excludeIDs.contains(p.id))
-        continue;
+      for (Paper p : pgt.papers) {
+        if (minYear > 0 && p.year < minYear)
+          continue;
+        if (excludeIDs.contains(p.id))
+          continue;
         File f = new File(dir, p.id + ".pdf");
 
         final Future<List<Pair<PaperToken, String>>> labeledDataFuture = executor.submit(() -> {
