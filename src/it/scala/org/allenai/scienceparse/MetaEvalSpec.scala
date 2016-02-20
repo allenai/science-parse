@@ -65,9 +65,9 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       //
 
       def normalizeBR(bibRecord: BibRecord) = new BibRecord(
-        normalize(bibRecord.title),
-        bibRecord.author.asScala.map(normalize).asJava,
-        normalize(bibRecord.venue),
+        StringUtils.normalize(bibRecord.title),
+        bibRecord.author.asScala.map(StringUtils.normalize).asJava,
+        StringUtils.normalize(bibRecord.venue),
         bibRecord.citeRegEx,
         bibRecord.shortCiteRegEx,
         bibRecord.year
