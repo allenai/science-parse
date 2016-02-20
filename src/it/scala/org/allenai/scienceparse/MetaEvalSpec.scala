@@ -64,8 +64,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       // define metrics
       //
 
-      def normalize(s: String) = s.replaceFancyUnicodeChars.removeUnprintable.normalize
-
       def normalizeBR(bibRecord: BibRecord) = new BibRecord(
         normalize(bibRecord.title),
         bibRecord.author.asScala.map(normalize).asJava,
@@ -189,22 +187,22 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       // inside the right scholar directory
       val metrics = Seq(
         Metric("authorFullName", "/golddata/dblp/authorFullName.tsv", stringEvaluator(fullNameExtractor)),
-        Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv", stringEvaluator(fullNameExtractor, normalizer = normalize)),
+        Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv", stringEvaluator(fullNameExtractor, normalizer = StringUtils.normalize)),
         Metric("authorLastName", "/golddata/dblp/authorLastName.tsv", stringEvaluator(lastNameExtractor)),
-        Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv", stringEvaluator(lastNameExtractor, normalizer = normalize)),
+        Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv", stringEvaluator(lastNameExtractor, normalizer = StringUtils.normalize)),
         Metric("title", "/golddata/dblp/title.tsv", stringEvaluator(titleExtractor)),
-        Metric("titleNormalized", "/golddata/dblp/title.tsv", stringEvaluator(titleExtractor, normalizer = normalize)),
+        Metric("titleNormalized", "/golddata/dblp/title.tsv", stringEvaluator(titleExtractor, normalizer = StringUtils.normalize)),
         Metric("abstract", "/golddata/isaac/abstracts.tsv", stringEvaluator(abstractExtractor, goldAbstractExtractor)),
-        Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
+        Metric("abstractNormalized", "/golddata/isaac/abstracts.tsv", stringEvaluator(abstractExtractor, goldAbstractExtractor, StringUtils.normalize)),
         Metric("bibAll", "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
         Metric("bibAllNormalized", "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
         Metric("bibCounts", "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
         Metric("bibAuthors", "/golddata/isaac/bib-authors.tsv", stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
-        Metric("bibAuthorsNormalized", "/golddata/isaac/bib-authors.tsv", stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, normalize)),
+        Metric("bibAuthorsNormalized", "/golddata/isaac/bib-authors.tsv", stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, StringUtils.normalize)),
         Metric("bibTitles", "/golddata/isaac/bib-titles.tsv", stringEvaluator(bibTitlesExtractor)),
-        Metric("bibTitlesNormalized", "/golddata/isaac/bib-titles.tsv", stringEvaluator(bibTitlesExtractor, normalizer = normalize)),
+        Metric("bibTitlesNormalized", "/golddata/isaac/bib-titles.tsv", stringEvaluator(bibTitlesExtractor, normalizer = StringUtils.normalize)),
         Metric("bibVenues", "/golddata/isaac/bib-venues.tsv", stringEvaluator(bibVenuesExtractor)),
-        Metric("bibVenuesNormalized", "/golddata/isaac/bib-venues.tsv", stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
+        Metric("bibVenuesNormalized", "/golddata/isaac/bib-venues.tsv", stringEvaluator(bibVenuesExtractor, normalizer = StringUtils.normalize)),
         Metric("bibYears", "/golddata/isaac/bib-years.tsv", stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
         Metric("bibMentions", "/golddata/isaac/mentions.tsv", stringEvaluator(bibMentionsExtractor)),
         Metric("bibMentionsNormalized", "/golddata/isaac/mentions.tsv", stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))

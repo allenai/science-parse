@@ -39,7 +39,7 @@ public class PDFToCRFInput {
     if (seq.size() == 0 || seqStartPos == seq.size())
       return -1;
 
-    final String pt = normalize(seq.get(seqStartPos));
+    final String pt = StringUtils.normalize(seq.get(seqStartPos));
     if (patOptional.get(patStartPos).getOne().matcher(pt).matches()) {
       //look forward:
       return findPatternEnd(seq, patOptional, seqStartPos + 1, patStartPos + 1);
@@ -107,7 +107,7 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findString(List<String> seq, String toFind) {
-    toFind = normalize(toFind);
+    toFind = StringUtils.normalize(toFind);
     if (seq.size() == 0 || toFind.length() == 0)
       return null;
     String[] toks = toFind.split(" ");
@@ -116,7 +116,7 @@ public class PDFToCRFInput {
     }
     int nextToMatch = 0;
     for (int i = 0; i < seq.size(); i++) {
-      String s = normalize(seq.get(i));
+      String s = StringUtils.normalize(seq.get(i));
       if (toks[nextToMatch].equalsIgnoreCase(s)) {
         nextToMatch++;
       } else {
@@ -139,8 +139,7 @@ public class PDFToCRFInput {
     author = author.replace("+", "");
     author = author.replace("^", "");
 
-    // get rid of accents, because they break matching
-    author = normalize(author);
+    author = StringUtils.normalize(author);
 
     String[] toks = author.split(" ");
     for (int i = 0; i < toks.length; i++) {
@@ -348,13 +347,5 @@ public class PDFToCRFInput {
 
   public static String getLabelString(List<Pair<PaperToken, String>> seq) {
     return seq.stream().map(Pair::getTwo).collect(Collectors.toList()).toString();
-  }
-
-  private static String normalize(String input) {
-    input = input.toLowerCase();
-    input = org.apache.commons.lang3.StringUtils.stripAccents(input);
-    input = input.replace('ı', 'i');
-    input = StringUtils.replaceFancyChars(input);
-    return input;
   }
 }
