@@ -351,6 +351,10 @@ public class PDFToCRFInput {
   }
 
   private static String normalize(String input) {
-    return org.apache.commons.lang3.StringUtils.stripAccents(input.toLowerCase()).replace('ı', 'i');
+    input = input.toLowerCase();
+    input = org.apache.commons.lang3.StringUtils.stripAccents(input);
+    input = input.replace('ı', 'i');
+    input = StringUtils.replaceFancyChars(input);
+    return input;
   }
 }
