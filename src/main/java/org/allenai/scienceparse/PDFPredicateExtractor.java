@@ -188,54 +188,54 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         int line = elems.get(i).getLine();
         //font-change forward (fcf) or backward (fcb):
         if (font != prevFont)
-          m.put("%fcb", 1.0);
+          m.put("%fcb", 1.0); //binary, 1.0 if there is a font change forward, 0.0 otherwise
         if (font != nextFont)
-          m.put("%fcf", 1.0);
+          m.put("%fcf", 1.0); //font change backward
         if (line != prevLine) {
-          m.put("%lcb", 1.0);
-          m.put("%hGapB", logYDelt(getY(elems.get(i), true), prevY));
+          m.put("%lcb", 1.0); //line change backward
+          m.put("%hGapB", logYDelt(getY(elems.get(i), true), prevY)); //height gap backward
         }
         if (line != nextLine) {
-          m.put("%lcf", 1.0);
-          m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false)));
+          m.put("%lcf", 1.0); //line change forward
+          m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false))); //height gap forward
         }
-        if (Math.abs(Math.abs(nextHeight - h) / Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% change
+        if (Math.abs(Math.abs(nextHeight - h) / Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% height change forward
           m.put("%hcf", 1.0);
         }
-        if (Math.abs(Math.abs(prevHeight - h) / Math.abs(prevHeight + h)) > 0.1) {
+        if (Math.abs(Math.abs(prevHeight - h) / Math.abs(prevHeight + h)) > 0.1) { //larger than ~20% height change backward
           m.put("%hcb", 1.0);
         }
 
         //font value:
         float relativeF = linearNormalize(font, fBounds);
-        m.put("%font", relativeF);
+        m.put("%font", relativeF); //font size normalized relative to doc
 
         m.put("%line", Math.min(line, 10.0)); //cap to max 10 lines
-        float relativeH = linearNormalize(h, hBounds);
-        m.put("%h", relativeH);
+        float relativeH = linearNormalize(h, hBounds); 
+        m.put("%h", relativeH); //normalized line height
 //				m.put("%h", h);
 
         //word features:
         String tok = elems.get(i).getPdfToken().token;
 
         getCaseMasks(tok).forEach(
-          (String s) -> m.put(s, 1.0));
+          (String s) -> m.put(s, 1.0)); //case masks
         if (isStopWord(tok)) {
-          m.put("%stop", 1.0);
+          m.put("%stop", 1.0); //stop word
           if (line != prevLine && (m.containsKey("%XXX") || m.containsKey("%Xxx")))
-            m.put("%startCapStop", 1.0);
+            m.put("%startCapStop", 1.0); //is a stop word that starts with a capital letter
         } else {
           if (m.containsKey("%xxx")) {
-            m.put("%uncapns", 1.0);
+            m.put("%uncapns", 1.0); //is an uncapitalized stop word
           }
         }
         double adjLen = Math.min(tok.length(), 10.0) / 10.0;
         double adjLenSq = (adjLen - 0.5) * (adjLen - 0.5);
-        m.put("%adjLen", adjLen);
-        m.put("%adjLenSq", adjLenSq);
+        m.put("%adjLen", adjLen); //adjusted word length
+        m.put("%adjLenSq", adjLenSq); //adjusted word length squared (?)
         if (line <= 2)
-          m.put("%first3lines", 1.0);
-        if (lmFeats != null) {
+          m.put("%first3lines", 1.0); //is it in the first three lines:
+        if (lmFeats != null) { //how well does token match title/author gazeetters
           m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
           m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleFirstBow));
           m.put("%tlfreq", smoothFreq(tok, this.lmFeats.titleLastBow));
