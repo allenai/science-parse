@@ -304,7 +304,7 @@ public class Parser {
               pgt,
               paperDir,
               opts.headerMax,
-              false,
+              true,
               pgt.papers.size(),
               opts.minYear,
               opts.checkAuthors,
