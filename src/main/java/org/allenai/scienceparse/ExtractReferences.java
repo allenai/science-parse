@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.allenai.ml.sequences.crf.CRFModel;
+
 @Slf4j
 public class ExtractReferences {
 
@@ -261,6 +263,16 @@ public class ExtractReferences {
     return Tuples.pair(results[idx], extractors.get(idx));
   }
 
+  /**
+   * Returns list of bibrecords.  Uses CRF only.
+   * @param paper
+   * @return
+   */
+  public Pair<List<BibRecord>, BibStractor> findReferencesCRF(List<String> paper) {
+    int start = refStart(paper) + 1;
+    log.info("refs: " + paper.subList(start, paper.size() - 1));
+    return Tuples.pair(null, null);
+  }
 
   public interface BibRecordParser {
     BibRecord parseRecord(String line);
@@ -508,6 +520,8 @@ public class ExtractReferences {
     }
   }
 
+
+  
   private static class BracketNameBibRecordParser implements BibRecordParser {
     private static final String regEx1 =
       "\\[([^\\]]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";

@@ -79,6 +79,41 @@ public class ExtractReferencesTest {
     return Tuples.pair(raw, rawReferences);
   }
 
+  public void testCRFExtractor() throws Exception {
+    ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString());
+
+    File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
+    final Pair<List<String>, List<String>> content = parseDoc(paper2);
+    final List<String> raw = content.getOne();
+    final List<String> rawReferences = content.getTwo();
+    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferencesCRF(rawReferences);
+    final List<BibRecord> br = fnd.getOne();
+    final BibStractor bs = fnd.getTwo();
+
+    int j = 0;
+    for (BibRecord b : br)
+      log.info("reference " + (j++) + " " + (b == null ? "null" : b.toString()));
+    for (BibRecord b : br)
+      Assert.assertNotNull(b);
+    Assert.assertEquals(16, br.size());
+    BibRecord tbr = br.get(15);
+    Assert.assertEquals("DASD dancing: A disk load balancing optimization scheme for video-on-demand computer systems", tbr.title);
+    Assert.assertEquals("Wolf et al\\.,? 1995", tbr.citeRegEx.pattern());
+    Assert.assertEquals("J. Wolf", tbr.author.get(0));
+    Assert.assertEquals("P. Yu", tbr.author.get(1));
+    Assert.assertEquals("H. Shachnai", tbr.author.get(2));
+    Assert.assertEquals(1995, tbr.year);
+    log.info(br.get(0).venue.trim());
+    Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
+    final List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
+    log.info("found " + crs.size() + " citations.");
+    CitationRecord cr = crs.get(crs.size() - 1);
+    log.info(cr.toString());
+    Assert.assertEquals("[Shachnai and Tamir 2000a]", cr.context.substring(cr.startOffset, cr.endOffset));
+    log.info(cr.context);
+    Assert.assertTrue(cr.context.startsWith("We have implemented"));
+  }
+  
   public void testFindReferencesAndCitations() throws Exception {
     ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString());
 
