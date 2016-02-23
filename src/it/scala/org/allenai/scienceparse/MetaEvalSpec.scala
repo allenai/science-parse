@@ -144,6 +144,11 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
       def lastNameExtractor(metadata: ExtractedMetadata) = metadata.authors.mapItems(_.split("\\s+").last)
 
+      def lastNameGoldExtractor(names: List[String]) = names.map { fullName =>
+        val lastName = fullName.split("\\s+").last
+        ItemWithOriginal(lastName, fullName)
+      }
+
       def titleExtractor(metadata: ExtractedMetadata) = (Set(metadata.title) - null).toList.toItems
 
       def firstNLastWord(x: String) = {
@@ -190,8 +195,8 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       val metrics = Seq(
         Metric("authorFullName", "/golddata/dblp/authorFullName.tsv", stringEvaluator(fullNameExtractor)),
         Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv", stringEvaluator(fullNameExtractor, normalizer = normalize)),
-        Metric("authorLastName", "/golddata/dblp/authorLastName.tsv", stringEvaluator(lastNameExtractor)),
-        Metric("authorLastNameNormalized", "/golddata/dblp/authorLastName.tsv", stringEvaluator(lastNameExtractor, normalizer = normalize)),
+        Metric("authorLastName", "/golddata/dblp/authorFullName.tsv", stringEvaluator(lastNameExtractor, lastNameGoldExtractor)),
+        Metric("authorLastNameNormalized", "/golddata/dblp/authorFullName.tsv", stringEvaluator(lastNameExtractor, lastNameGoldExtractor, normalizer = normalize)),
         Metric("title", "/golddata/dblp/title.tsv", stringEvaluator(titleExtractor)),
         Metric("titleNormalized", "/golddata/dblp/title.tsv", stringEvaluator(titleExtractor, normalizer = normalize)),
         Metric("abstract", "/golddata/isaac/abstracts.tsv", stringEvaluator(abstractExtractor, goldAbstractExtractor)),
