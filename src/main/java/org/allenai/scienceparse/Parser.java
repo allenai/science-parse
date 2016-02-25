@@ -45,12 +45,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -214,62 +211,48 @@ public class Parser {
     boolean checkAuthors,
     UnifiedSet<String> excludeIDs
   ) throws IOException {
-    List<Future<List<Pair<PaperToken, String>>>> labeledDataFutures = new ArrayList<>();
     File dir = new File(paperDir);
     PDFExtractor ext = new PDFExtractor();
 
-    final ExecutorService executor =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-    try {
-      for (Paper p : pgt.papers) {
-        if (minYear > 0 && p.year < minYear)
-          continue;
-        if (excludeIDs.contains(p.id))
-          continue;
-        File f = new File(dir, p.id + ".pdf");
+    final AtomicInteger triedCount = new AtomicInteger();
+    final AtomicInteger succeededCount = new AtomicInteger();
+    Stream<List<Pair<PaperToken, String>>> results = pgt.papers.parallelStream().
+            filter(p -> minYear > 0 && p.year >= minYear).
+            filter(p -> !excludeIDs.contains(p.id)).
+            flatMap(p -> {
+              try {
+                final List<Pair<PaperToken, String>> result =
+                        getPaperLabels(
+                                new File(dir, p.id + ".pdf"),
+                                p,
+                                ext,
+                                heuristicHeader,
+                                headerMax,
+                                checkAuthors);
 
-        final Future<List<Pair<PaperToken, String>>> labeledDataFuture = executor.submit(() -> {
-          return getPaperLabels(f, p, ext, heuristicHeader, headerMax, checkAuthors);
-        });
+                int tried = triedCount.incrementAndGet();
+                int succeeded = succeededCount.intValue();
+                if(result != null)
+                  succeeded = succeededCount.incrementAndGet();
+                if(tried % 100 == 0) {
+                  logger.info(
+                          "Tried to label {} papers, succeeded {} times ({}%)",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double)tried);
+                }
 
-        labeledDataFutures.add(labeledDataFuture);
-      }
+                return result == null ? Stream.empty() : Stream.of(result);
+              } catch(final IOException e) {
+                logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
+                return Stream.empty();
+              }
+            });
 
-      List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>(labeledDataFutures.size());
-      int triedPapers = 0;
-      int succeededPapers = 0;
-      for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
-        try {
-          val res = labeledDataFuture.get();
-          triedPapers += 1;
-          if (res != null) {
-            labeledData.add(res);
-            succeededPapers += 1;
-          }
-          if(triedPapers % 100 == 0) {
-            logger.info(
-              "Tried to label {} papers, labeled {} papers ({}%)",
-              triedPapers,
-              succeededPapers,
-              100.0 * succeededPapers / (double)triedPapers);
-          }
-        } catch (final InterruptedException | ExecutionException e) {
-          throw new RuntimeException(e);
-        }
+    if(maxFiles > 0)
+      results = results.limit(maxFiles);
 
-        if (labeledData.size() >= maxFiles)
-          break;
-      }
-
-      return labeledData;
-    } finally {
-      executor.shutdown();
-      try {
-        executor.awaitTermination(10, TimeUnit.MINUTES);
-      } catch(final InterruptedException e) {
-        logger.warn("Interrupted while waiting for thread pool termination. We may be leaking threads.");
-      }
-    }
+    return results.collect(Collectors.toList());
   }
 
   public static List<List<Pair<PaperToken, String>>>
