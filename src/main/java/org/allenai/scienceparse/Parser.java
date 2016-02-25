@@ -196,7 +196,7 @@ public class Parser {
                       labeledPaper.stream().map(Pair::getOne).collect(Collectors.toList()),
                       labeledPaper.stream().map(Pair::getTwo).collect(Collectors.toList()));
       if (checkEM.authors.size() != em.authors.size()) {
-        logger.info("{}: author mismatch, discarding. Expected {}, got {}.", paperId, em.authors, checkEM.authors);
+        logger.debug("{}: author mismatch, discarding. Expected {}, got {}.", paperId, em.authors, checkEM.authors);
         labeledPaper = null;
       }
     }

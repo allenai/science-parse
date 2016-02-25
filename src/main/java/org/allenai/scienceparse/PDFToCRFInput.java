@@ -283,7 +283,7 @@ public class PDFToCRFInput {
     else
       loc = findString(asStringList(seq), target);
     if (loc == null) {
-      log.warn("{}: could not find {} string {} in paper.", paperId, labelStem, target);
+      log.debug("{}: could not find {} string {} in paper.", paperId, labelStem, target);
       return false;
     } else {
       if (loc.getOne() == loc.getTwo() - 1) {
