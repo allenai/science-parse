@@ -236,11 +236,23 @@ public class Parser {
       }
 
       List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>(labeledDataFutures.size());
+      int triedPapers = 0;
+      int succeededPapers = 0;
       for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
         try {
           val res = labeledDataFuture.get();
-          if (res != null)
+          triedPapers += 1;
+          if (res != null) {
             labeledData.add(res);
+            succeededPapers += 1;
+          }
+          if(triedPapers % 100 == 0) {
+            logger.info(
+              "Tried to label {} papers, labeled {} papers ({}%)",
+              triedPapers,
+              succeededPapers,
+              100.0 * succeededPapers / (double)triedPapers);
+          }
         } catch (final InterruptedException | ExecutionException e) {
           throw new RuntimeException(e);
         }
