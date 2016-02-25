@@ -64,7 +64,7 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 1);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 2);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
