@@ -305,7 +305,7 @@ public class Parser {
               paperDir,
               opts.headerMax,
               true,
-              pgt.papers.size(),
+              opts.documentCount > 0 ? opts.documentCount : pgt.papers.size(),
               opts.minYear,
               opts.checkAuthors,
               excludeIDs);
@@ -486,7 +486,7 @@ public class Parser {
     if (!((args.length == 3 && args[0].equalsIgnoreCase("bootstrap")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parse")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
-      (args.length == 7 && args[0].equalsIgnoreCase("learn")) ||
+      (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
@@ -519,6 +519,7 @@ public class Parser {
       opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
       opts.checkAuthors = true; //exclude from training papers where we don't find authors
       opts.minYear = 2008; //discard papers from before this date
+      opts.documentCount = args.length > 7 ? Integer.parseInt(args[7]) : -1;
       trainParser(null, pgt, args[3], opts, args[6]); //args[3] holds the papers in which we can find ground truth
                 //args[6] is a list of paper ids (one id per line) that we must exclude from training data and gazetteers 
                 //(because they're used for final tests)
@@ -801,5 +802,6 @@ public class Parser {
     public String backgroundDirectory;
     public int minYear; //only process papers this year or later
     public boolean checkAuthors; //only bootstraps papers if all authors are found
+    public int documentCount = -1; // how many documents to train on. set to -1 to train on all.
   }
 }
