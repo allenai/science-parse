@@ -313,12 +313,12 @@ public class Parser {
     ParserLMFeatures plf = null;
     if (opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
-      UnifiedSet<String> trainIds = new UnifiedSet<String>();
-      pgt.papers.forEach((Paper p) -> trainIds.add(p.id));
-      trainIds.addAll(excludeIDs);
+      UnifiedSet<String> excludedIds = new UnifiedSet<String>();
+      pgt.papers.forEach((Paper p) -> excludedIds.add(p.id));
+      excludedIds.addAll(excludeIDs);
       plf = new ParserLMFeatures(
               gaz.papers,
-              trainIds,
+              excludedIds,
               new File(opts.backgroundDirectory),
               opts.backgroundSamples);
       predExtractor = new PDFPredicateExtractor(plf);
