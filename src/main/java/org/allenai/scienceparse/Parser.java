@@ -219,7 +219,7 @@ public class Parser {
     PDFExtractor ext = new PDFExtractor();
 
     final ExecutorService executor =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     try {
       for (Paper p : pgt.papers) {
         if (minYear > 0 && p.year < minYear)
@@ -502,7 +502,7 @@ public class Parser {
       //TODO: use config file
       opts.headerMax = 100;
       opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
-      opts.threads = Runtime.getRuntime().availableProcessors();
+      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
       trainParser(inFiles, null, null, opts, null);
 
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
@@ -512,7 +512,7 @@ public class Parser {
       //TODO: use config file
       opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
       opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
-      opts.threads = Runtime.getRuntime().availableProcessors();
+      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
       opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
       opts.backgroundDirectory = args[5]; //where to find the background papers
       opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)
