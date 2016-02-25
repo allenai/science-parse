@@ -61,7 +61,7 @@ public class ParserLMFeatures implements Serializable {
 
     // get token statistics from the background papers
     final ExecutorService executor =
-      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     final BlockingQueue<Future<String[]>> completionQueue = new ArrayBlockingQueue<>(16);
     final CompletionService<String[]> completionService =
             new ExecutorCompletionService<>(executor, completionQueue);
