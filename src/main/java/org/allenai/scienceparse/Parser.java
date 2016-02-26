@@ -410,6 +410,8 @@ public class Parser {
     // kill non-character letters
     // kill xml
     t = t.replaceAll("\\&.*?\\;", "");
+    if (t.endsWith("."))
+      t = t.substring(0, t.length() - 1);
     return t;
   }
 
