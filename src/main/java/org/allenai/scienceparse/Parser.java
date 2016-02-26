@@ -234,10 +234,9 @@ public class Parser {
     final AtomicInteger succeededCount = new AtomicInteger();
     final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
 
-    final int parallelism = Runtime.getRuntime().availableProcessors() * 8;
-      // We want lots of parallelism, because there is IO, and because we use this number to make
-      // sure we're processing papers even while we're waiting for stragglers.
-    final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(parallelism);
+    final int parallelism = Runtime.getRuntime().availableProcessors() * 2;
+    final int queueSize = parallelism * 4;
+    final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(queueSize);
     final Iterator<Paper> papers = pgt.papers.iterator();
     final ArrayList<List<Pair<PaperToken, String>>> results =
             new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
@@ -250,7 +249,7 @@ public class Parser {
 
       while (papers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
         // fill up the queue
-        while (papers.hasNext() && workQueue.size() < parallelism) {
+        while (papers.hasNext() && workQueue.size() < queueSize) {
           val p = papers.next();
           if (minYear > 0 && p.year < minYear)
             continue;
