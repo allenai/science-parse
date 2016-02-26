@@ -159,8 +159,8 @@ public class Parser {
 
     PDFDoc doc = null;
     try(final FileInputStream fis = new FileInputStream(pdf)) {
-    try {
-      doc = ext.extractFromInputStream(fis);
+      try {
+        doc = ext.extractFromInputStream(fis);
       } catch(final Exception e) {
         logger.warn("{} failed: {}", paperId, e.toString());
         return null;
