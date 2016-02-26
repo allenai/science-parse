@@ -327,7 +327,9 @@ public class Parser {
         // read from the queue
         val top = workQueue.poll();
         try {
-          results.add(top.get());
+          val result = top.get();
+          if(result != null)
+            results.add(result);
         } catch (final InterruptedException e) {
           logger.warn("Interrupted while processing paper", e);
         } catch (final ExecutionException e) {
