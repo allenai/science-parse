@@ -142,11 +142,14 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
 
       def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.toItems
 
-      def lastNameExtractor(metadata: ExtractedMetadata) = metadata.authors.mapItems(_.split("\\s+").last)
+      val suffixes = Set("Jr.")
+
+      def getLastName(name: String) = name.split("\\s+").filterNot(suffixes.contains).last
+
+      def lastNameExtractor(metadata: ExtractedMetadata) = metadata.authors.mapItems(getLastName)
 
       def lastNameGoldExtractor(names: List[String]) = names.map { fullName =>
-        val lastName = fullName.split("\\s+").last
-        ItemWithOriginal(lastName, fullName)
+        ItemWithOriginal(getLastName(fullName), fullName)
       }
 
       def titleExtractor(metadata: ExtractedMetadata) = (Set(metadata.title) - null).toList.toItems
