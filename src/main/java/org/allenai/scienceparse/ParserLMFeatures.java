@@ -50,7 +50,7 @@ public class ParserLMFeatures implements Serializable {
           File paperDirectory,
           int approxNumBackgroundDocs
   ) throws IOException {
-    log.info("excluding " + idsToExclude.size() + " paper ids from lm features.");
+    log.info("Excluding {} paper ids from LM features", idsToExclude.size());
     for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
         fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
@@ -59,12 +59,13 @@ public class ParserLMFeatures implements Serializable {
       }
     }
 
-    // get token statistics from the background papers
+    log.info(
+            "Getting token statistics from approximately {} background papers in {}",
+            approxNumBackgroundDocs,
+            paperDirectory);
     final ExecutorService executor =
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-    final BlockingQueue<Future<String[]>> completionQueue = new ArrayBlockingQueue<>(16);
-    final CompletionService<String[]> completionService =
-            new ExecutorCompletionService<>(executor, completionQueue);
+    final CompletionService<String[]> completionService = new ExecutorCompletionService<>(executor);
     try {
       final File[] pdfs = paperDirectory.listFiles(new FilenameFilter() {
         @Override
@@ -97,7 +98,9 @@ public class ParserLMFeatures implements Serializable {
 
       // process the tokenized papers
       int ct = 0;
-      while(submittedPapers > 0) {
+      int successfulPapers = 0;
+      int failedPapers = 0;
+      while(submittedPapers > successfulPapers + failedPapers) {
         final String[] tokens;
         try {
           tokens = completionService.take().get();
@@ -105,11 +108,20 @@ public class ParserLMFeatures implements Serializable {
           throw new RuntimeException(e);
         }
 
-        ct += fillBow(backgroundBow, tokens, null, null, false);
-
-        submittedPapers -= 1;
+        if(tokens != null) {
+          ct += fillBow(backgroundBow, tokens, null, null, false);
+          successfulPapers += 1;
+        } else {
+          failedPapers += 1;
+        }
       }
-      log.info("Gazetteer loaded with " + ct + " tokens.");
+      log.info("Gazetteer loaded with {} tokens", ct);
+      log.info(
+              String.format(
+                      "Tried %d papers, succeeded on %d (%.2f%%)",
+                      submittedPapers,
+                      successfulPapers,
+                      100.0 * successfulPapers / (double)submittedPapers));
 
     } finally {
       executor.shutdown();
