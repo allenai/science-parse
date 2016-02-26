@@ -243,6 +243,10 @@ public class Parser {
             new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
     final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
     try {
+      if(maxFiles > 0)
+        logger.info("Will be labeling {} papers in {} threads.", maxFiles, parallelism);
+      else
+        logger.info("Will be labeling all papers in {} threads.", parallelism);
 
       while (papers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
         // fill up the queue
@@ -334,6 +338,7 @@ public class Parser {
     } finally {
       executor.shutdown();
       try {
+        logger.info("Done labeling papers. Waiting for threads to shut down.");
         executor.awaitTermination(10, TimeUnit.MINUTES);
       } catch(final InterruptedException e) {
         logger.warn("Interrupted while waiting for the executor to shut down. We may be leaking threads.", e);
