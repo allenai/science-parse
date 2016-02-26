@@ -42,9 +42,15 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -217,11 +223,13 @@ public class Parser {
 
     final AtomicInteger triedCount = new AtomicInteger();
     final AtomicInteger succeededCount = new AtomicInteger();
+    final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
     Stream<List<Pair<PaperToken, String>>> results = pgt.papers.parallelStream().
             filter(p -> minYear > 0 && p.year >= minYear).
             filter(p -> !excludeIDs.contains(p.id)).
             flatMap(p -> {
               try {
+                paperId2startTime.put(p.id, System.currentTimeMillis());
                 final List<Pair<PaperToken, String>> result =
                         getPaperLabels(
                                 new File(dir, p.id + ".pdf"),
@@ -236,17 +244,52 @@ public class Parser {
                 if(result != null)
                   succeeded = succeededCount.incrementAndGet();
                 if(tried % 100 == 0) {
-                  logger.info(
-                          "Tried to label {} papers, succeeded {} times ({}%)",
-                          tried,
-                          succeeded,
-                          succeeded * 100.0 / (double)tried);
+                  // find the document that's been in flight the longest
+                  final long now = System.currentTimeMillis();
+                  final Set<Map.Entry<String, Long>> entries = paperId2startTime.entrySet();
+                  final Optional<Map.Entry<String, Long>> maxEntry =
+                        entries.stream().max(
+                          new Comparator<Map.Entry<String, Long>>() {
+                            @Override
+                            public int compare(
+                                    final Map.Entry<String, Long> left,
+                                    final Map.Entry<String, Long> right
+                            ) {
+                              final long l = now - left.getValue();
+                              final long r = now - right.getValue();
+                              if (l < r)
+                                return -1;
+                              else if (l > r)
+                                return 1;
+                              else
+                                return 0;
+                            }
+                          });
+
+                  if(maxEntry.isPresent()) {
+                    logger.info(String.format(
+                            "Tried to label %d papers, succeeded %d times (%.2f%%), %d papers in flight, oldest is %s at %.2f seconds",
+                            tried,
+                            succeeded,
+                            succeeded * 100.0 / (double) tried,
+                            entries.size(),
+                            maxEntry.get().getKey(),
+                            (now - maxEntry.get().getValue()) / 1000.0));
+                  } else {
+                    logger.info(String.format(
+                            "Tried to label %d papers, succeeded %d times (%.2f%%), 0 papers in flight",
+                            tried,
+                            succeeded,
+                            succeeded * 100.0 / (double) tried));
+                  }
                 }
 
                 return result == null ? Stream.empty() : Stream.of(result);
               } catch(final IOException e) {
                 logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
                 return Stream.empty();
+              } finally {
+                paperId2startTime.remove(p.id);
               }
             });
 
