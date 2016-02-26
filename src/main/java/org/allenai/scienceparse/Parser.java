@@ -330,7 +330,6 @@ public class Parser {
           val result = top.get();
           if(result != null)
             results.add(result);
-          logger.info("results.size() now {}", results.size());
         } catch (final InterruptedException e) {
           logger.warn("Interrupted while processing paper", e);
         } catch (final ExecutionException e) {
