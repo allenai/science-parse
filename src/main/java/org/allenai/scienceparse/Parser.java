@@ -36,21 +36,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -218,85 +227,126 @@ public class Parser {
     boolean checkAuthors,
     UnifiedSet<String> excludeIDs
   ) throws IOException {
-    File dir = new File(paperDir);
-    PDFExtractor ext = new PDFExtractor();
+    final File dir = new File(paperDir);
+    final PDFExtractor ext = new PDFExtractor();
 
     final AtomicInteger triedCount = new AtomicInteger();
     final AtomicInteger succeededCount = new AtomicInteger();
     final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
-    Stream<List<Pair<PaperToken, String>>> results = pgt.papers.parallelStream().
-            filter(p -> minYear > 0 && p.year >= minYear).
-            filter(p -> !excludeIDs.contains(p.id)).
-            flatMap(p -> {
-              try {
-                paperId2startTime.put(p.id, System.currentTimeMillis());
-                final List<Pair<PaperToken, String>> result =
-                        getPaperLabels(
-                                new File(dir, p.id + ".pdf"),
-                                p,
-                                ext,
-                                heuristicHeader,
-                                headerMax,
-                                checkAuthors);
 
-                int tried = triedCount.incrementAndGet();
-                int succeeded = succeededCount.intValue();
-                if(result != null)
-                  succeeded = succeededCount.incrementAndGet();
-                if(tried % 100 == 0) {
-                  // find the document that's been in flight the longest
-                  final long now = System.currentTimeMillis();
-                  final Set<Map.Entry<String, Long>> entries = paperId2startTime.entrySet();
-                  final Optional<Map.Entry<String, Long>> maxEntry =
+    final int parallelism = Runtime.getRuntime().availableProcessors() * 8;
+      // We want lots of parallelism, because there is IO, and because we use this number to make
+      // sure we're processing papers even while we're waiting for stragglers.
+    final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(parallelism);
+    final Iterator<Paper> papers = pgt.papers.iterator();
+    final ArrayList<List<Pair<PaperToken, String>>> results =
+            new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
+    final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+    try {
+
+      while (papers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
+        // fill up the queue
+        while (papers.hasNext() && workQueue.size() < parallelism) {
+          val p = papers.next();
+          if (minYear > 0 && p.year < minYear)
+            continue;
+          if (excludeIDs.contains(p.id))
+            continue;
+
+          final Future<List<Pair<PaperToken, String>>> future = executor.submit(() -> {
+            try {
+              paperId2startTime.put(p.id, System.currentTimeMillis());
+              final List<Pair<PaperToken, String>> result =
+                      getPaperLabels(
+                              new File(dir, p.id + ".pdf"),
+                              p,
+                              ext,
+                              heuristicHeader,
+                              headerMax,
+                              checkAuthors);
+
+              int tried = triedCount.incrementAndGet();
+              int succeeded = succeededCount.intValue();
+              if (result != null)
+                succeeded = succeededCount.incrementAndGet();
+              if (tried % 100 == 0) {
+                // find the document that's been in flight the longest
+                final long now = System.currentTimeMillis();
+                final Set<Map.Entry<String, Long>> entries = paperId2startTime.entrySet();
+                final Optional<Map.Entry<String, Long>> maxEntry =
                         entries.stream().max(
-                          new Comparator<Map.Entry<String, Long>>() {
-                            @Override
-                            public int compare(
-                                    final Map.Entry<String, Long> left,
-                                    final Map.Entry<String, Long> right
-                            ) {
-                              final long l = now - left.getValue();
-                              final long r = now - right.getValue();
-                              if (l < r)
-                                return -1;
-                              else if (l > r)
-                                return 1;
-                              else
-                                return 0;
-                            }
-                          });
+                                new Comparator<Map.Entry<String, Long>>() {
+                                  @Override
+                                  public int compare(
+                                          final Map.Entry<String, Long> left,
+                                          final Map.Entry<String, Long> right
+                                  ) {
+                                    final long l = now - left.getValue();
+                                    final long r = now - right.getValue();
+                                    if (l < r)
+                                      return -1;
+                                    else if (l > r)
+                                      return 1;
+                                    else
+                                      return 0;
+                                  }
+                                });
 
-                  if(maxEntry.isPresent()) {
-                    logger.info(String.format(
-                            "Tried to label %d papers, succeeded %d times (%.2f%%), %d papers in flight, oldest is %s at %.2f seconds",
-                            tried,
-                            succeeded,
-                            succeeded * 100.0 / (double) tried,
-                            entries.size(),
-                            maxEntry.get().getKey(),
-                            (now - maxEntry.get().getValue()) / 1000.0));
-                  } else {
-                    logger.info(String.format(
-                            "Tried to label %d papers, succeeded %d times (%.2f%%), 0 papers in flight",
-                            tried,
-                            succeeded,
-                            succeeded * 100.0 / (double) tried));
-                  }
+                if (maxEntry.isPresent()) {
+                  logger.info(String.format(
+                          "Tried to label %d papers, succeeded %d times (%.2f%%), %d papers in flight, oldest is %s at %.2f seconds",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double) tried,
+                          entries.size(),
+                          maxEntry.get().getKey(),
+                          (now - maxEntry.get().getValue()) / 1000.0));
+                } else {
+                  logger.info(String.format(
+                          "Tried to label %d papers, succeeded %d times (%.2f%%), 0 papers in flight",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double) tried));
                 }
-
-                return result == null ? Stream.empty() : Stream.of(result);
-              } catch(final IOException e) {
-                logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
-                return Stream.empty();
-              } finally {
-                paperId2startTime.remove(p.id);
               }
-            });
 
-    if(maxFiles > 0)
-      results = results.limit(maxFiles);
+              return result;
+            } catch (final IOException e) {
+              logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
+              return null;
+            } finally {
+              paperId2startTime.remove(p.id);
+            }
+          });
+          workQueue.add(future);
+        }
 
-    return results.collect(Collectors.toList());
+        // read from the queue
+        val top = workQueue.poll();
+        try {
+          results.add(top.get());
+        } catch (final InterruptedException e) {
+          logger.warn("Interrupted while processing paper", e);
+        } catch (final ExecutionException e) {
+          logger.warn("ExecutionException while processing paper", e);
+        }
+      }
+    } finally {
+      executor.shutdown();
+      try {
+        executor.awaitTermination(10, TimeUnit.MINUTES);
+      } catch(final InterruptedException e) {
+        logger.warn("Interrupted while waiting for the executor to shut down. We may be leaking threads.", e);
+      }
+    }
+
+    logger.info(String.format(
+            "Tried to label %d papers, succeeded %d times (%.2f%%), all done!",
+            triedCount.get(),
+            succeededCount.get(),
+            succeededCount.get() * 100.0 / triedCount.doubleValue()));
+
+    return results;
   }
 
   public static List<List<Pair<PaperToken, String>>>
