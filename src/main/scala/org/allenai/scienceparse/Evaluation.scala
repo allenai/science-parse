@@ -323,7 +323,6 @@ object Evaluation extends Datastores with Logging {
     }
 
     val scienceParseExtractions = {
-      val parser = new Parser()
       val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
       val documentCount = docIds.size
