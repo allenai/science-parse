@@ -5,14 +5,14 @@ import java.util.Calendar
 
 import org.allenai.common.StringUtils.StringExtras
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Element, TextNode}
+import org.jsoup.nodes.{ Element, TextNode }
 
 import scala.collection.JavaConverters._
 
 object GrobidParser {
   def addDot(x: String) = if (x.length == 1) s"$x." else x
 
-  def author(e: Element): String =  {
+  def author(e: Element): String = {
     val first = List(e.findText("persName>forename[type=first]"))
     val mids = e.select("persName>forename[type=middle]").asScala.map(_.text).toList
     val last = List(e.findText("persName>surname"))
@@ -67,7 +67,7 @@ object GrobidParser {
           ifNonEmpty(h.attr("n")),
           Some(hText),
           hText.size + bodyPlusHeaderText.drop(hText.size).takeWhile(_ <= ' ').size
-          )
+        )
       case None =>
         (None, None, 0)
     }
@@ -166,7 +166,6 @@ object GrobidParser {
       * that it's the word before the comma.
       */
     def lastNameFromFull(): String = str.trim.takeWhile(_ != ',')
-
 
   }
 }
