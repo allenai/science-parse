@@ -2,7 +2,6 @@ package org.allenai.scienceparse
 
 import java.io.{PrintWriter, File}
 
-import org.allenai.common.StringUtils._
 import org.allenai.common.testkit.UnitSpec
 import org.allenai.common.{Logging, Resource}
 import org.allenai.datastore.Datastores

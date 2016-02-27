@@ -1,12 +1,12 @@
 package org.allenai.scienceparse
 
-import org.allenai.common.StringUtils.StringExtras
+import java.nio.file.Path
+import java.util.Calendar
 
+import org.allenai.common.StringUtils.StringExtras
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Element, TextNode}
 
-import java.nio.file.Path
-import java.util.Calendar
 import scala.collection.JavaConverters._
 
 object GrobidParser {
