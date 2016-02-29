@@ -15,6 +15,8 @@ import scala.io.{Codec, Source}
 import scala.util.{Failure, Try, Success}
 
 object Evaluation extends Datastores with Logging {
+  import StringUtils.normalize
+
   /** This class saves the original representation of an item, so that even if said item is mangled
     * into an unrecognizable form for the sake of comparison, its original readable form is still
     * available.
@@ -67,9 +69,9 @@ object Evaluation extends Datastores with Logging {
 
   private def normalizeBR(bibRecord: BibRecord) =
     new BibRecord(
-      StringUtils.normalize(bibRecord.title),
-      bibRecord.author.asScala.map(StringUtils.normalize).asJava,
-      StringUtils.normalize(bibRecord.venue),
+      normalize(bibRecord.title),
+      bibRecord.author.asScala.map(normalize).asJava,
+      normalize(bibRecord.venue),
       bibRecord.citeRegEx,
       bibRecord.shortCiteRegEx,
       bibRecord.year)
@@ -232,22 +234,22 @@ object Evaluation extends Datastores with Logging {
   // src/it/resources/golddata/isaac/import_bib_gold.py inside the right scholar directory
   val metrics = Seq(
     Metric("authorFullName",           "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor)),
-    Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor, normalizer = StringUtils.normalize)),
+    Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor, normalizer = normalize)),
     Metric("authorLastName",           "/golddata/dblp/authorFullName.tsv",  stringEvaluator(lastNameExtractor, lastNameGoldExtractor)),
-    Metric("authorLastNameNormalized", "/golddata/dblp/authorFullName.tsv",  stringEvaluator(lastNameExtractor, lastNameGoldExtractor, normalizer = StringUtils.normalize)),
+    Metric("authorLastNameNormalized", "/golddata/dblp/authorFullName.tsv",  stringEvaluator(lastNameExtractor, lastNameGoldExtractor, normalizer = normalize)),
     Metric("title",                    "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor)),
-    Metric("titleNormalized",          "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor, normalizer = StringUtils.normalize)),
+    Metric("titleNormalized",          "/golddata/dblp/title.tsv",           stringEvaluator(titleExtractor, normalizer = normalize)),
     Metric("abstract",                 "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor)),
-    Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, StringUtils.normalize)),
+    Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
     Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
     Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
     Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
     Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
-    Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, StringUtils.normalize)),
+    Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, normalize)),
     Metric("bibTitles",                "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor)),
-    Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor, normalizer = StringUtils.normalize)),
+    Metric("bibTitlesNormalized",      "/golddata/isaac/bib-titles.tsv",     stringEvaluator(bibTitlesExtractor, normalizer = normalize)),
     Metric("bibVenues",                "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor)),
-    Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = StringUtils.normalize)),
+    Metric("bibVenuesNormalized",      "/golddata/isaac/bib-venues.tsv",     stringEvaluator(bibVenuesExtractor, normalizer = normalize)),
     Metric("bibYears",                 "/golddata/isaac/bib-years.tsv",      stringEvaluator(bibYearsExtractor, disallow = Set("0"))),
     Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
     Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))
