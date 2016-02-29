@@ -21,4 +21,4 @@ project/target/**
 project/project/**
 testdata/**
 
-MetaEvalErrors.tsv
+EvalErrors.log

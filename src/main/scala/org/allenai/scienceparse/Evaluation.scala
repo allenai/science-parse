@@ -51,7 +51,7 @@ object Evaluation extends Datastores with Logging {
     def toList = x.asScala.toList
   }
 
-  private val evaluationErrorLogger = LoggerFactory.getLogger("evaluationErrors")
+  private val evaluationErrorLogger = LoggerFactory.getLogger(s"${this.getClass.getCanonicalName}.evaluationErrors")
   private def logEvaluationErrors[T](
     metric: Metric,
     paperId: String,
