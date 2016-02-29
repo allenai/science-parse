@@ -402,7 +402,7 @@ object Evaluation extends Datastores with Logging {
   def printResults(results: EvaluationResult): Unit = {
     // buffer output so that console formatting doesn't get messed up
     val output = scala.collection.mutable.ArrayBuffer.empty[String]
-    output += f"""${Console.BOLD}${Console.BLUE}${"EVALUATION RESULTS"}%-30s${"PRECISION"}%28s${"RECALL"}%28s${"SAMPLE"}%10s"""
+    output += f"""${"EVALUATION RESULTS"}%-30s${"PRECISION"}%28s${"RECALL"}%28s${"SAMPLE"}%10s"""
     output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SIZE"}%10s"""
     output += "-----------------------------------------+--------+------------------+--------+-----------------"
     (results.scienceParse.keySet ++ results.grobid.keySet).toList.sortBy(_.name).foreach { metric =>
@@ -417,6 +417,6 @@ object Evaluation extends Datastores with Logging {
       val rDiff = spR - grobidR
       output += f"${metric.name}%-30s$spP%10.3f | $grobidP%6.3f | $pDiff%+5.3f$spR%10.3f | $grobidR%6.3f | $rDiff%+5.3f$size%10d"
     }
-    println(output.mkString("\n"))
+    println(output.map(line => s"${Console.BOLD}${Console.BLUE}$line${Console.RESET}").mkString("\n"))
   }
 }
