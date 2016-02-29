@@ -170,12 +170,12 @@ public class Parser {
   ) throws IOException {
     final String paperId = p == null ? null : p.getId();
     if(paperId != null)
-      logger.debug("{}: starting", paperId);
+    logger.debug("{}: starting", paperId);
 
     PDFDoc doc = null;
     try(final FileInputStream fis = new FileInputStream(pdf)) {
-      try {
-        doc = ext.extractFromInputStream(fis);
+    try {
+      doc = ext.extractFromInputStream(fis);
       } catch(final Exception e) {
         logger.warn("{} failed: {}", paperId, e.toString());
         return null;
@@ -251,10 +251,10 @@ public class Parser {
         // fill up the queue
         while (papers.hasNext() && workQueue.size() < queueSize) {
           val p = papers.next();
-          if (minYear > 0 && p.year < minYear)
-            continue;
-          if (excludeIDs.contains(p.id))
-            continue;
+        if (minYear > 0 && p.year < minYear)
+          continue;
+        if (excludeIDs.contains(p.id))
+          continue;
 
           final Future<List<Pair<PaperToken, String>>> future = executor.submit(() -> {
             try {
@@ -293,7 +293,7 @@ public class Parser {
                                     else
                                       return 0;
                                   }
-                                });
+        });
 
                 if (maxEntry.isPresent()) {
                   logger.info(String.format(
@@ -311,7 +311,7 @@ public class Parser {
                           succeeded,
                           succeeded * 100.0 / (double) tried));
                 }
-              }
+      }
 
               return result;
             } catch (final IOException e) {

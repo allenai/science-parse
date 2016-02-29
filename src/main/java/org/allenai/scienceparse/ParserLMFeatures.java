@@ -109,7 +109,7 @@ public class ParserLMFeatures implements Serializable {
         }
 
         if(tokens != null) {
-          ct += fillBow(backgroundBow, tokens, null, null, false);
+        ct += fillBow(backgroundBow, tokens, null, null, false);
           successfulPapers += 1;
         } else {
           failedPapers += 1;
