@@ -608,7 +608,7 @@ public class Parser {
       opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
       opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
       opts.threads = Runtime.getRuntime().availableProcessors() * 2;
-      opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
+      opts.backgroundSamples = 40000; //use up to this many papers from background dir to estimate background language model
       opts.backgroundDirectory = args[5]; //where to find the background papers
       opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)
       opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
