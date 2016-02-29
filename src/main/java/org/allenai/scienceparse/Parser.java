@@ -56,7 +56,7 @@ import static java.util.stream.Collectors.toList;
 
 public class Parser {
 
-  public static final int MAXHEADERWORDS = 1000; //set to something high for author/title parsing
+  public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
   public static final String DATA_VERSION = "0.1";
   private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
@@ -64,7 +64,7 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 1);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 2);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
@@ -139,8 +139,12 @@ public class Parser {
     return Tuples.pair(first, second);
   }
 
-  public static List<Pair<PaperToken, String>> getPaperLabels(File pdf, Paper p, PDFExtractor ext, boolean heuristicHeader,
-                                                              int headerMax) throws IOException {
+  public static List<Pair<PaperToken, String>> getPaperLabels(
+          File pdf,
+          Paper p,
+          PDFExtractor ext,
+          boolean heuristicHeader,
+          int headerMax) throws IOException {
     return getPaperLabels(pdf, p, ext, heuristicHeader, headerMax, false);
   }
 
@@ -153,7 +157,7 @@ public class Parser {
           boolean checkAuthors
   ) throws IOException {
     final String paperId = p == null ? null : p.getId();
-    logger.info("{}: starting", paperId);
+    logger.debug("{}: starting", paperId);
 
     PDFDoc doc = null;
     try(final FileInputStream fis = new FileInputStream(pdf)) {
@@ -215,13 +219,13 @@ public class Parser {
     PDFExtractor ext = new PDFExtractor();
 
     final ExecutorService executor =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
     try {
-    for (Paper p : pgt.papers) {
-      if (minYear > 0 && p.year < minYear)
-        continue;
-      if (excludeIDs.contains(p.id))
-        continue;
+      for (Paper p : pgt.papers) {
+        if (minYear > 0 && p.year < minYear)
+          continue;
+        if (excludeIDs.contains(p.id))
+          continue;
         File f = new File(dir, p.id + ".pdf");
 
         final Future<List<Pair<PaperToken, String>>> labeledDataFuture = executor.submit(() -> {
@@ -235,17 +239,17 @@ public class Parser {
       for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
         try {
           val res = labeledDataFuture.get();
-      if (res != null)
-        labeledData.add(res);
+          if (res != null)
+            labeledData.add(res);
         } catch (final InterruptedException | ExecutionException e) {
           throw new RuntimeException(e);
         }
 
-      if (labeledData.size() >= maxFiles)
-        break;
-    }
+        if (labeledData.size() >= maxFiles)
+          break;
+      }
 
-    return labeledData;
+      return labeledData;
     } finally {
       executor.shutdown();
       try {
@@ -296,18 +300,25 @@ public class Parser {
     if (files != null) {
       labeledData = bootstrapLabels(files, opts.headerMax, true); //don't exclude for pdf meta bootstrap
     } else {
-      labeledData = labelFromGroundTruth(pgt, paperDir, opts.headerMax, true, pgt.papers.size(), opts.minYear, opts.checkAuthors,
-        excludeIDs);
+      labeledData = labelFromGroundTruth(
+              pgt,
+              paperDir,
+              opts.headerMax,
+              true,
+              pgt.papers.size(),
+              opts.minYear,
+              opts.checkAuthors,
+              excludeIDs);
     }
     ParserLMFeatures plf = null;
     if (opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
-      UnifiedSet<String> trainIds = new UnifiedSet<String>();
-      pgt.papers.forEach((Paper p) -> trainIds.add(p.id));
-      trainIds.addAll(excludeIDs);
+      UnifiedSet<String> excludedIds = new UnifiedSet<String>();
+      pgt.papers.forEach((Paper p) -> excludedIds.add(p.id));
+      excludedIds.addAll(excludeIDs);
       plf = new ParserLMFeatures(
               gaz.papers,
-              trainIds,
+              excludedIds,
               new File(opts.backgroundDirectory),
               opts.backgroundSamples);
       predExtractor = new PDFPredicateExtractor(plf);
@@ -491,7 +502,7 @@ public class Parser {
       //TODO: use config file
       opts.headerMax = 100;
       opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
-      opts.threads = Runtime.getRuntime().availableProcessors();
+      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
       trainParser(inFiles, null, null, opts, null);
 
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
@@ -501,7 +512,7 @@ public class Parser {
       //TODO: use config file
       opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
       opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
-      opts.threads = Runtime.getRuntime().availableProcessors();
+      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
       opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
       opts.backgroundDirectory = args[5]; //where to find the background papers
       opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)

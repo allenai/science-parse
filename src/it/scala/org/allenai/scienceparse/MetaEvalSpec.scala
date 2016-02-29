@@ -2,7 +2,6 @@ package org.allenai.scienceparse
 
 import java.io.{PrintWriter, File}
 
-import org.allenai.common.StringUtils._
 import org.allenai.common.testkit.UnitSpec
 import org.allenai.common.{Logging, Resource}
 import org.allenai.datastore.Datastores
@@ -30,6 +29,8 @@ object ItemWithOriginal {
 }
 
 class MetaEvalSpec extends UnitSpec with Datastores with Logging {
+  import StringUtils.normalize
+
   implicit class BufferToItemToCompareList[T](x: scala.collection.mutable.Buffer[T]) {
     def toItems = x.toList.toItems
   }
@@ -63,8 +64,6 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       //
       // define metrics
       //
-
-      def normalize(s: String) = s.replaceFancyUnicodeChars.removeUnprintable.normalize
 
       def normalizeBR(bibRecord: BibRecord) = new BibRecord(
         normalize(bibRecord.title),
@@ -186,10 +185,10 @@ class MetaEvalSpec extends UnitSpec with Datastores with Logging {
       }
 
       case class Metric(
-                         name: String,
-                         goldFile: String,
-                         // get P/R values for each individual paper. values will be averaged later across all papers
-                         evaluator: (EvaluationInfo, ExtractedMetadata, List[String]) => (Double, Double))
+        name: String,
+        goldFile: String,
+        // get P/R values for each individual paper. values will be averaged later across all papers
+        evaluator: (EvaluationInfo, ExtractedMetadata, List[String]) => (Double, Double))
       // to get a new version of Isaac's gold data into this format, run src/it/resources/golddata/isaac/import_bib_gold.py
       // inside the right scholar directory
       val metrics = Seq(
