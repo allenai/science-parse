@@ -117,7 +117,9 @@ object Training extends App with Datastores with Logging {
     opts.documentCount = config.maxPaperCount
     opts.minExpectedFeatureCount = config.minExpectedFeatureCount
 
-    val paperSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
+    val paperSource = config.paperDir.map(new DirectoryPaperSource(_)).getOrElse {
+      new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
+    }
 
     val excludedIds = Evaluation.goldDocIds ++ config.excludeIdsFile.map { excludedIdsFile =>
       Resource.using(Source.fromFile(excludedIdsFile)) { source =>
