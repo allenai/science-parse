@@ -296,7 +296,7 @@ public class Parser {
                                     else
                                       return 0;
                                   }
-        });
+                                });
 
                 if (maxEntry.isPresent()) {
                   logger.info(String.format(
@@ -314,7 +314,7 @@ public class Parser {
                           succeeded,
                           succeeded * 100.0 / (double) tried));
                 }
-      }
+              }
 
               return result;
             } catch (final IOException e) {
