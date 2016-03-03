@@ -90,7 +90,11 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findPatternSequence(List<String> seq, List<Pair<Pattern, Boolean>> patOptional) {
-    log.debug("Finding {}\nin {}", patternToString(patOptional), seqToString(seq));
+    if(log.isDebugEnabled()) {
+      // patternToString() and seqToString() do a lot of work, and we don't want that done if debug
+      // isn't enabled.
+      log.debug("Finding {}\nin {}", patternToString(patOptional), seqToString(seq));
+    }
     for (int i = 0; i < seq.size(); i++) {
       int end = -1;
       if ((end = findPatternEnd(seq, patOptional, i, 0)) >= 0) {
