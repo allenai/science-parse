@@ -918,17 +918,30 @@ public class Parser {
     em.creator = doc.meta.creator;
       
     // extract references
-    final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
-    final Pair<List<BibRecord>, List<CitationRecord>> pair =
-      getReferences(em.raw, rawReferences, referenceExtractor);
-    em.references = pair.getOne();
-    List<CitationRecord> crs = new ArrayList<>();
-    for (CitationRecord cr: pair.getTwo()) {
-      crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+    try {
+      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+      final Pair<List<BibRecord>, List<CitationRecord>> pair =
+              getReferences(em.raw, rawReferences, referenceExtractor);
+      em.references = pair.getOne();
+      List<CitationRecord> crs = new ArrayList<>();
+      for (CitationRecord cr : pair.getTwo()) {
+        crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+      }
+      em.referenceMentions = crs;
+    } catch(final RegexWithTimeout.RegexTimeout e) {
+      logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
+      if(em.references == null)
+        em.references = Collections.emptyList();
+      if(em.referenceMentions == null)
+        em.referenceMentions = Collections.emptyList();
     }
-    em.referenceMentions = crs;
 
-    em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+    try {
+      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+    } catch(final RegexWithTimeout.RegexTimeout e) {
+      logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
+      em.abstractText = "";
+    }
 
     return em;
   }
