@@ -107,8 +107,7 @@ object Training extends App with Datastores with Logging {
       config.backgroundDirectory.getOrElse(publicDirectory("productionBackgroundDocs", 1).toFile)
     opts.backgroundDirectory = backgroundDirectory.toString
 
-    val gazetteerFile =
-      config.gazetteerFile.getOrElse(publicFile("gazetteer-1m.json", 1).toFile)
+    val gazetteerFile = config.gazetteerFile.getOrElse(Parser.getDefaultGazetteer.toFile)
     opts.gazetteerFile = gazetteerFile.toString
 
     opts.trainFraction = config.trainFraction
