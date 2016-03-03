@@ -4,15 +4,15 @@ import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
 
-import org.allenai.common.{Logging, Resource}
+import org.allenai.common.{ Logging, Resource }
 import org.allenai.datastore.Datastores
 import org.slf4j.LoggerFactory
 import scopt.OptionParser
 
-import scala.collection.{GenMap, GenTraversableOnce}
+import scala.collection.{ GenMap, GenTraversableOnce }
 import scala.collection.JavaConverters._
-import scala.io.{Codec, Source}
-import scala.util.{Failure, Try, Success}
+import scala.io.{ Codec, Source }
+import scala.util.{ Failure, Try, Success }
 
 object Evaluation extends Datastores with Logging {
   import StringUtils.normalize
@@ -74,7 +74,8 @@ object Evaluation extends Datastores with Logging {
       normalize(bibRecord.venue),
       bibRecord.citeRegEx,
       bibRecord.shortCiteRegEx,
-      bibRecord.year)
+      bibRecord.year
+    )
 
   private def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
 
@@ -114,12 +115,12 @@ object Evaluation extends Datastores with Logging {
     * when everything is already unique, so you can basically always apply it.
     */
   private def multiSet(refs: List[ItemWithOriginal[String]]) =
-    refs.groupBy(identity).values.flatMap(_.zipWithIndex.map { case (ref, i) =>
-      ref.map(_ + i.toString)
+    refs.groupBy(identity).values.flatMap(_.zipWithIndex.map {
+      case (ref, i) =>
+        ref.map(_ + i.toString)
     }).toSet
 
-  /**
-    * This generates an evaluator for string metadata
+  /** This generates an evaluator for string metadata
     *
     * @param extract      Given automatically ExtractedMetadata from a paper, how do we get the
     *                     field we want to compare against gold data?
@@ -157,7 +158,8 @@ object Evaluation extends Datastores with Logging {
       metric,
       paperId,
       extractGold(gold).map(_.map(normalizer)).toSet,
-      extract(metadata).map(_.map(normalizer)).toSet)
+      extract(metadata).map(_.map(normalizer)).toSet
+    )
   }
 
   private def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.toItems
@@ -198,8 +200,10 @@ object Evaluation extends Datastores with Logging {
         venue,
         null,
         null,
-        year.toInt),
-      ref)
+        year.toInt
+      ),
+      ref
+    )
   }
 
   private def bibAuthorsExtractor(metadata: ExtractedMetadata) =
@@ -228,10 +232,12 @@ object Evaluation extends Datastores with Logging {
     name: String,
     goldFile: String,
     // get P/R values for each individual paper. values will be averaged later across all papers
-    evaluator: (Metric, String, ExtractedMetadata, List[String]) => (Double, Double))
+    evaluator: (Metric, String, ExtractedMetadata, List[String]) => (Double, Double)
+  )
 
   // to get a new version of Isaac's gold data into this format, run
   // src/it/resources/golddata/isaac/import_bib_gold.py inside the right scholar directory
+  // format: OFF
   val metrics = Seq(
     Metric("authorFullName",           "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor)),
     Metric("authorFullNameNormalized", "/golddata/dblp/authorFullName.tsv",  stringEvaluator(fullNameExtractor, normalizer = normalize)),
@@ -254,6 +260,7 @@ object Evaluation extends Datastores with Logging {
     Metric("bibMentions",              "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor)),
     Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))
   )
+  // format: ON
 
   lazy val allGoldData = metrics.flatMap { metric =>
     Resource.using(Source.fromInputStream(getClass.getResourceAsStream(metric.goldFile))(Codec.UTF8)) { source =>
@@ -278,12 +285,14 @@ object Evaluation extends Datastores with Logging {
 
   case class EvaluationResult(
     scienceParse: Map[Metric, EvaluationStats],
-    grobid: Map[Metric, EvaluationStats])
+    grobid: Map[Metric, EvaluationStats]
+  )
 
-  def main(args: Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     case class Config(
       modelFile: Option[File] = None,
-      gazetteerFile: Option[File] = None)
+      gazetteerFile: Option[File] = None
+    )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
       opt[File]('m', "model") action { (m, c) =>
@@ -378,8 +387,9 @@ object Evaluation extends Datastores with Logging {
           toArray.
           sortBy(-_._2).
           take(10).
-          foreach { case (error, count) =>
-            logger.info(s"$count\t$error")
+          foreach {
+            case (error, count) =>
+              logger.info(s"$count\t$error")
           }
       }
 
@@ -391,12 +401,13 @@ object Evaluation extends Datastores with Logging {
     //
 
     def getPR(extractions: GenMap[String, Try[ExtractedMetadata]]) = {
-      val prResults = allGoldData.map { case (metric, docId, goldData) =>
-        extractions(docId) match {
-          case Failure(_) => (metric, (0.0, 0.0))
-          case Success(extractedMetadata) =>
-            (metric, metric.evaluator(metric, docId, extractedMetadata, goldData))
-        }
+      val prResults = allGoldData.map {
+        case (metric, docId, goldData) =>
+          extractions(docId) match {
+            case Failure(_) => (metric, (0.0, 0.0))
+            case Success(extractedMetadata) =>
+              (metric, metric.evaluator(metric, docId, extractedMetadata, goldData))
+          }
       }
       prResults.groupBy(_._1).mapValues { prs =>
         val (ps, rs) = prs.map(_._2).unzip
@@ -406,7 +417,8 @@ object Evaluation extends Datastores with Logging {
 
     EvaluationResult(
       getPR(scienceParseExtractions),
-      getPR(grobidExtractions))
+      getPR(grobidExtractions)
+    )
   }
 
   def printResults(results: EvaluationResult): Unit = {

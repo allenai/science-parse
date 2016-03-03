@@ -1,9 +1,9 @@
 package org.allenai.scienceparse
 
-import java.io.{FileInputStream, File}
+import java.io.{ FileInputStream, File }
 
 import com.gs.collections.impl.set.mutable.UnifiedSet
-import org.allenai.common.{Resource, Logging}
+import org.allenai.common.{ Resource, Logging }
 import org.allenai.datastore.Datastores
 import org.allenai.scienceparse.Parser.ParseOpts
 import scopt.OptionParser
@@ -34,7 +34,7 @@ object Training extends App with Datastores with Logging {
   val parser = new OptionParser[Config](this.getClass.getSimpleName) {
     head("Options that are not specified default to the settings that were used to make the production model.")
 
-    opt[File]('o', "output") required() action { (o, c) =>
+    opt[File]('o', "output") required () action { (o, c) =>
       c.copy(output = o)
     } text "The output file"
 
@@ -132,7 +132,8 @@ object Training extends App with Datastores with Logging {
       pgt,
       paperSource,
       opts,
-      UnifiedSet.newSet(excludedIds.toIterable.asJava))
+      UnifiedSet.newSet(excludedIds.toIterable.asJava)
+    )
 
     logger.info(s"New model at ${opts.modelFile}")
   }
