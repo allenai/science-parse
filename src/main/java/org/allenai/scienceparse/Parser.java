@@ -83,7 +83,7 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 2);
   }
   public static Path getDefaultGazetteer() {
-    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
 
   public Parser() throws Exception {
