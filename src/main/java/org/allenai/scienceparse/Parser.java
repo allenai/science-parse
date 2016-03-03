@@ -1,10 +1,13 @@
 package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gs.collections.api.set.ImmutableSet;
+import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
 
+import lombok.Data;
 import lombok.val;
 import org.allenai.datastore.Datastore;
 import org.allenai.ml.linalg.DenseVector;
@@ -219,29 +222,40 @@ public class Parser {
     return labeledPaper;
   }
 
-  public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
-    ParserGroundTruth pgt,
+  @Data
+  private static class LabelingOutput {
+    public final List<List<Pair<PaperToken, String>>> labeledData;
+    public final Set<String> usedPaperIds;
+  }
+
+  private static LabelingOutput labelFromGroundTruth(
+    final ParserGroundTruth pgt,
     final PaperSource paperSource,
-    int headerMax,
-    boolean heuristicHeader,
-    int maxFiles,
-    int minYear,
-    boolean checkAuthors,
-    UnifiedSet<String> excludeIDs
+    final int headerMax,
+    final boolean heuristicHeader,
+    final int maxFiles,
+    final int minYear,
+    final boolean checkAuthors,
+    final Set<String> excludeIDs
   ) throws IOException {
     final PDFExtractor ext = new PDFExtractor();
 
-    final AtomicInteger triedCount = new AtomicInteger();
-    final AtomicInteger succeededCount = new AtomicInteger();
-    final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
-
+    // input we need
     final int parallelism = Runtime.getRuntime().availableProcessors() * 2;
     final int queueSize = parallelism * 4;
     final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(queueSize);
     final Iterator<Paper> papers = pgt.papers.iterator();
+
+    // stuff we need while processing
+    final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+    final AtomicInteger triedCount = new AtomicInteger();
+    final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
+
+    // capturing results
     final ArrayList<List<Pair<PaperToken, String>>> results =
             new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
-    final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+    final MutableSet<String> usedPaperIds = new UnifiedSet<String>().asSynchronized();
+
     try {
       if(maxFiles > 0)
         logger.info("Will be labeling {} papers in {} threads.", maxFiles, parallelism);
@@ -272,9 +286,8 @@ public class Parser {
               }
 
               int tried = triedCount.incrementAndGet();
-              int succeeded = succeededCount.intValue();
               if (result != null)
-                succeeded = succeededCount.incrementAndGet();
+                usedPaperIds.add(p.id);
               if (tried % 100 == 0) {
                 // find the document that's been in flight the longest
                 final long now = System.currentTimeMillis();
@@ -298,6 +311,7 @@ public class Parser {
                                   }
                                 });
 
+                final int succeeded = usedPaperIds.size();
                 if (maxEntry.isPresent()) {
                   logger.info(String.format(
                           "Tried to label %d papers, succeeded %d times (%.2f%%), %d papers in flight, oldest is %s at %.2f seconds",
@@ -352,10 +366,10 @@ public class Parser {
     logger.info(String.format(
             "Tried to label %d papers, succeeded %d times (%.2f%%), all done!",
             triedCount.get(),
-            succeededCount.get(),
-            succeededCount.get() * 100.0 / triedCount.doubleValue()));
+            usedPaperIds.size(),
+            usedPaperIds.size() * 100.0 / triedCount.doubleValue()));
 
-    return results;
+    return new LabelingOutput(results, usedPaperIds.asUnmodifiable());
   }
 
   public static List<List<Pair<PaperToken, String>>> bootstrapLabels(
@@ -417,12 +431,14 @@ public class Parser {
           ParseOpts opts,
           final UnifiedSet<String> excludeIDs
   ) throws IOException {
-    List<List<Pair<PaperToken, String>>> labeledData;
+    final LabelingOutput labelingOutput;
     PDFPredicateExtractor predExtractor;
     if (files != null) {
-      labeledData = bootstrapLabels(files, opts.headerMax, true); //don't exclude for pdf meta bootstrap
+      labelingOutput = new LabelingOutput(
+        bootstrapLabels(files, opts.headerMax, true),  //don't exclude for pdf meta bootstrap
+        UnifiedSet.newSet());
     } else {
-      labeledData = labelFromGroundTruth(
+      labelingOutput = labelFromGroundTruth(
               pgt,
               paperSource,
               opts.headerMax,
@@ -435,8 +451,7 @@ public class Parser {
     ParserLMFeatures plf = null;
     if (opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
-      UnifiedSet<String> excludedIds = new UnifiedSet<String>();
-      pgt.papers.forEach((Paper p) -> excludedIds.add(p.id));  // TODO: don't exclude all of these, only the ones we're using
+      UnifiedSet<String> excludedIds = new UnifiedSet<String>(labelingOutput.usedPaperIds);
       excludedIds.addAll(excludeIDs);
       plf = new ParserLMFeatures(
               gaz.papers,
@@ -449,9 +464,12 @@ public class Parser {
     }
 
     // Split train/test data
-    logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
+    logger.info(
+            "CRF training with {} threads and {} labeled examples",
+            opts.threads,
+            labelingOutput.labeledData.size());
     Pair<List<List<Pair<PaperToken, String>>>, List<List<Pair<PaperToken, String>>>> trainTestPair =
-      splitData(labeledData, 1.0 - opts.trainFraction);
+      splitData(labelingOutput.labeledData, 1.0 - opts.trainFraction);
     val trainLabeledData = trainTestPair.getOne();
     val testLabeledData = trainTestPair.getTwo();
 
