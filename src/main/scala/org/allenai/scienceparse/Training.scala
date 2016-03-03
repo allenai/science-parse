@@ -27,7 +27,8 @@ object Training extends App with Datastores with Logging {
     minYear: Int = 2008,
     maxPaperCount: Int = 20000,
     paperDir: Option[File] = None,
-    excludeIdsFile: Option[File] = None
+    excludeIdsFile: Option[File] = None,
+    minExpectedFeatureCount: Int = 1
   )
 
   val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -81,6 +82,10 @@ object Training extends App with Datastores with Logging {
       c.copy(excludeIdsFile = Some(e))
     } text "A file with paper IDs to exclude, one per line. We always exclude the papers from the evaluation set."
 
+    opt[Int]("minExpectedFeatureCount") action { (n, c) =>
+      c.copy(minExpectedFeatureCount = n)
+    } text "The minimum number of times we should see a feature before accepting it."
+
     help("help") text "Prints help text"
   }
 
@@ -110,6 +115,7 @@ object Training extends App with Datastores with Logging {
     opts.checkAuthors = true
     opts.minYear = config.minYear
     opts.documentCount = config.maxPaperCount
+    opts.minExpectedFeatureCount = config.minExpectedFeatureCount
 
     val paperSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
 

@@ -459,6 +459,7 @@ public class Parser {
     CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
     trainOpts.optimizerOpts.maxIters = opts.iterations;
     trainOpts.numThreads = opts.threads;
+    trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
 
     // Trainer
     CRFTrainer<String, PaperToken, String> trainer =
@@ -926,5 +927,6 @@ public class Parser {
     public int minYear; //only process papers this year or later
     public boolean checkAuthors; //only bootstraps papers if all authors are found
     public int documentCount = -1; // how many documents to train on. set to -1 to train on all.
+    public int minExpectedFeatureCount = 1;
   }
 }
