@@ -59,7 +59,8 @@ public class PDFToCRFInput {
       b.append(s);
       b.append(' ');
     }
-    b.setLength(b.length() - 1);
+    if(b.length() > 0)
+      b.setLength(b.length() - 1);
     return b.toString();
   }
 
