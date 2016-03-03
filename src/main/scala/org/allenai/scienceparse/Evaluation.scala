@@ -255,6 +255,18 @@ object Evaluation extends Datastores with Logging {
     Metric("bibMentionsNormalized",    "/golddata/isaac/mentions.tsv",       stringEvaluator(bibMentionsExtractor, normalizer = mentionNormalize))
   )
 
+  lazy val allGoldData = metrics.flatMap { metric =>
+    Resource.using(Source.fromInputStream(getClass.getResourceAsStream(metric.goldFile))(Codec.UTF8)) { source =>
+      source.getLines().map { line =>
+        val fields = line.trim.split("\t").map(_.trim)
+        (metric, fields.head, fields.tail.toList)
+      }.toList
+    }
+  }
+  // allGoldData is a Seq[(Metric, DocId, Set[Label])]
+
+  lazy val goldDocIds = allGoldData.map(_._2).toSet
+
   case class EvaluationStats(precision: Double, recall: Double, evaluationSetSize: Int) {
     def p = precision
     def r = recall
@@ -282,7 +294,7 @@ object Evaluation extends Datastores with Logging {
         c.copy(gazetteerFile = Some(g))
       } text "Specifies the gazetteer file. Defaults to the production one. Take care not to use a gazetteer that you also used to train the model."
 
-      help("help") text "prints help text"
+      help("help") text "Prints help text"
     }
 
     parser.parse(args, Config()).foreach { config =>
@@ -309,8 +321,6 @@ object Evaluation extends Datastores with Logging {
         }.toList
       }
     }
-    // allGoldData is now a Seq[(Metric, DocId, Set[Label])]
-    val docIds = allGoldData.map(_._2).toSet
 
     //
     // download the documents and run extraction
@@ -318,7 +328,7 @@ object Evaluation extends Datastores with Logging {
 
     val grobidExtractions = {
       val grobidExtractionsDirectory = publicDirectory("GrobidExtractions", 1)
-      docIds.par.map { docid =>
+      goldDocIds.par.map { docid =>
         val grobidExtraction = grobidExtractionsDirectory.resolve(s"$docid.xml")
         docid -> Success(GrobidParser.parseGrobidXml(grobidExtraction))
       }.toMap
@@ -327,13 +337,13 @@ object Evaluation extends Datastores with Logging {
     val scienceParseExtractions = {
       val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
-      val documentCount = docIds.size
+      val documentCount = goldDocIds.size
       logger.info(s"Running on $documentCount documents")
 
       val totalDocumentsDone = new AtomicInteger()
       val startTime = System.currentTimeMillis()
 
-      val result = docIds.par.map { docid =>
+      val result = goldDocIds.par.map { docid =>
         val pdf = pdfDirectory.resolve(s"$docid.pdf")
         val result = Resource.using(Files.newInputStream(pdf)) { is =>
           docid -> Try(parser.doParse(is))

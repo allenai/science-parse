@@ -25,6 +25,7 @@ import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -156,12 +157,15 @@ public class Parser {
           Paper p,
           PDFExtractor ext,
           boolean heuristicHeader,
-          int headerMax) throws IOException {
-    return getPaperLabels(pdf, p, ext, heuristicHeader, headerMax, false);
+          int headerMax
+  ) throws IOException {
+    try(final InputStream is = new BufferedInputStream(new FileInputStream(pdf))) {
+      return getPaperLabels(is, p, ext, heuristicHeader, headerMax, false);
+    }
   }
 
   public static List<Pair<PaperToken, String>> getPaperLabels(
-          File pdf,
+          final InputStream is,
           Paper p,
           PDFExtractor ext,
           boolean heuristicHeader,
@@ -172,14 +176,12 @@ public class Parser {
     if(paperId != null)
     logger.debug("{}: starting", paperId);
 
-    PDFDoc doc = null;
-    try(final FileInputStream fis = new FileInputStream(pdf)) {
+    final PDFDoc doc;
     try {
-      doc = ext.extractFromInputStream(fis);
-      } catch(final Exception e) {
-        logger.warn("{} failed: {}", paperId, e.toString());
-        return null;
-      }
+      doc = ext.extractFromInputStream(is);
+    } catch(final Exception e) {
+      logger.warn("{} failed: {}", paperId, e.toString());
+      return null;
     }
     if (doc == null) {
       return null;
@@ -219,7 +221,7 @@ public class Parser {
 
   public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
     ParserGroundTruth pgt,
-    String paperDir,
+    final PaperSource paperSource,
     int headerMax,
     boolean heuristicHeader,
     int maxFiles,
@@ -227,7 +229,6 @@ public class Parser {
     boolean checkAuthors,
     UnifiedSet<String> excludeIDs
   ) throws IOException {
-    final File dir = new File(paperDir);
     final PDFExtractor ext = new PDFExtractor();
 
     final AtomicInteger triedCount = new AtomicInteger();
@@ -259,14 +260,16 @@ public class Parser {
           final Future<List<Pair<PaperToken, String>>> future = executor.submit(() -> {
             try {
               paperId2startTime.put(p.id, System.currentTimeMillis());
-              final List<Pair<PaperToken, String>> result =
-                      getPaperLabels(
-                              new File(dir, p.id + ".pdf"),
-                              p,
-                              ext,
-                              heuristicHeader,
-                              headerMax,
-                              checkAuthors);
+              final List<Pair<PaperToken, String>> result;
+              try(final InputStream is = paperSource.getPdf(p.id)) {
+                result = getPaperLabels(
+                        is,
+                        p,
+                        ext,
+                        heuristicHeader,
+                        headerMax,
+                        checkAuthors);
+              }
 
               int tried = triedCount.incrementAndGet();
               int succeeded = succeededCount.intValue();
@@ -355,8 +358,11 @@ public class Parser {
     return results;
   }
 
-  public static List<List<Pair<PaperToken, String>>>
-  bootstrapLabels(List<File> files, int headerMax, boolean heuristicHeader) throws IOException {
+  public static List<List<Pair<PaperToken, String>>> bootstrapLabels(
+          List<File> files,
+          int headerMax,
+          boolean heuristicHeader
+  ) throws IOException {
     List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
     PDFExtractor ext = new PDFExtractor();
 
@@ -379,17 +385,38 @@ public class Parser {
     return out;
   }
 
+  public static void trainParser(
+          final List<File> files,
+          final ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          final ParseOpts opts
+  ) throws IOException {
+    trainParser(files, pgt, paperSource, opts, UnifiedSet.newSet());
+  }
+
+  public static void trainParser(
+          final List<File> files,
+          final ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          final ParseOpts opts,
+          final String excludeIDsFile
+  ) throws IOException {
+    final UnifiedSet<String> excludedIDs;
+    if (excludeIDsFile == null)
+      excludedIDs = new UnifiedSet<>();
+    else
+      excludedIDs = readSet(excludeIDsFile);
+    trainParser(files, pgt, paperSource, opts, excludedIDs);
+  }
+
   //borrowing heavily from conll.Trainer
   public static void trainParser(
           List<File> files,
           ParserGroundTruth pgt,
-          String paperDir,
+          final PaperSource paperSource,
           ParseOpts opts,
-          String excludeIDsFile
+          final UnifiedSet<String> excludeIDs
   ) throws IOException {
-    UnifiedSet<String> excludeIDs = new UnifiedSet<String>();
-    if (excludeIDsFile != null)
-      excludeIDs = readSet(excludeIDsFile);
     List<List<Pair<PaperToken, String>>> labeledData;
     PDFPredicateExtractor predExtractor;
     if (files != null) {
@@ -397,7 +424,7 @@ public class Parser {
     } else {
       labeledData = labelFromGroundTruth(
               pgt,
-              paperDir,
+              paperSource,
               opts.headerMax,
               true,
               opts.documentCount > 0 ? opts.documentCount : pgt.papers.size(),
@@ -409,7 +436,7 @@ public class Parser {
     if (opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
       UnifiedSet<String> excludedIds = new UnifiedSet<String>();
-      pgt.papers.forEach((Paper p) -> excludedIds.add(p.id));
+      pgt.papers.forEach((Paper p) -> excludedIds.add(p.id));  // TODO: don't exclude all of these, only the ones we're using
       excludedIds.addAll(excludeIDs);
       plf = new ParserLMFeatures(
               gaz.papers,
@@ -598,7 +625,7 @@ public class Parser {
       opts.headerMax = 100;
       opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
       opts.threads = Runtime.getRuntime().availableProcessors() * 2;
-      trainParser(inFiles, null, null, opts, null);
+      trainParser(inFiles, null, null, opts);
 
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
       ParserGroundTruth pgt = new ParserGroundTruth(args[1]); //holds the labeled data to be used for train, test (S2 json bib format)
@@ -608,14 +635,15 @@ public class Parser {
       opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
       opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
       opts.threads = Runtime.getRuntime().availableProcessors() * 2;
-      opts.backgroundSamples = 40000; //use up to this many papers from background dir to estimate background language model
+      opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
       opts.backgroundDirectory = args[5]; //where to find the background papers
       opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)
       opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
       opts.checkAuthors = true; //exclude from training papers where we don't find authors
       opts.minYear = 2008; //discard papers from before this date
       opts.documentCount = args.length > 7 ? Integer.parseInt(args[7]) : -1;
-      trainParser(null, pgt, args[3], opts, args[6]); //args[3] holds the papers in which we can find ground truth
+      final PaperSource paperSource = new DirectoryPaperSource(new File(args[3])); //args[3] holds the papers in which we can find ground truth
+      trainParser(null, pgt, paperSource, opts, args[6]);
                 //args[6] is a list of paper ids (one id per line) that we must exclude from training data and gazetteers 
                 //(because they're used for final tests)
     } else if (args[0].equalsIgnoreCase("parse")) {

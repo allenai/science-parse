@@ -78,7 +78,11 @@ public class HeaderIntegrationTest {
         opts.minYear = 2008;
 
         log.info("Training CRF with {} papers", subset.papers.size());
-        Parser.trainParser(null, subset, "testdata/papers", opts, null);
+        Parser.trainParser(
+                null,
+                subset,
+                new DirectoryPaperSource(new File("testdata/papers")),
+                opts);
 
         final Parser result;
         try(
