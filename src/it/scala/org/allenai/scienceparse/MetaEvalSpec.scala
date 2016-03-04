@@ -29,7 +29,7 @@ class MetaEvalSpec extends UnitSpec {
       "bibYears                ".trim -> ((0.909, 0.658)),
       "title                   ".trim -> ((0.408, 0.408)),
       "titleNormalized         ".trim -> ((0.807, 0.807))
-    )
+      )
 
     val tolerance = 0.002
     evaluationResult.scienceParse.foreach { case (metric, eval) =>

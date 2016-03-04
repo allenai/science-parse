@@ -562,6 +562,8 @@ public class Parser {
     // kill non-character letters
     // kill xml
     t = t.replaceAll("\\&.*?\\;", "");
+    if (t.endsWith("."))
+      t = t.substring(0, t.length() - 1);
     return t;
   }
 
@@ -607,17 +609,19 @@ public class Parser {
     return truePos;
   }
 
-  public static String trimAuthor(String s) {
+  public static String normalizeAuthor(String s) {
     String sFix = s.replaceAll("(\\W|[0-9])+$", "");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
+    if (sFix.endsWith("Jr"))
+      sFix = sFix + ".";
     return sFix;
   }
 
   public static List<String> trimAuthors(List<String> auth) {
     List<String> out = new ArrayList<String>();
     auth.forEach(s -> {
-      s = trimAuthor(s);
+      s = normalizeAuthor(s);
       if (!out.contains(s)) out.add(s);
     });
     return out;

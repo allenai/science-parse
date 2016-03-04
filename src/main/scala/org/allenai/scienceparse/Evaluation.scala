@@ -164,12 +164,16 @@ object Evaluation extends Datastores with Logging {
 
   private def fullNameExtractor(metadata: ExtractedMetadata) = metadata.authors.toItems
 
+  private val suffixes = Set("Jr.")
+
+  private def getLastName(name: String) =
+    name.split("\\s+").filterNot(suffixes.contains).last
+
   private def lastNameExtractor(metadata: ExtractedMetadata) =
-    metadata.authors.mapItems(_.split("\\s+").last)
+    metadata.authors.mapItems(getLastName)
 
   private def lastNameGoldExtractor(names: List[String]) = names.map { fullName =>
-    val lastName = fullName.split("\\s+").last
-    ItemWithOriginal(lastName, fullName)
+    ItemWithOriginal(getLastName(fullName), fullName)
   }
 
   private def titleExtractor(metadata: ExtractedMetadata) =

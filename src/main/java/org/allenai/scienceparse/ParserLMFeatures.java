@@ -12,10 +12,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -160,12 +158,12 @@ public class ParserLMFeatures implements Serializable {
     int ct = 0;
     if (toks.length > 0) {
       if (firstHM != null)
-        firstHM.addToValue(doTrim ? Parser.trimAuthor(toks[0]) : toks[0], 1.0);
+        firstHM.addToValue(doTrim ? Parser.normalizeAuthor(toks[0]) : toks[0], 1.0);
       if (lastHM != null)
-        lastHM.addToValue(doTrim ? Parser.trimAuthor(toks[toks.length - 1]) : toks[toks.length - 1], 1.0);
+        lastHM.addToValue(doTrim ? Parser.normalizeAuthor(toks[toks.length - 1]) : toks[toks.length - 1], 1.0);
     }
     for (String t : toks) {
-      hm.addToValue(doTrim ? Parser.trimAuthor(t) : t, 1.0);
+      hm.addToValue(doTrim ? Parser.normalizeAuthor(t) : t, 1.0);
       ct++;
     }
     return ct;
