@@ -14,7 +14,7 @@ public class CheckReferencesTest {
     String jsonFile = Parser.getDefaultGazetteer().toString();
     CheckReferences cr = new CheckReferences(jsonFile);
     log.info("num hashes: " + cr.getHashSize());
-    Assert.assertEquals(cr.getHashSize(), 13579);
+    Assert.assertEquals(13579, cr.getHashSize());
     Assert.assertTrue(cr.hasPaper(
       "Text-based measures of document diversity",
       Arrays.asList("Kevin Bache",
