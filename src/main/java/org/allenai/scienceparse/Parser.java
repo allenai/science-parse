@@ -353,6 +353,19 @@ public class Parser {
           logger.warn("ExecutionException while processing paper", e);
         }
       }
+
+      // read the queue empty if we have to
+      while(!workQueue.isEmpty() && (maxFiles <= 0 || results.size() < maxFiles)) {
+        try {
+          val result = workQueue.poll().get();
+          if(result != null)
+            results.add(result);
+        } catch (final InterruptedException e) {
+          logger.warn("Interrupted while processing paper", e);
+        } catch (final ExecutionException e) {
+          logger.warn("ExecutionException while processing paper", e);
+        }
+      }
     } finally {
       executor.shutdown();
       try {
