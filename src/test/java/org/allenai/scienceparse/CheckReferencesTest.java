@@ -2,6 +2,7 @@ package org.allenai.scienceparse;
 
 import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
+import org.allenai.datastore.Datastore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -11,7 +12,8 @@ import java.util.Arrays;
 @Slf4j
 public class CheckReferencesTest {
   public void smallTest() throws IOException {
-    String jsonFile = Parser.getDefaultGazetteer().toString();
+    final String jsonFile =
+            Datastore.apply().filePath("org.allenai.scienceparse", "gazetteer.json", 1).toString();
     CheckReferences cr = new CheckReferences(jsonFile);
     log.info("num hashes: " + cr.getHashSize());
     Assert.assertEquals(13579, cr.getHashSize());
