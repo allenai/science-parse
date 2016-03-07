@@ -34,8 +34,8 @@ class MetaEvalSpec extends UnitSpec {
     val tolerance = 0.002
     evaluationResult.scienceParse.foreach { case (metric, eval) =>
       val (minimumP, minimumR) = minimumPR(metric.name)
-      assert(eval.p > minimumP - tolerance)
-      assert(eval.r > minimumR - tolerance)
+      assert(eval.p > minimumP - tolerance, s"Evaluating precision for ${metric.name}")
+      assert(eval.r > minimumR - tolerance, s"Evaluating recall for ${metric.name}")
     }
   }
 }
