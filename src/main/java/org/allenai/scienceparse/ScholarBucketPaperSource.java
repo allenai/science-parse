@@ -22,7 +22,7 @@ public class ScholarBucketPaperSource implements PaperSource {
     private static ScholarBucketPaperSource instance = new ScholarBucketPaperSource();
     protected ScholarBucketPaperSource() { }
     public static ScholarBucketPaperSource getInstance() { return instance; }
-;
+
     private final static String bucket = "ai2-s2-pdfs";
     private final AmazonS3 s3 = new AmazonS3Client();
 
