@@ -1,23 +1,24 @@
 package org.allenai.scienceparse;
 
+import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.allenai.datastore.Datastore;
 import org.allenai.pdfbox.io.IOUtils;
 import org.testng.annotations.Test;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Test(groups = {"integration"})
 @Slf4j
 public class HeaderIntegrationTest {
+    private final static PaperSource paperSource =
+            new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5);
+
     static final int kSampledPapers = 100;
-    static final String kTestDirectory = "./testdata/dblp";
 
     public static class Result {
         int authorHits;
@@ -28,73 +29,6 @@ public class HeaderIntegrationTest {
         boolean titleMissing;
     }
 
-    public static File downloadPDF(String urlStr, String targetDir) {
-        new File(targetDir).mkdirs();
-        try {
-            URL url = new URL(urlStr);
-            String fileName = new File(url.getFile()).getName();
-            File outputFile = new File(targetDir, fileName);
-
-            if (outputFile.exists()) {
-                return outputFile;
-            }
-
-            log.info("Fetching: {} -> {}", urlStr, fileName);
-            InputStream is = url.openStream();
-            byte[] bytes = IOUtils.toByteArray(is);
-            FileOutputStream fOs = new FileOutputStream(outputFile);
-            fOs.write(bytes);
-            fOs.close();
-
-            return outputFile;
-        } catch (IOException e) {
-            log.warn("Failed to download PDF {}, {}", urlStr, e);
-            return null;
-        }
-    }
-
-    public static void downloadAllPapers(ParserGroundTruth pgt) throws Exception {
-        new File(kTestDirectory).mkdirs();
-        for (ParserGroundTruth.Paper paper : pgt.papers) {
-            downloadPDF(paper.url, kTestDirectory);
-        }
-    }
-
-    public Parser trainParser(ParserGroundTruth pgt) throws Exception {
-        ParserGroundTruth subset = new ParserGroundTruth(pgt.papers.subList(0, 100));
-        Parser.ParseOpts opts = new Parser.ParseOpts();
-
-        final File tempModelFile = File.createTempFile("science-parse-temp-model.", ".dat");
-        tempModelFile.deleteOnExit();
-        opts.modelFile = tempModelFile.getPath();
-        opts.headerMax = Parser.MAXHEADERWORDS;
-        opts.iterations = 10;
-        opts.threads = 4;
-        opts.backgroundSamples = 400;
-        opts.backgroundDirectory = "testdata/background";
-        opts.gazetteerFile = null;
-        opts.trainFraction = 0.9;
-        opts.checkAuthors = true;
-        opts.minYear = 2008;
-
-        log.info("Training CRF with {} papers", subset.papers.size());
-        Parser.trainParser(
-                null,
-                subset,
-                new DirectoryPaperSource(new File("testdata/papers")),
-                opts);
-
-        final Parser result;
-        try(
-          val modelStream = new FileInputStream(tempModelFile);
-          val gazetteerStream = Files.newInputStream(Parser.getDefaultGazetteer())
-        ){
-          result = new Parser(modelStream, gazetteerStream);
-        }
-        tempModelFile.delete();
-        return result;
-    }
-
     public static HashSet<String> authorSet(Iterable<String> authors) {
         HashSet<String> result = new HashSet<String>();
         for (String author : authors) {
@@ -103,22 +37,21 @@ public class HeaderIntegrationTest {
         return result;
     }
 
-    public static Result testPaper(Parser parser, ParserGroundTruth pgt, File pdfFile) {
+    public static Result testPaper(
+            final Parser parser,
+            final ParserGroundTruth pgt,
+            final String paperId
+    ) {
         ExtractedMetadata metadata;
 
-        // TODO -- why is the paper id a substring of parsergroundtruth?
-        String key = pdfFile.getName().split("[.]")[0];
-        ParserGroundTruth.Paper paper = pgt.forKey(key);
+        ParserGroundTruth.Paper paper = pgt.forKey(paperId.substring(4));
 
         try {
             metadata = parser.doParse(
-                    new FileInputStream(pdfFile),
+                    paperSource.getPdf(paperId),
                     Parser.MAXHEADERWORDS);
         } catch (Exception e) {
             log.info("Failed to parse or extract from {}.  Skipping.", paper.url);
-            return null;
-        } catch (NoClassDefFoundError e) {
-            log.info("Ignoring encrypted PDF {}", pdfFile.getName());
             return null;
         }
 
@@ -158,7 +91,7 @@ public class HeaderIntegrationTest {
         if (res.authorInvalid > 0 || !res.titleMatch) {
             metadata.authors.sort((String a, String b) -> a.compareTo(b));
             Arrays.sort(paper.authors);
-            log.info("Failed match for paper: {}.", pdfFile.getAbsolutePath());
+            log.info("Failed match for paper {}.", paperId);
             log.info("Titles: GOLD:\n{} OURS:\n{}", paper.title, metadata.title);
             for (int i = 0; i < Math.max(paper.authors.length, metadata.authors.size()); ++i) {
                 String goldAuthor = null;
@@ -190,9 +123,7 @@ public class HeaderIntegrationTest {
         ArrayList<Result> results = sampledPapers
                 .stream()
                 .parallel()
-                .map(p -> downloadPDF(p.url, kTestDirectory))
-                .filter(f -> f != null)
-                .map(f -> testPaper(parser, pgt, f))
+                .map(p -> testPaper(parser, pgt, p.id))
                 .filter(f -> f != null)
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -214,6 +145,8 @@ public class HeaderIntegrationTest {
         double elapsed = (finishTime - startTime) / 1000.0;
         log.info("Testing complete.  {} papers processed in {} seconds; {} papers/sec ",
                 results.size(), elapsed, results.size() / elapsed);
+
+        Assert.assertTrue(results.size() > 5);
 
         log.info("Authors: {} (Match: {} Invalid: {} Total {})",
                 totalHits / (double)totalAuthors, totalHits, totalInvalid, totalAuthors);
