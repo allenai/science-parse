@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -28,20 +29,19 @@ import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
 
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
+import com.sun.media.jfxmedia.logging.Logger;
 
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class CRFBibRecordParser implements BibRecordParser {
   private static CRFModel<String, String, String> model;
   public static final String DATA_VERSION = "0.1";
   
-  public CRFBibRecordParser(String modelFile) throws Exception {
-      try(
-        final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
-      ) {
-        model = loadModel(modelIs);
-      }
-   }
+  public CRFBibRecordParser(CRFModel<String, String, String> inModel) {
+    model = inModel;
+  }
 
   public static List<Pair<String, String>> getLabeledLine(String s) {
     final String [] sourceTags = new String [] {"author", "booktitle", "date", "title"}; //MUST BE SORTED
@@ -50,14 +50,15 @@ public class CRFBibRecordParser implements BibRecordParser {
         ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, ExtractedMetadata.titleTag};
     
     final Pattern yearPat= Pattern.compile("[1-2][0-9]{3}");
-    String [] toks = s.split(" ");
+    List<String> toks = tokenize(s);
     List<Pair<String, String>> out = new ArrayList<>();
-    for(int i=0; i<toks.length; i++) {
-      if(toks[i].endsWith(">")) {
-        String t = toks[i].replaceAll("<", "").replaceAll("//", "").replaceAll(">", "");
+    out.add(Tuples.pair("<S>", "<S>"));
+    for(String sTok : toks) {
+      if(sTok.endsWith(">")) {
+        String t = sTok.replaceAll("<", "").replaceAll("/", "").replaceAll(">", "");
         int idx = Arrays.binarySearch(sourceTags, t);
         if(idx >= 0) { //ignore unescaped XML chars in bib
-           inTag[idx] = (toks[i].startsWith("</"))?false:true;
+           inTag[idx] = (sTok.startsWith("</"))?false:true;
         }
       }
       else { //write it out with proper tag
@@ -65,7 +66,7 @@ public class CRFBibRecordParser implements BibRecordParser {
         for(int j=0; j<inTag.length; j++) {
           if(inTag[j]) {
             if(j==2) { //special case for date, we only want year
-              if(RegexWithTimeout.matcher(yearPat, toks[i]).matches())
+              if(RegexWithTimeout.matcher(yearPat, sTok).matches())
                 tag = destTags[2];
             }
             else
@@ -73,13 +74,16 @@ public class CRFBibRecordParser implements BibRecordParser {
             break;
           }
         }
-        Tuples.pair(toks[i], tag);
+        out.add(Tuples.pair(sTok, tag));
       }
     }
+    //change to begin/end:
+    
+    out.add(Tuples.pair("</S>", "</S>"));
     return out;
   }
   
-  public static List<List<Pair<String, String>>> labelFromCoraFile(File trainFile) throws Exception {
+  public static List<List<Pair<String, String>>> labelFromCoraFile(File trainFile) throws IOException {
     List<List<Pair<String, String>>> out = new ArrayList<>();
     BufferedReader brIn = new BufferedReader(new InputStreamReader(new FileInputStream(trainFile), "UTF-8"));
     String sLine;
@@ -91,30 +95,16 @@ public class CRFBibRecordParser implements BibRecordParser {
     return out;
   }
   
-  public static CRFModel<String, String, String> loadModel(
-    DataInputStream dis) throws Exception {
-    IOUtils.ensureVersionMatch(dis, DATA_VERSION);
-    val stateSpace = StateSpace.load(dis);
-    Indexer<String> nodeFeatures = Indexer.load(dis);
-    Indexer<String> edgeFeatures = Indexer.load(dis);
-    Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
-    ObjectInputStream ois = new ObjectInputStream(dis);
-    ParserLMFeatures plf = (ParserLMFeatures) ois.readObject();
-    val predExtractor = new ReferencesPredicateExtractor(plf);
-    val featureEncoder = new CRFFeatureEncoder<String, String, String>
-      (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
-    val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
-
-    return new CRFModel<String, String, String>(featureEncoder, weightsEncoder, weights);
-  }
-
   private static List<String> tokenize(String line) { //tokenizes string for use in bib parsing
-    String [] toks = line.split(" "); //not fancy
+    line = line.replaceAll("([a-z0-9])(,|\\.)", "$1 $2"); //break on lowercase alpha or num before . or ,
+    String [] toks = line.split(" "); //otherwise not fancy
     return Arrays.asList(toks);
   }
   
   public BibRecord parseRecord(String line) {
     line = line.trim();
+    if(line.length() == 0)
+      return null;
     Pattern pBracket = Pattern.compile("\\[([0-9]+)\\](.*)");
     Pattern pDot = Pattern.compile("([0-9]+)\\.(.*)$");
     Matcher m = RegexWithTimeout.matcher(pBracket,  line);
@@ -133,8 +123,18 @@ public class CRFBibRecordParser implements BibRecordParser {
         line = m.group(2);
       }
     }
-    List<String> toks = tokenize(line);
+    line = line.trim();
+    if(line.length()==0)
+      return null;
+    
+    ArrayList<String> toks = new ArrayList<String>();
+    toks.add("<S>");
+    toks.addAll(tokenize(line));
+    toks.add("</S>");
+    log.info("processing bib line with crf: " + toks.toString());
     List<String> labels = model.bestGuess(toks);
+    labels = PDFToCRFInput.padTagSequence(labels);
+    log.info("labels " + labels.toString());
     List<LabelSpan> lss = ExtractedMetadata.getSpans(labels);
     
     String title = null;
@@ -153,19 +153,23 @@ public class CRFBibRecordParser implements BibRecordParser {
         year = PDFToCRFInput.stringAtForStringList(toks, ls.loc);
       }
     }
-    List<String> authors = ExtractReferences.authorStringToList(author);
+    
+    List<String> authors = (author==null)?null:ExtractReferences.authorStringToList(author);
     if(citeRegEx == null) {
-      shortCiteRegEx = NamedYear.getCiteAuthorFromAuthors(authors);
+      shortCiteRegEx = ExtractReferences.getCiteAuthorFromAuthors(authors);
       citeRegEx = shortCiteRegEx + ",? " + year;
     }
     BibRecord brOut = null;
+    if(citeRegEx == null || shortCiteRegEx == null)
+      return null;
     try {
       brOut = new BibRecord(
           title, authors, venue, Pattern.compile(citeRegEx), Pattern.compile(shortCiteRegEx), Integer.parseInt(year));
     }
     catch (NumberFormatException e) {
-      return null;
+      brOut = new BibRecord(title, authors, venue, Pattern.compile(citeRegEx), Pattern.compile(shortCiteRegEx), 0);
     }
+    log.info("got with CRF: " + brOut.toString());
     return brOut;
   }
 }

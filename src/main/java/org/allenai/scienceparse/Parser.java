@@ -69,6 +69,9 @@ public class Parser {
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
   }
+  public static Path getDefaultBibModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 1);
+  }
 
   public Parser() throws Exception {
     this(getDefaultProductionModel(), getDefaultGazetteer());
@@ -82,14 +85,22 @@ public class Parser {
     this(modelFile.toFile(), gazetteerFile.toFile());
   }
 
-  public Parser(final File modelFile, final File gazetteerFile) throws Exception {
+  public Parser(final File modelFile, final File gazetteerFile, final File bibModelFile) throws Exception {
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
       final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
+      final DataInputStream bibModelIs = (bibModelFile!=null)?(new DataInputStream(new FileInputStream(bibModelFile))):null; 
     ) {
       model = loadModel(modelIs);
-      referenceExtractor = new ExtractReferences(gazetteerIs);
+      if(bibModelIs == null)
+        referenceExtractor = new ExtractReferences(gazetteerIs);
+      else
+        referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
     }
+  }
+  
+  public Parser(final File modelFile, final File gazetteerFile) throws Exception {
+    this(modelFile, gazetteerFile, null);
   }
 
   public Parser(final InputStream modelStream, final InputStream gazetteerStream) throws Exception {
@@ -280,16 +291,16 @@ public class Parser {
     return out;
   }
   
-  public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) {
+  public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) throws IOException {
     List<List<Pair<String, String>>> labeledData;
-    labeledData = labelFromCoraFile(coraTrainFile);
+    labeledData = CRFBibRecordParser.labelFromCoraFile(coraTrainFile);
     ReferencesPredicateExtractor predExtractor;
     ParserLMFeatures plf = null;
     if(opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
       plf = new ParserLMFeatures(
           gaz.papers,
-          null,
+          new UnifiedSet<>(),
           new File(opts.backgroundDirectory),
           opts.backgroundSamples);
       predExtractor = new ReferencesPredicateExtractor(plf);
@@ -309,7 +320,7 @@ public class Parser {
     CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
     trainOpts.optimizerOpts.maxIters = opts.iterations;
     trainOpts.numThreads = opts.threads;
-
+    logger.info("first example: " + trainLabeledData.get(0));
     // Trainer
     CRFTrainer<String, String, String> trainer =
       new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
@@ -450,7 +461,7 @@ public class Parser {
     ObjectOutputStream oos = new ObjectOutputStream(dos);
     oos.writeObject(plf);
   }
-
+  
   public static CRFModel<String, PaperToken, String> loadModel(
     DataInputStream dis) throws Exception {
     IOUtils.ensureVersionMatch(dis, DATA_VERSION);
@@ -548,12 +559,14 @@ public class Parser {
       (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
       (args.length == 7 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
+      (args.length == 6 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
+      (args.length == 5 && args[0].equalsIgnoreCase("learnBibCRF")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
       System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
       System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
       System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
-      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file>");
+      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file> <bib model file>");
+      System.err.println("OR:    learnBibCRF <cora file> <output file> <gazetteer file> <background dir>");
     } else if (args[0].equalsIgnoreCase("bootstrap")) {
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -712,7 +725,7 @@ public class Parser {
       //TODO: write output
 
     } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
-      Parser p = new Parser(args[2], args[4]);
+      Parser p = new Parser(new File(args[2]), new File(args[4]), new File(args[5]));
       File inDir = new File(args[1]);
       File outDir = new File(args[3]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -765,6 +778,18 @@ public class Parser {
       logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
       logger.info("blank abstracts: " + blankAbstracts);
+    }
+    else if(args[0].equalsIgnoreCase("learnBibCRF")) {
+      ParseOpts opts = new ParseOpts();
+      opts.modelFile = args[2];
+      opts.gazetteerFile = args[3];
+      opts.backgroundDirectory = args[4];
+      opts.iterations = 200;
+      opts.threads = 1;//Runtime.getRuntime().availableProcessors();
+      opts.backgroundSamples = 5;
+      opts.trainFraction = 0.9;
+      trainBibliographyCRF(new File(args[1]), opts);
+      
     }
   }
 

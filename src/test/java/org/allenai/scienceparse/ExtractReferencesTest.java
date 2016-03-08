@@ -80,13 +80,18 @@ public class ExtractReferencesTest {
   }
 
   public void testCRFExtractor() throws Exception {
-    ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString());
+//    ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString(),
+//        Parser.getDefaultBibModel().toString());
+    
+  ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString(),
+      filePathOfResource("/model-bib-crf-test.dat"));
 
+    
     File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
     final Pair<List<String>, List<String>> content = parseDoc(paper2);
     final List<String> raw = content.getOne();
     final List<String> rawReferences = content.getTwo();
-    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferencesCRF(rawReferences);
+    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
     final List<BibRecord> br = fnd.getOne();
     final BibStractor bs = fnd.getTwo();
 

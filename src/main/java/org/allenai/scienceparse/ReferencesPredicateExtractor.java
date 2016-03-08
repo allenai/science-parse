@@ -56,6 +56,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%bfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.backgroundBow));
         m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.trimAuthor(tok), this.lmFeats.backgroundBow));
       }
+      out.add(m);
     }
     return out;
   }
