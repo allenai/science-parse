@@ -279,6 +279,77 @@ public class Parser {
     brIn.close();
     return out;
   }
+  
+  public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) {
+    List<List<Pair<String, String>>> labeledData;
+    labeledData = labelFromCoraFile(coraTrainFile);
+    ReferencesPredicateExtractor predExtractor;
+    ParserLMFeatures plf = null;
+    if(opts.gazetteerFile != null) {
+      ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
+      plf = new ParserLMFeatures(
+          gaz.papers,
+          null,
+          new File(opts.backgroundDirectory),
+          opts.backgroundSamples);
+      predExtractor = new ReferencesPredicateExtractor(plf);
+    } else {
+      predExtractor = new ReferencesPredicateExtractor();
+    }
+    
+    //TODO: remove duplication with trainParser in the below
+    // Split train/test data
+    logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
+    Pair<List<List<Pair<String, String>>>, List<List<Pair<String, String>>>> trainTestPair =
+      splitData(labeledData, 1.0 - opts.trainFraction);
+    val trainLabeledData = trainTestPair.getOne();
+    val testLabeledData = trainTestPair.getTwo();
+
+    // Set up Train options
+    CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
+    trainOpts.optimizerOpts.maxIters = opts.iterations;
+    trainOpts.numThreads = opts.threads;
+
+    // Trainer
+    CRFTrainer<String, String, String> trainer =
+      new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
+
+    // Setup iteration callback, weird trick here where you require
+    // the trainer to make a model for each iteration but then need
+    // to modify the iteration-callback to use it
+    Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
+    CRFModel<String, String, String> cacheModel = null;
+    trainOpts.optimizerOpts.iterCallback = (weights) -> {
+      CRFModel<String, String, String> crfModel = trainer.modelForWeights(weights);
+      long start = System.currentTimeMillis();
+      List<List<Pair<String, String>>> trainEvalData = trainLabeledData.stream()
+        .map(x -> x.stream().map(Pair::swap).collect(toList()))
+        .collect(toList());
+      Evaluation<String> eval = Evaluation.compute(crfModel, trainEvalData, evalMrOpts);
+      long stop = System.currentTimeMillis();
+      logger.info("Train Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
+      if (!testLabeledData.isEmpty()) {
+        start = System.currentTimeMillis();
+        List<List<Pair<String, String>>> testEvalData = testLabeledData.stream()
+          .map(x -> x.stream().map(Pair::swap).collect(toList()))
+          .collect(toList());
+        eval = Evaluation.compute(crfModel, testEvalData, evalMrOpts);
+        stop = System.currentTimeMillis();
+        logger.info("Test Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
+      }
+    };
+
+    CRFModel<String, String, String> crfModel = null;
+    crfModel = trainer.train(trainLabeledData);
+
+    Vector weights = crfModel.weights();
+    Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
+
+    val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
+    logger.info("Writing model to {}", opts.modelFile);
+    saveModel(dos, crfModel.featureEncoder, weights, plf);
+    dos.close();
+  }
 
   //borrowing heavily from conll.Trainer
   public static void trainParser(
@@ -368,8 +439,8 @@ public class Parser {
     dos.close();
   }
 
-  public static void saveModel(DataOutputStream dos,
-                               CRFFeatureEncoder<String, PaperToken, String> fe,
+  public static <T> void saveModel(DataOutputStream dos,
+                               CRFFeatureEncoder<String, T, String> fe,
                                Vector weights, ParserLMFeatures plf) throws IOException {
     dos.writeUTF(DATA_VERSION);
     fe.stateSpace.save(dos);

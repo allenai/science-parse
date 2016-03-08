@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.allenai.ml.sequences.crf.CRFModel;
-
 @Slf4j
 public class ExtractReferences {
 
@@ -44,7 +42,11 @@ public class ExtractReferences {
       new NumberDot(NumberDotYearNoParensBibRecordParser.class),
       new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
       new BracketNumber(BracketNumberBibRecordParser.class),
-      new BracketName(BracketNameBibRecordParser.class));
+      new BracketName(BracketNameBibRecordParser.class),
+      new NamedYear(CRFBibRecordParser.class),
+      new NumberDot(CRFBibRecordParser.class),
+      new BracketNumber(CRFBibRecordParser.class),
+      new BracketName(CRFBibRecordParser.class));
 
   CheckReferences cr;
 
@@ -56,7 +58,7 @@ public class ExtractReferences {
     cr = new CheckReferences(is);
   }
 
-  private static Pattern authStrToPat(String s) {
+  public static Pattern authStrToPat(String s) {
     return Pattern.compile(s, Pattern.CASE_INSENSITIVE);
   }
 
@@ -441,7 +443,7 @@ public class ExtractReferences {
 
     public NamedYearBibRecordParser() {
     }
-
+    
     //example:
     //STONEBREAKER, M. 1986. A Case for Shared Nothing. Database Engineering 9, 1, 4–9.
     public BibRecord parseRecord(String line) {
@@ -450,7 +452,7 @@ public class ExtractReferences {
         final List<String> authors = authorStringToList(m.group(1));
         final int year = Integer.parseInt(m.group(2).substring(0, 4));
         final String nameStr = NamedYear.getCiteAuthorFromAuthors(authors);
-        final String citeStr = nameStr + ",? " + m.group(2);
+        final String citeStr = nameStr + ",? " + year;
         return new BibRecord(m.group(3), authors, m.group(4), authStrToPat(citeStr), authStrToPat(nameStr), year);
       } else {
         return null;
@@ -564,7 +566,7 @@ public class ExtractReferences {
     }
   }
 
-  private static class NamedYear extends BibStractor {
+  public static class NamedYear extends BibStractor {
     private final static String citeRegex =
       "(?:\\[|\\()([^\\[\\(\\]\\)]+ [1-2][0-9]{3}[a-z]?)+(?:\\]|\\))";
     private final static String shortCiteRegex = "(?:\\[|\\()([1-2][0-9]{3}[a-z]?)(?:\\]|\\))";
