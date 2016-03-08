@@ -59,7 +59,8 @@ public class PDFToCRFInput {
       b.append(s);
       b.append(' ');
     }
-    b.setLength(b.length() - 1);
+    if(b.length() > 0)
+      b.setLength(b.length() - 1);
     return b.toString();
   }
 
@@ -89,7 +90,11 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findPatternSequence(List<String> seq, List<Pair<Pattern, Boolean>> patOptional) {
-    log.debug("Finding {}\nin {}", patternToString(patOptional), seqToString(seq));
+    if(log.isDebugEnabled()) {
+      // patternToString() and seqToString() do a lot of work, and we don't want that done if debug
+      // isn't enabled.
+      log.debug("Finding {}\nin {}", patternToString(patOptional), seqToString(seq));
+    }
     for (int i = 0; i < seq.size(); i++) {
       int end = -1;
       if ((end = findPatternEnd(seq, patOptional, i, 0)) >= 0) {
@@ -283,7 +288,7 @@ public class PDFToCRFInput {
     else
       loc = findString(asStringList(seq), target);
     if (loc == null) {
-      log.warn("{}: could not find {} string {} in paper.", paperId, labelStem, target);
+      log.debug("{}: could not find {} string {} in paper.", paperId, labelStem, target);
       return false;
     } else {
       if (loc.getOne() == loc.getTwo() - 1) {

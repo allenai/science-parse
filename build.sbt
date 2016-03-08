@@ -59,5 +59,7 @@ libraryDependencies ++= Seq(
   "org.bouncycastle" % "bcprov-jdk16" % "1.46",
   "org.bouncycastle" % "bcmail-jdk16" % "1.46",
   "org.jsoup" % "jsoup" % "1.8.1",
-  "org.apache.commons" % "commons-lang3" % "3.4"
+  "org.apache.commons" % "commons-lang3" % "3.4",
+  "com.github.scopt" %% "scopt" % "3.3.0",
+  "com.amazonaws" % "aws-java-sdk" % "1.7.4"
 )

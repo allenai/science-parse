@@ -12,10 +12,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,7 +48,7 @@ public class ParserLMFeatures implements Serializable {
           File paperDirectory,
           int approxNumBackgroundDocs
   ) throws IOException {
-    log.info("excluding " + idsToExclude.size() + " paper ids from lm features.");
+    log.info("Excluding {} paper ids from LM features", idsToExclude.size());
     for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
         fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
@@ -59,12 +57,13 @@ public class ParserLMFeatures implements Serializable {
       }
     }
 
-    // get token statistics from the background papers
+    log.info(
+            "Getting token statistics from approximately {} background papers in {}",
+            approxNumBackgroundDocs,
+            paperDirectory);
     final ExecutorService executor =
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-    final BlockingQueue<Future<String[]>> completionQueue = new ArrayBlockingQueue<>(16);
-    final CompletionService<String[]> completionService =
-            new ExecutorCompletionService<>(executor, completionQueue);
+    final CompletionService<String[]> completionService = new ExecutorCompletionService<>(executor);
     try {
       final File[] pdfs = paperDirectory.listFiles(new FilenameFilter() {
         @Override
@@ -97,7 +96,9 @@ public class ParserLMFeatures implements Serializable {
 
       // process the tokenized papers
       int ct = 0;
-      while(submittedPapers > 0) {
+      int successfulPapers = 0;
+      int failedPapers = 0;
+      while(submittedPapers > successfulPapers + failedPapers) {
         final String[] tokens;
         try {
           tokens = completionService.take().get();
@@ -105,11 +106,20 @@ public class ParserLMFeatures implements Serializable {
           throw new RuntimeException(e);
         }
 
+        if(tokens != null) {
         ct += fillBow(backgroundBow, tokens, null, null, false);
-
-        submittedPapers -= 1;
+          successfulPapers += 1;
+        } else {
+          failedPapers += 1;
+        }
       }
-      log.info("Gazetteer loaded with " + ct + " tokens.");
+      log.info("Gazetteer loaded with {} tokens", ct);
+      log.info(
+              String.format(
+                      "Tried %d papers, succeeded on %d (%.2f%%)",
+                      submittedPapers,
+                      successfulPapers,
+                      100.0 * successfulPapers / (double)submittedPapers));
 
     } finally {
       executor.shutdown();
@@ -148,12 +158,12 @@ public class ParserLMFeatures implements Serializable {
     int ct = 0;
     if (toks.length > 0) {
       if (firstHM != null)
-        firstHM.addToValue(doTrim ? Parser.trimAuthor(toks[0]) : toks[0], 1.0);
+        firstHM.addToValue(doTrim ? Parser.normalizeAuthor(toks[0]) : toks[0], 1.0);
       if (lastHM != null)
-        lastHM.addToValue(doTrim ? Parser.trimAuthor(toks[toks.length - 1]) : toks[toks.length - 1], 1.0);
+        lastHM.addToValue(doTrim ? Parser.normalizeAuthor(toks[toks.length - 1]) : toks[toks.length - 1], 1.0);
     }
     for (String t : toks) {
-      hm.addToValue(doTrim ? Parser.trimAuthor(t) : t, 1.0);
+      hm.addToValue(doTrim ? Parser.normalizeAuthor(t) : t, 1.0);
       ct++;
     }
     return ct;

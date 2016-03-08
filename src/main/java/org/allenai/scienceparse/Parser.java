@@ -1,10 +1,13 @@
 package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gs.collections.api.set.ImmutableSet;
+import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
 
+import lombok.Data;
 import lombok.val;
 import org.allenai.datastore.Datastore;
 import org.allenai.ml.linalg.DenseVector;
@@ -25,6 +28,7 @@ import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,21 +40,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -64,10 +80,10 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 2);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 3);
   }
   public static Path getDefaultGazetteer() {
-    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 1);
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
 
   public Parser() throws Exception {
@@ -144,12 +160,15 @@ public class Parser {
           Paper p,
           PDFExtractor ext,
           boolean heuristicHeader,
-          int headerMax) throws IOException {
-    return getPaperLabels(pdf, p, ext, heuristicHeader, headerMax, false);
+          int headerMax
+  ) throws IOException {
+    try(final InputStream is = new BufferedInputStream(new FileInputStream(pdf))) {
+      return getPaperLabels(is, p, ext, heuristicHeader, headerMax, false);
+    }
   }
 
   public static List<Pair<PaperToken, String>> getPaperLabels(
-          File pdf,
+          final InputStream is,
           Paper p,
           PDFExtractor ext,
           boolean heuristicHeader,
@@ -157,16 +176,15 @@ public class Parser {
           boolean checkAuthors
   ) throws IOException {
     final String paperId = p == null ? null : p.getId();
+    if(paperId != null)
     logger.debug("{}: starting", paperId);
 
-    PDFDoc doc = null;
-    try(final FileInputStream fis = new FileInputStream(pdf)) {
+    final PDFDoc doc;
     try {
-      doc = ext.extractFromInputStream(fis);
-      } catch(final Exception e) {
-        logger.warn("{} failed: {}", paperId, e.toString());
-        return null;
-      }
+      doc = ext.extractFromInputStream(is);
+    } catch(final Exception e) {
+      logger.warn("{} failed: {}", paperId, e.toString());
+      return null;
     }
     if (doc == null) {
       return null;
@@ -196,7 +214,7 @@ public class Parser {
                       labeledPaper.stream().map(Pair::getOne).collect(Collectors.toList()),
                       labeledPaper.stream().map(Pair::getTwo).collect(Collectors.toList()));
       if (checkEM.authors.size() != em.authors.size()) {
-        logger.info("{}: author mismatch, discarding. Expected {}, got {}.", paperId, em.authors, checkEM.authors);
+        logger.debug("{}: author mismatch, discarding. Expected {}, got {}.", paperId, em.authors, checkEM.authors);
         labeledPaper = null;
       }
     }
@@ -204,64 +222,174 @@ public class Parser {
     return labeledPaper;
   }
 
-  public static List<List<Pair<PaperToken, String>>> labelFromGroundTruth(
-    ParserGroundTruth pgt,
-    String paperDir,
-    int headerMax,
-    boolean heuristicHeader,
-    int maxFiles,
-    int minYear,
-    boolean checkAuthors,
-    UnifiedSet<String> excludeIDs
-  ) throws IOException {
-    List<Future<List<Pair<PaperToken, String>>>> labeledDataFutures = new ArrayList<>();
-    File dir = new File(paperDir);
-    PDFExtractor ext = new PDFExtractor();
+  @Data
+  private static class LabelingOutput {
+    public final List<List<Pair<PaperToken, String>>> labeledData;
+    public final Set<String> usedPaperIds;
+  }
 
-    final ExecutorService executor =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+  private static LabelingOutput labelFromGroundTruth(
+    final ParserGroundTruth pgt,
+    final PaperSource paperSource,
+    final int headerMax,
+    final boolean heuristicHeader,
+    final int maxFiles,
+    final int minYear,
+    final boolean checkAuthors,
+    final Set<String> excludeIDs
+  ) throws IOException {
+    final PDFExtractor ext = new PDFExtractor();
+
+    // input we need
+    final int parallelism = Runtime.getRuntime().availableProcessors() * 2;
+    final int queueSize = parallelism * 4;
+    final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(queueSize);
+    final Iterator<Paper> papers = pgt.papers.iterator();
+
+    // stuff we need while processing
+    final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+    final AtomicInteger triedCount = new AtomicInteger();
+    final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
+
+    // capturing results
+    final ArrayList<List<Pair<PaperToken, String>>> results =
+            new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
+    final MutableSet<String> usedPaperIds = new UnifiedSet<String>().asSynchronized();
+
     try {
-      for (Paper p : pgt.papers) {
+      if(maxFiles > 0)
+        logger.info("Will be labeling {} papers in {} threads.", maxFiles, parallelism);
+      else
+        logger.info("Will be labeling all papers in {} threads.", parallelism);
+
+      while (papers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
+        // fill up the queue
+        while (papers.hasNext() && workQueue.size() < queueSize) {
+          val p = papers.next();
         if (minYear > 0 && p.year < minYear)
           continue;
         if (excludeIDs.contains(p.id))
           continue;
-        File f = new File(dir, p.id + ".pdf");
 
-        final Future<List<Pair<PaperToken, String>>> labeledDataFuture = executor.submit(() -> {
-          return getPaperLabels(f, p, ext, heuristicHeader, headerMax, checkAuthors);
-        });
+          final Future<List<Pair<PaperToken, String>>> future = executor.submit(() -> {
+            try {
+              paperId2startTime.put(p.id, System.currentTimeMillis());
+              final List<Pair<PaperToken, String>> result;
+              try(final InputStream is = paperSource.getPdf(p.id)) {
+                result = getPaperLabels(
+                        is,
+                        p,
+                        ext,
+                        heuristicHeader,
+                        headerMax,
+                        checkAuthors);
+              }
 
-        labeledDataFutures.add(labeledDataFuture);
-      }
+              int tried = triedCount.incrementAndGet();
+              if (result != null)
+                usedPaperIds.add(p.id);
+              if (tried % 100 == 0) {
+                // find the document that's been in flight the longest
+                final long now = System.currentTimeMillis();
+                final Set<Map.Entry<String, Long>> entries = paperId2startTime.entrySet();
+                final Optional<Map.Entry<String, Long>> maxEntry =
+                        entries.stream().max(
+                                new Comparator<Map.Entry<String, Long>>() {
+                                  @Override
+                                  public int compare(
+                                          final Map.Entry<String, Long> left,
+                                          final Map.Entry<String, Long> right
+                                  ) {
+                                    final long l = now - left.getValue();
+                                    final long r = now - right.getValue();
+                                    if (l < r)
+                                      return -1;
+                                    else if (l > r)
+                                      return 1;
+                                    else
+                                      return 0;
+                                  }
+                                });
 
-      List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>(labeledDataFutures.size());
-      for (final Future<List<Pair<PaperToken, String>>> labeledDataFuture : labeledDataFutures) {
-        try {
-          val res = labeledDataFuture.get();
-          if (res != null)
-            labeledData.add(res);
-        } catch (final InterruptedException | ExecutionException e) {
-          throw new RuntimeException(e);
+                final int succeeded = usedPaperIds.size();
+                if (maxEntry.isPresent()) {
+                  logger.info(String.format(
+                          "Tried to label %d papers, succeeded %d times (%.2f%%), %d papers in flight, oldest is %s at %.2f seconds",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double) tried,
+                          entries.size(),
+                          maxEntry.get().getKey(),
+                          (now - maxEntry.get().getValue()) / 1000.0));
+                } else {
+                  logger.info(String.format(
+                          "Tried to label %d papers, succeeded %d times (%.2f%%), 0 papers in flight",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double) tried));
+                }
+              }
+
+              return result;
+            } catch (final IOException e) {
+              logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
+              return null;
+            } finally {
+              paperId2startTime.remove(p.id);
+            }
+          });
+          workQueue.add(future);
         }
 
-        if (labeledData.size() >= maxFiles)
-          break;
+        // read from the queue
+        val top = workQueue.poll();
+        try {
+          val result = top.get();
+          if(result != null)
+            results.add(result);
+        } catch (final InterruptedException e) {
+          logger.warn("Interrupted while processing paper", e);
+        } catch (final ExecutionException e) {
+          logger.warn("ExecutionException while processing paper", e);
+        }
       }
 
-      return labeledData;
+      // read the queue empty if we have to
+      while(!workQueue.isEmpty() && (maxFiles <= 0 || results.size() < maxFiles)) {
+        try {
+          val result = workQueue.poll().get();
+          if(result != null)
+            results.add(result);
+        } catch (final InterruptedException e) {
+          logger.warn("Interrupted while processing paper", e);
+        } catch (final ExecutionException e) {
+          logger.warn("ExecutionException while processing paper", e);
+        }
+      }
     } finally {
       executor.shutdown();
       try {
+        logger.info("Done labeling papers. Waiting for threads to shut down.");
         executor.awaitTermination(10, TimeUnit.MINUTES);
       } catch(final InterruptedException e) {
-        logger.warn("Interrupted while waiting for thread pool termination. We may be leaking threads.");
+        logger.warn("Interrupted while waiting for the executor to shut down. We may be leaking threads.", e);
       }
     }
+
+    logger.info(String.format(
+            "Tried to label %d papers, succeeded %d times (%.2f%%), all done!",
+            triedCount.get(),
+            usedPaperIds.size(),
+            usedPaperIds.size() * 100.0 / triedCount.doubleValue()));
+
+    return new LabelingOutput(results, usedPaperIds.asUnmodifiable());
   }
 
-  public static List<List<Pair<PaperToken, String>>>
-  bootstrapLabels(List<File> files, int headerMax, boolean heuristicHeader) throws IOException {
+  public static List<List<Pair<PaperToken, String>>> bootstrapLabels(
+          List<File> files,
+          int headerMax,
+          boolean heuristicHeader
+  ) throws IOException {
     List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
     PDFExtractor ext = new PDFExtractor();
 
@@ -284,28 +412,51 @@ public class Parser {
     return out;
   }
 
+  public static void trainParser(
+          final List<File> files,
+          final ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          final ParseOpts opts
+  ) throws IOException {
+    trainParser(files, pgt, paperSource, opts, UnifiedSet.newSet());
+  }
+
+  public static void trainParser(
+          final List<File> files,
+          final ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          final ParseOpts opts,
+          final String excludeIDsFile
+  ) throws IOException {
+    final UnifiedSet<String> excludedIDs;
+    if (excludeIDsFile == null)
+      excludedIDs = new UnifiedSet<>();
+    else
+      excludedIDs = readSet(excludeIDsFile);
+    trainParser(files, pgt, paperSource, opts, excludedIDs);
+  }
+
   //borrowing heavily from conll.Trainer
   public static void trainParser(
           List<File> files,
           ParserGroundTruth pgt,
-          String paperDir,
+          final PaperSource paperSource,
           ParseOpts opts,
-          String excludeIDsFile
+          final UnifiedSet<String> excludeIDs
   ) throws IOException {
-    UnifiedSet<String> excludeIDs = new UnifiedSet<String>();
-    if (excludeIDsFile != null)
-      excludeIDs = readSet(excludeIDsFile);
-    List<List<Pair<PaperToken, String>>> labeledData;
+    final LabelingOutput labelingOutput;
     PDFPredicateExtractor predExtractor;
     if (files != null) {
-      labeledData = bootstrapLabels(files, opts.headerMax, true); //don't exclude for pdf meta bootstrap
+      labelingOutput = new LabelingOutput(
+        bootstrapLabels(files, opts.headerMax, true),  //don't exclude for pdf meta bootstrap
+        UnifiedSet.newSet());
     } else {
-      labeledData = labelFromGroundTruth(
+      labelingOutput = labelFromGroundTruth(
               pgt,
-              paperDir,
+              paperSource,
               opts.headerMax,
               true,
-              pgt.papers.size(),
+              opts.documentCount > 0 ? opts.documentCount : pgt.papers.size(),
               opts.minYear,
               opts.checkAuthors,
               excludeIDs);
@@ -313,8 +464,7 @@ public class Parser {
     ParserLMFeatures plf = null;
     if (opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
-      UnifiedSet<String> excludedIds = new UnifiedSet<String>();
-      pgt.papers.forEach((Paper p) -> excludedIds.add(p.id));
+      UnifiedSet<String> excludedIds = new UnifiedSet<String>(labelingOutput.usedPaperIds);
       excludedIds.addAll(excludeIDs);
       plf = new ParserLMFeatures(
               gaz.papers,
@@ -327,9 +477,12 @@ public class Parser {
     }
 
     // Split train/test data
-    logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
+    logger.info(
+            "CRF training with {} threads and {} labeled examples",
+            opts.threads,
+            labelingOutput.labeledData.size());
     Pair<List<List<Pair<PaperToken, String>>>, List<List<Pair<PaperToken, String>>>> trainTestPair =
-      splitData(labeledData, 1.0 - opts.trainFraction);
+      splitData(labelingOutput.labeledData, 1.0 - opts.trainFraction);
     val trainLabeledData = trainTestPair.getOne();
     val testLabeledData = trainTestPair.getTwo();
 
@@ -337,6 +490,7 @@ public class Parser {
     CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
     trainOpts.optimizerOpts.maxIters = opts.iterations;
     trainOpts.numThreads = opts.threads;
+    trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
 
     // Trainer
     CRFTrainer<String, PaperToken, String> trainer =
@@ -421,6 +575,8 @@ public class Parser {
     // kill non-character letters
     // kill xml
     t = t.replaceAll("\\&.*?\\;", "");
+    if (t.endsWith("."))
+      t = t.substring(0, t.length() - 1);
     return t;
   }
 
@@ -466,17 +622,19 @@ public class Parser {
     return truePos;
   }
 
-  public static String trimAuthor(String s) {
+  public static String normalizeAuthor(String s) {
     String sFix = s.replaceAll("(\\W|[0-9])+$", "");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
+    if (sFix.endsWith("Jr"))
+      sFix = sFix + ".";
     return sFix;
   }
 
   public static List<String> trimAuthors(List<String> auth) {
     List<String> out = new ArrayList<String>();
     auth.forEach(s -> {
-      s = trimAuthor(s);
+      s = normalizeAuthor(s);
       if (!out.contains(s)) out.add(s);
     });
     return out;
@@ -486,7 +644,7 @@ public class Parser {
     if (!((args.length == 3 && args[0].equalsIgnoreCase("bootstrap")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parse")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
-      (args.length == 7 && args[0].equalsIgnoreCase("learn")) ||
+      (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
@@ -503,7 +661,7 @@ public class Parser {
       opts.headerMax = 100;
       opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
       opts.threads = Runtime.getRuntime().availableProcessors() * 2;
-      trainParser(inFiles, null, null, opts, null);
+      trainParser(inFiles, null, null, opts);
 
     } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
       ParserGroundTruth pgt = new ParserGroundTruth(args[1]); //holds the labeled data to be used for train, test (S2 json bib format)
@@ -519,7 +677,9 @@ public class Parser {
       opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
       opts.checkAuthors = true; //exclude from training papers where we don't find authors
       opts.minYear = 2008; //discard papers from before this date
-      trainParser(null, pgt, args[3], opts, args[6]); //args[3] holds the papers in which we can find ground truth
+      opts.documentCount = args.length > 7 ? Integer.parseInt(args[7]) : -1;
+      final PaperSource paperSource = new DirectoryPaperSource(new File(args[3])); //args[3] holds the papers in which we can find ground truth
+      trainParser(null, pgt, paperSource, opts, args[6]);
                 //args[6] is a list of paper ids (one id per line) that we must exclude from training data and gazetteers 
                 //(because they're used for final tests)
     } else if (args[0].equalsIgnoreCase("parse")) {
@@ -775,17 +935,30 @@ public class Parser {
     em.creator = doc.meta.creator;
       
     // extract references
-    final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
-    final Pair<List<BibRecord>, List<CitationRecord>> pair =
-      getReferences(em.raw, rawReferences, referenceExtractor);
-    em.references = pair.getOne();
-    List<CitationRecord> crs = new ArrayList<>();
-    for (CitationRecord cr: pair.getTwo()) {
-      crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+    try {
+      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+      final Pair<List<BibRecord>, List<CitationRecord>> pair =
+              getReferences(em.raw, rawReferences, referenceExtractor);
+      em.references = pair.getOne();
+      List<CitationRecord> crs = new ArrayList<>();
+      for (CitationRecord cr : pair.getTwo()) {
+        crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+      }
+      em.referenceMentions = crs;
+    } catch(final RegexWithTimeout.RegexTimeout e) {
+      logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
+      if(em.references == null)
+        em.references = Collections.emptyList();
+      if(em.referenceMentions == null)
+        em.referenceMentions = Collections.emptyList();
     }
-    em.referenceMentions = crs;
 
-    em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+    try {
+      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+    } catch(final RegexWithTimeout.RegexTimeout e) {
+      logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
+      em.abstractText = "";
+    }
 
     return em;
   }
@@ -801,5 +974,7 @@ public class Parser {
     public String backgroundDirectory;
     public int minYear; //only process papers this year or later
     public boolean checkAuthors; //only bootstraps papers if all authors are found
+    public int documentCount = -1; // how many documents to train on. set to -1 to train on all.
+    public int minExpectedFeatureCount = 1;
   }
 }

@@ -239,15 +239,24 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
           m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleFirstBow));
           m.put("%tlfreq", smoothFreq(tok, this.lmFeats.titleLastBow));
-          m.put("%afreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorBow));
-          m.put("%affreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorFirstBow));
-          m.put("%alfreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorLastBow));
+          m.put("%afreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorBow));
+          m.put("%affreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorFirstBow));
+          m.put("%alfreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorLastBow));
           m.put("%bfreq", smoothFreq(tok, this.lmFeats.backgroundBow));
-          m.put("%bafreq", smoothFreq(Parser.trimAuthor(tok), this.lmFeats.backgroundBow));
-//					log.info("features for " + tok);
-//					log.info(m.toString());
+          m.put("%bafreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.backgroundBow));
         }
-//				m.put("%t=" + elems.get(i).getPdfToken().token.toLowerCase(), 1.0);
+
+        // add the token itself as a feature
+        final String token = StringUtils.normalize(elems.get(i).getPdfToken().token);
+		m.put("%t=" + token, 1.0);
+
+        // add trigram features
+        final String trigramSourceToken = token + "$";
+        for(int j = 0; j <= trigramSourceToken.length() - 3; ++j) {
+          final String trigram = trigramSourceToken.substring(j, j + 3);
+          final String feature = "%tri=" + trigram;
+          m.updateValue(feature, 0.0, d -> d + 1);
+        }
       }
       out.add(m);
     }
@@ -268,7 +277,5 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
   private interface TokenPropertySelector {
     float getProp(PaperToken t);
   }
-
-
 }
 
