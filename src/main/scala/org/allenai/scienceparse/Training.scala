@@ -25,10 +25,10 @@ object Training extends App with Datastores with Logging {
     gazetteerFile: Option[File] = None,
     trainFraction: Double = 0.9,
     minYear: Int = 2008,
-    maxPaperCount: Int = 13000,
+    maxPaperCount: Int = 34000,
     paperDir: Option[File] = None,
     excludeIdsFile: Option[File] = None,
-    minExpectedFeatureCount: Int = 1
+    minExpectedFeatureCount: Int = 13
   )
 
   val parser = new OptionParser[Config](this.getClass.getSimpleName) {
