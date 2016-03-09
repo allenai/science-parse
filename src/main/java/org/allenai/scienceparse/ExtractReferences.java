@@ -109,6 +109,8 @@ public class ExtractReferences {
     }
   
   public static Pattern authStrToPat(String s) {
+    if(s == null || s.length() == 0)
+      s = "";
     return Pattern.compile(s, Pattern.CASE_INSENSITIVE);
   }
 
@@ -613,6 +615,7 @@ public class ExtractReferences {
   //in regex form
   public static String getCiteAuthorFromAuthors(List<String> authors) {
     if(authors == null || authors.size()==0)
+      return null;
     if (authors.size() > 2) {
       return cleanAuthString(getAuthorLastName(authors.get(0))) + " et al\\.";
     } else if (authors.size() == 1) {

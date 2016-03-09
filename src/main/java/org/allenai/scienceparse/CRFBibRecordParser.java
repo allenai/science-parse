@@ -53,12 +53,15 @@ public class CRFBibRecordParser implements BibRecordParser {
     List<String> toks = tokenize(s);
     List<Pair<String, String>> out = new ArrayList<>();
     out.add(Tuples.pair("<S>", "<S>"));
-    for(String sTok : toks) {
+    boolean atStart = false;
+    for(int i=0; i<toks.size(); i++) {
+      String sTok = toks.get(i);
       if(sTok.endsWith(">")) {
         String t = sTok.replaceAll("<", "").replaceAll("/", "").replaceAll(">", "");
         int idx = Arrays.binarySearch(sourceTags, t);
         if(idx >= 0) { //ignore unescaped XML chars in bib
            inTag[idx] = (sTok.startsWith("</"))?false:true;
+           atStart = inTag[idx];
         }
       }
       else { //write it out with proper tag
@@ -74,7 +77,24 @@ public class CRFBibRecordParser implements BibRecordParser {
             break;
           }
         }
+        if(i<toks.size()-1) { //note we can only be inside a tag if this condition holds
+          if(toks.get(i+1).startsWith("</")) { //our tag ends on next word(assuming no nesting)
+            if(atStart) { //single-word span
+              tag = "W_" + tag;
+            }
+            else {
+              tag = "E_" + tag;
+            }
+          }
+          else if(tag=="Y" && atStart) //special case for year (unfortunately)
+            tag = "W_" + tag;
+          else if(atStart)
+            tag = "B_" + tag;
+          else
+            tag = "I_" + tag;
+        }
         out.add(Tuples.pair(sTok, tag));
+        atStart = false;
       }
     }
     //change to begin/end:
@@ -131,10 +151,16 @@ public class CRFBibRecordParser implements BibRecordParser {
     toks.add("<S>");
     toks.addAll(tokenize(line));
     toks.add("</S>");
-    log.info("processing bib line with crf: " + toks.toString());
-    List<String> labels = model.bestGuess(toks);
+//    log.info("processing bib line with crf: " + toks.toString());
+    List<String> labels;
+    try{
+      labels = model.bestGuess(toks);
+    }
+    catch(Exception e) {
+      return null;
+    }
     labels = PDFToCRFInput.padTagSequence(labels);
-    log.info("labels " + labels.toString());
+//    log.info("labels " + labels.toString());
     List<LabelSpan> lss = ExtractedMetadata.getSpans(labels);
     
     String title = null;
@@ -160,16 +186,16 @@ public class CRFBibRecordParser implements BibRecordParser {
       citeRegEx = shortCiteRegEx + ",? " + year;
     }
     BibRecord brOut = null;
-    if(citeRegEx == null || shortCiteRegEx == null)
+    if(citeRegEx == null || shortCiteRegEx == null || title == null || authors == null || year == null)
       return null;
     try {
       brOut = new BibRecord(
           title, authors, venue, Pattern.compile(citeRegEx), Pattern.compile(shortCiteRegEx), Integer.parseInt(year));
     }
     catch (NumberFormatException e) {
-      brOut = new BibRecord(title, authors, venue, Pattern.compile(citeRegEx), Pattern.compile(shortCiteRegEx), 0);
+      return null;
     }
-    log.info("got with CRF: " + brOut.toString());
+//    log.info("got with CRF: " + brOut.toString());
     return brOut;
   }
 }

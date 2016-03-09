@@ -497,6 +497,8 @@ public class Parser {
 
   public static String processTitle(String t) {
     // case fold and remove lead/trail space
+    if(t==null || t.length()==0)
+      return t;
     t = t.trim().toLowerCase();
     t = cleanTitle(t);
     // kill non-letter chars
@@ -522,7 +524,7 @@ public class Parser {
   }
 
   public static List<String> lastNames(List<String> ss) {
-    return ss.stream().map(s -> lastName(s)).collect(Collectors.toList());
+    return (ss==null)?null:ss.stream().map(s -> lastName(s)).collect(Collectors.toList());
   }
 
   public static int scoreAuthors(String[] expected, List<String> guessed) {
