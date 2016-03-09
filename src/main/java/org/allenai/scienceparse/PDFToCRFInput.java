@@ -11,15 +11,12 @@ import org.allenai.scienceparse.pdfapi.PDFToken;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class PDFToCRFInput {
-
-
   /**
    * Returns the index start (inclusive) and end (exclusive)
    * of end of pattern sequence in token seq, starting from startposes.  Returns -1 if not found
@@ -42,7 +39,7 @@ public class PDFToCRFInput {
     if (seq.size() == 0 || seqStartPos == seq.size())
       return -1;
 
-    String pt = seq.get(seqStartPos);
+    final String pt = StringUtils.normalize(seq.get(seqStartPos));
     if (patOptional.get(patStartPos).getOne().matcher(pt).matches()) {
       //look forward:
       return findPatternEnd(seq, patOptional, seqStartPos + 1, patStartPos + 1);
@@ -56,6 +53,34 @@ public class PDFToCRFInput {
 
   }
 
+  private static String seqToString(final List<String> seq) {
+    final StringBuilder b = new StringBuilder(seq.size() * 10);
+    for(final String s: seq) {
+      b.append(s);
+      b.append(' ');
+    }
+    if(b.length() > 0)
+      b.setLength(b.length() - 1);
+    return b.toString();
+  }
+
+  private static String patternToString(final List<Pair<Pattern, Boolean>> pattern) {
+    final StringBuilder b = new StringBuilder(pattern.size() * 10);
+    for(final Pair<Pattern, Boolean> p : pattern) {
+      final boolean optional = p.getTwo();
+      if(optional)
+        b.append('[');
+
+      b.append(p.getOne().pattern());
+
+      if(optional)
+        b.append(']');
+      b.append(' ');
+    }
+    b.setLength(b.length() - 1);
+    return b.toString();
+  }
+
   /**
    * Returns the index start (inclusive) and end (exclusive)
    * of first occurrence of pattern sequence in token seq, or null if not found
@@ -65,6 +90,11 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findPatternSequence(List<String> seq, List<Pair<Pattern, Boolean>> patOptional) {
+    if(log.isDebugEnabled()) {
+      // patternToString() and seqToString() do a lot of work, and we don't want that done if debug
+      // isn't enabled.
+      log.debug("Finding {}\nin {}", patternToString(patOptional), seqToString(seq));
+    }
     for (int i = 0; i < seq.size(); i++) {
       int end = -1;
       if ((end = findPatternEnd(seq, patOptional, i, 0)) >= 0) {
@@ -82,6 +112,7 @@ public class PDFToCRFInput {
    * @return
    */
   public static Pair<Integer, Integer> findString(List<String> seq, String toFind) {
+    toFind = StringUtils.normalize(toFind);
     if (seq.size() == 0 || toFind.length() == 0)
       return null;
     String[] toks = toFind.split(" ");
@@ -90,7 +121,7 @@ public class PDFToCRFInput {
     }
     int nextToMatch = 0;
     for (int i = 0; i < seq.size(); i++) {
-      String s = seq.get(i);
+      String s = StringUtils.normalize(seq.get(i));
       if (toks[nextToMatch].equalsIgnoreCase(s)) {
         nextToMatch++;
       } else {
@@ -112,6 +143,8 @@ public class PDFToCRFInput {
     author = author.replace("*", "");
     author = author.replace("+", "");
     author = author.replace("^", "");
+
+    author = StringUtils.normalize(author);
 
     String[] toks = author.split(" ");
     for (int i = 0; i < toks.length; i++) {
@@ -147,7 +180,7 @@ public class PDFToCRFInput {
         temp = temp2;
       }
       out.add(temp);
-      out.set(1, Tuples.pair(Pattern.compile("[A-Z](\\.)?"), true));
+      out.set(1, Tuples.pair(Pattern.compile("[A-Z](\\.)?", Pattern.CASE_INSENSITIVE), true));
     }
     return out;
   }
@@ -255,7 +288,7 @@ public class PDFToCRFInput {
     else
       loc = findString(asStringList(seq), target);
     if (loc == null) {
-      log.warn("{}: could not find {} string {} in paper.", paperId, labelStem, target);
+      log.debug("{}: could not find {} string {} in paper.", paperId, labelStem, target);
       return false;
     } else {
       if (loc.getOne() == loc.getTwo() - 1) {
@@ -327,6 +360,6 @@ public class PDFToCRFInput {
   }
 
   public static String getLabelString(List<Pair<PaperToken, String>> seq) {
-    return seq.stream().map((Pair<PaperToken, String> a) -> a.getTwo()).collect(Collectors.toList()).toString();
+    return seq.stream().map(Pair::getTwo).collect(Collectors.toList()).toString();
   }
 }

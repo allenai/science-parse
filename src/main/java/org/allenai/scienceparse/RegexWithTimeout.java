@@ -9,7 +9,7 @@ final class RegexWithTimeout {
   public static class RegexTimeout extends RuntimeException { }
 
   public static Matcher matcher(final Pattern pattern, final CharSequence string) {
-    final long timeout = 1000; //ms
+    final long timeout = 1500; //ms
 
     class TimeoutCharSequence implements CharSequence {
       private CharSequence inner;

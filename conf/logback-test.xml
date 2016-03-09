@@ -9,6 +9,14 @@
     </encoder>
   </appender>
 
+  <appender name="EVALLOG" class="ch.qos.logback.core.FileAppender">
+    <append>false</append>
+    <file>EvalErrors.log</file>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
+
   <root level="${logback_rootLevel:-INFO}">
     <appender-ref ref="STDOUT" />
   </root>
@@ -20,4 +28,7 @@
   <logger name="org.allenai.pdfbox" level="OFF" />
   <logger name="org.allenai.fontbox" level="OFF" />
   <logger name="org.allenai.scienceparse.TextExtractor" level="ERROR" />
+  <logger name="org.allenai.scienceparse.Evaluation$.evaluationErrors" additivity="false">
+    <appender-ref ref="EVALLOG" />
+  </logger>
 </configuration>
