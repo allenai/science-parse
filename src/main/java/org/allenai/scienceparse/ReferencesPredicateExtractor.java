@@ -50,11 +50,11 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%tfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleBow));
         m.put("%tffreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleFirstBow));
         m.put("%tlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleLastBow));
-        m.put("%afreq", PDFPredicateExtractor.smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorBow));
-        m.put("%affreq", PDFPredicateExtractor.smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorFirstBow));
-        m.put("%alfreq", PDFPredicateExtractor.smoothFreq(Parser.trimAuthor(tok), this.lmFeats.authorLastBow));
+        m.put("%afreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorBow));
+        m.put("%affreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorFirstBow));
+        m.put("%alfreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorLastBow));
         m.put("%bfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.backgroundBow));
-        m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.trimAuthor(tok), this.lmFeats.backgroundBow));
+        m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.backgroundBow));
       }
       out.add(m);
     }
