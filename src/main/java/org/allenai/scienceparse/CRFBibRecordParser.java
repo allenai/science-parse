@@ -123,7 +123,7 @@ public class CRFBibRecordParser implements BibRecordParser {
   
   public BibRecord parseRecord(String line) {
     line = line.trim();
-    if(line.length() == 0)
+    if(line.isEmpty())
       return null;
     Pattern pBracket = Pattern.compile("\\[([0-9]+)\\](.*)");
     Pattern pDot = Pattern.compile("([0-9]+)\\.(.*)$");
@@ -134,8 +134,7 @@ public class CRFBibRecordParser implements BibRecordParser {
       citeRegEx = m.group(1);
       shortCiteRegEx = citeRegEx;
       line = m.group(2);
-    }
-    else {
+    } else {
       m = RegexWithTimeout.matcher(pDot, line);
       if(m.matches()) {
         citeRegEx = m.group(1);
@@ -144,23 +143,20 @@ public class CRFBibRecordParser implements BibRecordParser {
       }
     }
     line = line.trim();
-    if(line.length()==0)
+    if(line.isEmpty())
       return null;
     
     ArrayList<String> toks = new ArrayList<String>();
     toks.add("<S>");
     toks.addAll(tokenize(line));
     toks.add("</S>");
-//    log.info("processing bib line with crf: " + toks.toString());
     List<String> labels;
     try{
       labels = model.bestGuess(toks);
-    }
-    catch(Exception e) {
+    } catch(final Exception e) {
       return null;
     }
     labels = PDFToCRFInput.padTagSequence(labels);
-//    log.info("labels " + labels.toString());
     List<LabelSpan> lss = ExtractedMetadata.getSpans(labels);
     
     String title = null;
