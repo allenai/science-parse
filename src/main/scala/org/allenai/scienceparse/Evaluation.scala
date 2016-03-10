@@ -80,6 +80,18 @@ object Evaluation extends Datastores with Logging {
         bibRecord.year)
   }
 
+  private def normalizeBRstripVenues(bibRecord: BibRecord) = {
+    val normalized = normalizeBR(bibRecord)
+
+    new BibRecord(
+      normalized.title,
+      normalized.author,
+      null,
+      normalized.citeRegEx,
+      normalized.shortCiteRegEx,
+      normalized.year)
+  }
+
   private def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
 
   // Strip everything except for text and numbers out so that minor differences in
@@ -259,6 +271,7 @@ object Evaluation extends Datastores with Logging {
     Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
     Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
     Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
+    Metric("bibAllButVenuesNormalized","/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBRstripVenues, calculatePR)),
     Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
     Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
     Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, normalize)),
