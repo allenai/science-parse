@@ -183,7 +183,7 @@ public class CRFBibRecordParser implements BibRecordParser {
     List<String> authors = (author==null)?null:ExtractReferences.authorStringToList(author);
     if(citeRegEx == null) {
       shortCiteRegEx = ExtractReferences.getCiteAuthorFromAuthors(authors);
-      citeRegEx = shortCiteRegEx + ",? " + year;
+      citeRegEx = shortCiteRegEx + ",? " + Pattern.quote(year);
     }
     BibRecord brOut = null;
     if(citeRegEx == null || shortCiteRegEx == null || title == null || authors == null || year == null)
