@@ -176,14 +176,18 @@ public class CRFBibRecordParser implements BibRecordParser {
       }
     }
     
-    List<String> authors = (author==null)?null:ExtractReferences.authorStringToList(author);
-    if(citeRegEx == null) {
+    List<String> authors =
+            author == null ?
+                    null :
+                    ExtractReferences.authorStringToList(author);
+    if(citeRegEx == null && year != null) {
       shortCiteRegEx = ExtractReferences.getCiteAuthorFromAuthors(authors);
       citeRegEx = shortCiteRegEx + ",? " + Pattern.quote(year);
     }
-    BibRecord brOut = null;
     if(citeRegEx == null || shortCiteRegEx == null || title == null || authors == null || year == null)
       return null;
+
+    BibRecord brOut = null;
     try {
       brOut = new BibRecord(
         title,
@@ -192,11 +196,10 @@ public class CRFBibRecordParser implements BibRecordParser {
         Pattern.compile(citeRegEx),
         Pattern.compile(shortCiteRegEx),
         Integer.parseInt(year));
-    }
-    catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
       return null;
     }
-//    log.info("got with CRF: " + brOut.toString());
+
     return brOut;
   }
 }
