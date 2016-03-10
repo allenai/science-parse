@@ -1065,9 +1065,11 @@ public class Parser {
 
     try {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+      if(em.abstractText.isEmpty())
+        em.abstractText = null;
     } catch(final RegexWithTimeout.RegexTimeout e) {
       logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
-      em.abstractText = "";
+      em.abstractText = null;
     }
 
     return em;
