@@ -209,8 +209,13 @@ public class PDFDocToPartitionedText {
    * intended to be one reference per list element, using spacing and indentation as cues
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
-    final List<String> refTags = Arrays.asList("References", "REFERENCES", "Citations", "CITATIONS", "Bibliography",
-      "BIBLIOGRAPHY");
+    final List<String> refTags = Arrays.asList(
+            "References",
+            "REFERENCES",
+            "Citations",
+            "CITATIONS",
+            "Bibliography",
+            "BIBLIOGRAPHY");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;

@@ -69,26 +69,29 @@ public class ExtractReferences {
   public ExtractReferences(final InputStream is, final DataInputStream bibCRFModel) throws IOException {
     cr = new CheckReferences(is);
     extractors = new ArrayList<>();
-    extractors.addAll(Arrays.asList(new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
-          new NamedYear(NamedYearBibRecordParser.class),
-          new NamedYear(NamedYearInParensBibRecordParser.class),
-          new NumberDot(NumberDotYearParensBibRecordParser.class),
-          new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
-          new NumberDot(NumberDotYearNoParensBibRecordParser.class),
-          new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
-          new BracketNumber(BracketNumberBibRecordParser.class),
-          new BracketName(BracketNameBibRecordParser.class)));
+    extractors.addAll(Arrays.asList(
+      new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
+      new NamedYear(NamedYearBibRecordParser.class),
+      new NamedYear(NamedYearInParensBibRecordParser.class),
+      new NumberDot(NumberDotYearParensBibRecordParser.class),
+      new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
+      new NumberDot(NumberDotYearNoParensBibRecordParser.class),
+      new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
+      new BracketNumber(BracketNumberBibRecordParser.class),
+      new BracketName(BracketNameBibRecordParser.class)));
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
-      extractors.addAll(Arrays.asList(new NamedYear(CRFBibRecordParser.class),
-         new NumberDot(CRFBibRecordParser.class),
-         new BracketNumber(CRFBibRecordParser.class),
-         new BracketName(CRFBibRecordParser.class)));
+      extractors.addAll(Arrays.asList(
+        new NamedYear(CRFBibRecordParser.class),
+        new NumberDot(CRFBibRecordParser.class),
+        new BracketNumber(CRFBibRecordParser.class),
+        new BracketName(CRFBibRecordParser.class)));
     }
   }
 
   public static CRFModel<String, String, String> loadModel(
-      DataInputStream dis) throws IOException {
+      DataInputStream dis
+  ) throws IOException {
       IOUtils.ensureVersionMatch(dis, Parser.DATA_VERSION);
       val stateSpace = StateSpace.load(dis);
       Indexer<String> nodeFeatures = Indexer.load(dis);
@@ -97,9 +100,11 @@ public class ExtractReferences {
       ObjectInputStream ois = new ObjectInputStream(dis);
       ParserLMFeatures plf = null;
       try {
-        plf = (ParserLMFeatures) ois.readObject();
+        plf = (ParserLMFeatures)ois.readObject();
+      } catch(final Exception e) {
+        // do nothing
+        // but now plf is NULL. Is that OK?
       }
-      catch(Exception e) {}
       val predExtractor = new ReferencesPredicateExtractor(plf);
       val featureEncoder = new CRFFeatureEncoder<String, String, String>
         (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
@@ -303,7 +308,7 @@ public class ExtractReferences {
     int start = refStart(paper) + 1;
     List<BibRecord>[] results = new ArrayList[extractors.size()];
     for (int i = 0; i < results.length; i++)
-      results[i] = new ArrayList<BibRecord>();
+      results[i] = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
     for (int i = start; i < paper.size(); i++) {
       sb.append("<bb>");
@@ -328,8 +333,7 @@ public class ExtractReferences {
       BibRecordParser b = null;
       if(c == CRFBibRecordParser.class) { //special case, requires arg
         b = new CRFBibRecordParser(bibCRF);
-      }
-      else {
+      } else {
         try {
           b = (BibRecordParser) c.newInstance();
         } catch (final Exception e) {
@@ -635,9 +639,6 @@ public class ExtractReferences {
     NamedYear(Class c) {
       super(c);
     }
-    
-
-
 
     public String getCiteRegex() {
       return citeRegex;
@@ -665,7 +666,6 @@ public class ExtractReferences {
       out = removeNulls(out);
       return out;
     }
-
   }
 
   private class NumberDot extends BracketNumber {

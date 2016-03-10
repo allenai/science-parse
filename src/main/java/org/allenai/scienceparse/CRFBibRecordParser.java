@@ -190,7 +190,12 @@ public class CRFBibRecordParser implements BibRecordParser {
       return null;
     try {
       brOut = new BibRecord(
-          title, authors, venue, Pattern.compile(citeRegEx), Pattern.compile(shortCiteRegEx), Integer.parseInt(year));
+        title,
+        authors,
+        venue,
+        Pattern.compile(citeRegEx),
+        Pattern.compile(shortCiteRegEx),
+        Integer.parseInt(year));
     }
     catch (NumberFormatException e) {
       return null;
