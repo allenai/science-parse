@@ -90,39 +90,51 @@ public class Parser {
   }
 
   public Parser() throws Exception {
-    this(getDefaultProductionModel(), getDefaultGazetteer());
+    this(getDefaultProductionModel(), getDefaultGazetteer(), getDefaultBibModel());
   }
 
-  public Parser(final String modelFile, final String gazetteerFile) throws Exception {
-    this(new File(modelFile), new File(gazetteerFile));
+  public Parser(
+          final String modelFile,
+          final String gazetteerFile,
+          final String bibModelFile
+  ) throws Exception {
+    this(new File(modelFile), new File(gazetteerFile), new File(bibModelFile));
   }
 
-  public Parser(final Path modelFile, final Path gazetteerFile) throws Exception {
-    this(modelFile.toFile(), gazetteerFile.toFile());
+  public Parser(
+          final Path modelFile,
+          final Path gazetteerFile,
+          final Path bibModelFile
+  ) throws Exception {
+    this(modelFile.toFile(), gazetteerFile.toFile(), bibModelFile.toFile());
   }
 
-  public Parser(final File modelFile, final File gazetteerFile, final File bibModelFile) throws Exception {
+  public Parser(
+          final File modelFile,
+          final File gazetteerFile,
+          final File bibModelFile
+  ) throws Exception {
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
       final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
-      final DataInputStream bibModelIs = (bibModelFile!=null)?(new DataInputStream(new FileInputStream(bibModelFile))):null; 
+      final DataInputStream bibModelIs = new DataInputStream(new FileInputStream(bibModelFile))
     ) {
       model = loadModel(modelIs);
-      if(bibModelIs == null)
-        referenceExtractor = new ExtractReferences(gazetteerIs);
-      else
-        referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
+      referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
     }
   }
-  
-  public Parser(final File modelFile, final File gazetteerFile) throws Exception {
-    this(modelFile, gazetteerFile, null);
-  }
 
-  public Parser(final InputStream modelStream, final InputStream gazetteerStream) throws Exception {
+  public Parser(
+          final InputStream modelStream,
+          final InputStream gazetteerStream,
+          final InputStream bibModelStream
+  ) throws Exception {
     final DataInputStream dis = new DataInputStream(modelStream);
     model = loadModel(dis);
-    referenceExtractor = new ExtractReferences(gazetteerStream);
+    referenceExtractor =
+            new ExtractReferences(
+                    gazetteerStream,
+                    new DataInputStream(bibModelStream));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
@@ -781,7 +793,7 @@ public class Parser {
       else
         gazetteerFile = Paths.get(args[4]);
 
-      Parser p = new Parser(modelFile, gazetteerFile);
+      Parser p = new Parser(modelFile, gazetteerFile, getDefaultBibModel());
       File input = new File(args[1]);
       File outDir = new File(args[3]);
       final List<File> inFiles;
@@ -807,7 +819,7 @@ public class Parser {
       }
 
     } else if (args[0].equalsIgnoreCase("parseAndScore")) {
-      Parser p = new Parser(args[2], args[4]);
+      Parser p = new Parser(args[2], args[4], getDefaultBibModel().toString());
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
       ParserGroundTruth pgt = new ParserGroundTruth(args[4]);

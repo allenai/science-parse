@@ -107,7 +107,10 @@ public class ParserTest {
     File f = new File(opts.modelFile);
     f.deleteOnExit();
     Parser.trainParser(resolveKeys(pdfKeys), null, null, opts);
-    final Parser p = new Parser(testModelFile, Parser.getDefaultGazetteer().toFile());
+    final Parser p = new Parser(
+            testModelFile,
+            Parser.getDefaultGazetteer().toFile(),
+            Parser.getDefaultBibModel().toFile());
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;
@@ -149,7 +152,10 @@ public class ParserTest {
             pgt,
             new DirectoryPaperSource(new File(resourceDirectory("/groundTruth.json"))),
             opts); //assumes pdfs in same dir as groundTruth
-    final Parser p = new Parser(testModelFile, Parser.getDefaultGazetteer().toFile());
+    final Parser p = new Parser(
+            testModelFile,
+            Parser.getDefaultGazetteer().toFile(),
+            Parser.getDefaultBibModel().toFile());
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;
