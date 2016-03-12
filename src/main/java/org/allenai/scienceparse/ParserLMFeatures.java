@@ -35,6 +35,9 @@ public class ParserLMFeatures implements Serializable {
   ObjectDoubleHashMap<String> authorFirstBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> authorLastBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
+  ObjectDoubleHashMap<String> venueBow = new ObjectDoubleHashMap<String>();
+  ObjectDoubleHashMap<String> venueFirstBow = new ObjectDoubleHashMap<String>();
+  ObjectDoubleHashMap<String> venueLastBow = new ObjectDoubleHashMap<String>();
 
 
   public ParserLMFeatures() {
@@ -52,6 +55,7 @@ public class ParserLMFeatures implements Serializable {
     for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
         fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
+        fillBow(venueBow, p.venue, venueFirstBow, venueLastBow, false);
         for (String a : p.authors)
           fillBow(authorBow, a, authorFirstBow, authorLastBow, true);
       }
@@ -170,6 +174,6 @@ public class ParserLMFeatures implements Serializable {
   }
 
   private String[] tokenize(final String s) {
-    return s.split("( |,)");  //not great
+    return s.split(" ");  //not great
   }
 }

@@ -749,7 +749,7 @@ public class Parser {
       System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
       System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
       System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file> <bib model file>");
-      System.err.println("OR:    learnBibCRF <cora file> <output file> <gazetteer file> <background dir>");
+      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir>");
     } else if (args[0].equalsIgnoreCase("bootstrap")) {
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -967,9 +967,9 @@ public class Parser {
     else if(args[0].equalsIgnoreCase("learnBibCRF")) {
       ParseOpts opts = new ParseOpts();
       opts.modelFile = args[2];
-      opts.gazetteerFile = args[3];
-      opts.backgroundDirectory = args[4];
-      opts.iterations = 200;
+      opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
+      opts.backgroundDirectory = args[3];
+      opts.iterations = 150;
       opts.threads = 1;//Runtime.getRuntime().availableProcessors();
       opts.backgroundSamples = 5;
       opts.trainFraction = 0.9;

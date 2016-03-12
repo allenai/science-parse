@@ -81,7 +81,7 @@ public class ExtractReferencesTest {
 
   public void testCoraLabeling() throws Exception {
     String s = "<author> A. Cau </author> <title> Formalising Dijkstra's development strategy within Stark's formalism. </title> <booktitle> BCS-FACS Refinement Workshop, </booktitle> <date> 1992. </date>";
-    int tokens = 2 + 21 + 3 - 8; //start/stop plus tokens in source plus three for breaking on punctuation minus eight tags. 
+    int tokens = 2 + 21  - 8; //start/stop plus tokens in source minus eight tags. 
     List<Pair<String, String>> labeledData = CRFBibRecordParser.getLabeledLine(s);
     Assert.assertEquals(tokens, labeledData.size());
     Assert.assertEquals("Cau", labeledData.get(2).getOne());
@@ -90,8 +90,8 @@ public class ExtractReferencesTest {
     Assert.assertEquals("B_T", labeledData.get(3).getTwo());
     Assert.assertEquals("development", labeledData.get(5).getOne());
     Assert.assertEquals("I_T", labeledData.get(5).getTwo());
-    Assert.assertEquals("1992", labeledData.get(15).getOne());
-    Assert.assertEquals("W_Y", labeledData.get(15).getTwo());
+    Assert.assertEquals("1992.", labeledData.get(13).getOne());
+    Assert.assertEquals("W_Y", labeledData.get(13).getTwo());
   }
   
   public void testCRFExtractor() throws Exception { //TODO: target crf correctness more specifically

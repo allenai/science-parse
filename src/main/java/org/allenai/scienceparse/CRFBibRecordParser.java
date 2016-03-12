@@ -49,7 +49,7 @@ public class CRFBibRecordParser implements BibRecordParser {
     final String [] destTags = new String [] {ExtractedMetadata.authorTag, 
         ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, ExtractedMetadata.titleTag};
     
-    final Pattern yearPat= Pattern.compile("[1-2][0-9]{3}");
+    final Pattern yearPat= Pattern.compile("[1-2][0-9]{3}.*");
     List<String> toks = tokenize(s);
     List<Pair<String, String>> out = new ArrayList<>();
     out.add(Tuples.pair("<S>", "<S>"));
@@ -116,7 +116,7 @@ public class CRFBibRecordParser implements BibRecordParser {
   }
   
   private static List<String> tokenize(String line) { //tokenizes string for use in bib parsing
-    line = line.replaceAll("([a-z0-9])(,|\\.)", "$1 $2"); //break on lowercase alpha or num before . or ,
+    //line = line.replaceAll("([a-z0-9])(,|\\.)", "$1 $2"); //break on lowercase alpha or num before . or ,
     String [] toks = line.split(" "); //otherwise not fancy
     return Arrays.asList(toks);
   }
@@ -173,6 +173,8 @@ public class CRFBibRecordParser implements BibRecordParser {
         venue = PDFToCRFInput.stringAtForStringList(toks, ls.loc); 
       } else if (year == null && ls.tag.equals(ExtractedMetadata.yearTag)) {
         year = PDFToCRFInput.stringAtForStringList(toks, ls.loc);
+        if(year != null)
+          year = year.substring(0, Math.min(4, year.length()));
       }
     }
     
