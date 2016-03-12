@@ -9,6 +9,11 @@
 # errors, and outputs them into a table of pairs of names. These pairs are
 # likely different forms of the same name, and should probably be treated equal
 # by downstream tools.
+#
+# Examples of error pairs that aren't really errors:
+# Extracted: Michael Schumacher     Gold: Mike Schumacher
+# Extracted: Alfred Neuman          Gold: Alfred E. Neuman
+# Extracted: H G Wells              Gold: H. Wells
 
 def ngrams(s, n):
   for i in xrange(len(s) - n + 1):
