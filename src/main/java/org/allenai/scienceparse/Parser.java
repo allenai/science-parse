@@ -80,7 +80,7 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 3);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 4);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
@@ -955,9 +955,11 @@ public class Parser {
 
     try {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+      if(em.abstractText.isEmpty())
+        em.abstractText = null;
     } catch(final RegexWithTimeout.RegexTimeout e) {
       logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
-      em.abstractText = "";
+      em.abstractText = null;
     }
 
     return em;

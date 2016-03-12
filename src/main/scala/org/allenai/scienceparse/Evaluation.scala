@@ -42,7 +42,7 @@ object Evaluation extends Datastores with Logging {
   }
 
   private implicit class ListToItemToCompareList[T](x: List[T]) {
-    def toItems = x.map(ItemWithOriginal.create)
+    def toItems = x.filter(_ != null).map(ItemWithOriginal.create)
   }
 
   private implicit class UtilListToItemToCompareList[T](x: java.util.List[T]) {
@@ -68,15 +68,30 @@ object Evaluation extends Datastores with Logging {
   // define metrics
   //
 
-  private def normalizeBR(bibRecord: BibRecord) =
+  private def normalizeBR(bibRecord: BibRecord) = {
+    def nullMap[In, Out](itemOrNull: In, f: (In => Out)): Out =
+      Option(itemOrNull).map(f).getOrElse(null.asInstanceOf[Out])
+
     new BibRecord(
-      normalize(bibRecord.title),
-      bibRecord.author.asScala.map(normalize).asJava,
-      normalize(bibRecord.venue),
-      bibRecord.citeRegEx,
-      bibRecord.shortCiteRegEx,
-      bibRecord.year
-    )
+        nullMap(bibRecord.title, normalize),
+        bibRecord.author.asScala.map(normalize).asJava,
+        nullMap(bibRecord.venue, normalize),
+        bibRecord.citeRegEx,
+        bibRecord.shortCiteRegEx,
+        bibRecord.year)
+  }
+
+  private def normalizeBRstripVenues(bibRecord: BibRecord) = {
+    val normalized = normalizeBR(bibRecord)
+
+    new BibRecord(
+      normalized.title,
+      normalized.author,
+      null,
+      normalized.citeRegEx,
+      normalized.shortCiteRegEx,
+      normalized.year)
+  }
 
   private def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
 
@@ -235,13 +250,16 @@ object Evaluation extends Datastores with Logging {
     bibAuthors.flatMap(_.split(":").toList).toItems
 
   private def bibTitlesExtractor(metadata: ExtractedMetadata) =
-    metadata.references.mapItems(_.title)
+    metadata.references.mapItems(_.title).filter(_ != null)
 
   private def bibVenuesExtractor(metadata: ExtractedMetadata) =
-    metadata.references.mapItems(_.venue)
+    metadata.references.mapItems(_.venue).filter(_ != null)
 
   private def bibYearsExtractor(metadata: ExtractedMetadata) =
-    metadata.references.mapItems(_.year.toString)
+    metadata.references.flatMapItems { r =>
+      val year = r.year
+      if(year == 0) None else Some(year.toString)
+    }
 
   private def bibMentionsExtractor(metadata: ExtractedMetadata) =
     metadata.referenceMentions.toList.map { r =>
@@ -271,6 +289,7 @@ object Evaluation extends Datastores with Logging {
     Metric("abstractNormalized",       "/golddata/isaac/abstracts.tsv",      stringEvaluator(abstractExtractor, goldAbstractExtractor, normalize)),
     Metric("bibAll",                   "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, calculatePR)), // gold from scholar
     Metric("bibAllNormalized",         "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBR, calculatePR)),
+    Metric("bibAllButVenuesNormalized","/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, normalizeBRstripVenues, calculatePR)),
     Metric("bibCounts",                "/golddata/isaac/bibliographies.tsv", genericEvaluator[BibRecord](bibExtractor, goldBibExtractor, identity, bibCounter)),
     Metric("bibAuthors",               "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor)),
     Metric("bibAuthorsNormalized",     "/golddata/isaac/bib-authors.tsv",    stringEvaluator(bibAuthorsExtractor, goldBibAuthorsExtractor, normalize)),

@@ -278,4 +278,3 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     float getProp(PaperToken t);
   }
 }
-
