@@ -1,7 +1,6 @@
 package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
@@ -40,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -66,7 +64,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -622,7 +619,11 @@ public class Parser {
     return truePos;
   }
 
-  public static String normalizeAuthor(String s) {
+  /** Fixes common author problems. This is applied to the output of both normalized and
+   * unnormalized author names, and it is used in training as well. Experience shows that if you
+   * make changes here, there is a good chance you'll need to retrain, even if you think the change
+   * is fairly trivial. */
+  public static String fixupAuthors(String s) {
     String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
@@ -634,7 +635,7 @@ public class Parser {
   public static List<String> trimAuthors(List<String> auth) {
     List<String> out = new ArrayList<String>();
     auth.forEach(s -> {
-      s = normalizeAuthor(s);
+      s = fixupAuthors(s);
       if (!out.contains(s)) out.add(s);
     });
     return out;

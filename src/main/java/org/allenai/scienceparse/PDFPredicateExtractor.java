@@ -239,11 +239,11 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
           m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleFirstBow));
           m.put("%tlfreq", smoothFreq(tok, this.lmFeats.titleLastBow));
-          m.put("%afreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorBow));
-          m.put("%affreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorFirstBow));
-          m.put("%alfreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorLastBow));
+          m.put("%afreq", smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.authorBow));
+          m.put("%affreq", smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.authorFirstBow));
+          m.put("%alfreq", smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.authorLastBow));
           m.put("%bfreq", smoothFreq(tok, this.lmFeats.backgroundBow));
-          m.put("%bafreq", smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.backgroundBow));
+          m.put("%bafreq", smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.backgroundBow));
         }
 
         // add the token itself as a feature
