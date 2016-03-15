@@ -514,7 +514,7 @@ public class Parser {
     // set up early stopping so that we stop training after 50 down-iterations
     final TrainCriterionEval<CRFModel<String, PaperToken, String>> earlyStoppingEvaluator =
             new TrainCriterionEval<>(testEvalFn);
-    earlyStoppingEvaluator.maxNumDipIters = 50;
+    earlyStoppingEvaluator.maxNumDipIters = 100;
     trainOpts.iterCallback = earlyStoppingEvaluator;
 
     // training
