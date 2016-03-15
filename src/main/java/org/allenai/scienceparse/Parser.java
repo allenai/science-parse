@@ -632,13 +632,18 @@ public class Parser {
     return sFix;
   }
 
+  private final static int MAX_AUTHOR_LENGTH = 32;
+  private final static int MIN_AUTHOR_LENGTH = 2;
   public static List<String> trimAuthors(List<String> auth) {
-    List<String> out = new ArrayList<String>();
-    auth.forEach(s -> {
-      s = fixupAuthors(s);
-      if (!out.contains(s)) out.add(s);
-    });
-    return out;
+    return auth.stream().
+            flatMap(s -> Arrays.stream(s.split("(?!,\\s*Jr),|\\band\\b"))).
+            map(String::trim).
+            map(Parser::fixupAuthors).
+            filter(s -> !s.isEmpty()).
+            filter(s -> s.length() <= MAX_AUTHOR_LENGTH).
+            filter(s -> s.length() >= MIN_AUTHOR_LENGTH).
+            distinct().
+            collect(Collectors.toList());
   }
 
   public static void main(String[] args) throws Exception {
