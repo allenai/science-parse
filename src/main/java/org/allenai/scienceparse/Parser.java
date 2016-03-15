@@ -623,7 +623,7 @@ public class Parser {
   }
 
   public static String normalizeAuthor(String s) {
-    String sFix = s.replaceAll("(\\W|[0-9])+$", "");
+    String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
     if (sFix.endsWith("Jr"))
