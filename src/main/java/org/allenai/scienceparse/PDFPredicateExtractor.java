@@ -213,7 +213,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         m.put("%line", Math.min(line, 10.0)); //cap to max 10 lines
         float relativeH = linearNormalize(h, hBounds);
         m.put("%h", relativeH);
-//				m.put("%h", h);
 
         //word features:
         String tok = elems.get(i).getPdfToken().token;
