@@ -10,6 +10,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import lombok.Data;
 import lombok.val;
 import org.allenai.datastore.Datastore;
+import org.allenai.ml.eval.TrainCriterionEval;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -18,6 +19,7 @@ import org.allenai.ml.sequences.crf.CRFFeatureEncoder;
 import org.allenai.ml.sequences.crf.CRFModel;
 import org.allenai.ml.sequences.crf.CRFTrainer;
 import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
+import org.allenai.ml.sequences.crf.conll.ConllFormat;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
@@ -65,6 +67,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -492,45 +495,41 @@ public class Parser {
     trainOpts.numThreads = opts.threads;
     trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
 
-    // Trainer
-    CRFTrainer<String, PaperToken, String> trainer =
+    // set up evaluation function
+    final Parallel.MROpts evalMrOpts =
+            Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
+    final ToDoubleFunction<CRFModel<String, PaperToken, String>> testEvalFn;
+    {
+      final List<List<Pair<String, PaperToken>>> testEvalData =
+              testLabeledData.
+                      stream().
+                      map(x -> x.stream().map(Pair::swap).collect(toList())).
+                      collect(toList());
+      testEvalFn = (model) -> {
+        final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        return eval.tokenAccuracy.accuracy();
+      };
+    }
+
+    // set up early stopping so that we stop training after 50 down-iterations
+    final TrainCriterionEval<CRFModel<String, PaperToken, String>> earlyStoppingEvaluator =
+            new TrainCriterionEval<>(testEvalFn);
+    earlyStoppingEvaluator.maxNumDipIters = 100;
+    trainOpts.iterCallback = earlyStoppingEvaluator;
+
+    // training
+    final CRFTrainer<String, PaperToken, String> trainer =
       new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
+    trainer.train(trainLabeledData);
+    final CRFModel<String, PaperToken, String> crfModel = earlyStoppingEvaluator.bestModel;
 
-    // Setup iteration callback, weird trick here where you require
-    // the trainer to make a model for each iteration but then need
-    // to modify the iteration-callback to use it
-    Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
-    CRFModel<String, PaperToken, String> cacheModel = null;
-    trainOpts.optimizerOpts.iterCallback = (weights) -> {
-      CRFModel<String, PaperToken, String> crfModel = trainer.modelForWeights(weights);
-      long start = System.currentTimeMillis();
-      List<List<Pair<String, PaperToken>>> trainEvalData = trainLabeledData.stream()
-        .map(x -> x.stream().map(Pair::swap).collect(toList()))
-        .collect(toList());
-      Evaluation<String> eval = Evaluation.compute(crfModel, trainEvalData, evalMrOpts);
-      long stop = System.currentTimeMillis();
-      logger.info("Train Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
-      if (!testLabeledData.isEmpty()) {
-        start = System.currentTimeMillis();
-        List<List<Pair<String, PaperToken>>> testEvalData = testLabeledData.stream()
-          .map(x -> x.stream().map(Pair::swap).collect(toList()))
-          .collect(toList());
-        eval = Evaluation.compute(crfModel, testEvalData, evalMrOpts);
-        stop = System.currentTimeMillis();
-        logger.info("Test Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
-      }
-    };
-
-    CRFModel<String, PaperToken, String> crfModel = null;
-    crfModel = trainer.train(trainLabeledData);
-
-    Vector weights = crfModel.weights();
+    final Vector weights = crfModel.weights();
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
 
-    val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
-    logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf);
-    dos.close();
+    try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
+      logger.info("Writing model to {}", opts.modelFile);
+      saveModel(dos, crfModel.featureEncoder, weights, plf);
+    }
   }
 
   public static void saveModel(DataOutputStream dos,
