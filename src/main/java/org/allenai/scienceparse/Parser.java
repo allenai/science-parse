@@ -1,7 +1,6 @@
 package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
@@ -42,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -69,7 +67,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -83,7 +80,7 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 4);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel-ce5b11.dat", 1);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
@@ -621,8 +618,12 @@ public class Parser {
     return truePos;
   }
 
-  public static String normalizeAuthor(String s) {
-    String sFix = s.replaceAll("(\\W|[0-9])+$", "");
+  /** Fixes common author problems. This is applied to the output of both normalized and
+   * unnormalized author names, and it is used in training as well. Experience shows that if you
+   * make changes here, there is a good chance you'll need to retrain, even if you think the change
+   * is fairly trivial. */
+  public static String fixupAuthors(String s) {
+    String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
     if (sFix.endsWith("Jr"))
@@ -630,13 +631,18 @@ public class Parser {
     return sFix;
   }
 
+  private final static int MAX_AUTHOR_LENGTH = 32;
+  private final static int MIN_AUTHOR_LENGTH = 2;
   public static List<String> trimAuthors(List<String> auth) {
-    List<String> out = new ArrayList<String>();
-    auth.forEach(s -> {
-      s = normalizeAuthor(s);
-      if (!out.contains(s)) out.add(s);
-    });
-    return out;
+    return auth.stream().
+            flatMap(s -> Arrays.stream(s.split("(?!,\\s*Jr),|\\band\\b"))).
+            map(String::trim).
+            map(Parser::fixupAuthors).
+            filter(s -> !s.isEmpty()).
+            filter(s -> s.length() <= MAX_AUTHOR_LENGTH).
+            filter(s -> s.length() >= MIN_AUTHOR_LENGTH).
+            distinct().
+            collect(Collectors.toList());
   }
 
   public static void main(String[] args) throws Exception {
