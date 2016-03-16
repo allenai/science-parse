@@ -1,7 +1,16 @@
 package org.allenai.scienceparse;
 
+import com.gs.collections.api.list.primitive.IntList;
+import com.gs.collections.api.set.ImmutableSet;
+import com.gs.collections.api.set.primitive.ImmutableIntSet;
+import com.gs.collections.api.set.primitive.IntSet;
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.api.tuple.primitive.IntIntPair;
+import com.gs.collections.impl.factory.primitive.FloatLists;
+import com.gs.collections.impl.factory.primitive.IntSets;
 import com.gs.collections.impl.tuple.Tuples;
+import com.gs.collections.impl.tuple.primitive.IntIntPairImpl;
+import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -13,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -225,6 +235,61 @@ public class PDFToCRFInput {
     }
   }
 
+  private final static ImmutableIntSet whitespaceCharTypes = IntSets.immutable.of(
+          Character.CONTROL,
+          Character.PARAGRAPH_SEPARATOR,
+          Character.LINE_SEPARATOR,
+          Character.SPACE_SEPARATOR);
+  private final static ImmutableIntSet punctuationCharTypes = IntSets.immutable.of(
+          Character.CURRENCY_SYMBOL,
+          Character.DASH_PUNCTUATION,
+          Character.ENCLOSING_MARK,
+          Character.START_PUNCTUATION,
+          Character.END_PUNCTUATION,
+          Character.FINAL_QUOTE_PUNCTUATION,
+          Character.INITIAL_QUOTE_PUNCTUATION,
+          Character.MATH_SYMBOL,
+          Character.MODIFIER_SYMBOL,
+          Character.OTHER_PUNCTUATION,
+          Character.OTHER_SYMBOL
+  );
+
+  /**
+   * Returns a list of ranges that define words in the given string
+   */
+  public static List<IntIntPair> findWordRanges(final CharSequence s) {
+    final List<IntIntPair> result = new ArrayList<>(2);
+    int wordStart = 0;
+    for(int i = 0; i < s.length(); i++) {
+      final char c = s.charAt(i);
+      final int cType = Character.getType(c);
+
+      if(whitespaceCharTypes.contains(cType)) {
+        if(wordStart < i)
+          result.add(PrimitiveTuples.pair(wordStart, i));
+        wordStart = i + 1;
+      } else if(c == '.') {
+        // special case for periods, since we want to keep them with the word before, but not with
+        // the word after
+        result.add(PrimitiveTuples.pair(wordStart, i + 1));
+        wordStart = i + 1;
+      } else if(punctuationCharTypes.contains(cType)) {
+        // add whatever was before the punctuation
+        if(i > wordStart)
+          result.add(PrimitiveTuples.pair(wordStart, i));
+        wordStart = i;
+
+        // add the punctuation itself
+        result.add(PrimitiveTuples.pair(wordStart, wordStart + 1));
+        wordStart = i + 1;
+      }
+    }
+
+    if(wordStart < s.length())
+      result.add(PrimitiveTuples.pair(wordStart, s.length()));
+
+    return result;
+  }
 
   /**
    * Returns the PaperToken sequence form of a given PDF document
@@ -235,18 +300,51 @@ public class PDFToCRFInput {
    * @throws IOException
    */
   public static List<PaperToken> getSequence(PDFDoc pdf, boolean heuristicHeader) throws IOException {
-
-    ArrayList<PaperToken> out = new ArrayList<>();
+    final ArrayList<PaperToken> rawTokens = new ArrayList<>();
     if (heuristicHeader && pdf.heuristicHeader() != null) {
       List<PDFLine> header = pdf.heuristicHeader();
-      addLineTokens(out, header, 0);
+      addLineTokens(rawTokens, header, 0);
     } else {
       int pg = 0;
       for (PDFPage p : pdf.getPages()) {
-        addLineTokens(out, p.getLines(), pg);
+        addLineTokens(rawTokens, p.getLines(), pg);
       }
     }
-    return out;
+
+    // split tokens according to tokenization rules
+    final ArrayList<PaperToken> splitTokens = new ArrayList<>(3 * rawTokens.size());
+    for(final PaperToken rawToken : rawTokens) {
+      final PDFToken rawPdfToken = rawToken.getPdfToken();
+
+      final String rawTokenText = rawPdfToken.getToken();
+      final List<IntIntPair> wordRanges = findWordRanges(rawTokenText);
+
+      final float rawX0 = rawPdfToken.bounds.get(0);
+      final float rawY0 = rawPdfToken.bounds.get(1);
+      final float rawX1 = rawPdfToken.bounds.get(2);
+      final float rawY1 = rawPdfToken.bounds.get(3);
+      final float widthPerCharacter = (rawX1 - rawX0) / rawTokenText.length();
+
+      for(final IntIntPair wordRange : wordRanges) {
+        // This way of re-calculating the token boundaries only works with left-to-right languages.
+        // It also makes the crude assumption that all characters have the same width.
+        final PDFToken newPdfToken = PDFToken.builder().
+                fontMetrics(rawPdfToken.getFontMetrics()).
+                token(rawTokenText.substring(wordRange.getOne(), wordRange.getTwo())).
+                bounds(FloatLists.immutable.of(
+                        rawX0 + wordRange.getOne() * widthPerCharacter,
+                        rawY0,
+                        rawX0 + wordRange.getTwo() * widthPerCharacter,
+                        rawY1)).
+                build();
+
+        final PaperToken newToken =
+                new PaperToken(newPdfToken, rawToken.getLine(), rawToken.getPage());
+        splitTokens.add(newToken);
+      }
+    }
+
+    return splitTokens;
   }
 
   public static List<PaperToken> padSequence(List<PaperToken> seq) {
