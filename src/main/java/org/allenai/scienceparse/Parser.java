@@ -177,7 +177,7 @@ public class Parser {
   ) throws IOException {
     final String paperId = p == null ? null : p.getId();
     if(paperId != null)
-    logger.debug("{}: starting", paperId);
+      logger.debug("{}: starting", paperId);
 
     final PDFDoc doc;
     try {
@@ -199,7 +199,7 @@ public class Parser {
       em = new ExtractedMetadata(
               doc.getMeta().getTitle(),
               doc.getMeta().getAuthors(),
-        doc.getMeta().getCreateDate());
+              doc.getMeta().getCreateDate());
       if (em.title == null) {
         logger.info("{}: skipping", paperId);
         return null;
