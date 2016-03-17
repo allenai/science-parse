@@ -125,7 +125,8 @@ public class PDFToCRFInput {
     toFind = StringUtils.normalize(toFind);
     if (seq.size() == 0 || toFind.length() == 0)
       return null;
-    String[] toks = toFind.split(" ");
+    final List<String> tokenList = tokenize(toFind);
+    final String[] toks = tokenList.toArray(new String[tokenList.size()]);
     if (toks.length == 0) { //can happen if toFind is just spaces
       return null;
     }
@@ -154,9 +155,8 @@ public class PDFToCRFInput {
     author = author.replace("+", "");
     author = author.replace("^", "");
 
-    author = StringUtils.normalize(author);
-
-    String[] toks = author.split(" ");
+    final List<String> tokenList = tokenize(StringUtils.normalize(author));
+    String[] toks = tokenList.toArray(new String[tokenList.size()]);
     for (int i = 0; i < toks.length; i++) {
       boolean optional = true;
       if (i == 0 || i == toks.length - 1)
@@ -289,6 +289,12 @@ public class PDFToCRFInput {
       result.add(PrimitiveTuples.pair(wordStart, s.length()));
 
     return result;
+  }
+
+  public static List<String> tokenize(final String s) {
+    return findWordRanges(s).stream().map(
+            range -> s.substring(range.getOne(), range.getTwo())
+    ).collect(Collectors.toList());
   }
 
   /**
