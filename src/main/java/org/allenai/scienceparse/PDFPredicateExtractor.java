@@ -150,9 +150,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     Pair<Float, Float> fBounds = getExtrema(elems.subList(1, elems.size() - 1), (PaperToken t) -> {
       return getFixedFont(t);
     });
-//		log.info("h bounds: " + hBounds);
-//		log.info("f bounds: " + fBounds);
-    //log.info("called with " + elems.size() + " tokens.");
+
     for (int i = 0; i < elems.size(); i++) {
       ObjectDoubleHashMap<String> m = new ObjectDoubleHashMap<String>();
       float prevFont = -10.0f;
@@ -186,6 +184,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         float font = getFixedFont(elems.get(i));
         float h = height(elems.get(i).getPdfToken());
         int line = elems.get(i).getLine();
+
         //font-change forward (fcf) or backward (fcb):
         if (font != prevFont)
           m.put("%fcb", 1.0);
@@ -199,6 +198,8 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.put("%lcf", 1.0);
           m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false)));
         }
+
+        // change in height
         if (Math.abs(Math.abs(nextHeight - h) / Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% change
           m.put("%hcf", 1.0);
         }
