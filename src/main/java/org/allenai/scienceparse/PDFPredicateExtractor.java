@@ -266,6 +266,9 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         if(token.equals("and") || token.equals(","))
           m.put("%and", 1.0);
 
+        if(token.equals("-"))
+          m.put("%dash", 1.0);
+
         // add trigram features
         final String trigramSourceToken = token + "$";
         for(int j = 0; j <= trigramSourceToken.length() - 3; ++j) {
