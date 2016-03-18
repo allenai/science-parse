@@ -207,6 +207,19 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.put("%hcb", 1.0);
         }
 
+        // distance to previous token
+        if(line == prevLine && i > 1) {
+          final float prevEnd = elems.get(i - 1).getPdfToken().bounds.get(2);
+          final float thisStart = elems.get(i).getPdfToken().bounds.get(0);
+          m.put("%dxb", logYDelt(thisStart, prevEnd));
+        }
+        // distance to next token
+        if(line == nextLine && i < elems.size() - 2) {
+          final float thisEnd = elems.get(i).getPdfToken().bounds.get(2);
+          final float nextStart = elems.get(i + 1).getPdfToken().bounds.get(0);
+          m.put("%dxf", logYDelt(nextStart, thisEnd));
+        }
+
         //font value:
         float relativeF = linearNormalize(font, fBounds);
         m.put("%font", relativeF);
