@@ -940,7 +940,7 @@ public class Parser {
       if (doc.meta.createDate != null)
         em.setYearFromDate(doc.meta.createDate);
     }
-    
+
     clean(em);
     em.raw = PDFDocToPartitionedText.getRaw(doc);
     em.creator = doc.meta.creator;
