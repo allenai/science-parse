@@ -923,18 +923,24 @@ public class Parser {
     seq = seq.subList(0, Math.min(seq.size(), headerMax));
     seq = PDFToCRFInput.padSequence(seq);
 
-    if (doc.meta == null || doc.meta.title == null) { //use the model
+    { // get title and authors from the CRF
       List<String> outSeq = model.bestGuess(seq);
       //the output tag sequence will not include the start/stop states!
       outSeq = PDFToCRFInput.padTagSequence(outSeq);
       em = new ExtractedMetadata(seq, outSeq);
       em.source = ExtractedMetadata.Source.CRF;
-    } else {
-      em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
-      em.source = ExtractedMetadata.Source.META;
     }
-    if (doc.meta.createDate != null)
-      em.setYearFromDate(doc.meta.createDate);
+
+    // use PDF metadata if it's there
+    if(doc.meta != null) {
+      if (doc.meta.title != null) {
+        em.setTitle(doc.meta.title);
+        em.source = ExtractedMetadata.Source.META;
+      }
+      if (doc.meta.createDate != null)
+        em.setYearFromDate(doc.meta.createDate);
+    }
+    
     clean(em);
     em.raw = PDFDocToPartitionedText.getRaw(doc);
     em.creator = doc.meta.creator;
