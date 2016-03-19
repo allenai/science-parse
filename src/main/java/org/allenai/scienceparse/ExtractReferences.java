@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
@@ -50,6 +51,9 @@ public class ExtractReferences {
   public static final String authGeneralList = authGeneral + "(?:(?:; |, |, and |; and | and )" + authGeneral + ")*";
   private ArrayList<BibStractor> extractors = null;
 
+  public static Pattern pBracket = Pattern.compile("\\[([0-9]+)\\](.*)");
+  public static Pattern pDot = Pattern.compile("([0-9]+)\\.(.*)");
+  
   CheckReferences cr;
   CRFModel<String, String, String> bibCRF = null;
   
@@ -81,10 +85,12 @@ public class ExtractReferences {
       new BracketName(BracketNameBibRecordParser.class)));
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
+      extractors = new ArrayList<>();
       extractors.addAll(Arrays.asList(
-        new NamedYear(CRFBibRecordParser.class),
-        new NumberDot(CRFBibRecordParser.class),
         new BracketNumber(CRFBibRecordParser.class),
+          new NumberDot(CRFBibRecordParser.class),
+        new NumberDotNaturalLineBreaks(CRFBibRecordParser.class),
+        new NamedYear(CRFBibRecordParser.class),
         new BracketName(CRFBibRecordParser.class)));
     }
   }
@@ -125,7 +131,7 @@ public class ExtractReferences {
   }
 
   private static final Pattern yearPattern = Pattern.compile("[1-2][0-9][0-9][0-9]");
-  private static int extractRefYear(String sYear) {
+  public static int extractRefYear(String sYear) {
     final Matcher mYear = RegexWithTimeout.matcher(yearPattern, sYear);
     int a = 0;
     while (mYear.find()) {
@@ -141,6 +147,7 @@ public class ExtractReferences {
   }
 
   private static final Pattern authorStringToListPattern = Pattern.compile("\\p{Lu}\\..*");
+  
   /**
    * Takes in a string mentioning several authors, returns normalized list of authors
    *
@@ -152,18 +159,24 @@ public class ExtractReferences {
     if (authString.contains(";")) { //assume semi-colon delimiter
       semiDelim = true;
     }
-
+    
     //figure out whether M. Johnson or Johnson, M.:
     boolean firstLast = false;
     List<String> out = new ArrayList<>();
     if (RegexWithTimeout.matcher(authorStringToListPattern, authString).matches()) {
       firstLast = true;
+      //strip trailing punctuation:
+      authString = authString.trim().replaceAll("\\p{P}$", "");
+    }
+    else {
+      //replacing trailing punct that's not .
+      authString = authString.trim().replaceAll("(,|:|;)$", "");
     }
     String[] names;
     if (semiDelim)
-      names = authString.split("(;|; and| and | AND | And )+");
+      names = authString.split("(;|; and| and | AND | And | & )+");
     else
-      names = authString.split("(,| and | AND | And )+");
+      names = authString.split("(,| and | AND | And | & )+");
     if (firstLast) {
       out = Arrays.asList(names);
     } else {
@@ -183,12 +196,13 @@ public class ExtractReferences {
   }
 
   private static <T> List<T> removeNulls(List<T> in) {
-    List<T> out = new ArrayList<T>();
-    for (T a : in) {
-      if (a != null)
-        out.add(a);
-    }
-    return out;
+    return in.stream().filter(a -> (a != null)).collect(Collectors.toList());
+//    List<T> out = new ArrayList<T>();
+//    for (T a : in) {
+//      if (a != null)
+//        out.add(a);
+//    }
+//    return out;
   }
 
   private static String getAuthorLastName(String authName) {
@@ -297,6 +311,7 @@ public class ExtractReferences {
         maxLen = f;
       }
     }
+//    log.info("chose " + idx + " with " + maxLen);
     return idx;
   }
 
@@ -319,6 +334,7 @@ public class ExtractReferences {
       results[i] = extractors.get(i).parse(text);
     }
     int idx = longestIdx(results);
+//    log.info("references: " + results[idx].toString());
     return Tuples.pair(results[idx], extractors.get(idx));
   }
 
@@ -659,8 +675,19 @@ public class ExtractReferences {
       String[] citesa = line.split("<bb>");
       List<String> cites = Arrays.asList(citesa);
       List<BibRecord> out = new ArrayList<BibRecord>();
+      boolean first = true;
       for (String s : cites) {
-        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
+        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ").trim();
+        if(first) { //don't overwrite number-bracket or number-dot
+          if(s.length() > 0)
+              if(RegexWithTimeout.matcher(pBracket, s).matches() ||
+            RegexWithTimeout.matcher(pDot, s).matches()) {
+                return removeNulls(out);
+              }
+              else {
+                first = false;
+              }
+        }
         out.add(this.recParser.parseRecord(s));
       }
       out = removeNulls(out);
@@ -668,19 +695,40 @@ public class ExtractReferences {
     }
   }
 
+  private class NumberDotNaturalLineBreaks extends NumberDot {
+
+    NumberDotNaturalLineBreaks(Class c) {
+      super(c);
+    }
+    
+    @Override
+    public List<BibRecord> parse(String line) {
+      return parseWithGivenBreaks(line, true);
+    }
+    
+  }
+  
   private class NumberDot extends BracketNumber {
     NumberDot(Class c) {
       super(c);
     }
-
-    public List<BibRecord> parse(String line) {
-      line = line.replaceAll("<bb>", "<lb>");
+    
+    //
+    protected List<BibRecord> parseWithGivenBreaks(String line, boolean bigBreaks) {
+//      log.info("trying " + line);
+      if(!bigBreaks)
+        line = line.replaceAll("<bb>", "<lb>");
+      else
+        line = line.replaceAll("<lb>", " ");
       int i = 0;
-      String tag = "<lb>" + (++i) + ". ";
+      String preTag = "<bb>";
+      if(!bigBreaks)
+        preTag = "<lb>";
+      String tag = preTag + (++i) + ". ";
       List<String> cites = new ArrayList<String>();
       int st = line.indexOf(tag);
       while (line.contains(tag) && st >= 0) {
-        tag = "<lb>" + (++i) + ". ";
+        tag = preTag + (++i) + ". ";
         int end = line.indexOf(tag, st);
         if (end > 0) {
           cites.add(line.substring(st, end));
@@ -692,10 +740,15 @@ public class ExtractReferences {
       List<BibRecord> out = new ArrayList<BibRecord>();
       for (String s : cites) {
         s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
+        s = s.replaceAll("-<bb>", "").replaceAll("<bb>", " ");
         out.add(this.recParser.parseRecord(s));
       }
       out = removeNulls(out);
       return out;
+    }      
+    
+    public List<BibRecord> parse(String line) {
+      return parseWithGivenBreaks(line,  false);
     }
   }
 
@@ -732,8 +785,9 @@ public class ExtractReferences {
         st = end;
       }
       List<BibRecord> out = new ArrayList<BibRecord>();
+      boolean first = true;
       for (String s : cites) {
-        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
+        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ").trim();
         out.add(this.recParser.parseRecord(s));
       }
       out = removeNulls(out);
@@ -763,8 +817,19 @@ public class ExtractReferences {
       String[] citesa = line.split("<bb>");
       List<String> cites = Arrays.asList(citesa);
       List<BibRecord> out = new ArrayList<BibRecord>();
+      boolean first = true;
       for (String s : cites) {
-        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
+        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ").trim();
+        if(first) { //don't overwrite number-bracket or number-dot
+          if(s.length() > 0)
+              if(RegexWithTimeout.matcher(pBracket, s).matches() ||
+            RegexWithTimeout.matcher(pDot, s).matches()) {
+                return removeNulls(out);
+              }
+              else {
+                first = false;
+              }
+        }
         out.add(this.recParser.parseRecord(s));
       }
       out = removeNulls(out);

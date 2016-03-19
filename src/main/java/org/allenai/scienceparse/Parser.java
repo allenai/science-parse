@@ -41,6 +41,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -86,7 +87,8 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 1);
+    //return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 1);
+    return FileSystems.getDefault().getPath("model-bib-crf.dat");
   }
 
   public Parser() throws Exception {
@@ -742,13 +744,13 @@ public class Parser {
       (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
       (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
-      (args.length == 6 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("learnBibCRF")))) {
+      (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
+      (args.length == 4 && args[0].equalsIgnoreCase("learnBibCRF")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
       System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
       System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
       System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
-      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file> <bib model file>");
+      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <bib model file>");
       System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir>");
     } else if (args[0].equalsIgnoreCase("bootstrap")) {
       File inDir = new File(args[1]);
@@ -910,7 +912,7 @@ public class Parser {
       //TODO: write output
 
     } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
-      Parser p = new Parser(new File(args[2]), new File(args[4]), new File(args[5]));
+      Parser p = new Parser(new File(args[2]), new File(Parser.getDefaultGazetteer().toString()), new File(args[4]));
       File inDir = new File(args[1]);
       File outDir = new File(args[3]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());

@@ -44,10 +44,15 @@ public class CRFBibRecordParser implements BibRecordParser {
   }
 
   public static List<Pair<String, String>> getLabeledLine(String s) {
-    final String [] sourceTags = new String [] {"author", "booktitle", "date", "title"}; //MUST BE SORTED
-    boolean [] inTag = new boolean [] {false, false, false, false};
+    final String [] sourceTags = new String [] {"author", "booktitle", "date", "editor", "institution",
+        "journal", "location", "note", "pages", "publisher", "tech", "title", "volume"}; //MUST BE SORTED
+    boolean [] inTag = new boolean [] {false, false, false, false, false, 
+        false, false, false,false, false,
+        false, false, false};
     final String [] destTags = new String [] {ExtractedMetadata.authorTag, 
-        ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, ExtractedMetadata.titleTag};
+        ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, "editor", "institution", 
+        ExtractedMetadata.venueTag, "location", "note", "pages", "publisher", ExtractedMetadata.venueTag,
+        ExtractedMetadata.titleTag, "volume"};
     
     final Pattern yearPat= Pattern.compile("[1-2][0-9]{3}.*");
     List<String> toks = tokenize(s);
@@ -68,12 +73,7 @@ public class CRFBibRecordParser implements BibRecordParser {
         String tag = "O";
         for(int j=0; j<inTag.length; j++) {
           if(inTag[j]) {
-            if(j==2) { //special case for date, we only want year
-              if(RegexWithTimeout.matcher(yearPat, sTok).matches())
-                tag = destTags[2];
-            }
-            else
-              tag = destTags[j];
+            tag = destTags[j];
             break;
           }
         }
@@ -86,8 +86,6 @@ public class CRFBibRecordParser implements BibRecordParser {
               tag = "E_" + tag;
             }
           }
-          else if(tag=="Y" && atStart) //special case for year (unfortunately)
-            tag = "W_" + tag;
           else if(atStart)
             tag = "B_" + tag;
           else
@@ -97,7 +95,6 @@ public class CRFBibRecordParser implements BibRecordParser {
         atStart = false;
       }
     }
-    //change to begin/end:
     
     out.add(Tuples.pair("</S>", "</S>"));
     return out;
@@ -125,9 +122,7 @@ public class CRFBibRecordParser implements BibRecordParser {
     line = line.trim();
     if(line.isEmpty())
       return null;
-    Pattern pBracket = Pattern.compile("\\[([0-9]+)\\](.*)");
-    Pattern pDot = Pattern.compile("([0-9]+)\\.(.*)$");
-    Matcher m = RegexWithTimeout.matcher(pBracket,  line);
+    Matcher m = RegexWithTimeout.matcher(ExtractReferences.pBracket,  line);
     String citeRegEx = null;
     String shortCiteRegEx = null;
     if(m.matches()) {
@@ -135,7 +130,7 @@ public class CRFBibRecordParser implements BibRecordParser {
       shortCiteRegEx = citeRegEx;
       line = m.group(2);
     } else {
-      m = RegexWithTimeout.matcher(pDot, line);
+      m = RegexWithTimeout.matcher(ExtractReferences.pDot, line);
       if(m.matches()) {
         citeRegEx = m.group(1);
         shortCiteRegEx = citeRegEx;
@@ -145,7 +140,7 @@ public class CRFBibRecordParser implements BibRecordParser {
     line = line.trim();
     if(line.isEmpty())
       return null;
-    
+//    log.info("parsing " + line);
     ArrayList<String> toks = new ArrayList<String>();
     toks.add("<S>");
     toks.addAll(tokenize(line));
@@ -173,8 +168,6 @@ public class CRFBibRecordParser implements BibRecordParser {
         venue = PDFToCRFInput.stringAtForStringList(toks, ls.loc); 
       } else if (year == null && ls.tag.equals(ExtractedMetadata.yearTag)) {
         year = PDFToCRFInput.stringAtForStringList(toks, ls.loc);
-        if(year != null)
-          year = year.substring(0, Math.min(4, year.length()));
       }
     }
     
@@ -182,26 +175,33 @@ public class CRFBibRecordParser implements BibRecordParser {
             author == null ?
                     null :
                     ExtractReferences.authorStringToList(author);
+//    log.info("authors first extracted: " + ((authors==null)?"":authors.toString()));
+//    log.info("year first extracted: " + year);
+    
+    int iYear = -1;
+    if(year != null)
+     iYear = ExtractReferences.extractRefYear(year);
+    
     if(citeRegEx == null && year != null) {
       shortCiteRegEx = ExtractReferences.getCiteAuthorFromAuthors(authors);
-      citeRegEx = shortCiteRegEx + ",? " + Pattern.quote(year);
+      citeRegEx = shortCiteRegEx + ",? " + ((iYear > 0)?Pattern.quote(iYear + ""):"");
     }
     if(citeRegEx == null || shortCiteRegEx == null || title == null || authors == null || year == null)
       return null;
-
+//    log.info("cite string " + citeRegEx);
     BibRecord brOut = null;
     try {
       brOut = new BibRecord(
-        title,
-        authors,
-        venue,
+        Parser.cleanTitle(title),
+        Parser.trimAuthors(authors),
+        Parser.cleanTitle(venue),
         Pattern.compile(citeRegEx),
         Pattern.compile(shortCiteRegEx),
-        Integer.parseInt(year));
+        iYear);
     } catch (final NumberFormatException e) {
       return null;
     }
-
+//    log.info("returning " + brOut.toString());
     return brOut;
   }
 }
