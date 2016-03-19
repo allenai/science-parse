@@ -276,6 +276,13 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           final String feature = "%tri=" + trigram;
           m.updateValue(feature, 0.0, d -> d + 1);
         }
+
+        // add bigram features
+        for(int j = 0; j <= trigramSourceToken.length() - 2; ++j) {
+          final String trigram = trigramSourceToken.substring(j, j + 2);
+          final String feature = "%bi=" + trigram;
+          m.updateValue(feature, 0.0, d -> d + 1);
+        }
       }
       out.add(m);
     }
