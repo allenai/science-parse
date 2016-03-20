@@ -87,8 +87,7 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
   public static Path getDefaultBibModel() {
-    //return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 1);
-    return FileSystems.getDefault().getPath("model-bib-crf.dat");
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 1);
   }
 
   public Parser() throws Exception {
@@ -722,6 +721,7 @@ public class Parser {
 
   public static String normalizeAuthor(String s) {
     String sFix = s.replaceAll("(\\W|[0-9])+$", "");
+    sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
     if (sFix.endsWith("Jr"))
@@ -1023,7 +1023,6 @@ public class Parser {
 
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final ExtractedMetadata em;
-
     PDFExtractor ext = new PDFExtractor();
     PDFDoc doc = ext.extractFromInputStream(is);
     List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
@@ -1045,7 +1044,6 @@ public class Parser {
     clean(em);
     em.raw = PDFDocToPartitionedText.getRaw(doc);
     em.creator = doc.meta.creator;
-      
     // extract references
     try {
       final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
@@ -1064,6 +1062,7 @@ public class Parser {
       if(em.referenceMentions == null)
         em.referenceMentions = Collections.emptyList();
     }
+    logger.info(em.references.size() + " refs for " + em.title);
 
     try {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);

@@ -36,13 +36,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CRFBibRecordParser implements BibRecordParser {
-  private static CRFModel<String, String, String> model;
+  private CRFModel<String, String, String> model;
   public static final String DATA_VERSION = "0.1";
   
   public CRFBibRecordParser(CRFModel<String, String, String> inModel) {
-    model = inModel;
+      model = inModel;
   }
-
+  
   public static List<Pair<String, String>> getLabeledLine(String s) {
     final String [] sourceTags = new String [] {"author", "booktitle", "date", "editor", "institution",
         "journal", "location", "note", "pages", "publisher", "tech", "title", "volume"}; //MUST BE SORTED
@@ -192,7 +192,7 @@ public class CRFBibRecordParser implements BibRecordParser {
     BibRecord brOut = null;
     try {
       brOut = new BibRecord(
-        Parser.cleanTitle(title),
+        CRFBibRecordParser.cleanTitle(title),
         Parser.trimAuthors(authors),
         Parser.cleanTitle(venue),
         Pattern.compile(citeRegEx),
@@ -203,5 +203,10 @@ public class CRFBibRecordParser implements BibRecordParser {
     }
 //    log.info("returning " + brOut.toString());
     return brOut;
+  }
+  
+  public static String cleanTitle(String title) {
+    return title.replaceAll("^\\p{Pi}", "").
+        replaceAll("(\\p{Pe}|,|\\.)$", "");
   }
 }

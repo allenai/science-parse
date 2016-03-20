@@ -311,7 +311,7 @@ public class ExtractReferences {
         maxLen = f;
       }
     }
-//    log.info("chose " + idx + " with " + maxLen);
+    log.info("chose " + idx + " with " + maxLen);
     return idx;
   }
 
