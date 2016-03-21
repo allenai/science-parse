@@ -31,9 +31,11 @@ public class ParserLMFeatures implements Serializable {
   ObjectDoubleHashMap<String> titleBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> titleFirstBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> titleLastBow = new ObjectDoubleHashMap<String>();
+  ObjectDoubleHashMap<String> titleBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> authorBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> authorFirstBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> authorLastBow = new ObjectDoubleHashMap<String>();
+  ObjectDoubleHashMap<String> authorBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> venueBow = new ObjectDoubleHashMap<String>();
   ObjectDoubleHashMap<String> venueFirstBow = new ObjectDoubleHashMap<String>();
@@ -54,10 +56,10 @@ public class ParserLMFeatures implements Serializable {
     log.info("Excluding {} paper ids from LM features", idsToExclude.size());
     for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
-        fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
-        fillBow(venueBow, p.venue, venueFirstBow, venueLastBow, false);
+        fillBow(titleBow, p.title, titleFirstBow, titleLastBow, titleBagOfCharTrigrams, false);
+        fillBow(venueBow, p.venue, venueFirstBow, venueLastBow, null, false);
         for (String a : p.authors)
-          fillBow(authorBow, a, authorFirstBow, authorLastBow, true);
+          fillBow(authorBow, a, authorFirstBow, authorLastBow, authorBagOfCharTrigrams, true);
       }
     }
 
@@ -111,7 +113,7 @@ public class ParserLMFeatures implements Serializable {
         }
 
         if(tokens != null) {
-        ct += fillBow(backgroundBow, tokens, null, null, false);
+        ct += fillBow(backgroundBow, tokens, null, null, null, false);
           successfulPapers += 1;
         } else {
           failedPapers += 1;
@@ -140,23 +142,35 @@ public class ParserLMFeatures implements Serializable {
           String s,
           ObjectDoubleHashMap<String> firstHM,
           ObjectDoubleHashMap<String> lastHM,
+          ObjectDoubleHashMap<String> trigramHM,
           boolean doTrim
   ) {
     if(s == null)
       return 0;
     else
-      return fillBow(hm, tokenize(s), firstHM, lastHM, doTrim);
+      return fillBow(hm, tokenize(s), firstHM, lastHM, trigramHM, doTrim);
   }
 
   public int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
-    return fillBow(hm, s, null, null, doTrim);
+    return fillBow(hm, s, null, null, null, doTrim);
   }
 
+  public static void addTrigrams(ObjectDoubleHashMap<String> hm, String t) {
+    if(t == null)
+      return;
+    t = "^" + t + "$";
+    int len = t.length();
+    for(int i=0; i<len - 3; i++) {
+      hm.addToValue(t.substring(i, i+3), 1.0);
+    }
+  }
+  
   private int fillBow(
           ObjectDoubleHashMap<String> hm,
           String[] toks,
           ObjectDoubleHashMap<String> firstHM,
           ObjectDoubleHashMap<String> lastHM,
+          ObjectDoubleHashMap<String> trigramHM,
           boolean doTrim
   ) {
     int ct = 0;
@@ -168,12 +182,14 @@ public class ParserLMFeatures implements Serializable {
     }
     for (String t : toks) {
       hm.addToValue(doTrim ? Parser.normalizeAuthor(t) : t, 1.0);
+      if(trigramHM != null)
+        addTrigrams(trigramHM, doTrim ? Parser.normalizeAuthor(t) : t);
       ct++;
     }
     return ct;
   }
 
   private String[] tokenize(final String s) {
-    return s.split("( |,)");  //not great
+    return s.split(" ");  //not great
   }
 }

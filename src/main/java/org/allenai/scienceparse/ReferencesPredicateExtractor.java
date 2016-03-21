@@ -33,7 +33,10 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
     Pattern pInitialQuote = Pattern.compile("\\p{Pi}");
     Pattern pEndQuote = Pattern.compile("\\p{Pf}");
     Pattern pDoubleDash = Pattern.compile("\\p{Pd}\\p{Pd}");
-    Pattern pContinuing = Pattern.compile(",;:$");
+    //Pattern pContinuing = Pattern.compile(",;:$");
+    Pattern pColon = Pattern.compile(":$");
+    Pattern pComma = Pattern.compile(",$");
+    Pattern pSemicolon = Pattern.compile(";$");
     Pattern pEnding = Pattern.compile("(\\.$|\\p{Pf}$)");
     Pattern pPairedBraces = Pattern.compile("\\p{Ps}.*\\p{Pe}");
     int ct = 0;
@@ -49,8 +52,16 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
       m.put("%pDoubleDash", 1.0);
       ct++;
     }
-    if(RegexWithTimeout.matcher(pContinuing, tok).find()) {
-      m.put("%pContinuing", 1.0);
+    if(RegexWithTimeout.matcher(pComma, tok).find()) {
+      m.put("%pComma", 1.0);
+      ct++;
+    }
+    if(RegexWithTimeout.matcher(pColon, tok).find()) {
+      m.put("%pColon", 1.0);
+      ct++;
+    }
+    if(RegexWithTimeout.matcher(pSemicolon, tok).find()) {
+      m.put("%pSemicolon", 1.0);
       ct++;
     }
     if(RegexWithTimeout.matcher(pEnding, tok).find()) {
@@ -120,6 +131,10 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
 //    m.put("%raw=" + tok, 1.0);
 //    m.put("%rawlc=" + tok.toLowerCase(), 1.0);
     m.put("%rawnopunct=" + tok.toLowerCase().replaceAll("\\p{P}", ""), 1.0);
+//    ObjectDoubleHashMap<String> hmTgrams = new ObjectDoubleHashMap<>();
+//    ParserLMFeatures.addTrigrams(hmTgrams, tok);
+//    for(String s: hmTgrams.keySet())
+//      m.put("%tgram=" + s, 1.0);
     String prefix = tok.substring(0, Math.min(tok.length(), 4));
     String suffix = tok.substring(Math.max(tok.length() - 4, 0));
     m.put("%prefix=" + prefix, 1.0);
@@ -156,9 +171,19 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%tfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleBow));
         m.put("%tffreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleFirstBow));
         m.put("%tlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleLastBow));
+        ObjectDoubleHashMap<String> hmTgrams = new ObjectDoubleHashMap<>();
+        ParserLMFeatures.addTrigrams(hmTgrams, tok);
+        for(String s: hmTgrams.keySet())
+          m.addToValue("%titleTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.titleBagOfCharTrigrams));
+        m.put("%titleTG", m.get("%titleTG")/(tok.length()+2)); //use average
         m.put("%afreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorBow));
         m.put("%affreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorFirstBow));
         m.put("%alfreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorLastBow));
+        hmTgrams = new ObjectDoubleHashMap<>();
+        ParserLMFeatures.addTrigrams(hmTgrams, Parser.normalizeAuthor(tok));
+        for(String s: hmTgrams.keySet())
+          m.addToValue("%authorTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.authorBagOfCharTrigrams));
+        m.put("%authorTG", m.get("%authorTG")/(Parser.normalizeAuthor(tok).length()+2)); //use average
         m.put("%vfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueBow));
         m.put("%vffreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueFirstBow));
         m.put("%vlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueLastBow));

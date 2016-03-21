@@ -722,6 +722,7 @@ public class Parser {
   public static String normalizeAuthor(String s) {
     String sFix = s.replaceAll("(\\W|[0-9])+$", "");
     sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2");
+    sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2"); //twice to catch three-initial seq.
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
     if (sFix.endsWith("Jr"))

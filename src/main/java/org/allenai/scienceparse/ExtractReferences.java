@@ -85,7 +85,7 @@ public class ExtractReferences {
       new BracketName(BracketNameBibRecordParser.class)));
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
-      extractors = new ArrayList<>();
+      //extractors = new ArrayList<>();
       extractors.addAll(Arrays.asList(
         new BracketNumber(CRFBibRecordParser.class),
           new NumberDot(CRFBibRecordParser.class),
@@ -211,7 +211,7 @@ public class ExtractReferences {
   }
 
   private static int refStart(List<String> paper) {
-    for (int i = 0; i < paper.size(); i++) {
+    for (int i = paper.size() / 3; i < paper.size(); i++) { //heuristic, assume refs start at least 1/3 into doc
       String s = paper.get(i);
       if (s.endsWith("References") || s.endsWith("Citations") || s.endsWith("Bibliography") ||
         s.endsWith("REFERENCES") || s.endsWith("CITATIONS") || s.endsWith("BIBLIOGRAPHY"))
@@ -256,7 +256,8 @@ public class ExtractReferences {
   public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
     ArrayList<CitationRecord> out = new ArrayList<>();
     Pattern p = Pattern.compile(bs.getCiteRegex());
-
+    Pattern pRange = Pattern.compile("([0-9]+)\\p{Pd}([0-9]+)");
+    
     int stop = refStart(paper); //stop at start of refs
     if (stop < 0)
       stop = paper.size(); //start of refs not found (should never happen for non-null bibliography...)
@@ -268,9 +269,22 @@ public class ExtractReferences {
       while (m.find()) {
         String[] citations = m.group(1).split(bs.getCiteDelimiter());
         for (final String citation : citations) {
-          int idx = getIdxOf(bib, citation.trim());
-          if (idx >= 0) {
-            out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
+          Matcher mRange = RegexWithTimeout.matcher(pRange, citation);
+          if(mRange.matches()) { //special case for ranges
+              int st = Integer.parseInt(mRange.group(1));
+              int end = Integer.parseInt(mRange.group(2));
+              for(int j=st;j<=end;j++) {
+                int idx = getIdxOf(bib, j + "");
+                if (idx >= 0) {
+                  out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
+                }                
+              }
+          }
+          else {
+            int idx = getIdxOf(bib, citation.trim());
+            if (idx >= 0) {
+              out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
+            }
           }
         }
       }
@@ -315,6 +329,14 @@ public class ExtractReferences {
     return idx;
   }
 
+  //heuristic
+  public boolean refEnd(String s) {
+    if (s.endsWith("Appendix") || s.endsWith("APPENDIX"))
+        return true;
+    else
+      return false;
+  }
+  
   /**
    * Returns the list of BibRecords, plus the extractor that produced them (in order to enable
    * citation parsing)
@@ -326,6 +348,8 @@ public class ExtractReferences {
       results[i] = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
     for (int i = start; i < paper.size(); i++) {
+      if(refEnd(paper.get(i)))
+        break;
       sb.append("<bb>");
       sb.append(paper.get(i));
     }
@@ -454,7 +478,7 @@ public class ExtractReferences {
 
   private static class NumberDotYearParensBibRecordParser implements BibRecordParser {
     private static final String regEx =
-      "([0-9]+)\\. ([^:]+): ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) \\(([0-9]{4})\\)(?: .*)?"; //last part is for header break
+      "([0-9]+)\\. ([^:]+): ([^\\.]+)\\. (?:(?:I|i)n: )?(.*) \\([^)]*([0-9]{4})\\)\\.?(?: .*)?"; //last part is for header break
     private static final Pattern pattern = Pattern.compile(regEx);
 
     public NumberDotYearParensBibRecordParser() {
@@ -553,10 +577,10 @@ public class ExtractReferences {
 
   private static class BracketNumberInitialsYearParensCOMMAS implements BibRecordParser {
     private static final String regEx1 =
-      "\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*) +\\(.*([1-2][0-9]{3}).*\\).*";
+      "\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*)\\(.*([1-2][0-9]{3}).*\\).*";
     private static final Pattern pattern1 = Pattern.compile(regEx1);
     private static final String regEx2 =
-      "\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ([1-2][0-9]{3})\\.";
+      "\\[([0-9]+)\\] (" + authInitialsLastList + ")(?:,|\\.) ([^\\.,]+)(?:,|\\.) (?:(?:I|i)n )?(.*), ((?:20|19)[0-9]{2})(?:\\.|,).*";
     private static final Pattern pattern2 = Pattern.compile(regEx2);
 
     public BracketNumberInitialsYearParensCOMMAS() {
@@ -753,7 +777,7 @@ public class ExtractReferences {
   }
 
   private class BracketNumber extends BibStractor {
-    protected final String citeRegex = "\\[([0-9, ]+)\\]";
+    protected final String citeRegex = "\\[([0-9, \\p{Pd}]+)\\]";
     protected final String citeDelimiter = "(,| |;)+";
 
     BracketNumber(Class c) {
