@@ -70,7 +70,7 @@ object PrintCRFInput extends App {
             line = token.getLine
           }
 
-          val style = font2style(token.getPdfToken.getFontMetrics)
+          val style = font2style(token.getPdfToken.fontMetrics)
           val escaped = StringEscapeUtils.escapeHtml4(token.getPdfToken.token)
           out.println(s"<span class=$style>$escaped</span>")
         }
