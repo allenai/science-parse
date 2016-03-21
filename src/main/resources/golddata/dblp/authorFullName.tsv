@@ -32,12 +32,12 @@
 0a395aa2965bcfeaa860c967971e5cb6c89bc035	Long Quan	Radu Horaud	Yves Dufournaud
 0a86a047d18cd011dd8df23aad5bb42cf99cc941	Dragomir Radev	Jahna Otterbacher	Zhu Zhang
 0ab9dc7290e2ba31028a535d19b66dc02aa492c5	Gérard Chollet	Hervé Bredin	Najim Dehak
-0ad6ed8cc5e5a3d26e047f0c9478fd06f327da3b	F. Stortoni	F. Fioravanti	Paolo Nesi
+0ad6ed8cc5e5a3d26e047f0c9478fd06f327da3b	F. Stortoni	F. Fioravanti	P. Nesi
 0b225be92ba6aeb9b417eebf63f0e4a33c5cfe27	Alexander Metzner	Christian Herde	Ingo Stierand	Martin Fränzle
 0b824c4ffe362bf2f8987232c9b5a8eb72f96f3b	Daisy Zhe Wang	Joseph M. Hellerstein	Michael J. Franklin	Michael L. Wick	Minos Garofalakis
 0b8ecf769bfefc5daa0ca2cc2c8b097bf34c90a6	Jian Zhang	Rong Jin
 0c45f23551a88db06af891dcdc633317fa64bc88	Olivier Le Meur
-0caf94d184087e175245540a54cb10c16a4745fe	Huan Xu	Shiau Hong Lim	Yudong Chen
+0caf94d184087e175245540a54cb10c16a4745fe
 0cb49416099ba101c5fcb3eb6c957d45e106195a	David Sands	Delphine Demange
 0cc37453fbc8297cc797bba5fb79abb2f0d1eded	Abbas Ebrahimi-Moghadam	Shahram Shirani
 0d07b9746c3862b6263037ee405e4f7fcd6d51f6	Asaf Levin	Leah Epstein
@@ -83,7 +83,7 @@
 17672157ae97ca104c956ad1a6312b71bd8ad038	Dinesh Manocha	John Keyser	Kenneth E. Hoff III	Ming Lin	Tim Culver
 178eceeae8aed820b789d7b5e4e2ddd1cfa7c557	Antonio J. Fernández	Carlos Cotta	José E. Gallardo
 17b6ef93649bfe4c273b531028ee4550fbc5ac0a	Jim Jing-Yan Wang
-180b6f72a143c218f84d675fe42dc0d2b3e0152e	Jozef Sirán	Ljiljana Brankovic
+180b6f72a143c218f84d675fe42dc0d2b3e0152e	L. Mathieson	T. King	L. Branković
 1820869030fca660212fb7a6449b6ad1aa99d9db	Cormac Flanagan	Stephen N. Freund
 18879a57e4f01b6f7f642a99c72d82907e78fe94	Longin Jan Latecki	Xingwei Yang
 197e2e4d2992484435b5323649668b10a9cce0a2	Jun Han	Ryszard Kowalczyk	Xuan Thang Nguyen
@@ -105,7 +105,7 @@
 1d10b433f7ba603c764f0d372694e685d6696ee0	Jiafeng Guo	Pan Du	Xueqi Cheng	Yadong Zhu	Yanyan Lan
 1d69c28148bf39bcd3d0e0a92000ecee57c279ae	Constantinos K. Coursaris	Khaled Hassanein	Milena M. Head	Nick Bontis
 1d84bdc5b236a10c557d16554efda4ae45ddf56c	Carlos Mosquera	David Vazquez-Padin	Fernando Pérez-González
-1dfcb022f23cae23824032835fde88bd60f65f37	A. Shokrani	Ioannis Lambadaris	Yannis Viniotis
+1dfcb022f23cae23824032835fde88bd60f65f37	Arash Shokrani	Ioannis Lambadaris	Yannis Viniotis
 1e1788ccee8fa4a21fa58f339852767076dc6246	David A. Smith	Jason Eisner
 1e28589db62cfa8523da102491d680d38044fdf4	Kyung-Yong Chwa	Sang Won Bae
 1e6f61c574fad2460d06d6f52295922f5c99857a	Christopher D. Manning	Dan Klein
@@ -133,7 +133,7 @@
 26364baae4556bd6c94bdb74409e9903286ef7c6	Arash Farzan	Rajeev Raman	S. Srinivasa Rao
 2649ad59de4f044248b36ce1ad33daeb98e3c7ca	Cristian Riveros	Gabriele Puppis	Michael Benedikt
 2696009abd88223e8164f8c22bfafbd93531752e	Jun Xie	Ming-Ting Sun	Rogério Schmidt Feris	Yu-Feng Hsu
-26ad6c18609e0d4de3f5616fbd2b6928ab9b816e	Charles H. Romine	Eduardo F. D'Azevedo
+26ad6c18609e0d4de3f5616fbd2b6928ab9b816e	C.H. Romine	E.F. D'Azevedo
 26bae4f8d04e8f195e3d468defad5b8cc4f945ef	Frédéric Cuppens
 26f96ba9abe554ff5e3c5a88e43ba36812ab7879	Jennifer A. Rode	Siân E. Lindley	Tamara Alsheikh
 27105937da25fbc516322ebbe30236f509514e0d	Gérald Masini	Karl Tombre	Philippe Dosch
@@ -144,11 +144,11 @@
 2920674386f1d59a4298437d54582e7c41aa72a1	Ines Rehbein	Sandra Kübler	Wolfgang Maier	Yannick Versley
 29ab1fb317559718bc468727369bb37ed91d972d	Evica Milchevski	Sebastian Michel
 29b6a897e8ef4f9c48b6c847bbef2eabd4506678	César Silva	José Santos-Victor
-2a457c79b12c01d480e3eca359f08a804a858d27	Anastassia Ailamaki	Dinesh Manocha	Naga K. Govindaraju	Stavros Harizopoulos
+2a457c79b12c01d480e3eca359f08a804a858d27	Anastassia Ailamaki	Dinesh Manocha	Naga K. Govindaraju
 2b370d4e52a64de17c0c4dd3e3bc7fbcbf006c50	Jürgen Dix	Stefan Brass
 2ba266b79d833cdfe4f8d16da6c6c10f6b2935c7	Jakub Szymanik	Juha Kontinen
 2bf5cd5de7244861ed14e1cd104902e58b7b43a6	Chia-Hung Wang	Hsing Luh
-2c31df0855cd391e709cebd98e372a3655255f25	Domenico Talia	Esther Pacitti	Hillol Kargupta	Josep-Lluis Larriba-Pey
+2c31df0855cd391e709cebd98e372a3655255f25	Marta Patiño-Martinez	Genoveva Vargas-Solar	Elena Baralis	Bettina Kemme
 2c3b294dbdd5a4b5a913aef37b25147e03d45d91	Fahim Kawsar	Kaori Fujinami	Tatsuo Nakajima
 2c422c9ce4b0c609584ec6f9bc43c5ddd87f86e1	Patrick Maupin	Ron van der Meyden	Xiaowei Huang
 2cc9e6d894c156faadafe4d75ef9c3e5ae7c8cd3	David Lomet	Mark R. Tuttle
@@ -166,7 +166,7 @@
 3074cffbb72923b6229fc72fd5814e1d09de1290	Ahmed Helmy	Sandeep Gupta	Shamim Begum
 3077a41befe3d30e0f348076c1122ef307fa62f0	Daniel Kersten	Zili Liu
 309fbeaa395906cd5c5554f8e3b5742f17656a22	Neil Mitchell
-315163d3559fc3e298f9b190028d86fe83bdf62f	Byung-Ro Moon	Keehyung Kim	Robert Ian (Bob) McKay
+315163d3559fc3e298f9b190028d86fe83bdf62f	Byung-Ro Moon	Keehyung Kim	RI (Bob) McKay
 31a6424107ddbc18e12f2722e2c72a93f75cd5e7	Ankur Srivastava	Azadeh Davoodi
 31c12a7b0f374303c472d1d9fbd656e41e938cac	Chita R. Das	Eun Jung Kim	José Duato	Ki Hwan Yum	Mazin Yousif
 31dbd5a56e35a14eb556637a2124207c725bcac6	Efthymia Tsamoura	Ioannis Kompatsiaris	Vasileios Mezaris
@@ -174,9 +174,9 @@
 323f596b85a35bce45eac65ff4855e08fcdaa31d	Donald Ferguson	Francisco Curbera	Marcia L. Stockton	Martin Nally
 3282cb4b9ec1cda352cc5ed4aa7fcfa9a60b424b	Radu Marinescu	Rina Dechter
 32d9aa752afd5242b39b2d288fd9831b60688c4a	Bruce Reed	Michael Molloy
-32e2d061edf1ea7d88d95b6cee92f7443210c825	Chang Xu	S. C. Cheung	Yepang Liu
+32e2d061edf1ea7d88d95b6cee92f7443210c825	Chang Xu	S.C. Cheung	Yepang Liu
 3332653e7f019abd4ce05818db016f40a085ba89	Binyu Zang	Chuanqi Zhu	Tao Bao	Weihua Zhang
-33c171926c708b876cc75e84f64bd3a18ea4fbb9	Ayse Kivilcim Coskun	José L. Ayala	José M. Moya	Kalyan Vaidyanathan	Kenny C. Gross	Marina Zapater
+33c171926c708b876cc75e84f64bd3a18ea4fbb9	Ayse K.Coskun	José L. Ayala	José M. Moya	Kalyan Vaidyanathan	Kenny Gross	Marina Zapater
 33d4973a85f8e87c180952cbcdff6ec695022e0d	Donal J. Flynn	Zahid Hussain
 34050164c3f3c29101ad38773ec359c058b08724	David Dagan Feng	Fuhui Long	Hanchuan Peng	Wan-Chi Siu	Zheru Chi
 34e21cbfcd1fdbd1f5964fc59db6941a3c740791	Hinrich Schütze
