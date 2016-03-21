@@ -465,6 +465,8 @@ public class Parser {
     CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
     trainOpts.optimizerOpts.maxIters = opts.iterations;
     trainOpts.numThreads = opts.threads;
+    trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
+    
     logger.info("first example: " + trainLabeledData.get(0));
     // Trainer
     CRFTrainer<String, String, String> trainer =
@@ -977,7 +979,6 @@ public class Parser {
       opts.backgroundSamples = 5;
       opts.trainFraction = 0.9;
       trainBibliographyCRF(new File(args[1]), opts);
-      
     }
   }
 

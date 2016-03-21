@@ -190,6 +190,6 @@ public class ParserLMFeatures implements Serializable {
   }
 
   private String[] tokenize(final String s) {
-    return s.split(" ");  //not great
+    return s.split("( )");  //not great
   }
 }

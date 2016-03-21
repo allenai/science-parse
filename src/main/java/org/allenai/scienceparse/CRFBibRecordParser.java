@@ -201,6 +201,8 @@ public class CRFBibRecordParser implements BibRecordParser {
     } catch (final NumberFormatException e) {
       return null;
     }
+    if(iYear==0) //heuristic -- if we don't find year, almost certainly we didn't extract correctly.
+      return null;
 //    log.info("returning " + brOut.toString());
     return brOut;
   }

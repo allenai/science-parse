@@ -83,6 +83,10 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
       m.put("%pRange", 1.0);
       ct++;
     }
+    Pattern pProbableYear = Pattern.compile("(19|20)[0-9][0-9]");
+    if(RegexWithTimeout.matcher(pProbableYear, tok).find()) {
+      m.put("%hasYear", 1.0);
+    }
     Pattern pVolume = Pattern.compile("[0-9](\\([0-9]+\\))?\\p{P}?");
     if(RegexWithTimeout.matcher(pVolume, tok).matches()) {
       m.put("%pVolume", 1.0);
@@ -171,19 +175,19 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%tfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleBow));
         m.put("%tffreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleFirstBow));
         m.put("%tlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.titleLastBow));
-        ObjectDoubleHashMap<String> hmTgrams = new ObjectDoubleHashMap<>();
-        ParserLMFeatures.addTrigrams(hmTgrams, tok);
-        for(String s: hmTgrams.keySet())
-          m.addToValue("%titleTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.titleBagOfCharTrigrams));
-        m.put("%titleTG", m.get("%titleTG")/(tok.length()+2)); //use average
+//        ObjectDoubleHashMap<String> hmTgrams = new ObjectDoubleHashMap<>();
+//        ParserLMFeatures.addTrigrams(hmTgrams, tok);
+//        for(String s: hmTgrams.keySet())
+//          m.addToValue("%titleTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.titleBagOfCharTrigrams));
+//        m.put("%titleTG", m.get("%titleTG")/(tok.length()+2)); //use average
         m.put("%afreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorBow));
         m.put("%affreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorFirstBow));
         m.put("%alfreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorLastBow));
-        hmTgrams = new ObjectDoubleHashMap<>();
-        ParserLMFeatures.addTrigrams(hmTgrams, Parser.normalizeAuthor(tok));
-        for(String s: hmTgrams.keySet())
-          m.addToValue("%authorTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.authorBagOfCharTrigrams));
-        m.put("%authorTG", m.get("%authorTG")/(Parser.normalizeAuthor(tok).length()+2)); //use average
+//        hmTgrams = new ObjectDoubleHashMap<>();
+//        ParserLMFeatures.addTrigrams(hmTgrams, Parser.normalizeAuthor(tok));
+//        for(String s: hmTgrams.keySet())
+//          m.addToValue("%authorTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.authorBagOfCharTrigrams));
+//        m.put("%authorTG", m.get("%authorTG")/(Parser.normalizeAuthor(tok).length()+2)); //use average
         m.put("%vfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueBow));
         m.put("%vffreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueFirstBow));
         m.put("%vlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueLastBow));
