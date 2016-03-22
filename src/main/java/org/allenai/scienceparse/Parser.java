@@ -608,6 +608,12 @@ public class Parser {
                       collect(toList());
       testEvalFn = (model) -> {
         final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        logger.info("Test Label F-measures");
+        eval.stateFMeasures.forEach((label, fMeasure) -> {
+          logger.info(String.format("-- %s: p:%.3f r:%.3f f1:%.3f",
+              label, fMeasure.precision(), fMeasure.recall(), fMeasure.f1()));
+        });
+        logger.info("");
         return eval.tokenAccuracy.accuracy();
       };
     }
