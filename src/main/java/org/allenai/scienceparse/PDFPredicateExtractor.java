@@ -4,14 +4,21 @@ import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.tuple.Tuples;
+import com.medallia.word2vec.Searcher;
+import com.medallia.word2vec.Word2VecModel;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.allenai.datastore.Datastore;
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFToken;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -23,12 +30,21 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
   public static final HashSet<String> stopHash = new HashSet<String>(stopWords);
 
   private ParserLMFeatures lmFeats;
+  private final Searcher word2vecSearcher;
 
   public PDFPredicateExtractor() {
-
+    try {
+      final Path word2VecModelPath =
+              Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
+      final Word2VecModel word2VecModel = Word2VecModel.fromBinFile(word2VecModelPath.toFile());
+      word2vecSearcher = word2VecModel.forSearch();
+    } catch(final IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public PDFPredicateExtractor(ParserLMFeatures plf) {
+    this();
     lmFeats = plf;
   }
 
@@ -236,6 +252,19 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           final String trigram = trigramSourceToken.substring(j, j + 3);
           final String feature = "%tri=" + trigram;
           m.updateValue(feature, 0.0, d -> d + 1);
+        }
+
+        // add word embeddings
+        try {
+          final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
+          int j = 0;
+          while(vector.hasNext()) {
+            final double value = vector.next();
+            m.put(String.format("%%emb%03d", j), value);
+            j += 1;
+          }
+        } catch (final Searcher.UnknownWordException e) {
+          // do nothing
         }
       }
       out.add(m);

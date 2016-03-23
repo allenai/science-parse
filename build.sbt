@@ -61,5 +61,7 @@ libraryDependencies ++= Seq(
   "org.jsoup" % "jsoup" % "1.8.1",
   "org.apache.commons" % "commons-lang3" % "3.4",
   "com.github.scopt" %% "scopt" % "3.3.0",
-  "com.amazonaws" % "aws-java-sdk" % "1.7.4"
+  "com.amazonaws" % "aws-java-sdk" % "1.7.4",
+  "com.medallia.word2vec" % "Word2VecJava" % "0.10.3-allenai-P1",
+  "com.google.guava" % "guava" % "18.0" // Medallia needs this, but somehow the dependency isn't transitive.
 )
