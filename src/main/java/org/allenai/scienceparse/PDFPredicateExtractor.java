@@ -73,10 +73,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     return Math.log10(freq + 0.1);
   }
 
-  public static void main(String[] args) throws Exception {
-
-  }
-
   private float height(PDFToken t) {
     return t.bounds.get(3) - t.bounds.get(1);
   }
@@ -120,22 +116,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
       return s;
   }
 
-  //assumes start-stop padded
-//	private float prevYGap(List<PaperToken> toks, int i) {
-//		if(i==1) {
-//			return getY(toks.get(i));
-//		}
-//	}
-//	
-//	private List<Float> getYGaps(List<PaperToken> toks) {
-//		List<Float> out = new ArrayList<Float>();
-//		for(int i=1; i<toks.size()-2; i++) {
-//			nextY = getY(elems.get(i), false) + height(elems.get(i).getPdfToken())
-//		}
-//		
-//		return out;
-//	}
-
   public double logYDelt(float y1, float y2) {
     return Math.log(Math.max(y1 - y2, 0.00001f));
   }
@@ -150,9 +130,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     Pair<Float, Float> fBounds = getExtrema(elems.subList(1, elems.size() - 1), (PaperToken t) -> {
       return getFixedFont(t);
     });
-//		log.info("h bounds: " + hBounds);
-//		log.info("f bounds: " + fBounds);
-    //log.info("called with " + elems.size() + " tokens.");
+
     for (int i = 0; i < elems.size(); i++) {
       ObjectDoubleHashMap<String> m = new ObjectDoubleHashMap<String>();
       float prevFont = -10.0f;
