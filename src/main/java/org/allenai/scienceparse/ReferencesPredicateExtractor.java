@@ -180,19 +180,19 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
 //        for(String s: hmTgrams.keySet())
 //          m.addToValue("%titleTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.titleBagOfCharTrigrams));
 //        m.put("%titleTG", m.get("%titleTG")/(tok.length()+2)); //use average
-        m.put("%afreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorBow));
-        m.put("%affreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorFirstBow));
-        m.put("%alfreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.authorLastBow));
+        m.put("%afreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.authorBow));
+        m.put("%affreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.authorFirstBow));
+        m.put("%alfreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.authorLastBow));
 //        hmTgrams = new ObjectDoubleHashMap<>();
-//        ParserLMFeatures.addTrigrams(hmTgrams, Parser.normalizeAuthor(tok));
+//        ParserLMFeatures.addTrigrams(hmTgrams, Parser.fixupAuthors(tok));
 //        for(String s: hmTgrams.keySet())
 //          m.addToValue("%authorTG", PDFPredicateExtractor.smoothFreq(s, this.lmFeats.authorBagOfCharTrigrams));
-//        m.put("%authorTG", m.get("%authorTG")/(Parser.normalizeAuthor(tok).length()+2)); //use average
+//        m.put("%authorTG", m.get("%authorTG")/(Parser.fixupAuthors(tok).length()+2)); //use average
         m.put("%vfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueBow));
         m.put("%vffreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueFirstBow));
         m.put("%vlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueLastBow));
         m.put("%bfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.backgroundBow));
-        m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.normalizeAuthor(tok), this.lmFeats.backgroundBow));
+        m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.backgroundBow));
       }
       String locBinFeat = "%locbin" + locationBin(i, elems.size());
       m.put(locBinFeat, 1.0);

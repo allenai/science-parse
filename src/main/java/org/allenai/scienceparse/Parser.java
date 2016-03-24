@@ -453,9 +453,8 @@ public class Parser {
       predExtractor = new ReferencesPredicateExtractor();
     }
     
-    //TODO: remove duplication with trainParser in the below
     // Split train/test data
-    logger.info("CRF training with {} threads and {} labeled examples", opts.threads, labeledData.size());
+    logger.info("CRF training for bibs with {} threads and {} labeled examples", opts.threads, labeledData.size());
     Pair<List<List<Pair<String, String>>>, List<List<Pair<String, String>>>> trainTestPair =
       splitData(labeledData, 1.0 - opts.trainFraction);
     val trainLabeledData = trainTestPair.getOne();
@@ -466,39 +465,34 @@ public class Parser {
     trainOpts.optimizerOpts.maxIters = opts.iterations;
     trainOpts.numThreads = opts.threads;
     trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
-    
-    logger.info("first example: " + trainLabeledData.get(0));
-    // Trainer
+
+    // set up evaluation function
+    final Parallel.MROpts evalMrOpts =
+            Parallel.MROpts.withIdAndThreads("mr-crf-bib-train-eval", opts.threads);
+    final ToDoubleFunction<CRFModel<String, String, String>> testEvalFn;
+    {
+      final List<List<Pair<String, String>>> testEvalData =
+              testLabeledData.
+                      stream().
+                      map(x -> x.stream().map(Pair::swap).collect(toList())).
+                      collect(toList());
+      testEvalFn = (model) -> {
+        final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        return eval.tokenAccuracy.accuracy();
+      };
+    }
+
+    // set up early stopping so that we stop training after 50 down-iterations
+    final TrainCriterionEval<CRFModel<String, String, String>> earlyStoppingEvaluator =
+            new TrainCriterionEval<>(testEvalFn);
+    earlyStoppingEvaluator.maxNumDipIters = 100;
+    trainOpts.iterCallback = earlyStoppingEvaluator;
+
+    // training
     CRFTrainer<String, String, String> trainer =
       new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
-
-    // Setup iteration callback, weird trick here where you require
-    // the trainer to make a model for each iteration but then need
-    // to modify the iteration-callback to use it
-    Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
-    CRFModel<String, String, String> cacheModel = null;
-    trainOpts.optimizerOpts.iterCallback = (weights) -> {
-      CRFModel<String, String, String> crfModel = trainer.modelForWeights(weights);
-      long start = System.currentTimeMillis();
-      List<List<Pair<String, String>>> trainEvalData = trainLabeledData.stream()
-        .map(x -> x.stream().map(Pair::swap).collect(toList()))
-        .collect(toList());
-      Evaluation<String> eval = Evaluation.compute(crfModel, trainEvalData, evalMrOpts);
-      long stop = System.currentTimeMillis();
-      logger.info("Train Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
-      if (!testLabeledData.isEmpty()) {
-        start = System.currentTimeMillis();
-        List<List<Pair<String, String>>> testEvalData = testLabeledData.stream()
-          .map(x -> x.stream().map(Pair::swap).collect(toList()))
-          .collect(toList());
-        eval = Evaluation.compute(crfModel, testEvalData, evalMrOpts);
-        stop = System.currentTimeMillis();
-        logger.info("Test Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
-      }
-    };
-
-    CRFModel<String, String, String> crfModel = null;
-    crfModel = trainer.train(trainLabeledData);
+    trainer.train(trainLabeledData);
+    final CRFModel<String, String, String> crfModel = earlyStoppingEvaluator.bestModel;
 
     Vector weights = crfModel.weights();
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
