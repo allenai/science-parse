@@ -87,7 +87,7 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 1);
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 2);
   }
 
   public Parser() throws Exception {
