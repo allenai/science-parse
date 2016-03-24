@@ -1,7 +1,6 @@
 package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
@@ -10,6 +9,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import lombok.Data;
 import lombok.val;
 import org.allenai.datastore.Datastore;
+import org.allenai.ml.eval.TrainCriterionEval;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.Evaluation;
@@ -18,6 +18,7 @@ import org.allenai.ml.sequences.crf.CRFFeatureEncoder;
 import org.allenai.ml.sequences.crf.CRFModel;
 import org.allenai.ml.sequences.crf.CRFTrainer;
 import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
+import org.allenai.ml.sequences.crf.conll.ConllFormat;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
@@ -40,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,8 +66,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -81,7 +81,7 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 3);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel-ce5b11.dat", 1);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
@@ -435,7 +435,7 @@ public class Parser {
     brIn.close();
     return out;
   }
-  
+
   public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) throws IOException {
     List<List<Pair<String, String>>> labeledData;
     labeledData = CRFBibRecordParser.labelFromCoraFile(coraTrainFile);
@@ -589,45 +589,41 @@ public class Parser {
     trainOpts.numThreads = opts.threads;
     trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
 
-    // Trainer
-    CRFTrainer<String, PaperToken, String> trainer =
+    // set up evaluation function
+    final Parallel.MROpts evalMrOpts =
+            Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
+    final ToDoubleFunction<CRFModel<String, PaperToken, String>> testEvalFn;
+    {
+      final List<List<Pair<String, PaperToken>>> testEvalData =
+              testLabeledData.
+                      stream().
+                      map(x -> x.stream().map(Pair::swap).collect(toList())).
+                      collect(toList());
+      testEvalFn = (model) -> {
+        final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        return eval.tokenAccuracy.accuracy();
+      };
+    }
+
+    // set up early stopping so that we stop training after 50 down-iterations
+    final TrainCriterionEval<CRFModel<String, PaperToken, String>> earlyStoppingEvaluator =
+            new TrainCriterionEval<>(testEvalFn);
+    earlyStoppingEvaluator.maxNumDipIters = 100;
+    trainOpts.iterCallback = earlyStoppingEvaluator;
+
+    // training
+    final CRFTrainer<String, PaperToken, String> trainer =
       new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
+    trainer.train(trainLabeledData);
+    final CRFModel<String, PaperToken, String> crfModel = earlyStoppingEvaluator.bestModel;
 
-    // Setup iteration callback, weird trick here where you require
-    // the trainer to make a model for each iteration but then need
-    // to modify the iteration-callback to use it
-    Parallel.MROpts evalMrOpts = Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
-    CRFModel<String, PaperToken, String> cacheModel = null;
-    trainOpts.optimizerOpts.iterCallback = (weights) -> {
-      CRFModel<String, PaperToken, String> crfModel = trainer.modelForWeights(weights);
-      long start = System.currentTimeMillis();
-      List<List<Pair<String, PaperToken>>> trainEvalData = trainLabeledData.stream()
-        .map(x -> x.stream().map(Pair::swap).collect(toList()))
-        .collect(toList());
-      Evaluation<String> eval = Evaluation.compute(crfModel, trainEvalData, evalMrOpts);
-      long stop = System.currentTimeMillis();
-      logger.info("Train Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
-      if (!testLabeledData.isEmpty()) {
-        start = System.currentTimeMillis();
-        List<List<Pair<String, PaperToken>>> testEvalData = testLabeledData.stream()
-          .map(x -> x.stream().map(Pair::swap).collect(toList()))
-          .collect(toList());
-        eval = Evaluation.compute(crfModel, testEvalData, evalMrOpts);
-        stop = System.currentTimeMillis();
-        logger.info("Test Accuracy: {} (took {} ms)", eval.tokenAccuracy.accuracy(), stop - start);
-      }
-    };
-
-    CRFModel<String, PaperToken, String> crfModel = null;
-    crfModel = trainer.train(trainLabeledData);
-
-    Vector weights = crfModel.weights();
+    final Vector weights = crfModel.weights();
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
 
-    val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
+    try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
     logger.info("Writing model to {}", opts.modelFile);
     saveModel(dos, crfModel.featureEncoder, weights, plf);
-    dos.close();
+    }
   }
 
   public static <T> void saveModel(DataOutputStream dos,
@@ -641,7 +637,7 @@ public class Parser {
     ObjectOutputStream oos = new ObjectOutputStream(dos);
     oos.writeObject(plf);
   }
-  
+
   public static CRFModel<String, PaperToken, String> loadModel(
     DataInputStream dis) throws Exception {
     IOUtils.ensureVersionMatch(dis, DATA_VERSION);
@@ -721,8 +717,12 @@ public class Parser {
     return truePos;
   }
 
-  public static String normalizeAuthor(String s) {
-    String sFix = s.replaceAll("(\\W|[0-9])+$", "");
+  /** Fixes common author problems. This is applied to the output of both normalized and
+   * unnormalized author names, and it is used in training as well. Experience shows that if you
+   * make changes here, there is a good chance you'll need to retrain, even if you think the change
+   * is fairly trivial. */
+  public static String fixupAuthors(String s) {
+    String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
     sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2");
     sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2"); //twice to catch three-initial seq.
     if (sFix.contains(","))
@@ -732,13 +732,18 @@ public class Parser {
     return sFix;
   }
 
+  private final static int MAX_AUTHOR_LENGTH = 32;
+  private final static int MIN_AUTHOR_LENGTH = 2;
   public static List<String> trimAuthors(List<String> auth) {
-    List<String> out = new ArrayList<String>();
-    auth.forEach(s -> {
-      s = normalizeAuthor(s);
-      if (!out.contains(s)) out.add(s);
-    });
-    return out;
+    return auth.stream().
+            flatMap(s -> Arrays.stream(s.split("(?!,\\s*Jr),|\\band\\b"))).
+            map(String::trim).
+            map(Parser::fixupAuthors).
+            filter(s -> !s.isEmpty()).
+            filter(s -> s.length() <= MAX_AUTHOR_LENGTH).
+            filter(s -> s.length() >= MIN_AUTHOR_LENGTH).
+            distinct().
+            collect(Collectors.toList());
   }
 
   public static void main(String[] args) throws Exception {
@@ -1031,18 +1036,24 @@ public class Parser {
     seq = seq.subList(0, Math.min(seq.size(), headerMax));
     seq = PDFToCRFInput.padSequence(seq);
 
-    if (doc.meta == null || doc.meta.title == null) { //use the model
+    { // get title and authors from the CRF
       List<String> outSeq = model.bestGuess(seq);
       //the output tag sequence will not include the start/stop states!
       outSeq = PDFToCRFInput.padTagSequence(outSeq);
       em = new ExtractedMetadata(seq, outSeq);
       em.source = ExtractedMetadata.Source.CRF;
-    } else {
-      em = new ExtractedMetadata(doc.meta.title, doc.meta.authors, doc.meta.createDate);
+    }
+
+    // use PDF metadata if it's there
+    if(doc.meta != null) {
+      if (doc.meta.title != null) {
+        em.setTitle(doc.meta.title);
       em.source = ExtractedMetadata.Source.META;
     }
     if (doc.meta.createDate != null)
       em.setYearFromDate(doc.meta.createDate);
+    }
+
     clean(em);
     em.raw = PDFDocToPartitionedText.getRaw(doc);
     em.creator = doc.meta.creator;

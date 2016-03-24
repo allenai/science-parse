@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.allenai.common.{ Logging, Resource }
 import org.allenai.datastore.Datastores
 import org.slf4j.LoggerFactory
+import org.slf4j.Logger
 import scopt.OptionParser
 
 import scala.collection.{ GenMap, GenTraversableOnce }
@@ -51,15 +52,15 @@ object Evaluation extends Datastores with Logging {
     def toList = x.asScala.toList
   }
 
-  private val evaluationErrorLogger = LoggerFactory.getLogger(s"${this.getClass.getCanonicalName}.evaluationErrors")
   private def logEvaluationErrors[T](
+    logger: Logger,
     metric: Metric,
     paperId: String,
     errorType: String,
     items: Set[ItemWithOriginal[T]]
   ): Unit = {
     items.foreach { item =>
-      evaluationErrorLogger.info(s"${metric.name}\t$errorType\t$paperId\t${item.item}\t${item.original}")
+      logger.info(s"${metric.name}\t$errorType\t$paperId\t${item.item}\t${item.original}")
     }
   }
 
@@ -102,15 +103,18 @@ object Evaluation extends Datastores with Logging {
     metric: Metric,
     paperId: String,
     goldData: Set[ItemWithOriginal[T]],
-    extractedData: Set[ItemWithOriginal[T]]
+    extractedData: Set[ItemWithOriginal[T]],
+    logger: Option[Logger] = None
   ) = {
     if (goldData.isEmpty) {
       (if (extractedData.isEmpty) 1.0 else 0.0, 1.0)
     } else if (extractedData.isEmpty) {
       (0.0, 0.0)
     } else {
-      logEvaluationErrors(metric, paperId, "recall", goldData.diff(extractedData))
-      logEvaluationErrors(metric, paperId, "precision", extractedData.diff(goldData))
+      logger.foreach { l =>
+        logEvaluationErrors(l, metric, paperId, "recall", goldData.diff(extractedData))
+        logEvaluationErrors(l, metric, paperId, "precision", extractedData.diff(goldData))
+      }
       val precision = extractedData.count(goldData.contains).toDouble / extractedData.size
       val recall = goldData.count(extractedData.contains).toDouble / goldData.size
       (precision, recall)
@@ -122,7 +126,8 @@ object Evaluation extends Datastores with Logging {
     metric: Metric,
     paperId: String,
     goldData: Set[ItemWithOriginal[BibRecord]],
-    extractedData: Set[ItemWithOriginal[BibRecord]]
+    extractedData: Set[ItemWithOriginal[BibRecord]],
+    logger: Option[Logger] = None
   ) = (1.0, extractedData.size.toDouble / goldData.size) // since we're not doing matching, just assume 100% precision
 
   /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get
@@ -152,28 +157,41 @@ object Evaluation extends Datastores with Logging {
     extract: ExtractedMetadata => List[ItemWithOriginal[String]],
     extractGold: List[String] => List[ItemWithOriginal[String]] = ItemWithOriginal.toList,
     normalizer: String => String = identity, disallow: Set[String] = Set(""),
-    prCalculator: (Metric, String, Set[ItemWithOriginal[String]], Set[ItemWithOriginal[String]]) => (Double, Double) = calculatePR
-  ) = (metric: Metric, paperId: String, metadata: ExtractedMetadata, gold: List[String]) => {
+    prCalculator: (Metric, String, Set[ItemWithOriginal[String]], Set[ItemWithOriginal[String]], Option[Logger]) => (Double, Double) = calculatePR
+  ) = (
+    metric: Metric,
+    paperId: String,
+    metadata: ExtractedMetadata,
+    gold: List[String],
+    logger: Option[Logger]
+  ) => {
     // function to clean up both gold and extracted data before we pass it in
     def clean(x: List[ItemWithOriginal[String]]) = {
       val normalizedItems = x.map(_.map(normalizer))
       val filteredItems = normalizedItems.filterNot(i => disallow.contains(i.item))
       multiSet(filteredItems)
     }
-    prCalculator(metric, paperId, clean(extractGold(gold)), clean(extract(metadata)))
+    prCalculator(metric, paperId, clean(extractGold(gold)), clean(extract(metadata)), logger)
   }
 
   private def genericEvaluator[T](
     extract: ExtractedMetadata => List[ItemWithOriginal[T]],
     extractGold: List[String] => List[ItemWithOriginal[T]],
     normalizer: T => T,
-    prCalculator: (Metric, String, Set[ItemWithOriginal[T]], Set[ItemWithOriginal[T]]) => (Double, Double)
-  ) = (metric: Metric, paperId: String, metadata: ExtractedMetadata, gold: List[String]) => {
+    prCalculator: (Metric, String, Set[ItemWithOriginal[T]], Set[ItemWithOriginal[T]], Option[Logger]) => (Double, Double)
+  ) = (
+    metric: Metric,
+    paperId: String,
+    metadata: ExtractedMetadata,
+    gold: List[String],
+    logger: Option[Logger]
+  ) => {
     prCalculator(
       metric,
       paperId,
       extractGold(gold).map(_.map(normalizer)).toSet,
-      extract(metadata).map(_.map(normalizer)).toSet
+      extract(metadata).map(_.map(normalizer)).toSet,
+      logger
     )
   }
 
@@ -254,7 +272,7 @@ object Evaluation extends Datastores with Logging {
     name: String,
     goldFile: String,
     // get P/R values for each individual paper. values will be averaged later across all papers
-    evaluator: (Metric, String, ExtractedMetadata, List[String]) => (Double, Double)
+    evaluator: (Metric, String, ExtractedMetadata, List[String], Option[Logger]) => (Double, Double)
   )
 
   // to get a new version of Isaac's gold data into this format, run
@@ -429,13 +447,16 @@ object Evaluation extends Datastores with Logging {
     // calculate precision and recall for all metrics
     //
 
-    def getPR(extractions: GenMap[String, Try[ExtractedMetadata]]) = {
+    def getPR(
+      extractions: GenMap[String, Try[ExtractedMetadata]],
+      logger: Option[Logger] = None
+    ) = {
       val prResults = allGoldData.map {
         case (metric, docId, goldData) =>
           extractions(docId) match {
             case Failure(_) => (metric, (0.0, 0.0))
             case Success(extractedMetadata) =>
-              (metric, metric.evaluator(metric, docId, extractedMetadata, goldData))
+              (metric, metric.evaluator(metric, docId, extractedMetadata, goldData, logger))
           }
       }
       prResults.groupBy(_._1).mapValues { prs =>
@@ -444,8 +465,10 @@ object Evaluation extends Datastores with Logging {
       }
     }
 
+    val evaluationErrorLogger =
+      LoggerFactory.getLogger(s"${this.getClass.getCanonicalName}.evaluationErrors")
     EvaluationResult(
-      getPR(scienceParseExtractions),
+      getPR(scienceParseExtractions, Some(evaluationErrorLogger)),
       getPR(grobidExtractions)
     )
   }
