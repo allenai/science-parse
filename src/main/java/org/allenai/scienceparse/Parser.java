@@ -716,9 +716,8 @@ public class Parser {
    * make changes here, there is a good chance you'll need to retrain, even if you think the change
    * is fairly trivial. */
   public static String fixupAuthors(String s) {
+    // delete trailing special characters
     String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
-    sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2");
-    sFix = sFix.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2"); //twice to catch three-initial seq.
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
     if (sFix.endsWith("Jr"))
