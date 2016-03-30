@@ -24,6 +24,12 @@ scmInfo := Some(ScmInfo(
 
 bintrayRepository := "private"
 
+fork := true
+
+connectInput in run := true
+
+outputStrategy := Some(StdoutOutput)
+
 enablePlugins(LibraryPlugin)
 
 resolvers ++= Seq(
