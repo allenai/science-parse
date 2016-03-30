@@ -47,12 +47,14 @@ object PrintFeaturizedCRFInput extends App {
     val seq = Resource.using(paperSource.getPdf(config.paperId)) { is =>
       val ext = new PDFExtractor
       val doc = ext.extractFromInputStream(is)
-      PDFToCRFInput.getSequence(doc, true).asScala
-    }.toSeq
+      PDFToCRFInput.getSequence(doc, true)
+    }
+
+    val paddedSeq = PDFToCRFInput.padSequence(seq).asScala.toSeq
 
     // featurize the input, and do a complicated dance to map from GS collections to Scala
     // collections
-    val featurized = predExtractor.nodePredicates(seq.asJava).asScala.map { gsMap =>
+    val featurized = predExtractor.nodePredicates(paddedSeq.asJava).asScala.map { gsMap =>
       gsMap.keySet().asScala.map { key => key -> gsMap.get(key) }.toMap
     }.toSeq
 
