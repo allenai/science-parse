@@ -632,21 +632,41 @@ public class Parser {
     oos.writeObject(plf);
   }
 
-  public static CRFModel<String, PaperToken, String> loadModel(
-    DataInputStream dis) throws Exception {
+  @Data
+  public static class ModelComponents {
+    public final PDFPredicateExtractor predExtractor;
+    public final CRFFeatureEncoder<String, PaperToken, String> featureEncoder;
+    public final CRFWeightsEncoder<String> weightsEncoder;
+    public final CRFModel<String, PaperToken, String> model;
+  }
+
+  public static ModelComponents loadModelComponents(
+          final DataInputStream dis
+  ) throws IOException {
     IOUtils.ensureVersionMatch(dis, DATA_VERSION);
     val stateSpace = StateSpace.load(dis);
     Indexer<String> nodeFeatures = Indexer.load(dis);
     Indexer<String> edgeFeatures = Indexer.load(dis);
     Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
     ObjectInputStream ois = new ObjectInputStream(dis);
-    ParserLMFeatures plf = (ParserLMFeatures) ois.readObject();
+    final ParserLMFeatures plf;
+    try {
+      plf = (ParserLMFeatures) ois.readObject();
+    } catch (final ClassNotFoundException e) {
+      throw new IOException("Model file contains unknown class.", e);
+    }
     val predExtractor = new PDFPredicateExtractor(plf);
     val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
-      (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
+            (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
     val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
+    val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
+    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
+  }
 
-    return new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
+  public static CRFModel<String, PaperToken, String> loadModel(
+    DataInputStream dis
+  ) throws IOException {
+    return loadModelComponents(dis).model;
   }
 
   public static void clean(ExtractedMetadata em) {
