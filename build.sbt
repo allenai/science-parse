@@ -1,5 +1,7 @@
 name := "science-parse"
 
+outputStrategy := Some(StdoutOutput)
+
 organization := "org.allenai"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
