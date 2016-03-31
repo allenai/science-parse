@@ -1,12 +1,12 @@
 package org.allenai.scienceparse
 
-import java.awt.Desktop
-import java.io.{DataInputStream, File, PrintWriter}
+import java.io.{DataInputStream, File}
 import java.nio.file.Files
+import java.util
 
+import com.gs.collections.api.map.primitive.ObjectDoubleMap
 import org.allenai.common.Resource
-import org.allenai.scienceparse.pdfapi.{PDFExtractor, PDFFontMetrics}
-import org.apache.commons.lang3.StringEscapeUtils
+import org.allenai.scienceparse.pdfapi.PDFExtractor
 import scopt.OptionParser
 
 import scala.collection.JavaConverters._
@@ -52,9 +52,17 @@ object PrintFeaturizedCRFInput extends App {
 
     val paddedSeq = PDFToCRFInput.padSequence(seq).asScala.toSeq
 
-    // featurize the input, and do a complicated dance to map from GS collections to Scala
-    // collections
-    val featurized = predExtractor.nodePredicates(paddedSeq.asJava).asScala.map { gsMap =>
+    val lines = stringsFromFeaturizedSeq(predExtractor.nodePredicates(paddedSeq.asJava))
+
+    lines.asScala.foreach(println)
+  }
+
+  def stringsFromFeaturizedSeq(
+    featurizedJava: util.List[ObjectDoubleMap[String]],
+    prefix: String = ""
+  ) = {
+    // do a complicated dance to map from GS collections to Scala collections
+    val featurized = featurizedJava.asScala.map { gsMap =>
       gsMap.keySet().asScala.map { key => key -> gsMap.get(key) }.toMap
     }.toSeq
 
@@ -82,19 +90,30 @@ object PrintFeaturizedCRFInput extends App {
       map(_._1)
 
     // write header
-    println((tokenFeaturePrefix +: orderedNonBinaryFeatures).mkString("\t"))
+    val header = (tokenFeaturePrefix +: orderedNonBinaryFeatures).mkString("\t")
 
     // write entries
-    featurized.foreach { features =>
-      println(
+    val body = featurized.zipWithIndex.map { case (features, index) =>
         (
-          features.filter(_._1.startsWith(tokenFeaturePrefix)).map { case (key, value) => s"$key=$value" }.mkString("/") +: // token feature
-          (
-            orderedNonBinaryFeatures.map { f => features.get(f).map(d => f"$d%.3f").getOrElse("") } ++ // non-binary features
-            (features.keySet & binaryFeatures).toSeq.sorted
-          )
+          // token feature
+          Seq(
+            features.filter(_._1.startsWith(tokenFeaturePrefix)).map { case (key, value) => s"$key=$value" }.mkString("/")
+          ) ++
+
+          // non-binary features
+          orderedNonBinaryFeatures.map { f => features.get(f).map(d => f"$d%.3f").getOrElse("") } ++
+
+          // binary features
+          (features.keySet & binaryFeatures).toSeq.sorted
         ).mkString("\t")
-      )
+      }
+
+    val result = header +: body
+
+    if(prefix.isEmpty) {
+      result.asJava
+    } else {
+      result.zipWithIndex.map { case (line, i) => f"$prefix\t$i%04d\t$line" }.asJava
     }
   }
 }

@@ -12,7 +12,6 @@ import org.allenai.datastore.Datastore;
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFToken;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, String> {
@@ -269,6 +269,25 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
       }
       out.add(m);
     }
+
+    // print extensive debug information
+    if(log.isDebugEnabled()) {
+      // calculate a hash out of the tokens, so we can match feature values from different runs
+      // based on the tokens
+      final String tokens =
+              out.stream().map(features ->
+                      features.
+                              keysView().
+                              select(key -> key.startsWith("%t=")).
+                              collect(featureName -> featureName.substring(3)).
+                              makeString("-")
+              ).collect(Collectors.joining(" "));
+      final String tokensHashPrefix = String.format("%x", tokens.hashCode());
+
+      log.debug("{} CRF Input for {}", tokensHashPrefix, tokens);
+      PrintFeaturizedCRFInput.stringsFromFeaturizedSeq(out, tokensHashPrefix).stream().forEach(log::debug);
+    }
+
     return out;
   }
 
