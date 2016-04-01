@@ -75,9 +75,13 @@ public class Parser {
 
   public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
   public static final String DATA_VERSION = "0.1";
-  private final static Logger logger = LoggerFactory.getLogger(Parser.class);
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
+
+  private final static Logger logger =
+          LoggerFactory.getLogger(Parser.class);
+  private final static Logger labeledDataLogger =
+          LoggerFactory.getLogger(logger.getName() + ".labeledData");
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
@@ -577,6 +581,15 @@ public class Parser {
     val trainLabeledData = trainTestPair.getOne();
     val testLabeledData = trainTestPair.getTwo();
 
+    // log test and training data
+    if(labeledDataLogger.isDebugEnabled()) {
+      labeledDataLogger.info("Training data before:");
+      logLabeledData(trainLabeledData);
+
+      labeledDataLogger.info("Test data before:");
+      logLabeledData(testLabeledData);
+    }
+
     // Set up Train options
     CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
     trainOpts.optimizerOpts.maxIters = opts.iterations;
@@ -617,6 +630,30 @@ public class Parser {
     try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
     logger.info("Writing model to {}", opts.modelFile);
     saveModel(dos, crfModel.featureEncoder, weights, plf);
+    }
+
+    // log test and training data
+    if(labeledDataLogger.isDebugEnabled()) {
+      labeledDataLogger.info("Training data after:");
+      logLabeledData(trainLabeledData);
+
+      labeledDataLogger.info("Test data after:");
+      logLabeledData(testLabeledData);
+    }
+
+  }
+
+  private static void logLabeledData(final List<List<Pair<PaperToken, String>>> data) {
+    for(List<Pair<PaperToken, String>> line : data) {
+      final String logLine = line.stream().map(pair ->
+              String.format(
+                      "%s/%x/%s",
+                      pair.getOne().getPdfToken() == null ?
+                              "null" :
+                              pair.getOne().getPdfToken().getToken(),
+                      pair.getOne().hashCode(),
+                      pair.getTwo())).collect(Collectors.joining(" "));
+      labeledDataLogger.info(logLine);
     }
   }
 

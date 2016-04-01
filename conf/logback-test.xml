@@ -28,6 +28,7 @@
   <logger name="org.allenai.pdfbox" level="OFF" />
   <logger name="org.allenai.fontbox" level="OFF" />
   <logger name="org.allenai.scienceparse.TextExtractor" level="ERROR" />
+  <logger name="org.allenai.scienceparse.Parser.labeledData" level="DEBUG" />
   <logger name="org.allenai.scienceparse.Evaluation$.evaluationErrors" additivity="false">
     <appender-ref ref="EVALLOG" />
   </logger>
