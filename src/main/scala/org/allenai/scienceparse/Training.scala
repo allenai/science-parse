@@ -100,7 +100,7 @@ object Training extends App with Datastores with Logging {
     opts.modelFile = config.output.toString
     opts.headerMax = config.maxHeaderWords
     opts.iterations = config.maxIterations
-    opts.threads = 1
+    opts.threads = Runtime.getRuntime.availableProcessors() * 2
     opts.backgroundSamples = config.backgroundSampleDocs
 
     val backgroundDirectory =
