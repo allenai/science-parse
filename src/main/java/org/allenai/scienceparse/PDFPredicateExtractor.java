@@ -29,10 +29,14 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     "to");
   public static final HashSet<String> stopHash = new HashSet<String>(stopWords);
 
-  private ParserLMFeatures lmFeats;
+  private final ParserLMFeatures lmFeats;
   private final Searcher word2vecSearcher;
 
   public PDFPredicateExtractor() {
+    this(null);
+  }
+
+  public PDFPredicateExtractor(ParserLMFeatures plf) {
     try {
       final Path word2VecModelPath =
               Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
@@ -41,10 +45,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     } catch(final IOException e) {
       throw new RuntimeException(e);
     }
-  }
 
-  public PDFPredicateExtractor(ParserLMFeatures plf) {
-    this();
     lmFeats = plf;
   }
 
@@ -89,15 +90,15 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     return Math.log10(freq + 0.1);
   }
 
-  private float height(PDFToken t) {
+  private static float height(PDFToken t) {
     return t.bounds.get(3) - t.bounds.get(1);
   }
 
-  private float width(PDFToken t) {
+  private static float width(PDFToken t) {
     return t.bounds.get(0) - t.bounds.get(2);
   }
 
-  public float getExtreme(List<PaperToken> toks, TokenPropertySelector s, boolean max) {
+  public static float getExtreme(List<PaperToken> toks, TokenPropertySelector s, boolean max) {
     float adj = -1.0f;
     float extremeSoFar = Float.NEGATIVE_INFINITY;
     if (max) {
@@ -112,19 +113,19 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     return extremeSoFar * adj;
   }
 
-  public float linearNormalize(float f, Pair<Float, Float> rng) {
+  public static float linearNormalize(float f, Pair<Float, Float> rng) {
     if (Math.abs(rng.getTwo() - rng.getOne()) < 0.00000001)
       return 0.5f;
     else
       return (f - rng.getOne()) / (rng.getTwo() - rng.getOne());
   }
 
-  public Pair<Float, Float> getExtrema(List<PaperToken> toks, TokenPropertySelector s) {
+  public static Pair<Float, Float> getExtrema(List<PaperToken> toks, TokenPropertySelector s) {
     Pair<Float, Float> out = Tuples.pair(getExtreme(toks, s, false), getExtreme(toks, s, true));
     return out;
   }
 
-  public float getFixedFont(PaperToken t) {
+  public static float getFixedFont(PaperToken t) {
     float s = t.getPdfToken().fontMetrics.ptSize;
     if (s > 30.0f) //assume it's an error
       return 11.0f;
