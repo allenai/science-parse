@@ -139,7 +139,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 
   //assumes start/stop padded
   @Override
-  public List<ObjectDoubleMap<String>> nodePredicates(List<PaperToken> elems) {
+  public synchronized List<ObjectDoubleMap<String>> nodePredicates(List<PaperToken> elems) {
     List<ObjectDoubleMap<String>> out = new ArrayList<>();
     Pair<Float, Float> hBounds = getExtrema(elems.subList(1, elems.size() - 1), (PaperToken t) -> {
       return height(t.getPdfToken());
