@@ -25,18 +25,18 @@ public class ParserLMFeatures implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
-  ObjectDoubleHashMap<String> titleBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> titleFirstBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> titleLastBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> titleBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorFirstBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorLastBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> venueBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> venueFirstBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> venueLastBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleFirstBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleLastBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorFirstBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorLastBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> venueBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> venueFirstBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> venueLastBow = new ObjectDoubleHashMap<String>();
 
 
   public ParserLMFeatures() {
@@ -134,7 +134,7 @@ public class ParserLMFeatures implements Serializable {
     }
   }
 
-  public int fillBow(
+  public static int fillBow(
           ObjectDoubleHashMap<String> hm,
           String s,
           ObjectDoubleHashMap<String> firstHM,
@@ -148,7 +148,7 @@ public class ParserLMFeatures implements Serializable {
       return fillBow(hm, tokenize(s), firstHM, lastHM, trigramHM, doTrim);
   }
 
-  public int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
+  public static int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
     return fillBow(hm, s, null, null, null, doTrim);
   }
 
@@ -162,7 +162,7 @@ public class ParserLMFeatures implements Serializable {
     }
   }
 
-  private int fillBow(
+  private static int fillBow(
           ObjectDoubleHashMap<String> hm,
           String[] toks,
           ObjectDoubleHashMap<String> firstHM,
@@ -186,7 +186,7 @@ public class ParserLMFeatures implements Serializable {
     return ct;
   }
 
-  private String[] tokenize(final String s) {
+  private static String[] tokenize(final String s) {
     return s.split("( )");  //not great
   }
 }
