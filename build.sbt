@@ -36,7 +36,8 @@ resolvers ++= Seq(
   "AllenAI ThirdParty" at "http://utility.allenai.org:8081/nexus/content/repositories/thirdparty",
   "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
   "AllenAi Bintray Private" at "http://dl.bintray.com/allenai/private",
-  Resolver.jcenterRepo
+  Resolver.jcenterRepo,
+  Resolver.mavenLocal
 )
 
 libraryDependencies ++= Seq(
@@ -46,7 +47,7 @@ libraryDependencies ++= Seq(
   "org.allenai.pdfbox" % "pdfbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
   "org.allenai.pdfbox" % "fontbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
-  "org.allenai" % "ml" % "0.13" excludeAll (
+  "org.allenai" % "ml" % "0.14-SNAPSHOT" excludeAll (
     ExclusionRule(organization = "args4j"),
     ExclusionRule(organization = "org.slf4j", name="slf4j-simple")
   ),
