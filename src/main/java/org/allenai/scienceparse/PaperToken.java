@@ -47,5 +47,4 @@ public class PaperToken {
     else
       return pdfToken.token;
   }
-
 }
