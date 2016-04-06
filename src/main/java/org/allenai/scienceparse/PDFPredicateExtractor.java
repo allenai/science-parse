@@ -242,7 +242,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 
         // add the token itself as a feature
         final String token = StringUtils.normalize(elems.get(i).getPdfToken().token);
-		//m.put("%t=" + token, 1.0);
+		m.put("%t=" + token, 1.0);
 
         if(token.equals("and") || token.equals(","))
           m.put("%and", 1.0);
