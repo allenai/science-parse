@@ -428,15 +428,16 @@ object Evaluation extends Datastores with Logging {
       logger.info(f"Failed ${failures.size} times ($errorRate%.2f%%)")
       if (failures.nonEmpty) {
         logger.info("Top errors:")
-        failures.
-          groupBy(_.getClass.getName).
-          mapValues(_.size).
+        failures.groupBy(_.getClass.getName).
           toArray.
-          sortBy(-_._2).
+          sortBy(-_._2.size).
           take(10).
           foreach {
-            case (error, count) =>
-              logger.info(s"$count\t$error")
+            case (errorClass, errs) =>
+              logger.info(s"$errorClass\t${errs.size}")
+              for (e <- errs.take(10)) {
+                e.printStackTrace()
+              }
           }
       }
 
