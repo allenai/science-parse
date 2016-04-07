@@ -1,5 +1,6 @@
 package org.allenai.scienceparse;
 
+import com.gs.collections.api.block.procedure.primitive.ObjectDoubleProcedure;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import lombok.extern.slf4j.Slf4j;
@@ -188,5 +189,30 @@ public class ParserLMFeatures implements Serializable {
 
   private static String[] tokenize(final String s) {
     return s.split("( )");  //not great
+  }
+
+  private void logBow(final String name, final ObjectDoubleHashMap<String> bow) {
+    log.debug("{}:", name);
+    bow.forEachKeyValue(new ObjectDoubleProcedure<String>() {
+      @Override
+      public void value(final String key, final double value) {
+        log.debug("{} = {}", key, value);
+      }
+    });
+  }
+
+  public void logState() {
+    logBow("titleBow", titleBow);
+    logBow("titleFirstBow", titleFirstBow);
+    logBow("titleLastBow", titleLastBow);
+    logBow("titleBagOfCharTrigrams", titleBagOfCharTrigrams);
+    logBow("authorBow", authorBow);
+    logBow("authorFirstBow", authorFirstBow);
+    logBow("authorLastBow", authorLastBow);
+    logBow("authorBagOfCharTrigrams", authorBagOfCharTrigrams);
+    logBow("backgroundBow", backgroundBow);
+    logBow("venueBow", venueBow);
+    logBow("venueFirstBow", venueFirstBow);
+    logBow("venueLastBow", venueLastBow);
   }
 }

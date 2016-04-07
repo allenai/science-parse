@@ -149,7 +149,7 @@ public class Parser {
     this.model = model;
     referenceExtractor = new ExtractReferences(
             Files.newInputStream(getDefaultGazetteer()),
-            new DataInputStream(new FileInputStream(new File("/Users/dirkg/temp/L19-7ea9c1-bib.dat"))));
+            new DataInputStream(new FileInputStream(new File("/Users/dirkg/temp/L21-024503-bib.dat"))));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
@@ -676,16 +676,22 @@ public class Parser {
     }
   }
 
-  public static <T> void saveModel(DataOutputStream dos,
-                               CRFFeatureEncoder<String, T, String> fe,
-                               Vector weights, ParserLMFeatures plf) throws IOException {
+  public static <T> void saveModel(
+          final DataOutputStream dos,
+          final CRFFeatureEncoder<String, T, String> fe,
+          final Vector weights,
+          final ParserLMFeatures plf
+  ) throws IOException {
     dos.writeUTF(DATA_VERSION);
     fe.stateSpace.save(dos);
     fe.nodeFeatures.save(dos);
     fe.edgeFeatures.save(dos);
     IOUtils.saveDoubles(dos, weights.toDoubles());
     ObjectOutputStream oos = new ObjectOutputStream(dos);
+
+    logger.debug("Saving ParserLMFeatures");
     oos.writeObject(plf);
+    plf.logState();
   }
 
   @Data
@@ -705,12 +711,16 @@ public class Parser {
     Indexer<String> edgeFeatures = Indexer.load(dis);
     Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
     ObjectInputStream ois = new ObjectInputStream(dis);
+
+    logger.debug("Loading ParserLMFeatures");
     final ParserLMFeatures plf;
     try {
       plf = (ParserLMFeatures) ois.readObject();
     } catch (final ClassNotFoundException e) {
       throw new IOException("Model file contains unknown class.", e);
     }
+    plf.logState();
+
     val predExtractor = new PDFPredicateExtractor(plf);
     val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
             (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
