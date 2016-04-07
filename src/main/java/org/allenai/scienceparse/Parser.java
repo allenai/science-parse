@@ -75,7 +75,7 @@ import static java.util.stream.Collectors.toList;
 public class Parser {
 
   public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
-  public static final String DATA_VERSION = "0.1";
+  public static final String DATA_VERSION = "0.2";
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
 
