@@ -657,10 +657,6 @@ public class Parser {
       logLabeledData(testLabeledData);
     }
 
-    // evaluate after training, without serializing
-    final Parser parser = new Parser(crfModel);
-    org.allenai.scienceparse.Evaluation.printResults(org.allenai.scienceparse.Evaluation.evaluate(parser));
-
     try(val dis = new DataInputStream(new FileInputStream(opts.modelFile))) {
       logger.info("Evaluating model after load");
       final CRFModel<String, PaperToken, String> loadedCRFModel = loadModel(dis);
@@ -674,6 +670,10 @@ public class Parser {
       }
       logger.info("");
     }
+
+    // evaluate after training, without serializing
+    final Parser parser = new Parser(crfModel);
+    org.allenai.scienceparse.Evaluation.printResults(org.allenai.scienceparse.Evaluation.evaluate(parser));
 
   }
 
