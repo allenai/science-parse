@@ -147,9 +147,10 @@ public class Parser {
           final CRFModel<String, PaperToken, String> model
   ) throws IOException {
     this.model = model;
-    referenceExtractor = new ExtractReferences(
-            Files.newInputStream(getDefaultGazetteer()),
-            new DataInputStream(new FileInputStream(new File("/home/ec2-user/L21-024503-bib.dat"))));
+    referenceExtractor = null;
+    //new ExtractReferences(
+            //Files.newInputStream(getDefaultGazetteer()),
+            //new DataInputStream(new FileInputStream(new File("/home/ec2-user/L21-024503-bib.dat"))));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
