@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -192,13 +194,16 @@ public class ParserLMFeatures implements Serializable {
   }
 
   private void logBow(final String name, final ObjectDoubleHashMap<String> bow) {
-    log.debug("{}:", name);
-    bow.forEachKeyValue(new ObjectDoubleProcedure<String>() {
-      @Override
-      public void value(final String key, final double value) {
-        log.debug("{} = {}", key, value);
-      }
-    });
+    // This goes out of its way to print the BOW in a repeatable order.
+    log.debug("{}:  {} elements", name, bow.size());
+    final String[] keysArray = new String[bow.size()];
+    final String[] keys = bow.keySet().toArray(keysArray);
+    Arrays.sort(keys);
+
+    for(final String key: keys) {
+      final double value = bow.get(key);
+      log.debug("{}: {} = {}", name, key, value);
+    }
   }
 
   public void logState() {
