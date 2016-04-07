@@ -148,9 +148,9 @@ public class Parser {
   ) throws IOException {
     this.model = model;
     referenceExtractor = null;
-    //new ExtractReferences(
-            //Files.newInputStream(getDefaultGazetteer()),
-            //new DataInputStream(new FileInputStream(new File("/home/ec2-user/L21-024503-bib.dat"))));
+    new ExtractReferences(
+            Files.newInputStream(getDefaultGazetteer()),
+            new DataInputStream(new FileInputStream(new File("/home/ec2-user/L21-024503-bib.dat"))));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
