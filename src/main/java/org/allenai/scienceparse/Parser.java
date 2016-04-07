@@ -149,7 +149,7 @@ public class Parser {
     this.model = model;
     referenceExtractor = new ExtractReferences(
             Files.newInputStream(getDefaultGazetteer()),
-            new DataInputStream(new FileInputStream(new File("/Users/dirkg/temp/L19-7ea9c1-bib.dat"))));
+            new DataInputStream(new FileInputStream(new File("/home/ec2-user/L21-024503-bib.dat"))));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
