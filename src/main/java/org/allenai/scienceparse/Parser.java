@@ -643,9 +643,11 @@ public class Parser {
     final Vector weights = crfModel.weights();
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
 
-    try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
-    logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf);
+    try(FileOutputStream fos = new FileOutputStream(opts.modelFile);
+        val dos = new DataOutputStream(fos))
+    {
+      logger.info("Writing model to {}", opts.modelFile);
+      saveModel(dos, crfModel.featureEncoder, weights, plf);
     }
 
     // log test and training data
@@ -657,7 +659,9 @@ public class Parser {
       logLabeledData(testLabeledData);
     }
 
-    try(val dis = new DataInputStream(new FileInputStream(opts.modelFile))) {
+    try(FileInputStream fis = new FileInputStream(opts.modelFile);
+        val dis = new DataInputStream(fis))
+    {
       logger.info("Evaluating model after load");
       final CRFModel<String, PaperToken, String> loadedCRFModel = loadModel(dis);
       final Parser loadedParser = new Parser(loadedCRFModel);
