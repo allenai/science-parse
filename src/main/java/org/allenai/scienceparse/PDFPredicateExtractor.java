@@ -4,14 +4,21 @@ import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.tuple.Tuples;
+import com.medallia.word2vec.Searcher;
+import com.medallia.word2vec.Word2VecModel;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.allenai.datastore.Datastore;
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFToken;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -23,12 +30,21 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
   public static final HashSet<String> stopHash = new HashSet<String>(stopWords);
 
   private ParserLMFeatures lmFeats;
+  private final Searcher word2vecSearcher;
 
   public PDFPredicateExtractor() {
-
+    try {
+      final Path word2VecModelPath =
+              Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
+      final Word2VecModel word2VecModel = Word2VecModel.fromBinFile(word2VecModelPath.toFile());
+      word2vecSearcher = word2VecModel.forSearch();
+    } catch(final IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public PDFPredicateExtractor(ParserLMFeatures plf) {
+    this();
     lmFeats = plf;
   }
 
@@ -71,10 +87,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     if (freq > 0.0)
       freq -= 0.6;
     return Math.log10(freq + 0.1);
-  }
-
-  public static void main(String[] args) throws Exception {
-
   }
 
   private float height(PDFToken t) {
@@ -120,22 +132,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
       return s;
   }
 
-  //assumes start-stop padded
-//	private float prevYGap(List<PaperToken> toks, int i) {
-//		if(i==1) {
-//			return getY(toks.get(i));
-//		}
-//	}
-//	
-//	private List<Float> getYGaps(List<PaperToken> toks) {
-//		List<Float> out = new ArrayList<Float>();
-//		for(int i=1; i<toks.size()-2; i++) {
-//			nextY = getY(elems.get(i), false) + height(elems.get(i).getPdfToken())
-//		}
-//		
-//		return out;
-//	}
-
   public double logYDelt(float y1, float y2) {
     return Math.log(Math.max(y1 - y2, 0.00001f));
   }
@@ -150,9 +146,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     Pair<Float, Float> fBounds = getExtrema(elems.subList(1, elems.size() - 1), (PaperToken t) -> {
       return getFixedFont(t);
     });
-//		log.info("h bounds: " + hBounds);
-//		log.info("f bounds: " + fBounds);
-    //log.info("called with " + elems.size() + " tokens.");
+
     for (int i = 0; i < elems.size(); i++) {
       ObjectDoubleHashMap<String> m = new ObjectDoubleHashMap<String>();
       float prevFont = -10.0f;
@@ -213,7 +207,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         m.put("%line", Math.min(line, 10.0)); //cap to max 10 lines
         float relativeH = linearNormalize(h, hBounds);
         m.put("%h", relativeH);
-//				m.put("%h", h);
 
         //word features:
         String tok = elems.get(i).getPdfToken().token;
@@ -250,12 +243,28 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         final String token = StringUtils.normalize(elems.get(i).getPdfToken().token);
 		m.put("%t=" + token, 1.0);
 
+        if(token.equals("and") || token.equals(","))
+          m.put("%and", 1.0);
+
         // add trigram features
         final String trigramSourceToken = token + "$";
         for(int j = 0; j <= trigramSourceToken.length() - 3; ++j) {
           final String trigram = trigramSourceToken.substring(j, j + 3);
           final String feature = "%tri=" + trigram;
           m.updateValue(feature, 0.0, d -> d + 1);
+        }
+
+        // add word embeddings
+        try {
+          final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
+          int j = 0;
+          while(vector.hasNext()) {
+            final double value = vector.next();
+            m.put(String.format("%%emb%03d", j), value);
+            j += 1;
+          }
+        } catch (final Searcher.UnknownWordException e) {
+          // do nothing
         }
       }
       out.add(m);

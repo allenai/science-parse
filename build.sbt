@@ -60,8 +60,12 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",
   "org.bouncycastle" % "bcprov-jdk16" % "1.46",
   "org.bouncycastle" % "bcmail-jdk16" % "1.46",
+  "com.github.jai-imageio" % "jai-imageio-jpeg2000" % "1.3.0", // For handling jpeg2000 images
+  "com.levigo.jbig2" % "levigo-jbig2-imageio" % "1.6.5", // For handling jbig2 images
   "org.jsoup" % "jsoup" % "1.8.1",
   "org.apache.commons" % "commons-lang3" % "3.4",
   "com.github.scopt" %% "scopt" % "3.3.0",
-  "com.amazonaws" % "aws-java-sdk" % "1.7.4"
+  "com.amazonaws" % "aws-java-sdk" % "1.7.4",
+  "com.medallia.word2vec" % "Word2VecJava" % "0.10.3-allenai-P1",
+  "com.google.guava" % "guava" % "18.0" // Medallia needs this, but somehow the dependency isn't transitive.
 )
