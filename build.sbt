@@ -36,8 +36,7 @@ resolvers ++= Seq(
   "AllenAI ThirdParty" at "http://utility.allenai.org:8081/nexus/content/repositories/thirdparty",
   "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
   "AllenAi Bintray Private" at "http://dl.bintray.com/allenai/private",
-  Resolver.jcenterRepo,
-  Resolver.mavenLocal
+  Resolver.jcenterRepo
 )
 
 libraryDependencies ++= Seq(
