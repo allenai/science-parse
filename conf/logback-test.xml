@@ -27,9 +27,9 @@
   <logger name="org.apache.fontbox" level="OFF" />
   <logger name="org.allenai.pdfbox" level="OFF" />
   <logger name="org.allenai.fontbox" level="OFF" />
-  <logger name="org.allenai.scienceparse.TextExtractor" level="ERROR" />
-  <logger name="org.allenai.scienceparse.Parser" level="DEBUG" />
-  <logger name="org.allenai.scienceparse.ParserLMFeatures" level="DEBUG" />
+  <logger name="org.allenai.scienceparse.TextExtractor" level="INFO" />
+  <logger name="org.allenai.scienceparse.Parser" level="INFO" />
+  <logger name="org.allenai.scienceparse.ParserLMFeatures" level="INFO" />
   <logger name="org.allenai.scienceparse.Evaluation$.evaluationErrors" additivity="false">
     <appender-ref ref="EVALLOG" />
   </logger>
