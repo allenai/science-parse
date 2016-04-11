@@ -248,17 +248,14 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.put("%and", 1.0);
 
         // add trigram features
-        /*
         final String trigramSourceToken = token + "$";
         for(int j = 0; j <= trigramSourceToken.length() - 3; ++j) {
           final String trigram = trigramSourceToken.substring(j, j + 3);
           final String feature = "%tri=" + trigram;
           m.updateValue(feature, 0.0, d -> d + 1);
         }
-        */
 
         // add word embeddings
-        /*
         try {
           final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
           int j = 0;
@@ -270,7 +267,6 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         } catch (final Searcher.UnknownWordException e) {
           // do nothing
         }
-        */
       }
       out.add(m);
     }
