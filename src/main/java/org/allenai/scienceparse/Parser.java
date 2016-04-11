@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -141,15 +140,6 @@ public class Parser {
             new ExtractReferences(
                     gazetteerStream,
                     new DataInputStream(bibModelStream));
-  }
-
-  private Parser(
-          final CRFModel<String, PaperToken, String> model
-  ) throws IOException {
-    this.model = model;
-    referenceExtractor = new ExtractReferences(
-            Files.newInputStream(getDefaultGazetteer()),
-            new DataInputStream(new FileInputStream(new File("/Users/dirkg/temp/L21-024503-bib.dat"))));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
@@ -657,9 +647,6 @@ public class Parser {
       logLabeledData(testLabeledData);
     }
 
-    // evaluate after training, without serializing
-    final Parser parser = new Parser(crfModel);
-    org.allenai.scienceparse.Evaluation.printResults(org.allenai.scienceparse.Evaluation.evaluate(parser));
   }
 
   private static void logLabeledData(final List<List<Pair<PaperToken, String>>> data) {
