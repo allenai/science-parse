@@ -228,7 +228,7 @@ public class Parser {
     public final Set<String> usedPaperIds;
   }
 
-  private static LabelingOutput labelFromGroundTruth(
+  public static LabelingOutput labelFromGroundTruth(
     final ParserGroundTruth pgt,
     final PaperSource paperSource,
     final int headerMax,

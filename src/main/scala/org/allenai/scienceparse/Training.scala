@@ -1,6 +1,7 @@
 package org.allenai.scienceparse
 
 import java.io.{ FileInputStream, File }
+import java.nio.file.Files
 
 import com.gs.collections.impl.set.mutable.UnifiedSet
 import org.allenai.common.{ Resource, Logging }
@@ -11,7 +12,7 @@ import scopt.OptionParser
 import scala.io.Source
 import scala.collection.JavaConverters._
 
-object Training extends App with Datastores with Logging {
+object Training extends Datastores with Logging {
   // The Files are all Option[File] defaulting to None. Properly, they should be set to the
   // defaults from the datastore, but if we do that here, they will download several gigabytes
   // of files during startup, even if they are unused later.
@@ -30,6 +31,8 @@ object Training extends App with Datastores with Logging {
     excludeIdsFile: Option[File] = None,
     minExpectedFeatureCount: Int = 13
   )
+
+  val defaultConfig = Config()
 
   val parser = new OptionParser[Config](this.getClass.getSimpleName) {
     head("Options that are not specified default to the settings that were used to make the production model.")
@@ -89,51 +92,54 @@ object Training extends App with Datastores with Logging {
     help("help") text "Prints help text"
   }
 
-  parser.parse(args, Config()).foreach { config =>
-    val groundTruthFile =
-      config.groundTruth.getOrElse(publicFile("productionGroundTruth.json", 1).toFile)
-    val pgt = Resource.using(new FileInputStream(groundTruthFile)) { is =>
-      new ParserGroundTruth(is)
-    }
+  def defaultGroundTruth = ParserGroundTruth.fromPath(publicFile("productionGroundTruth.json", 1))
 
-    val opts = new ParseOpts
-    opts.modelFile = config.output.toString
-    opts.headerMax = config.maxHeaderWords
-    opts.iterations = config.maxIterations
-    opts.threads = Runtime.getRuntime.availableProcessors() * 2
-    opts.backgroundSamples = config.backgroundSampleDocs
-
-    val backgroundDirectory =
-      config.backgroundDirectory.getOrElse(publicDirectory("productionBackgroundDocs", 1).toFile)
-    opts.backgroundDirectory = backgroundDirectory.toString
-
-    val gazetteerFile = config.gazetteerFile.getOrElse(Parser.getDefaultGazetteer.toFile)
-    opts.gazetteerFile = gazetteerFile.toString
-
-    opts.trainFraction = config.trainFraction
-    opts.checkAuthors = true
-    opts.minYear = config.minYear
-    opts.documentCount = config.maxPaperCount
-    opts.minExpectedFeatureCount = config.minExpectedFeatureCount
-
-    val paperSource = config.paperDir.map(new DirectoryPaperSource(_)).getOrElse {
-      new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
-    }
-
-    val excludedIds = Evaluation.goldDocIds ++ config.excludeIdsFile.map { excludedIdsFile =>
+  def readExcludedIds(excludeIdsFile: Option[File]) =
+    Evaluation.goldDocIds ++
+    excludeIdsFile.map { excludedIdsFile =>
       Resource.using(Source.fromFile(excludedIdsFile)) { source =>
         source.getLines().map(_.trim)
       }.toSet
     }.getOrElse(Set.empty)
 
-    Parser.trainParser(
-      null,
-      pgt,
-      paperSource,
-      opts,
-      UnifiedSet.newSet(excludedIds.toIterable.asJava)
-    )
 
-    logger.info(s"New model at ${opts.modelFile}")
+  def main(args: Array[String]): Unit = {
+    parser.parse(args, Config()).foreach { config =>
+      val pgt = config.groundTruth.map(ParserGroundTruth.fromFile).getOrElse(defaultGroundTruth)
+
+      val opts = new ParseOpts
+      opts.modelFile = config.output.toString
+      opts.headerMax = config.maxHeaderWords
+      opts.iterations = config.maxIterations
+      opts.threads = Runtime.getRuntime.availableProcessors() * 2
+      opts.backgroundSamples = config.backgroundSampleDocs
+
+      val backgroundDirectory =
+        config.backgroundDirectory.getOrElse(publicDirectory("productionBackgroundDocs", 1).toFile)
+      opts.backgroundDirectory = backgroundDirectory.toString
+
+      val gazetteerFile = config.gazetteerFile.getOrElse(Parser.getDefaultGazetteer.toFile)
+      opts.gazetteerFile = gazetteerFile.toString
+
+      opts.trainFraction = config.trainFraction
+      opts.checkAuthors = true
+      opts.minYear = config.minYear
+      opts.documentCount = config.maxPaperCount
+      opts.minExpectedFeatureCount = config.minExpectedFeatureCount
+
+      val paperSource = config.paperDir.map(new DirectoryPaperSource(_)).getOrElse {
+        new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
+      }
+
+      Parser.trainParser(
+        null,
+        pgt,
+        paperSource,
+        opts,
+        UnifiedSet.newSet(readExcludedIds(config.excludeIdsFile).toIterable.asJava)
+      )
+
+      logger.info(s"New model at ${opts.modelFile}")
+    }
   }
 }
