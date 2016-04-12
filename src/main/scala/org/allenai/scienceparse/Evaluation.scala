@@ -16,7 +16,9 @@ import scala.io.{ Codec, Source }
 import scala.util.{ Failure, Try, Success }
 
 object Evaluation extends Datastores with Logging {
-  import StringUtils.normalize
+  def normalize(s: String) = {
+    StringUtils.normalize(PDFToCRFInput.tokenize(s).asScala.mkString(" "))
+  }
 
   /** This class saves the original representation of an item, so that even if said item is mangled
     * into an unrecognizable form for the sake of comparison, its original readable form is still
