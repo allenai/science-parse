@@ -282,12 +282,21 @@ public class PDFExtractor {
     // The PDFBox class doesn't get exposed outside of this class
     public final List<TextPosition> textPositions;
 
+    public String discardSuperscripts(String token, FloatList bounds) {
+      double yThresh = (bounds.get(3) + bounds.get(1))/2.0;
+      StringBuilder sb = new StringBuilder();
+      int i=0;
+      for (TextPosition tp : textPositions) {
+        if(tp.getY() + tp.getHeight() > yThresh)
+          sb.append(token.charAt(i));
+        i++;
+      }
+      return sb.toString();
+    }
+
     public PDFToken toPDFToken() {
       val builder = PDFToken.builder();
       String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));
-      // separate ligands
-      tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
-      builder.token(tokenText);
       // HACK(aria42) assumes left-to-right text
       TextPosition firstTP = textPositions.get(0);
       PDFont pdFont = firstTP.getFont();
@@ -327,6 +336,10 @@ public class PDFExtractor {
       }
       FloatList bounds = FloatArrayList.newListWith(minX, minY, maxX, maxY);
       builder.bounds(bounds);
+      tokenText = discardSuperscripts(tokenText, bounds);
+      // separate ligands
+      tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
+      builder.token(tokenText);
       return builder.build();
     }
   }
