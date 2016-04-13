@@ -3,7 +3,7 @@ package org.allenai.scienceparse
 import java.io._
 
 import com.gs.collections.impl.set.mutable.UnifiedSet
-import org.allenai.common.Logging
+import org.allenai.common.{Resource, Logging}
 import org.allenai.datastore.Datastores
 import org.apache.commons.lang3.StringEscapeUtils
 import scopt.OptionParser
@@ -66,62 +66,65 @@ object Matching extends App with Datastores with Logging {
       true,
       UnifiedSet.newSet(Training.readExcludedIds(config.excludeIdsFile).toIterable.asJava))
 
-    val output = new PrintWriter(
+    Resource.using(new PrintWriter(
       new BufferedWriter(
         new OutputStreamWriter(
           config.output.map(
             new FileOutputStream(_)
-          ).getOrElse(System.out), "UTF-8")))
+          ).getOrElse(System.out), "UTF-8")))) { output =>
 
-    for {
-      (doc, docNumber) <- labeled.labeledData.asScala.zipWithIndex
-      tokenLabelPair <- doc.asScala
-      pdfToken = tokenLabelPair.getOne.getPdfToken
-      if pdfToken != null
-      label = tokenLabelPair.getTwo
-      (character, index) <- pdfToken.token.zipWithIndex
-    } {
-      val fontName = {
-        val rawFontName = pdfToken.fontMetrics.name
-        val lastUnderscore = rawFontName.lastIndexOf('_')
-        if(lastUnderscore < 1) rawFontName else {
-          val secondLastUnderscore = rawFontName.lastIndexOf('_', lastUnderscore - 1)
-          if(secondLastUnderscore < 0) rawFontName else {
-            rawFontName.substring(0, secondLastUnderscore)
+      for {
+        (doc, docNumber) <- labeled.labeledData.asScala.zipWithIndex
+        tokenLabelPair <- doc.asScala
+        pdfToken = tokenLabelPair.getOne.getPdfToken
+        if pdfToken != null
+        label = tokenLabelPair.getTwo
+        (character, index) <- pdfToken.token.zipWithIndex
+      } {
+        val fontName = {
+          val rawFontName = pdfToken.fontMetrics.name
+          val lastUnderscore = rawFontName.lastIndexOf('_')
+          if (lastUnderscore < 1) rawFontName
+          else {
+            val secondLastUnderscore = rawFontName.lastIndexOf('_', lastUnderscore - 1)
+            if (secondLastUnderscore < 0) rawFontName
+            else {
+              rawFontName.substring(0, secondLastUnderscore)
+            }
           }
         }
+
+        // coordinates
+        val top = pdfToken.bounds.get(1)
+        val bottom = pdfToken.bounds.get(3)
+        val width = pdfToken.bounds.get(2) - pdfToken.bounds.get(0)
+        val widthPerCharacter = width / pdfToken.token.length
+        val left = pdfToken.bounds.get(0) + widthPerCharacter * index
+        val right = left + widthPerCharacter
+
+        output.print(docNumber)
+        output.print('\t')
+        output.print(StringEscapeUtils.escapeCsv(character.toString))
+        output.print('\t')
+        output.print(character.asInstanceOf[Int])
+        output.print('\t')
+        output.print(fontName)
+        output.print('\t')
+        output.print(pdfToken.fontMetrics.ptSize)
+        output.print('\t')
+        output.print(pdfToken.fontMetrics.spaceWidth)
+        output.print('\t')
+        output.print(top)
+        output.print('\t')
+        output.print(bottom)
+        output.print('\t')
+        output.print(left)
+        output.print('\t')
+        output.print(right)
+        output.print('\t')
+        output.print(label.last)
+        output.println()
       }
-
-      // coordinates
-      val top = pdfToken.bounds.get(1)
-      val bottom = pdfToken.bounds.get(3)
-      val width = pdfToken.bounds.get(2) - pdfToken.bounds.get(0)
-      val widthPerCharacter = width / pdfToken.token.length
-      val left = pdfToken.bounds.get(0) + widthPerCharacter * index
-      val right = left + widthPerCharacter
-
-      output.print(docNumber)
-      output.print('\t')
-      output.print(StringEscapeUtils.escapeCsv(character.toString))
-      output.print('\t')
-      output.print(character.asInstanceOf[Int])
-      output.print('\t')
-      output.print(fontName)
-      output.print('\t')
-      output.print(pdfToken.fontMetrics.ptSize)
-      output.print('\t')
-      output.print(pdfToken.fontMetrics.spaceWidth)
-      output.print('\t')
-      output.print(top)
-      output.print('\t')
-      output.print(bottom)
-      output.print('\t')
-      output.print(left)
-      output.print('\t')
-      output.print(right)
-      output.print('\t')
-      output.print(label.last)
-      output.println()
     }
   }
 }
