@@ -119,6 +119,9 @@ public class Parser {
           final File gazetteerFile,
           final File bibModelFile
   ) throws Exception {
+    logger.info("Loading model from {}", modelFile);
+    logger.info("Loading gazetteer from {}", gazetteerFile);
+    logger.info("Loading bib model from {}", bibModelFile);
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
       final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
