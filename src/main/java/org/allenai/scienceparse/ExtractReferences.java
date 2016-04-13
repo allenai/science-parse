@@ -85,7 +85,6 @@ public class ExtractReferences {
       new BracketName(BracketNameBibRecordParser.class)));
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
-      //extractors = new ArrayList<>();
       extractors.addAll(Arrays.asList(
         new BracketNumber(CRFBibRecordParser.class),
           new NumberDot(CRFBibRecordParser.class),
