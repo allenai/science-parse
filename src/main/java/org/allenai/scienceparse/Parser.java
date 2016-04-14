@@ -679,10 +679,10 @@ public class Parser {
     fe.edgeFeatures.save(dos);
     IOUtils.saveDoubles(dos, weights.toDoubles());
     ObjectOutputStream oos = new ObjectOutputStream(dos);
-
     logger.debug("Saving ParserLMFeatures");
     oos.writeObject(plf);
-    plf.logState();
+    if(plf!=null)
+      plf.logState();
   }
 
   @Data
@@ -710,7 +710,8 @@ public class Parser {
     } catch (final ClassNotFoundException e) {
       throw new IOException("Model file contains unknown class.", e);
     }
-    plf.logState();
+    if(plf!=null)
+      plf.logState();
 
     val predExtractor = new PDFPredicateExtractor(plf);
     val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>

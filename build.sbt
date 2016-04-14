@@ -4,7 +4,7 @@ organization := "org.allenai"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
-javaOptions in Test += s"-Xmx8G"
+javaOptions in Test += s"-Xmx40G"
 
 javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
