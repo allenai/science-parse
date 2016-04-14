@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Data @EqualsAndHashCode(exclude={"citeRegEx", "shortCiteRegEx"})
 public class BibRecord {
@@ -28,6 +29,22 @@ public class BibRecord {
     this.citeRegEx = citeRegEx;
     this.shortCiteRegEx = shortCiteRegEx;
     this.year = year;
+  }
+
+  static private String normalizeInitialsInAuthor(String author) {
+    author = author.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2");
+    author = author.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2"); //twice to catch three-initial seq.
+    return author;
+  }
+
+  public BibRecord withNormalizedAuthors() {
+    return new BibRecord(
+            title,
+            author.stream().map(BibRecord::normalizeInitialsInAuthor).collect(Collectors.toList()),
+            venue,
+            citeRegEx,
+            shortCiteRegEx,
+            year);
   }
 
   public final String title;

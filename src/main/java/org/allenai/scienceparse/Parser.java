@@ -150,11 +150,12 @@ public class Parser {
     final List<String> rawReferences,
     final ExtractReferences er
   ) throws IOException {
-    Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
-    List<BibRecord> br = fnd.getOne();
-    BibStractor bs = fnd.getTwo();
-    List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
-    return Tuples.pair(br, crs);
+    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
+    final List<BibRecord> brs =
+            fnd.getOne().stream().map(BibRecord::withNormalizedAuthors).collect(Collectors.toList());
+    final BibStractor bs = fnd.getTwo();
+    final List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs, bs);
+    return Tuples.pair(brs, crs);
   }
 
   //slow
