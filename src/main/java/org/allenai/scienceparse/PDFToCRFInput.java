@@ -342,12 +342,21 @@ public class PDFToCRFInput {
   public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
     List<PaperToken> pts = toks.subList(span.getOne(), span.getTwo());
     List<String> words = pts.stream().map(pt -> (pt.getLine() == -1) ? "<S>" : pt.getPdfToken().token).collect(Collectors.toList());
+    return appendStringList(words).trim();
+  }
+  
+  public static String stringAtForStringList(List<String> toks, Pair<Integer, Integer> span) {
+    List<String> words = toks.subList(span.getOne(), span.getTwo());
+    return appendStringList(words).trim();
+  }
+  
+  public static String appendStringList(List<String> toks) {
     StringBuilder sb = new StringBuilder();
-    for (String s : words) {
+    for (String s : toks) {
       sb.append(s);
       sb.append(" ");
     }
-    return sb.toString().trim();
+    return sb.toString();
   }
 
   public static String getLabelString(List<Pair<PaperToken, String>> seq) {

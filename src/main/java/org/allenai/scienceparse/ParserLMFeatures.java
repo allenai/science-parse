@@ -1,5 +1,6 @@
 package org.allenai.scienceparse;
 
+import com.gs.collections.api.block.procedure.primitive.ObjectDoubleProcedure;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -25,13 +28,18 @@ public class ParserLMFeatures implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
-  ObjectDoubleHashMap<String> titleBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> titleFirstBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> titleLastBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorFirstBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> authorLastBow = new ObjectDoubleHashMap<String>();
-  ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleFirstBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleLastBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> titleBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorFirstBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorLastBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> authorBagOfCharTrigrams = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> backgroundBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> venueBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> venueFirstBow = new ObjectDoubleHashMap<String>();
+  final ObjectDoubleHashMap<String> venueLastBow = new ObjectDoubleHashMap<String>();
 
 
   public ParserLMFeatures() {
@@ -48,9 +56,10 @@ public class ParserLMFeatures implements Serializable {
     log.info("Excluding {} paper ids from LM features", idsToExclude.size());
     for(Paper p : ps) {
       if (!idsToExclude.contains(p.id)) {
-        fillBow(titleBow, p.title, titleFirstBow, titleLastBow, false);
+        fillBow(titleBow, p.title, titleFirstBow, titleLastBow, titleBagOfCharTrigrams, false);
+        fillBow(venueBow, p.venue, venueFirstBow, venueLastBow, null, false);
         for (String a : p.authors)
-          fillBow(authorBow, a, authorFirstBow, authorLastBow, true);
+          fillBow(authorBow, a, authorFirstBow, authorLastBow, authorBagOfCharTrigrams, true);
       }
     }
 
@@ -104,7 +113,7 @@ public class ParserLMFeatures implements Serializable {
         }
 
         if(tokens != null) {
-        ct += fillBow(backgroundBow, tokens, null, null, false);
+        ct += fillBow(backgroundBow, tokens, null, null, null, false);
           successfulPapers += 1;
         } else {
           failedPapers += 1;
@@ -128,28 +137,40 @@ public class ParserLMFeatures implements Serializable {
     }
   }
 
-  public int fillBow(
+  public static int fillBow(
           ObjectDoubleHashMap<String> hm,
           String s,
           ObjectDoubleHashMap<String> firstHM,
           ObjectDoubleHashMap<String> lastHM,
+          ObjectDoubleHashMap<String> trigramHM,
           boolean doTrim
   ) {
     if(s == null)
       return 0;
     else
-      return fillBow(hm, tokenize(s), firstHM, lastHM, doTrim);
+      return fillBow(hm, tokenize(s), firstHM, lastHM, trigramHM, doTrim);
   }
 
-  public int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
-    return fillBow(hm, s, null, null, doTrim);
+  public static int fillBow(ObjectDoubleHashMap<String> hm, String s, boolean doTrim) {
+    return fillBow(hm, s, null, null, null, doTrim);
   }
 
-  private int fillBow(
+  public static void addTrigrams(ObjectDoubleHashMap<String> hm, String t) {
+    if(t == null)
+      return;
+    t = "^" + t + "$";
+    int len = t.length();
+    for(int i=0; i<len - 3; i++) {
+      hm.addToValue(t.substring(i, i+3), 1.0);
+    }
+  }
+
+  private static int fillBow(
           ObjectDoubleHashMap<String> hm,
           String[] toks,
           ObjectDoubleHashMap<String> firstHM,
           ObjectDoubleHashMap<String> lastHM,
+          ObjectDoubleHashMap<String> trigramHM,
           boolean doTrim
   ) {
     int ct = 0;
@@ -161,12 +182,42 @@ public class ParserLMFeatures implements Serializable {
     }
     for (String t : toks) {
       hm.addToValue(doTrim ? Parser.fixupAuthors(t) : t, 1.0);
+      if(trigramHM != null)
+        addTrigrams(trigramHM, doTrim ? Parser.fixupAuthors(t) : t);
       ct++;
     }
     return ct;
   }
 
-  private String[] tokenize(final String s) {
-    return s.split("( |,)");  //not great
+  private static String[] tokenize(final String s) {
+    return s.split("( )");  //not great
+  }
+
+  private void logBow(final String name, final ObjectDoubleHashMap<String> bow) {
+    // This goes out of its way to print the BOW in a repeatable order.
+    log.debug("{}:  {} elements", name, bow.size());
+    final String[] keysArray = new String[bow.size()];
+    final String[] keys = bow.keySet().toArray(keysArray);
+    Arrays.sort(keys);
+
+    for(final String key: keys) {
+      final double value = bow.get(key);
+      log.debug("{}: {} = {}", name, key, value);
+    }
+  }
+
+  public void logState() {
+    logBow("titleBow", titleBow);
+    logBow("titleFirstBow", titleFirstBow);
+    logBow("titleLastBow", titleLastBow);
+    logBow("titleBagOfCharTrigrams", titleBagOfCharTrigrams);
+    logBow("authorBow", authorBow);
+    logBow("authorFirstBow", authorFirstBow);
+    logBow("authorLastBow", authorLastBow);
+    logBow("authorBagOfCharTrigrams", authorBagOfCharTrigrams);
+    logBow("backgroundBow", backgroundBow);
+    logBow("venueBow", venueBow);
+    logBow("venueFirstBow", venueFirstBow);
+    logBow("venueLastBow", venueLastBow);
   }
 }

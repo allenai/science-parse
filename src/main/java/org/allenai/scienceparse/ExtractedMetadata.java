@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 public class ExtractedMetadata {
   public static final String titleTag = "T"; //label used in labeled data
   public static final String authorTag = "A"; //label used in labeled data
+  public static final String yearTag = "Y"; //label used in labeled data (bibligraphy only)
+  public static final String venueTag = "V"; //label used in labeled data (bibligraphy only)
 
   transient private static Pattern emailDelimitersRegex = Pattern.compile(",|\\||;");
 
