@@ -241,9 +241,9 @@ public class PDFToCRFInput {
       List<PDFLine> header = pdf.heuristicHeader();
       addLineTokens(out, header, 0);
     } else {
-      int pg = 0;
-      for (PDFPage p : pdf.getPages()) {
-        addLineTokens(out, p.getLines(), pg);
+      List<PDFPage> pages = pdf.getPages();
+      for (int pageNum = 0; pageNum < pages.size(); pageNum++) {
+        addLineTokens(out, pages.get(pageNum).lines, pageNum);
       }
     }
     return out;
