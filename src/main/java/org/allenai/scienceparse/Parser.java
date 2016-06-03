@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -73,45 +74,75 @@ import static java.util.stream.Collectors.toList;
 public class Parser {
 
   public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
-  public static final String DATA_VERSION = "0.1";
-  private final static Logger logger = LoggerFactory.getLogger(Parser.class);
+  public static final String DATA_VERSION = "0.2";
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
 
+  private final static Logger logger =
+          LoggerFactory.getLogger(Parser.class);
+  private final static Logger labeledDataLogger =
+          LoggerFactory.getLogger(logger.getName() + ".labeledData");
+
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel-ce5b11.dat", 1);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 5);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
+  public static Path getDefaultBibModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
+  }
 
   public Parser() throws Exception {
-    this(getDefaultProductionModel(), getDefaultGazetteer());
+    this(getDefaultProductionModel(), getDefaultGazetteer(), getDefaultBibModel());
   }
 
-  public Parser(final String modelFile, final String gazetteerFile) throws Exception {
-    this(new File(modelFile), new File(gazetteerFile));
+  public Parser(
+          final String modelFile,
+          final String gazetteerFile,
+          final String bibModelFile
+  ) throws Exception {
+    this(new File(modelFile), new File(gazetteerFile), new File(bibModelFile));
   }
 
-  public Parser(final Path modelFile, final Path gazetteerFile) throws Exception {
-    this(modelFile.toFile(), gazetteerFile.toFile());
+  public Parser(
+          final Path modelFile,
+          final Path gazetteerFile,
+          final Path bibModelFile
+  ) throws Exception {
+    this(modelFile.toFile(), gazetteerFile.toFile(), bibModelFile.toFile());
   }
 
-  public Parser(final File modelFile, final File gazetteerFile) throws Exception {
+  public Parser(
+          final File modelFile,
+          final File gazetteerFile,
+          final File bibModelFile
+  ) throws Exception {
+    logger.info("Loading model from {}", modelFile);
+    logger.info("Loading gazetteer from {}", gazetteerFile);
+    logger.info("Loading bib model from {}", bibModelFile);
     try(
       final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
       final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
+      final DataInputStream bibModelIs = new DataInputStream(new FileInputStream(bibModelFile))
     ) {
       model = loadModel(modelIs);
-      referenceExtractor = new ExtractReferences(gazetteerIs);
+      referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
     }
   }
 
-  public Parser(final InputStream modelStream, final InputStream gazetteerStream) throws Exception {
+  public Parser(
+          final InputStream modelStream,
+          final InputStream gazetteerStream,
+          final InputStream bibModelStream
+  ) throws Exception {
     final DataInputStream dis = new DataInputStream(modelStream);
     model = loadModel(dis);
-    referenceExtractor = new ExtractReferences(gazetteerStream);
+    referenceExtractor =
+            new ExtractReferences(
+                    gazetteerStream,
+                    new DataInputStream(bibModelStream));
   }
 
   public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
@@ -119,11 +150,12 @@ public class Parser {
     final List<String> rawReferences,
     final ExtractReferences er
   ) throws IOException {
-    Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
-    List<BibRecord> br = fnd.getOne();
-    BibStractor bs = fnd.getTwo();
-    List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
-    return Tuples.pair(br, crs);
+    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
+    final List<BibRecord> brs =
+            fnd.getOne().stream().map(BibRecord::withNormalizedAuthors).collect(Collectors.toList());
+    final BibStractor bs = fnd.getTwo();
+    final List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs, bs);
+    return Tuples.pair(brs, crs);
   }
 
   //slow
@@ -412,6 +444,73 @@ public class Parser {
     return out;
   }
 
+  public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) throws IOException {
+    List<List<Pair<String, String>>> labeledData;
+    labeledData = CRFBibRecordParser.labelFromCoraFile(coraTrainFile);
+    ReferencesPredicateExtractor predExtractor;
+    ParserLMFeatures plf = null;
+    if(opts.gazetteerFile != null) {
+      ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
+      plf = new ParserLMFeatures(
+          gaz.papers,
+          new UnifiedSet<>(),
+          new File(opts.backgroundDirectory),
+          opts.backgroundSamples);
+      predExtractor = new ReferencesPredicateExtractor(plf);
+    } else {
+      predExtractor = new ReferencesPredicateExtractor();
+    }
+    
+    // Split train/test data
+    logger.info("CRF training for bibs with {} threads and {} labeled examples", opts.threads, labeledData.size());
+    Pair<List<List<Pair<String, String>>>, List<List<Pair<String, String>>>> trainTestPair =
+      splitData(labeledData, 1.0 - opts.trainFraction);
+    val trainLabeledData = trainTestPair.getOne();
+    val testLabeledData = trainTestPair.getTwo();
+
+    // Set up Train options
+    CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
+    trainOpts.optimizerOpts.maxIters = opts.iterations;
+    trainOpts.numThreads = opts.threads;
+    trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
+
+    // set up evaluation function
+    final Parallel.MROpts evalMrOpts =
+            Parallel.MROpts.withIdAndThreads("mr-crf-bib-train-eval", opts.threads);
+    final ToDoubleFunction<CRFModel<String, String, String>> testEvalFn;
+    {
+      final List<List<Pair<String, String>>> testEvalData =
+              testLabeledData.
+                      stream().
+                      map(x -> x.stream().map(Pair::swap).collect(toList())).
+                      collect(toList());
+      testEvalFn = (model) -> {
+        final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        return eval.tokenAccuracy.accuracy();
+      };
+    }
+
+    // set up early stopping so that we stop training after 50 down-iterations
+    final TrainCriterionEval<CRFModel<String, String, String>> earlyStoppingEvaluator =
+            new TrainCriterionEval<>(testEvalFn);
+    earlyStoppingEvaluator.maxNumDipIters = 100;
+    trainOpts.iterCallback = earlyStoppingEvaluator;
+
+    // training
+    CRFTrainer<String, String, String> trainer =
+      new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
+    trainer.train(trainLabeledData);
+    final CRFModel<String, String, String> crfModel = earlyStoppingEvaluator.bestModel;
+
+    Vector weights = crfModel.weights();
+    Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
+
+    val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
+    logger.info("Writing model to {}", opts.modelFile);
+    saveModel(dos, crfModel.featureEncoder, weights, plf);
+    dos.close();
+  }
+
   public static void trainParser(
           final List<File> files,
           final ParserGroundTruth pgt,
@@ -486,6 +585,15 @@ public class Parser {
     val trainLabeledData = trainTestPair.getOne();
     val testLabeledData = trainTestPair.getTwo();
 
+    // log test and training data
+    if(labeledDataLogger.isDebugEnabled()) {
+      labeledDataLogger.info("Training data before:");
+      logLabeledData(trainLabeledData);
+
+      labeledDataLogger.info("Test data before:");
+      logLabeledData(testLabeledData);
+    }
+
     // Set up Train options
     CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
     trainOpts.optimizerOpts.maxIters = opts.iterations;
@@ -504,6 +612,12 @@ public class Parser {
                       collect(toList());
       testEvalFn = (model) -> {
         final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        logger.info("Test Label F-measures");
+        eval.stateFMeasures.forEach((label, fMeasure) -> {
+          logger.info(String.format("-- %s: p:%.3f r:%.3f f1:%.3f",
+              label, fMeasure.precision(), fMeasure.recall(), fMeasure.f1()));
+        });
+        logger.info("");
         return eval.tokenAccuracy.accuracy();
       };
     }
@@ -524,38 +638,93 @@ public class Parser {
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
 
     try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
-      logger.info("Writing model to {}", opts.modelFile);
-      saveModel(dos, crfModel.featureEncoder, weights, plf);
+    logger.info("Writing model to {}", opts.modelFile);
+    saveModel(dos, crfModel.featureEncoder, weights, plf);
+    }
+
+    // log test and training data
+    if(labeledDataLogger.isDebugEnabled()) {
+      labeledDataLogger.info("Training data after:");
+      logLabeledData(trainLabeledData);
+
+      labeledDataLogger.info("Test data after:");
+      logLabeledData(testLabeledData);
+    }
+
+  }
+
+  private static void logLabeledData(final List<List<Pair<PaperToken, String>>> data) {
+    for(List<Pair<PaperToken, String>> line : data) {
+      final String logLine = line.stream().map(pair ->
+              String.format(
+                      "%s/%x/%s",
+                      pair.getOne().getPdfToken() == null ?
+                              "null" :
+                              pair.getOne().getPdfToken().getToken(),
+                      pair.getOne().hashCode(),
+                      pair.getTwo())).collect(Collectors.joining(" "));
+      labeledDataLogger.info(logLine);
     }
   }
 
-  public static void saveModel(DataOutputStream dos,
-                               CRFFeatureEncoder<String, PaperToken, String> fe,
-                               Vector weights, ParserLMFeatures plf) throws IOException {
+  public static <T> void saveModel(
+          final DataOutputStream dos,
+          final CRFFeatureEncoder<String, T, String> fe,
+          final Vector weights,
+          final ParserLMFeatures plf
+  ) throws IOException {
     dos.writeUTF(DATA_VERSION);
     fe.stateSpace.save(dos);
     fe.nodeFeatures.save(dos);
     fe.edgeFeatures.save(dos);
     IOUtils.saveDoubles(dos, weights.toDoubles());
     ObjectOutputStream oos = new ObjectOutputStream(dos);
+    logger.debug("Saving ParserLMFeatures");
     oos.writeObject(plf);
+    if(plf!=null)
+      plf.logState();
   }
 
-  public static CRFModel<String, PaperToken, String> loadModel(
-    DataInputStream dis) throws Exception {
+  @Data
+  public static class ModelComponents {
+    public final PDFPredicateExtractor predExtractor;
+    public final CRFFeatureEncoder<String, PaperToken, String> featureEncoder;
+    public final CRFWeightsEncoder<String> weightsEncoder;
+    public final CRFModel<String, PaperToken, String> model;
+  }
+
+  public static ModelComponents loadModelComponents(
+          final DataInputStream dis
+  ) throws IOException {
     IOUtils.ensureVersionMatch(dis, DATA_VERSION);
     val stateSpace = StateSpace.load(dis);
     Indexer<String> nodeFeatures = Indexer.load(dis);
     Indexer<String> edgeFeatures = Indexer.load(dis);
     Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
     ObjectInputStream ois = new ObjectInputStream(dis);
-    ParserLMFeatures plf = (ParserLMFeatures) ois.readObject();
+
+    logger.debug("Loading ParserLMFeatures");
+    final ParserLMFeatures plf;
+    try {
+      plf = (ParserLMFeatures) ois.readObject();
+    } catch (final ClassNotFoundException e) {
+      throw new IOException("Model file contains unknown class.", e);
+    }
+    if(plf!=null)
+      plf.logState();
+
     val predExtractor = new PDFPredicateExtractor(plf);
     val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
-      (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
+            (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
     val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
+    val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
+    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
+  }
 
-    return new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
+  public static CRFModel<String, PaperToken, String> loadModel(
+    DataInputStream dis
+  ) throws IOException {
+    return loadModelComponents(dis).model;
   }
 
   public static void clean(ExtractedMetadata em) {
@@ -578,6 +747,8 @@ public class Parser {
 
   public static String processTitle(String t) {
     // case fold and remove lead/trail space
+    if(t==null || t.length()==0)
+      return t;
     t = t.trim().toLowerCase();
     t = cleanTitle(t);
     // kill non-letter chars
@@ -603,7 +774,7 @@ public class Parser {
   }
 
   public static List<String> lastNames(List<String> ss) {
-    return ss.stream().map(s -> lastName(s)).collect(Collectors.toList());
+    return (ss==null)?null:ss.stream().map(s -> lastName(s)).collect(Collectors.toList());
   }
 
   public static int scoreAuthors(String[] expected, List<String> guessed) {
@@ -623,6 +794,7 @@ public class Parser {
    * make changes here, there is a good chance you'll need to retrain, even if you think the change
    * is fairly trivial. */
   public static String fixupAuthors(String s) {
+    // delete trailing special characters
     String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
     if (sFix.contains(","))
       sFix = sFix.substring(0, sFix.indexOf(","));
@@ -651,12 +823,14 @@ public class Parser {
       (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
       (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")))) {
+      (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
+      (args.length == 4 && args[0].equalsIgnoreCase("learnBibCRF")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
       System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
       System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
       System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
-      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <ground truth file>");
+      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <bib model file>");
+      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir>");
     } else if (args[0].equalsIgnoreCase("bootstrap")) {
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -700,7 +874,7 @@ public class Parser {
       else
         gazetteerFile = Paths.get(args[4]);
 
-      Parser p = new Parser(modelFile, gazetteerFile);
+      Parser p = new Parser(modelFile, gazetteerFile, getDefaultBibModel());
       File input = new File(args[1]);
       File outDir = new File(args[3]);
       final List<File> inFiles;
@@ -726,7 +900,7 @@ public class Parser {
       }
 
     } else if (args[0].equalsIgnoreCase("parseAndScore")) {
-      Parser p = new Parser(args[2], args[4]);
+      Parser p = new Parser(args[2], args[4], getDefaultBibModel().toString());
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
       ParserGroundTruth pgt = new ParserGroundTruth(args[4]);
@@ -817,7 +991,7 @@ public class Parser {
       //TODO: write output
 
     } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
-      Parser p = new Parser(args[2], args[4]);
+      Parser p = new Parser(new File(args[2]), new File(Parser.getDefaultGazetteer().toString()), new File(args[4]));
       File inDir = new File(args[1]);
       File outDir = new File(args[3]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -871,6 +1045,17 @@ public class Parser {
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
       logger.info("blank abstracts: " + blankAbstracts);
     }
+    else if(args[0].equalsIgnoreCase("learnBibCRF")) {
+      ParseOpts opts = new ParseOpts();
+      opts.modelFile = args[2];
+      opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
+      opts.backgroundDirectory = args[3];
+      opts.iterations = 150;
+      opts.threads = 1;//Runtime.getRuntime().availableProcessors();
+      opts.backgroundSamples = 5;
+      opts.trainFraction = 0.9;
+      trainBibliographyCRF(new File(args[1]), opts);
+    }
   }
 
   static void logExceptionShort(final Throwable t, final String errorType, final String filename) {
@@ -916,7 +1101,6 @@ public class Parser {
 
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final ExtractedMetadata em;
-
     PDFExtractor ext = new PDFExtractor();
     PDFDoc doc = ext.extractFromInputStream(is);
     List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
@@ -935,16 +1119,15 @@ public class Parser {
     if(doc.meta != null) {
       if (doc.meta.title != null) {
         em.setTitle(doc.meta.title);
-        em.source = ExtractedMetadata.Source.META;
-      }
-      if (doc.meta.createDate != null)
-        em.setYearFromDate(doc.meta.createDate);
+      em.source = ExtractedMetadata.Source.META;
+    }
+    if (doc.meta.createDate != null)
+      em.setYearFromDate(doc.meta.createDate);
     }
 
     clean(em);
     em.raw = PDFDocToPartitionedText.getRaw(doc);
     em.creator = doc.meta.creator;
-      
     // extract references
     try {
       final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
@@ -963,6 +1146,7 @@ public class Parser {
       if(em.referenceMentions == null)
         em.referenceMentions = Collections.emptyList();
     }
+    logger.info(em.references.size() + " refs for " + em.title);
 
     try {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);

@@ -6,7 +6,7 @@ organization := "org.allenai"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
-javaOptions in Test += s"-Xmx8G"
+javaOptions in Test += s"-Xmx12G"
 
 javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
@@ -26,6 +26,12 @@ scmInfo := Some(ScmInfo(
 
 bintrayRepository := "private"
 
+fork := true
+
+connectInput in run := true
+
+outputStrategy := Some(StdoutOutput)
+
 enablePlugins(LibraryPlugin)
 
 resolvers ++= Seq(
@@ -42,7 +48,7 @@ libraryDependencies ++= Seq(
   "org.allenai.pdfbox" % "pdfbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
   "org.allenai.pdfbox" % "fontbox" % "2.0.0-AI2" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
-  "org.allenai" % "ml" % "0.13" excludeAll (
+  "org.allenai" % "ml" % "0.15" excludeAll (
     ExclusionRule(organization = "args4j"),
     ExclusionRule(organization = "org.slf4j", name="slf4j-simple")
   ),

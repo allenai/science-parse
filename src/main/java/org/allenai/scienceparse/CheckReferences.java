@@ -5,6 +5,7 @@ import org.allenai.scienceparse.ParserGroundTruth.Paper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +35,10 @@ public class CheckReferences {
   public long getHashCode(String title, List<String> authors, int year, String venue) {
     title = Parser.processTitle(title);
     authors = Parser.lastNames(authors);
-
+    if(title==null)
+      title = "";
+    if(authors==null)
+      authors = new ArrayList<String>();
     long hashCode = ((long) authors.hashCode()) * ((long) Integer.MAX_VALUE) + ((long) title.hashCode())
       + ((long) Integer.hashCode(year));
     return hashCode;

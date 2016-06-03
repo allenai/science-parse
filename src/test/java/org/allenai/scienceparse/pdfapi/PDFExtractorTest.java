@@ -142,6 +142,27 @@ public class
     pdfKeys.forEach(this::testPDF);
   }
 
+  @Test
+  public void testSuperscript() throws Exception {
+    String pdfPath = "/superscripttest.pdf";
+    InputStream pdfInputStream = getClass().getResourceAsStream(pdfPath);
+    PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(true).build();
+    PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(pdfInputStream);
+    
+    for(PDFPage p : doc.pages) {
+      for(PDFLine l : p.lines) {
+        for(PDFToken t : l.tokens) {
+          if(t.token.startsWith("SHEIKHAHMADI"))
+            Assert.assertEquals(t.token, "SHEIKHAHMADI,");
+          if(t.token.startsWith("(CN")) {
+            Assert.assertEquals(t.token, "(CN)");
+            break;
+          }
+        }
+      }
+    }
+  }
+  
   public void testPDFBenchmark() throws Exception {
     long numTitleBytes = 0L;
     for (int idx = 0; idx < 10; ++idx) {

@@ -62,7 +62,7 @@ public class PDFDocToPartitionedText {
     return (PDFToCRFInput.getY(l2, true) - PDFToCRFInput.getY(l1, false)) / Math.min(h1, h2);
   }
   
-  private static ArrayList<Double> getBreaks(PDFPage p) {
+  private static List<Double> getBreaks(PDFPage p) {
     PDFLine prevLine = null;
     ArrayList<Double> breaks = new ArrayList<>();
     for (PDFLine l : p.getLines()) {
@@ -76,7 +76,7 @@ public class PDFDocToPartitionedText {
     return breaks;
   }
   
-  private static ArrayList<Double> getBreaks(PDFDoc pdf) {
+  private static List<Double> getBreaks(PDFDoc pdf) {
     ArrayList<Double> breaks = new ArrayList<>();
     for (PDFPage p : pdf.getPages()) {
       breaks.addAll(getBreaks(p));
@@ -86,7 +86,7 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getReferenceLineBreak(PDFDoc pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf);
+    List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
       return 1.0;
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking references
@@ -94,7 +94,7 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getRawBlockLineBreak(PDFDoc pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf);
+    List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
       return 1.0;
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking papers
@@ -102,7 +102,7 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getFirstPagePartitionBreak(PDFPage pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf);
+    List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
       return 1.0;
     int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
@@ -209,8 +209,13 @@ public class PDFDocToPartitionedText {
    * intended to be one reference per list element, using spacing and indentation as cues
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
-    final List<String> refTags = Arrays.asList("References", "REFERENCES", "Citations", "CITATIONS", "Bibliography",
-      "BIBLIOGRAPHY");
+    final List<String> refTags = Arrays.asList(
+            "References",
+            "REFERENCES",
+            "Citations",
+            "CITATIONS",
+            "Bibliography",
+            "BIBLIOGRAPHY");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;

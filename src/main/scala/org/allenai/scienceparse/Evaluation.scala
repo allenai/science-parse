@@ -332,7 +332,8 @@ object Evaluation extends Datastores with Logging {
   def main(args: Array[String]): Unit = {
     case class Config(
       modelFile: Option[File] = None,
-      gazetteerFile: Option[File] = None
+      gazetteerFile: Option[File] = None,
+      bibModelFile: Option[File] = None
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -344,14 +345,19 @@ object Evaluation extends Datastores with Logging {
         c.copy(gazetteerFile = Some(g))
       } text "Specifies the gazetteer file. Defaults to the production one. Take care not to use a gazetteer that you also used to train the model."
 
+      opt[File]('b', "bibModel") action { (b, c) =>
+        c.copy(bibModelFile = Some(b))
+      } text "Specified the bibliography model file to evaluate. Defaults to the production model"
+
       help("help") text "Prints help text"
     }
 
     parser.parse(args, Config()).foreach { config =>
       val modelFile = config.modelFile.map(_.toPath).getOrElse(Parser.getDefaultProductionModel)
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
+      val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
 
-      val parser = new Parser(modelFile, gazetteerFile)
+      val parser = new Parser(modelFile, gazetteerFile, bibModelFile)
       val results = evaluate(parser)
       printResults(results)
     }
