@@ -1,18 +1,22 @@
 package org.allenai.scienceparse
 
-import java.io.{File, FileInputStream, FileOutputStream, StringWriter}
-
+import java.io.{File, FileInputStream, FileOutputStream}
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.allenai.common.Resource
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import org.allenai.common.{Logging, Resource}
 import scopt.OptionParser
 
-object RunSP {
-  private val objectMapper = new ObjectMapper()
+object RunSP extends Logging {
+  case class MetadataWrapper(filename: String, metadata: ExtractedMetadata)
+
+  val objectMapper = new ObjectMapper() with ScalaObjectMapper
+  objectMapper.registerModule(DefaultScalaModule)
 
   def printResults(f: File, outputDir: File, metadata: ExtractedMetadata): Unit = {
-    case class MetadataWrapper(filename: String, metadata: ExtractedMetadata)
     val wrapper = MetadataWrapper(f.getAbsolutePath, metadata)
-    Resource.using(new FileOutputStream(new File(outputDir, f.getName))) { os =>
+
+    Resource.using(new FileOutputStream(new File(outputDir, f.getName + ".json"))) { os =>
       objectMapper.writeValue(os, wrapper)
     }
   }
