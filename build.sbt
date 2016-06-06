@@ -1,5 +1,7 @@
 name := "science-parse"
 
+outputStrategy := Some(StdoutOutput)
+
 organization := "org.allenai"
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
@@ -52,8 +54,9 @@ libraryDependencies ++= Seq(
   ),
   "org.projectlombok" % "lombok" % "1.16.6",
   "com.goldmansachs" % "gs-collections" % "6.1.0",
-  "com.fasterxml.jackson.core" % "jackson-core" % "2.5.2",
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.5.2",
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.7.2",
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
