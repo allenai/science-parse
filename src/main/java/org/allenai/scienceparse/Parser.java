@@ -1144,7 +1144,7 @@ public class Parser {
       if(em.referenceMentions == null)
         em.referenceMentions = Collections.emptyList();
     }
-    logger.info(em.references.size() + " refs for " + em.title);
+    logger.debug(em.references.size() + " refs for " + em.title);
 
     try {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
