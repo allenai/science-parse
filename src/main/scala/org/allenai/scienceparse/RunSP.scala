@@ -1,10 +1,10 @@
 package org.allenai.scienceparse
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{ File, FileInputStream, FileOutputStream }
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.allenai.common.{Logging, Resource}
+import org.allenai.common.{ Logging, Resource }
 import scopt.OptionParser
 
 object RunSP extends Logging {
@@ -43,11 +43,11 @@ object RunSP extends Logging {
         c.copy(gazetteerFile = Some(g))
       } text "Specifies the gazetteer file. Defaults to the production one. Take care not to use a gazetteer that you also used to train the model."
 
-      opt[File]('o', "outputDirectory") required() action {
+      opt[File]('o', "outputDirectory") required () action {
         (o, c) => c.copy(outputDir = Some(o))
       } text "Output directory."
 
-      arg[File]("<pdf>...") unbounded() action {
+      arg[File]("<pdf>...") unbounded () action {
         (f, c) => c.copy(pdfInputs = c.pdfInputs :+ f)
       } text "PDFs you'd like to process"
 

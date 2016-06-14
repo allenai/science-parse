@@ -1,9 +1,9 @@
 package org.allenai.scienceparse
 
-import java.io.{File, FileInputStream}
+import java.io.{ File, FileInputStream }
 
 import com.gs.collections.impl.set.mutable.UnifiedSet
-import org.allenai.common.{Logging, Resource}
+import org.allenai.common.{ Logging, Resource }
 import org.allenai.datastore.Datastores
 import org.allenai.scienceparse.Parser.ParseOpts
 import scopt.OptionParser

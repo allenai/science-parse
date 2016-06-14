@@ -73,12 +73,13 @@ object Evaluation extends Datastores with Logging {
       Option(itemOrNull).map(f).getOrElse(null.asInstanceOf[Out])
 
     new BibRecord(
-        nullMap(bibRecord.title, normalize),
-        bibRecord.author.asScala.map(normalize).asJava,
-        nullMap(bibRecord.venue, normalize),
-        bibRecord.citeRegEx,
-        bibRecord.shortCiteRegEx,
-        bibRecord.year)
+      nullMap(bibRecord.title, normalize),
+      bibRecord.author.asScala.map(normalize).asJava,
+      nullMap(bibRecord.venue, normalize),
+      bibRecord.citeRegEx,
+      bibRecord.shortCiteRegEx,
+      bibRecord.year
+    )
   }
 
   private def normalizeBRstripVenues(bibRecord: BibRecord) = {
@@ -90,7 +91,8 @@ object Evaluation extends Datastores with Logging {
       null,
       normalized.citeRegEx,
       normalized.shortCiteRegEx,
-      normalized.year)
+      normalized.year
+    )
   }
 
   private def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
@@ -258,7 +260,7 @@ object Evaluation extends Datastores with Logging {
   private def bibYearsExtractor(metadata: ExtractedMetadata) =
     metadata.references.flatMapItems { r =>
       val year = r.year
-      if(year == 0) None else Some(year.toString)
+      if (year == 0) None else Some(year.toString)
     }
 
   private def bibMentionsExtractor(metadata: ExtractedMetadata) =

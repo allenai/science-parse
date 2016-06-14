@@ -1,6 +1,6 @@
 package org.allenai.scienceparse
 
-import java.io.{DataInputStream, File}
+import java.io.{ DataInputStream, File }
 import java.nio.file.Files
 import java.util
 
@@ -27,7 +27,7 @@ object PrintFeaturizedCRFInput extends App {
       c.copy(modelFile = Some(m))
     } text "A model to load LM feature values from"
 
-    arg[String]("<paperId>") required() action { (p, c) =>
+    arg[String]("<paperId>") required () action { (p, c) =>
       c.copy(paperId = p)
     } text "The ID of the paper whose CRF input you want to see"
   }
@@ -93,24 +93,25 @@ object PrintFeaturizedCRFInput extends App {
     val header = (tokenFeaturePrefix +: orderedNonBinaryFeatures).mkString("\t")
 
     // write entries
-    val body = featurized.zipWithIndex.map { case (features, index) =>
+    val body = featurized.zipWithIndex.map {
+      case (features, index) =>
         (
           // token feature
           Seq(
             features.filter(_._1.startsWith(tokenFeaturePrefix)).map { case (key, value) => s"$key=$value" }.mkString("/")
           ) ++
 
-          // non-binary features
-          orderedNonBinaryFeatures.map { f => features.get(f).map(d => f"$d%.3f").getOrElse("") } ++
+            // non-binary features
+            orderedNonBinaryFeatures.map { f => features.get(f).map(d => f"$d%.3f").getOrElse("") } ++
 
-          // binary features
-          (features.keySet & binaryFeatures).toSeq.sorted
+            // binary features
+            (features.keySet & binaryFeatures).toSeq.sorted
         ).mkString("\t")
-      }
+    }
 
     val result = header +: body
 
-    if(prefix.isEmpty) {
+    if (prefix.isEmpty) {
       result.asJava
     } else {
       result.zipWithIndex.map { case (line, i) => f"$prefix\t$i%04d\t$line" }.asJava

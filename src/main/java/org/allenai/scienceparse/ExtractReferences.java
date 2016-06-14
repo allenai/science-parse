@@ -357,7 +357,7 @@ public class ExtractReferences {
       results[i] = extractors.get(i).parse(text);
     }
     int idx = longestIdx(results);
-//    log.info("references: " + results[idx].toString());
+    //log.info("references: " + results[idx].toString());
     return Tuples.pair(results[idx], extractors.get(idx));
   }
 
