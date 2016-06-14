@@ -94,6 +94,13 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
   }
 
+  private static Parser defaultParser = null;
+  public synchronized static Parser getInstance() throws Exception {
+    if(defaultParser == null)
+      defaultParser = new Parser();
+    return defaultParser;
+  }
+
   public Parser() throws Exception {
     this(getDefaultProductionModel(), getDefaultGazetteer(), getDefaultBibModel());
   }
