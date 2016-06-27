@@ -1027,8 +1027,8 @@ public class Parser {
           totalRefs += br.size();
           totalCites += cr.size();
           mapper.writeValue(
-            new File(outDir, f.getName() + ".dat"),
-            Tuples.pair(em.references, em.referenceMentions));
+            new File(outDir, f.getName() + ".dat"), em);
+            //Tuples.pair(em.references, em.referenceMentions));
         } catch (Exception e) {
           logger.info("Parse error: " + f);
           e.printStackTrace();
