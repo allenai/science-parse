@@ -82,7 +82,7 @@ public class Parser {
           LoggerFactory.getLogger(Parser.class);
   private final static Logger labeledDataLogger =
           LoggerFactory.getLogger(logger.getName() + ".labeledData");
-
+  
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
     return datastore.filePath("org.allenai.scienceparse", "productionModel-ce5b11.dat", 1);
@@ -91,7 +91,7 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 2);
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
   }
 
   public Parser() throws Exception {
@@ -507,7 +507,7 @@ public class Parser {
 
     val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
     logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf);
+    saveModel(dos, crfModel.featureEncoder, weights, plf, ExtractReferences.DATA_VERSION);
     dos.close();
   }
 
@@ -668,21 +668,31 @@ public class Parser {
   }
 
   public static <T> void saveModel(
+      final DataOutputStream dos,
+      final CRFFeatureEncoder<String, T, String> fe,
+      final Vector weights,
+      final ParserLMFeatures plf,
+      final String dataVersion) throws IOException {
+        dos.writeUTF(dataVersion);
+        fe.stateSpace.save(dos);
+        fe.nodeFeatures.save(dos);
+        fe.edgeFeatures.save(dos);
+        IOUtils.saveDoubles(dos, weights.toDoubles());
+        ObjectOutputStream oos = new ObjectOutputStream(dos);
+        logger.debug("Saving ParserLMFeatures");
+        oos.writeObject(plf);
+        if(plf!=null)
+          plf.logState();        
+      }
+
+  
+  public static <T> void saveModel(
           final DataOutputStream dos,
           final CRFFeatureEncoder<String, T, String> fe,
           final Vector weights,
           final ParserLMFeatures plf
   ) throws IOException {
-    dos.writeUTF(DATA_VERSION);
-    fe.stateSpace.save(dos);
-    fe.nodeFeatures.save(dos);
-    fe.edgeFeatures.save(dos);
-    IOUtils.saveDoubles(dos, weights.toDoubles());
-    ObjectOutputStream oos = new ObjectOutputStream(dos);
-    logger.debug("Saving ParserLMFeatures");
-    oos.writeObject(plf);
-    if(plf!=null)
-      plf.logState();
+    saveModel(dos, fe, weights, plf, Parser.DATA_VERSION);
   }
 
   @Data

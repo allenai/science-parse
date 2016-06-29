@@ -56,7 +56,7 @@ public class ExtractReferences {
   
   CheckReferences cr;
   CRFModel<String, String, String> bibCRF = null;
-  
+  public static final String DATA_VERSION = "0.2";
   
   public ExtractReferences(String gazFile) throws IOException {
     this(new FileInputStream(gazFile));
@@ -97,7 +97,7 @@ public class ExtractReferences {
   public static CRFModel<String, String, String> loadModel(
       DataInputStream dis
   ) throws IOException {
-      IOUtils.ensureVersionMatch(dis, Parser.DATA_VERSION);
+      IOUtils.ensureVersionMatch(dis, ExtractReferences.DATA_VERSION);
       val stateSpace = StateSpace.load(dis);
       Indexer<String> nodeFeatures = Indexer.load(dis);
       Indexer<String> edgeFeatures = Indexer.load(dis);
@@ -324,7 +324,7 @@ public class ExtractReferences {
         maxLen = f;
       }
     }
-    log.info("chose " + idx + " with " + maxLen);
+    log.debug("chose " + idx + " with " + maxLen);
     return idx;
   }
 
@@ -357,7 +357,7 @@ public class ExtractReferences {
       results[i] = extractors.get(i).parse(text);
     }
     int idx = longestIdx(results);
-//    log.info("references: " + results[idx].toString());
+    //log.info("references: " + results[idx].toString());
     return Tuples.pair(results[idx], extractors.get(idx));
   }
 
