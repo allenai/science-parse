@@ -85,7 +85,7 @@ public class Parser {
   
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel-ce5b11.dat", 1);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 5);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
@@ -704,9 +704,12 @@ public class Parser {
   }
 
   public static ModelComponents loadModelComponents(
-          final DataInputStream dis
-  ) throws IOException {
-    IOUtils.ensureVersionMatch(dis, DATA_VERSION);
+  final DataInputStream dis, String dataVersion
+      ) throws IOException {
+//    String version = dis.readUTF();
+//    logger.info("got version: " + version);
+    IOUtils.ensureVersionMatch(dis, dataVersion);
+    logger.info("checked data version matches " + dataVersion);
     val stateSpace = StateSpace.load(dis);
     Indexer<String> nodeFeatures = Indexer.load(dis);
     Indexer<String> edgeFeatures = Indexer.load(dis);
@@ -728,7 +731,13 @@ public class Parser {
             (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
     val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
     val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
-    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
+    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);  
+}
+  
+  public static ModelComponents loadModelComponents(
+          final DataInputStream dis
+  ) throws IOException {
+    return loadModelComponents(dis, DATA_VERSION);
   }
 
   public static CRFModel<String, PaperToken, String> loadModel(
