@@ -3,7 +3,7 @@ package org.allenai.scienceparse;
 import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.allenai.pdfbox.io.IOUtils;
+import org.apache.pdfbox.io.IOUtils;
 import org.testng.annotations.Test;
 
 import java.io.*;

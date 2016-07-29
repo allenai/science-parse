@@ -5,8 +5,8 @@ import java.awt.event.{ ActionEvent, KeyEvent }
 import java.awt.image.BufferedImage
 import javax.swing._
 
-import org.allenai.pdfbox.pdmodel.PDDocument
-import org.allenai.pdfbox.rendering.PDFRenderer
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.PDFRenderer
 import org.allenai.scienceparse.figureextraction
 import org.allenai.scienceparse.figureextraction.SectionedTextBuilder.DocumentSection
 

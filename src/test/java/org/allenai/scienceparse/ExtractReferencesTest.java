@@ -5,7 +5,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.allenai.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;

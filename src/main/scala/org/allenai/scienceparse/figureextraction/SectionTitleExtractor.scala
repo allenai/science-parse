@@ -1,8 +1,8 @@
 package org.allenai.scienceparse.figureextraction
 
 import org.allenai.common.Logging
-import org.allenai.pdfbox.pdmodel.font.PDFont
-import org.allenai.pdfbox.text.TextPosition
+import org.apache.pdfbox.pdmodel.font.PDFont
+import org.apache.pdfbox.text.TextPosition
 
 object SectionTitleExtractor extends Logging {
 

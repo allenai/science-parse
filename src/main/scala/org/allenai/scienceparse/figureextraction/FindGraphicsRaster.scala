@@ -2,8 +2,8 @@ package org.allenai.scienceparse.figureextraction
 
 import java.awt.image.BufferedImage
 
-import org.allenai.pdfbox.pdmodel.PDDocument
-import org.allenai.pdfbox.rendering.{ ImageType, PDFRenderer }
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.{ ImageType, PDFRenderer }
 
 /** Finds the bounding boxes of graphical elements in a PDF by rasterizing the PDF and
   * finding the the bounding boxes of the connected components in the image

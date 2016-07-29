@@ -3,7 +3,7 @@ package org.allenai.scienceparse.figureextraction
 import java.io.File
 
 import org.allenai.common.Logging
-import org.allenai.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocument
 
 object FigureExtractorVisualizationCli extends Logging {
 

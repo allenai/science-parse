@@ -3,9 +3,9 @@ package org.allenai.scienceparse.figureextraction
 import java.io.Writer
 
 import org.allenai.common.Logging
-import org.allenai.pdfbox.cos.COSBase
-import org.allenai.pdfbox.pdmodel.{ PDDocument, PDPage }
-import org.allenai.pdfbox.text.{ PDFTextStripper, TextPosition }
+import org.apache.pdfbox.cos.COSBase
+import org.apache.pdfbox.pdmodel.{ PDDocument, PDPage }
+import org.apache.pdfbox.text.{ PDFTextStripper, TextPosition }
 
 import scala.collection.{ immutable, mutable }
 
