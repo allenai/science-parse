@@ -38,15 +38,16 @@ resolvers ++= Seq(
   "AllenAI ThirdParty" at "http://utility.allenai.org:8081/nexus/content/repositories/thirdparty",
   "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
   "AllenAi Bintray Private" at "http://dl.bintray.com/allenai/private",
-  Resolver.jcenterRepo
+  Resolver.jcenterRepo,
+  Resolver.mavenLocal
 )
 
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
-  "org.apache.pdfbox" % "pdfbox" % "2.0.2" exclude ("commons-logging", "commons-logging"),
-  "org.apache.pdfbox" % "fontbox" % "2.0.2" exclude ("commons-logging", "commons-logging"),
+  "org.apache.pdfbox" % "pdfbox" % "2.1.0-SNAPSHOT" exclude ("commons-logging", "commons-logging"),
+  "org.apache.pdfbox" % "fontbox" % "2.1.0-SNAPSHOT" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
   "org.allenai" % "ml" % "0.15" excludeAll (
     ExclusionRule(organization = "args4j"),
