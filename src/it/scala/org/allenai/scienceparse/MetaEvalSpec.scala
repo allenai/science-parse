@@ -11,7 +11,7 @@ class MetaEvalSpec extends UnitSpec {
     val minimumPR = Map(
       "abstract                 ".trim -> ((0.856, 0.856)),
       "abstractNormalized       ".trim -> ((0.856, 0.856)),
-      "authorFullName           ".trim -> ((0.830, 0.809)),
+      "authorFullName           ".trim -> ((0.828, 0.809)),
       "authorFullNameNormalized ".trim -> ((0.858, 0.834)),
       "authorLastName           ".trim -> ((0.871, 0.847)),
       "authorLastNameNormalized ".trim -> ((0.889, 0.862)),
@@ -21,7 +21,7 @@ class MetaEvalSpec extends UnitSpec {
       "bibAuthors               ".trim -> ((0.726, 0.637)),
       "bibAuthorsNormalized     ".trim -> ((0.840, 0.743)),
       "bibCounts                ".trim -> ((1.000, 0.826)),
-      "bibMentions              ".trim -> ((0.234, 0.218)),
+      "bibMentions              ".trim -> ((0.231, 0.218)),
       "bibMentionsNormalized    ".trim -> ((0.273, 0.245)),
       "bibTitles                ".trim -> ((0.795, 0.709)),
       "bibTitlesNormalized      ".trim -> ((0.796, 0.710)),
