@@ -91,8 +91,8 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
-    //return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
+    //return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
+    return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
   }
 
   public Parser() throws Exception {
@@ -1078,8 +1078,8 @@ public class Parser {
       opts.modelFile = args[2];
       opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
       opts.backgroundDirectory = args[3];
-      opts.iterations = 300;
-      opts.threads = 1;//Runtime.getRuntime().availableProcessors();
+      opts.iterations = 600;
+      opts.threads = Runtime.getRuntime().availableProcessors();
       opts.backgroundSamples = 5;
       opts.trainFraction = 0.9;
       if(args.length == 6)

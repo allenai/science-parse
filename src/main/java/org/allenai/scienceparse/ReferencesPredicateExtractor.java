@@ -1,7 +1,10 @@
 package org.allenai.scienceparse;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -9,18 +12,30 @@ import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import com.medallia.word2vec.Searcher;
+import com.medallia.word2vec.Word2VecModel;
+import org.allenai.datastore.Datastore;
 
 import lombok.val;
 
 public class ReferencesPredicateExtractor implements CRFPredicateExtractor<String, String> {
 
   private ParserLMFeatures lmFeats;
+  private final Searcher word2vecSearcher;
   
   public ReferencesPredicateExtractor() {
     this(null);
   }
   
   public ReferencesPredicateExtractor(ParserLMFeatures lmf) {
+    try {
+      final Path word2VecModelPath =
+              Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
+      final Word2VecModel word2VecModel = Word2VecModel.fromBinFile(word2VecModelPath.toFile());
+      word2vecSearcher = word2VecModel.forSearch();
+    } catch(final IOException e) {
+      throw new RuntimeException(e);
+    }
     lmFeats = lmf;
   }
   
@@ -193,6 +208,18 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%vlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueLastBow));
         m.put("%bfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.backgroundBow));
         m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.backgroundBow));
+        // add word embeddings
+        try {
+          final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
+          int j = 0;
+          while(vector.hasNext()) {
+            final double value = vector.next();
+            m.put(String.format("%%emb%03d", j), value);
+            j += 1;
+          }
+        } catch (final Searcher.UnknownWordException e) {
+          // do nothing
+        }
       }
       String locBinFeat = "%locbin" + locationBin(i, elems.size());
       m.put(locBinFeat, 1.0);
