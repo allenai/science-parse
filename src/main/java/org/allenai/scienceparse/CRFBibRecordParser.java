@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,53 +44,59 @@ public class CRFBibRecordParser implements BibRecordParser {
       model = inModel;
   }
   
-  public static List<Pair<String, String>> getLabeledLine(String s) {
-    final String [] sourceTags = new String [] {"author", "booktitle", "date", "editor", "institution",
-        "journal", "location", "note", "pages", "publisher", "tech", "title", "volume"}; //MUST BE SORTED
-    boolean [] inTag = new boolean [] {false, false, false, false, false, 
-        false, false, false,false, false,
-        false, false, false};
-    final String [] destTags = new String [] {ExtractedMetadata.authorTag, 
-        ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, "editor", "institution", 
-        ExtractedMetadata.venueTag, "location", "note", "pages", "publisher", ExtractedMetadata.venueTag,
-        ExtractedMetadata.titleTag, "volume"};
+  public static List<Pair<String, String>> getLabeledLineUMass(String s) {
+    final String [] sourceTags = new String [] {"address", "authors", "booktitle", "editor", "institution",
+        "journal", "pages", "publisher", "tech", "thesis", "title", "volume", "year"}; //MUST BE SORTED
+    final String [] destTags = new String [] {"address", ExtractedMetadata.authorTag, ExtractedMetadata.venueTag,
+        "editor", "institution", ExtractedMetadata.venueTag, "pages", "publisher", "tech", ExtractedMetadata.venueTag, 
+        ExtractedMetadata.titleTag, "volume", ExtractedMetadata.yearTag};
     
-    final Pattern yearPat= Pattern.compile("[1-2][0-9]{3}.*");
+    
+    //pull the ref marker
+    s.replaceAll("<ref-marker>.*</ref-marker>", "");
+    
+    return labelAccordingToTags(s, sourceTags, destTags);
+  }
+  
+  public static List<Pair<String, String>> labelAccordingToTags(String s, String [] sourceTags, String [] destTags) {
+    
     List<String> toks = tokenize(s);
     List<Pair<String, String>> out = new ArrayList<>();
     out.add(Tuples.pair("<S>", "<S>"));
     boolean atStart = false;
+    int curTagIndex = -1; //the current source tag that we're in, and labeling for
     for(int i=0; i<toks.size(); i++) {
       String sTok = toks.get(i);
       if(sTok.endsWith(">")) {
         String t = sTok.replaceAll("<", "").replaceAll("/", "").replaceAll(">", "");
         int idx = Arrays.binarySearch(sourceTags, t);
         if(idx >= 0) { //ignore unescaped XML chars in bib
-           inTag[idx] = (sTok.startsWith("</"))?false:true;
-           atStart = inTag[idx];
+          if(sTok.startsWith("</"))
+            curTagIndex = -1; //our tag closed
+          else {
+            curTagIndex = idx;
+            atStart = true;
+          }
         }
       }
       else { //write it out with proper tag
         String tag = "O";
-        for(int j=0; j<inTag.length; j++) {
-          if(inTag[j]) {
-            tag = destTags[j];
-            break;
-          }
-        }
-        if(i<toks.size()-1) { //note we can only be inside a tag if this condition holds
-          if(toks.get(i+1).startsWith("</")) { //our tag ends on next word(assuming no nesting)
-            if(atStart) { //single-word span
-              tag = "W_" + tag;
+        if(curTagIndex >= 0) {
+          tag = destTags[curTagIndex];
+          if(i<toks.size()-1 && curTagIndex >= 0) {
+            if(toks.get(i+1).equals("</" + sourceTags[curTagIndex] + ">")) { //our tag ends on next word
+              if(atStart) { //single-word span
+                tag = "W_" + tag;
+              }
+              else {
+                tag = "E_" + tag;
+              }
             }
-            else {
-              tag = "E_" + tag;
-            }
+            else if(atStart)
+              tag = "B_" + tag;
+            else
+              tag = "I_" + tag;
           }
-          else if(atStart)
-            tag = "B_" + tag;
-          else
-            tag = "I_" + tag;
         }
         out.add(Tuples.pair(sTok, tag));
         atStart = false;
@@ -100,12 +107,53 @@ public class CRFBibRecordParser implements BibRecordParser {
     return out;
   }
   
+  public static List<Pair<String, String>> getLabeledLineCora(String s) {
+    final String [] sourceTags = new String [] {"author", "booktitle", "date", "editor", "institution",
+        "journal", "location", "note", "pages", "publisher", "tech", "title", "volume"}; //MUST BE SORTED
+    final String [] destTags = new String [] {ExtractedMetadata.authorTag, 
+        ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, "editor", "institution", 
+        ExtractedMetadata.venueTag, "location", "note", "pages", "publisher", ExtractedMetadata.venueTag,
+        ExtractedMetadata.titleTag, "volume"};
+    
+    return labelAccordingToTags(s, sourceTags, destTags);
+  }
+  
+  public static List<Pair<String, String>> getLabeledLineKermit(String s) {
+    final String [] sourceTags = new String [] {"author", "booktitle", "date", "editor", 
+        "note", "pages", "publisher", "pubPlace", "title", "volume"}; //MUST BE SORTED
+    final String [] destTags = new String [] {ExtractedMetadata.authorTag, 
+        ExtractedMetadata.venueTag, ExtractedMetadata.yearTag, "editor", "note", "pages",  
+        "publisher", "location", ExtractedMetadata.titleTag, "volume"};
+    
+    s = s.replaceAll("<title level=\"j\"> ([^<]+) </title>", "<booktitle> $1 </booktitle>");
+    s = s.replaceAll("<title level=\"m\"> ([^<]+) </title>", "<booktitle> $1 </booktitle>");
+    s = s.replaceAll("<title level=\"a\"> ([^<]+) </title>", "<title> $1 </title>");
+    s = s.replaceAll("biblScope type=\"vol\" ([^<]+) </biblScope>", "<vol> $1 </vol>");
+    s = s.replaceAll("biblScope type=\"pp\" ([^<]+) </biblScope>", "<pages> $1 </pages>");
+    s = s.replaceAll("biblScope type=\"issue\" ([^<]+) </biblScope>", "<issue> $1 </issue>");
+    
+    return labelAccordingToTags(s, sourceTags, destTags);
+  }
+  
   public static List<List<Pair<String, String>>> labelFromCoraFile(File trainFile) throws IOException {
+    return labelFromFile(trainFile, s->getLabeledLineCora(s));
+  }
+  
+  public static List<List<Pair<String, String>>> labelFromUMassFile(File trainFile) throws IOException {
+    return labelFromFile(trainFile, s-> getLabeledLineUMass(s));
+  }
+  
+  public static List<List<Pair<String, String>>> labelFromKermitFile(File trainFile) throws IOException {
+    return labelFromFile(trainFile, s-> getLabeledLineKermit(s));
+  }
+  
+  
+  public static List<List<Pair<String, String>>> labelFromFile(File trainFile, Function<String, List<Pair<String, String>>> gll) throws IOException {
     List<List<Pair<String, String>>> out = new ArrayList<>();
     BufferedReader brIn = new BufferedReader(new InputStreamReader(new FileInputStream(trainFile), "UTF-8"));
     String sLine;
     while((sLine = brIn.readLine())!=null) {
-      List<Pair<String,String>> labeledLine = getLabeledLine(sLine);
+      List<Pair<String,String>> labeledLine = gll.apply(sLine);
       out.add(labeledLine);
     }
     brIn.close();

@@ -92,6 +92,7 @@ public class Parser {
   }
   public static Path getDefaultBibModel() {
     return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
+    //return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
   }
 
   public Parser() throws Exception {
@@ -445,8 +446,16 @@ public class Parser {
   }
 
   public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) throws IOException {
+    trainBibliographyCRF(coraTrainFile, null, null, opts);
+  }
+  
+  public static void trainBibliographyCRF(File coraTrainFile, File umassTrainFile, File kermitTrainFile, ParseOpts opts) throws IOException {
     List<List<Pair<String, String>>> labeledData;
     labeledData = CRFBibRecordParser.labelFromCoraFile(coraTrainFile);
+    if(umassTrainFile != null)
+      labeledData.addAll(CRFBibRecordParser.labelFromUMassFile(umassTrainFile));
+    if(kermitTrainFile != null)
+      labeledData.addAll(CRFBibRecordParser.labelFromKermitFile(kermitTrainFile));
     ReferencesPredicateExtractor predExtractor;
     ParserLMFeatures plf = null;
     if(opts.gazetteerFile != null) {
@@ -682,7 +691,7 @@ public class Parser {
         logger.debug("Saving ParserLMFeatures");
         oos.writeObject(plf);
         if(plf!=null)
-          plf.logState();        
+          plf.logState();
       }
 
   
@@ -843,13 +852,13 @@ public class Parser {
       (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
-      (args.length == 4 && args[0].equalsIgnoreCase("learnBibCRF")))) {
+      ((args.length == 4 || args.length == 6) && args[0].equalsIgnoreCase("learnBibCRF")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
       System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
       System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
       System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
       System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <bib model file>");
-      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir>");
+      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir> [<umass file> <kermit file>]");
     } else if (args[0].equalsIgnoreCase("bootstrap")) {
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -1069,11 +1078,14 @@ public class Parser {
       opts.modelFile = args[2];
       opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
       opts.backgroundDirectory = args[3];
-      opts.iterations = 150;
+      opts.iterations = 300;
       opts.threads = 1;//Runtime.getRuntime().availableProcessors();
       opts.backgroundSamples = 5;
       opts.trainFraction = 0.9;
-      trainBibliographyCRF(new File(args[1]), opts);
+      if(args.length == 6)
+        trainBibliographyCRF(new File(args[1]), new File(args[4]), new File(args[5]), opts);
+      else
+        trainBibliographyCRF(new File(args[1]), opts);
     }
   }
 
