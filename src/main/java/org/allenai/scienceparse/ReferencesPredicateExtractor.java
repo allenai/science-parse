@@ -210,7 +210,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.backgroundBow));
         // add word embeddings
         try {
-          final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
+          final Iterator<Double> vector = word2vecSearcher.getRawVector(tok).iterator();
           int j = 0;
           while(vector.hasNext()) {
             final double value = vector.next();

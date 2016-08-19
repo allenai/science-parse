@@ -257,7 +257,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 
         // add word embeddings
         try {
-          final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
+          final Iterator<Double> vector = word2vecSearcher.getRawVector(tok).iterator();
           int j = 0;
           while(vector.hasNext()) {
             final double value = vector.next();
