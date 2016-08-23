@@ -5,7 +5,7 @@ import java.io.InputStream
 import com.typesafe.config.ConfigFactory
 import org.allenai.common.Config._
 import org.allenai.common.Logging
-import org.allenai.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.allenai.scienceparse.figureextraction.FigureExtractor.{ DocumentWithRasterizedFigures, Document, DocumentContent }
 import org.allenai.scienceparse.figureextraction.SectionedTextBuilder.{ DocumentSection, PdfText }
 

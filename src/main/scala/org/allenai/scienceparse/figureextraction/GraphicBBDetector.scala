@@ -3,14 +3,14 @@ package org.allenai.scienceparse.figureextraction
 import java.awt.Rectangle
 import java.awt.geom._
 
-import org.allenai.pdfbox.contentstream.PDFGraphicsStreamEngine
-import org.allenai.pdfbox.contentstream.operator.{ Operator, OperatorProcessor }
-import org.allenai.pdfbox.cos.{ COSBase, COSName }
-import org.allenai.pdfbox.pdmodel.PDPage
-import org.allenai.pdfbox.pdmodel.graphics.color.PDColor
-import org.allenai.pdfbox.pdmodel.graphics.image.PDImage
-import org.allenai.pdfbox.pdmodel.graphics.state.PDSoftMask
-import org.allenai.pdfbox.util.Matrix
+import org.apache.pdfbox.contentstream.PDFGraphicsStreamEngine
+import org.apache.pdfbox.contentstream.operator.{ Operator, OperatorProcessor }
+import org.apache.pdfbox.cos.{ COSBase, COSName }
+import org.apache.pdfbox.pdmodel.PDPage
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor
+import org.apache.pdfbox.pdmodel.graphics.image.PDImage
+import org.apache.pdfbox.pdmodel.graphics.state.PDSoftMask
+import org.apache.pdfbox.util.Matrix
 
 /** Based on PageDrawer.java, this attempts to infer the bounding boxes of all graphical elements
   * on a PDPage by parsing the PDF operators

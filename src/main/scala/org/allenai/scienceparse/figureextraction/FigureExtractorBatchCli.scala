@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import ch.qos.logback.classic.{ Level, Logger }
 import org.allenai.common.Logging
-import org.allenai.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.allenai.scienceparse.figureextraction.FigureExtractor.DocumentWithSavedFigures
 import org.allenai.scienceparse.figureextraction.JsonProtocol._
 import org.slf4j.LoggerFactory

@@ -3,7 +3,7 @@ package org.allenai.scienceparse.figureextraction
 import java.text.Normalizer
 
 import org.allenai.common.StringUtils._
-import org.allenai.pdfbox.text.TextPosition
+import org.apache.pdfbox.text.TextPosition
 
 /** Span of text denoted by the starting and ending line number, inclusive */
 case class TextSpan(start: Int, end: Int) extends Ordered[TextSpan] {

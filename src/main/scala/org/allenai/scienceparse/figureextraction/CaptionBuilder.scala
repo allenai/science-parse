@@ -1,7 +1,7 @@
 package org.allenai.scienceparse.figureextraction
 
 import org.allenai.common.Logging
-import org.allenai.pdfbox.pdmodel.font.PDFont
+import org.apache.pdfbox.pdmodel.font.PDFont
 
 object CaptionBuilder extends Logging {
 

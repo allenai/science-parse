@@ -1,9 +1,9 @@
 package org.allenai.scienceparse.figureextraction
 
-import org.allenai.pdfbox.contentstream.operator.Operator
-import org.allenai.pdfbox.cos.COSBase
-import org.allenai.pdfbox.pdmodel.PDDocument
-import org.allenai.pdfbox.rendering.{ PDFRenderer, PageDrawer, PageDrawerParameters }
+import org.apache.pdfbox.contentstream.operator.Operator
+import org.apache.pdfbox.cos.COSBase
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.{ PDFRenderer, PageDrawer, PageDrawerParameters }
 
 class InterruptiblePDFRenderer(doc: PDDocument) extends PDFRenderer(doc) {
 

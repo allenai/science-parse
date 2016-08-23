@@ -1,6 +1,6 @@
 package org.allenai.scienceparse.figureextraction
 
-import org.allenai.pdfbox.pdmodel.common.PDRectangle
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 
 object Box {
 

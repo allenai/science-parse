@@ -82,7 +82,7 @@ public class Parser {
           LoggerFactory.getLogger(Parser.class);
   private final static Logger labeledDataLogger =
           LoggerFactory.getLogger(logger.getName() + ".labeledData");
-  
+
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
     return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 5);
@@ -93,6 +93,13 @@ public class Parser {
   public static Path getDefaultBibModel() {
     return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
     //return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
+  }
+
+  private static Parser defaultParser = null;
+  public synchronized static Parser getInstance() throws Exception {
+    if(defaultParser == null)
+      defaultParser = new Parser();
+    return defaultParser;
   }
 
   public Parser() throws Exception {
@@ -202,7 +209,7 @@ public class Parser {
 
   public static List<Pair<PaperToken, String>> getPaperLabels(
           final InputStream is,
-          Paper p,
+          final Paper p,
           PDFExtractor ext,
           boolean heuristicHeader,
           int headerMax,
@@ -233,10 +240,8 @@ public class Parser {
               doc.getMeta().getTitle(),
               doc.getMeta().getAuthors(),
         doc.getMeta().getCreateDate());
-      if (em.title == null) {
-        logger.info("{}: skipping", paperId);
+      if (em.title == null)
         return null;
-      }
     } else {
       em = new ExtractedMetadata(p);
     }
@@ -677,22 +682,22 @@ public class Parser {
   }
 
   public static <T> void saveModel(
-      final DataOutputStream dos,
-      final CRFFeatureEncoder<String, T, String> fe,
-      final Vector weights,
+          final DataOutputStream dos,
+          final CRFFeatureEncoder<String, T, String> fe,
+          final Vector weights,
       final ParserLMFeatures plf,
       final String dataVersion) throws IOException {
         dos.writeUTF(dataVersion);
-        fe.stateSpace.save(dos);
-        fe.nodeFeatures.save(dos);
-        fe.edgeFeatures.save(dos);
-        IOUtils.saveDoubles(dos, weights.toDoubles());
-        ObjectOutputStream oos = new ObjectOutputStream(dos);
-        logger.debug("Saving ParserLMFeatures");
-        oos.writeObject(plf);
-        if(plf!=null)
-          plf.logState();
-      }
+    fe.stateSpace.save(dos);
+    fe.nodeFeatures.save(dos);
+    fe.edgeFeatures.save(dos);
+    IOUtils.saveDoubles(dos, weights.toDoubles());
+    ObjectOutputStream oos = new ObjectOutputStream(dos);
+    logger.debug("Saving ParserLMFeatures");
+    oos.writeObject(plf);
+    if(plf!=null)
+      plf.logState();
+  }
 
   
   public static <T> void saveModel(
@@ -713,10 +718,9 @@ public class Parser {
   }
 
   public static ModelComponents loadModelComponents(
-  final DataInputStream dis, String dataVersion
-      ) throws IOException {
-//    String version = dis.readUTF();
-//    logger.info("got version: " + version);
+    final DataInputStream dis,
+    String dataVersion
+  ) throws IOException {
     IOUtils.ensureVersionMatch(dis, dataVersion);
     logger.info("checked data version matches " + dataVersion);
     val stateSpace = StateSpace.load(dis);
@@ -740,9 +744,9 @@ public class Parser {
             (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
     val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
     val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
-    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);  
-}
-  
+    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
+  }
+
   public static ModelComponents loadModelComponents(
           final DataInputStream dis
   ) throws IOException {
@@ -1085,7 +1089,7 @@ public class Parser {
       if(args.length == 6)
         trainBibliographyCRF(new File(args[1]), new File(args[4]), new File(args[5]), opts);
       else
-        trainBibliographyCRF(new File(args[1]), opts);
+      trainBibliographyCRF(new File(args[1]), opts);
     }
   }
 
@@ -1177,7 +1181,7 @@ public class Parser {
       if(em.referenceMentions == null)
         em.referenceMentions = Collections.emptyList();
     }
-    logger.info(em.references.size() + " refs for " + em.title);
+    logger.debug(em.references.size() + " refs for " + em.title);
 
     try {
       em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);

@@ -1,8 +1,8 @@
 package org.allenai.scienceparse.figureextraction
 
-import org.allenai.pdfbox.pdmodel.font.PDType1Font
-import org.allenai.pdfbox.text.TextPosition
-import org.allenai.pdfbox.util.Matrix
+import org.apache.pdfbox.pdmodel.font.PDType1Font
+import org.apache.pdfbox.text.TextPosition
+import org.apache.pdfbox.util.Matrix
 
 /** Build mock Paragraph/Line objects, text positions have Fonts but otherwise don't contain
   * real data, words always have the same bounding box as their line and a single text position.

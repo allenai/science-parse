@@ -1,7 +1,7 @@
 package org.allenai.scienceparse.figureextraction
 
 import org.allenai.common.Logging
-import org.allenai.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.allenai.scienceparse.figureextraction.FigureExtractor.OcredPdfException
 
 object GraphicsExtractor extends Logging {

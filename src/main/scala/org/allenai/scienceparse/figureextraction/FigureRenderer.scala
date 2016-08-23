@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage
 import java.io._
 import javax.imageio.ImageIO
 
-import org.allenai.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDDocument
 import spray.json._
 
 /** Methods rendering figures as images and saving those images to disk */
