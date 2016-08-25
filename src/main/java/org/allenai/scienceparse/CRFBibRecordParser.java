@@ -50,16 +50,18 @@ public class CRFBibRecordParser implements BibRecordParser {
     final String [] destTags = new String [] {"address", ExtractedMetadata.authorTag, ExtractedMetadata.venueTag,
         "editor", "institution", ExtractedMetadata.venueTag, "pages", "publisher", "tech", ExtractedMetadata.venueTag, 
         ExtractedMetadata.titleTag, "volume", ExtractedMetadata.yearTag};
-    
-    
+
     //pull the ref marker
     s.replaceAll("<ref-marker>.*</ref-marker>", "");
     
     return labelAccordingToTags(s, sourceTags, destTags);
   }
   
-  public static List<Pair<String, String>> labelAccordingToTags(String s, String [] sourceTags, String [] destTags) {
-    
+  public static List<Pair<String, String>> labelAccordingToTags(
+          String s,
+          String[] sourceTags,
+          String[] destTags
+  ) {
     List<String> toks = tokenize(s);
     List<Pair<String, String>> out = new ArrayList<>();
     out.add(Tuples.pair("<S>", "<S>"));
@@ -78,24 +80,22 @@ public class CRFBibRecordParser implements BibRecordParser {
             atStart = true;
           }
         }
-      }
-      else { //write it out with proper tag
+      } else { //write it out with proper tag
         String tag = "O";
         if(curTagIndex >= 0) {
           tag = destTags[curTagIndex];
-          if(i<toks.size()-1 && curTagIndex >= 0) {
+          if(i<toks.size()-1) {
             if(toks.get(i+1).equals("</" + sourceTags[curTagIndex] + ">")) { //our tag ends on next word
               if(atStart) { //single-word span
                 tag = "W_" + tag;
-              }
-              else {
+              } else {
                 tag = "E_" + tag;
               }
-            }
-            else if(atStart)
+            } else if(atStart) {
               tag = "B_" + tag;
-            else
+            } else {
               tag = "I_" + tag;
+            }
           }
         }
         out.add(Tuples.pair(sTok, tag));
