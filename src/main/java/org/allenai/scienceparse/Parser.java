@@ -450,8 +450,14 @@ public class Parser {
     return out;
   }
 
-  public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) throws IOException {
-    trainBibliographyCRF(coraTrainFile, null, null, opts);
+  public static void trainBibliographyCRF(
+          final File bibsGroundTruthDirectory,
+          final ParseOpts opts
+  ) throws IOException {
+    final File coraTrainFile = new File(bibsGroundTruthDirectory, "cora-citations.txt");
+    final File umassTrainFile = new File(bibsGroundTruthDirectory, "umass-citations.txt");
+    final File kermitTrainFile = new File(bibsGroundTruthDirectory, "kermit-citations.txt");
+    trainBibliographyCRF(coraTrainFile, umassTrainFile, kermitTrainFile, opts);
   }
   
   public static void trainBibliographyCRF(File coraTrainFile, File umassTrainFile, File kermitTrainFile, ParseOpts opts) throws IOException {
