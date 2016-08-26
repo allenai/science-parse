@@ -67,6 +67,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -1104,6 +1105,8 @@ public class Parser {
             end - sentenceStart);
   }
 
+  private static final Pattern multipleSpaces = Pattern.compile("\\s+");
+  private static final Pattern hyphenated = Pattern.compile("([a-z])- ([a-z][a-z])");
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final ExtractedMetadata em;
     PDFExtractor ext = new PDFExtractor();
@@ -1131,13 +1134,25 @@ public class Parser {
     }
 
     clean(em);
-    em.raw = PDFDocToPartitionedText.getRaw(doc);
+    final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
+
+    // build body text
+    final StringBuilder bodyBuilder = new StringBuilder();
+    for(final String line : lines) {
+      bodyBuilder.append(line.replace("<lb>", " "));
+      bodyBuilder.append(' ');
+    }
+    em.body = bodyBuilder.toString();
+    em.body = multipleSpaces.matcher(em.body).replaceAll(" ");
+    em.body = hyphenated.matcher(em.body).replaceAll("$1$2");
+    em.body = em.body.trim();
+
     em.creator = doc.meta.creator;
     // extract references
     try {
       final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
       final Pair<List<BibRecord>, List<CitationRecord>> pair =
-              getReferences(em.raw, rawReferences, referenceExtractor);
+              getReferences(lines, rawReferences, referenceExtractor);
       em.references = pair.getOne();
       List<CitationRecord> crs = new ArrayList<>();
       for (CitationRecord cr : pair.getTwo()) {
@@ -1154,7 +1169,7 @@ public class Parser {
     logger.debug(em.references.size() + " refs for " + em.title);
 
     try {
-      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
+      em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc);
       if(em.abstractText.isEmpty())
         em.abstractText = null;
     } catch(final RegexWithTimeout.RegexTimeout e) {
