@@ -40,8 +40,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     try {
       final Path word2VecModelPath =
               Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
-      final Word2VecModel word2VecModel = Word2VecModel.fromBinFile(word2VecModelPath.toFile());
-      word2vecSearcher = word2VecModel.forSearch();
+      word2vecSearcher = WordVectorCache.searcherForPath(word2VecModelPath);
     } catch(final IOException e) {
       throw new RuntimeException(e);
     }
