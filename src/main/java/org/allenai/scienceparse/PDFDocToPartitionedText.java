@@ -72,7 +72,7 @@ public class PDFDocToPartitionedText {
       }
       prevLine = l;
     }
-    breaks.sort((d1, d2) -> Double.compare(d1, d2));
+    breaks.sort(Double::compare);
     return breaks;
   }
   
@@ -125,7 +125,7 @@ public class PDFDocToPartitionedText {
   public static String getFirstTextBlock(PDFDoc pdf) {
     PDFPage fp = pdf.pages.get(0);
     double fpp = getFirstPagePartitionBreak(fp);
-    StringBuffer out = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     PDFLine prevLine = null;
     boolean first = true;
     for(PDFLine l : fp.lines) {
@@ -138,11 +138,13 @@ public class PDFDocToPartitionedText {
           return out.toString().trim();
         } else {
           out.delete(0, out.length());
-          out.append(" " + cleanLine(lineToString(l)));
+          out.append(' ');
+          out.append(cleanLine(lineToString(l)));
         }
       }
       else {
-        out.append(" " + cleanLine(lineToString(l)));
+        out.append(' ');
+        out.append(cleanLine(lineToString(l)));
       }
       prevLine = l;
     }
