@@ -403,6 +403,7 @@ object Evaluation extends Datastores with Logging {
 
       val result = goldDocIds.par.map { docid =>
         val pdf = pdfDirectory.resolve(s"$docid.pdf")
+        logger.debug(s"Processing $pdf")
         val result = Resource.using(Files.newInputStream(pdf)) { is =>
           docid -> Try(parser.doParse(is))
         }
