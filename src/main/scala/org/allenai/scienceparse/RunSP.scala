@@ -74,7 +74,7 @@ object RunSP extends Logging {
           def listFiles(startFile: File): Seq[File] =
             startFile.listFiles.flatMap {
               case dir if dir.isDirectory => listFiles(dir)
-              case file if file.isFile => Seq(file)
+              case file if file.isFile && file.getName.endsWith(".pdf") => Seq(file)
               case _ => Seq.empty
             }
           listFiles(f)
