@@ -6,6 +6,10 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.allenai.common.{ Logging, Resource }
 import scopt.OptionParser
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import language.postfixOps
 
 object RunSP extends Logging {
   case class MetadataWrapper(filename: String, metadata: ExtractedMetadata)
@@ -59,11 +63,33 @@ object RunSP extends Logging {
       val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
 
-      val parser = new Parser(modelFile, gazetteerFile, bibModelFile)
-      config.pdfInputs.foreach { f =>
-        Resource.using(new FileInputStream(f)) { is =>
+      val parserFuture = Future {
+        new Parser(modelFile, gazetteerFile, bibModelFile)
+      }
+
+      val files = config.pdfInputs.par.flatMap { f =>
+        if(f.isFile) {
+          Seq(f)
+        } else if (f.isDirectory) {
+          def listFiles(startFile: File): Seq[File] =
+            startFile.listFiles.flatMap {
+              case dir if dir.isDirectory => listFiles(dir)
+              case file if file.isFile => Seq(file)
+              case _ => Seq.empty
+            }
+          listFiles(f)
+        } else {
+          logger.warn(s"Input $f is neither file nor directory. I'm ignoring it.")
+          Seq.empty
+        }
+      }
+
+      val parser = Await.result(parserFuture, 15 minutes)
+
+      files.foreach { file =>
+        Resource.using(new FileInputStream(file)) { is =>
           val metadata = parser.doParse(is)
-          printResults(f, config.outputDir.get, metadata)
+          printResults(file, config.outputDir.get, metadata)
         }
       }
     }
