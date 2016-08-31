@@ -188,10 +188,11 @@ object FigureDetector extends Logging {
     override def hasNext: Boolean = currentIndex < elementCount
 
     override def next(): Seq[T] = {
-      if(!hasNext) throw new NoSuchElementException
+      if (!hasNext) throw new NoSuchElementException
 
-      val result = xss.foldLeft((Seq.empty[T], currentIndex)) { case ((resultSoFar, index), xs) =>
-        (resultSoFar :+ xs(index % xs.size), index / xs.size)
+      val result = xss.foldLeft((Seq.empty[T], currentIndex)) {
+        case ((resultSoFar, index), xs) =>
+          (resultSoFar :+ xs(index % xs.size), index / xs.size)
       }
 
       currentIndex += 1
@@ -520,10 +521,10 @@ object FigureDetector extends Logging {
         page.classifiedText, List(), captionsWithNoProposals.map(Caption.apply)
       )
     } else {
-      val maxConfigurationsConsidered = 500001  // This is a crude cut-off, but this almost never happens.
+      val maxConfigurationsConsidered = 500001 // This is a crude cut-off, but this almost never happens.
       val bestConfiguration = cartesianProduct(validProposals).take(maxConfigurationsConsidered).zipWithIndex.map {
         case (proposalsToUse, index) =>
-          if(index >= maxConfigurationsConsidered - 1)
+          if (index >= maxConfigurationsConsidered - 1)
             logger.warn(s"More than $index possible configurations for figures on page ${page.pageNumber}. Result may not be optimal.")
 
           var props = splitProposals(proposalsToUse, allContent).toList
