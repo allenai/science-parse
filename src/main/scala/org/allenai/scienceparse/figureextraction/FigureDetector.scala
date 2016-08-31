@@ -1,6 +1,8 @@
 package org.allenai.scienceparse.figureextraction
 
-object FigureDetector {
+import org.allenai.common.Logging
+
+object FigureDetector extends Logging {
 
   private val MinProposalHeight = 15
   private val MinProposalWidth = 20
@@ -518,8 +520,12 @@ object FigureDetector {
         page.classifiedText, List(), captionsWithNoProposals.map(Caption.apply)
       )
     } else {
-      val bestConfiguration = cartesianProduct(validProposals).zipWithIndex.map {
+      val maxConfigurationsConsidered = 500001  // This is a crude cut-off, but this almost never happens.
+      val bestConfiguration = cartesianProduct(validProposals).take(maxConfigurationsConsidered).zipWithIndex.map {
         case (proposalsToUse, index) =>
+          if(index >= maxConfigurationsConsidered - 1)
+            logger.warn(s"More than $index possible configurations for figures on page ${page.pageNumber}. Result may not be optimal.")
+
           var props = splitProposals(proposalsToUse, allContent).toList
           var scored = List[Proposal]()
           var scores = List[Option[Double]]()
