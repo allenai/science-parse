@@ -87,10 +87,18 @@ object RunSP extends Logging {
       val parser = Await.result(parserFuture, 15 minutes)
 
       files.foreach { file =>
+        logger.info(s"Processing $file")
+        val start = System.currentTimeMillis()
         Resource.using(new FileInputStream(file)) { is =>
           val metadata = parser.doParse(is)
           printResults(file, config.outputDir.get, metadata)
         }
+        val end = System.currentTimeMillis()
+        val elapsed = (end - start) / 1000
+        if(elapsed > 0)
+          logger.info(s"Finished processing $file in $elapsed seconds")
+        else
+          logger.info(s"Finished processing $file")
       }
     }
   }
