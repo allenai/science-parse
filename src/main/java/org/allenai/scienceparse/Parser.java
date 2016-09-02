@@ -90,6 +90,9 @@ public class Parser {
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
+  public static Path getDefaultGazetteerDir() {
+    return FileSystems.getDefault().getPath("e:\\data\\science-parse\\kermit-gazetteers\\");
+  }
   public static Path getDefaultBibModel() {
     return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
     //return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
@@ -468,6 +471,15 @@ public class Parser {
     if(kermitTrainFile != null)
       labeledData.addAll(CRFBibRecordParser.labelFromKermitFile(kermitTrainFile));
     ReferencesPredicateExtractor predExtractor;
+    
+    GazetteerFeatures gf = null;
+    try {
+    if(opts.gazetteerDir != null)
+      gf = new GazetteerFeatures(opts.gazetteerDir);
+    }
+    catch (IOException e) {
+      logger.error("Error importing gazetteer directory, ignoring.");
+    }
     ParserLMFeatures plf = null;
     if(opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
@@ -480,6 +492,7 @@ public class Parser {
     } else {
       predExtractor = new ReferencesPredicateExtractor();
     }
+    predExtractor.setGf(gf);
     
     // Split train/test data
     logger.info("CRF training for bibs with {} threads and {} labeled examples", opts.threads, labeledData.size());
@@ -1087,6 +1100,7 @@ public class Parser {
       ParseOpts opts = new ParseOpts();
       opts.modelFile = args[2];
       opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
+      opts.gazetteerDir = Parser.getDefaultGazetteerDir().toString();
       opts.backgroundDirectory = args[3];
       opts.iterations = 600;
       opts.threads = Runtime.getRuntime().availableProcessors();
@@ -1207,7 +1221,8 @@ public class Parser {
     public int threads;
     public int headerMax;
     public double trainFraction;
-    public String gazetteerFile;
+    public String gazetteerFile; //record of references
+    public String gazetteerDir; //directory of entity lists (universities, person names, etc.)
     public int backgroundSamples;
     public String backgroundDirectory;
     public int minYear; //only process papers this year or later
