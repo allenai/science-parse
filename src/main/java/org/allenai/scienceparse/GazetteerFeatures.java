@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class GazetteerFeatures {
+public class GazetteerFeatures implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private LongHashSet [] hashSets; //each element represents a gazetteer, the long hashcodes of contained strings

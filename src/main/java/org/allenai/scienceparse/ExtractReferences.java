@@ -73,16 +73,16 @@ public class ExtractReferences {
   public ExtractReferences(final InputStream is, final DataInputStream bibCRFModel) throws IOException {
     cr = new CheckReferences(is);
     extractors = new ArrayList<>();
-    extractors.addAll(Arrays.asList(
-      new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
-      new NamedYear(NamedYearBibRecordParser.class),
-      new NamedYear(NamedYearInParensBibRecordParser.class),
-      new NumberDot(NumberDotYearParensBibRecordParser.class),
-      new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
-      new NumberDot(NumberDotYearNoParensBibRecordParser.class),
-      new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
-      new BracketNumber(BracketNumberBibRecordParser.class),
-      new BracketName(BracketNameBibRecordParser.class)));
+//    extractors.addAll(Arrays.asList(
+//      new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
+//      new NamedYear(NamedYearBibRecordParser.class),
+//      new NamedYear(NamedYearInParensBibRecordParser.class),
+//      new NumberDot(NumberDotYearParensBibRecordParser.class),
+//      new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
+//      new NumberDot(NumberDotYearNoParensBibRecordParser.class),
+//      new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
+//      new BracketNumber(BracketNumberBibRecordParser.class),
+//      new BracketName(BracketNameBibRecordParser.class)));
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
       extractors.addAll(Arrays.asList(
@@ -104,13 +104,25 @@ public class ExtractReferences {
       Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
       ObjectInputStream ois = new ObjectInputStream(dis);
       ParserLMFeatures plf = null;
+      GazetteerFeatures gf = null;
       try {
         plf = (ParserLMFeatures)ois.readObject();
       } catch(final Exception e) {
         // do nothing
         // but now plf is NULL. Is that OK?
       }
+      try {
+        gf = (GazetteerFeatures)ois.readObject();
+      } catch(final Exception e) {
+        log.info(e.getStackTrace().toString());
+      }
+      if(gf != null)
+        log.info("kermit gazetteer successfully loaded.");
+      else
+        log.info("could not load kermit gazetter");
+      
       val predExtractor = new ReferencesPredicateExtractor(plf);
+      predExtractor.setGf(gf);
       val featureEncoder = new CRFFeatureEncoder<String, String, String>
         (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
       val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());

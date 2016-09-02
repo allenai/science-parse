@@ -94,8 +94,8 @@ public class Parser {
     return FileSystems.getDefault().getPath("e:\\data\\science-parse\\kermit-gazetteers\\");
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
-    //return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
+    //return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
+    return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
   }
 
   private static Parser defaultParser = null;
@@ -540,7 +540,7 @@ public class Parser {
 
     val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
     logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf, ExtractReferences.DATA_VERSION);
+    saveModel(dos, crfModel.featureEncoder, weights, plf, gf, ExtractReferences.DATA_VERSION);
     dos.close();
   }
 
@@ -701,10 +701,20 @@ public class Parser {
   }
 
   public static <T> void saveModel(
+      final DataOutputStream dos,
+      final CRFFeatureEncoder<String, T, String> fe,
+      final Vector weights,
+  final ParserLMFeatures plf,
+  final String dataVersion) throws IOException {
+    saveModel(dos, fe,weights, plf, null, dataVersion);
+  }
+  
+  public static <T> void saveModel(
           final DataOutputStream dos,
           final CRFFeatureEncoder<String, T, String> fe,
           final Vector weights,
       final ParserLMFeatures plf,
+      final GazetteerFeatures gf,
       final String dataVersion) throws IOException {
         dos.writeUTF(dataVersion);
     fe.stateSpace.save(dos);
@@ -716,6 +726,8 @@ public class Parser {
     oos.writeObject(plf);
     if(plf!=null)
       plf.logState();
+    logger.debug("Saving gazetteer features");
+    oos.writeObject(gf);
   }
 
   
@@ -741,7 +753,6 @@ public class Parser {
     String dataVersion
   ) throws IOException {
     IOUtils.ensureVersionMatch(dis, dataVersion);
-    logger.info("checked data version matches " + dataVersion);
     val stateSpace = StateSpace.load(dis);
     Indexer<String> nodeFeatures = Indexer.load(dis);
     Indexer<String> edgeFeatures = Indexer.load(dis);
@@ -1109,7 +1120,7 @@ public class Parser {
       if(args.length == 6)
         trainBibliographyCRF(new File(args[1]), new File(args[4]), new File(args[5]), opts);
       else
-      trainBibliographyCRF(new File(args[1]), opts);
+        trainBibliographyCRF(new File(args[1]), opts);
     }
   }
 
