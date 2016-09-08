@@ -73,16 +73,16 @@ public class ExtractReferences {
   public ExtractReferences(final InputStream is, final DataInputStream bibCRFModel) throws IOException {
     cr = new CheckReferences(is);
     extractors = new ArrayList<>();
-//    extractors.addAll(Arrays.asList(
-//      new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
-//      new NamedYear(NamedYearBibRecordParser.class),
-//      new NamedYear(NamedYearInParensBibRecordParser.class),
-//      new NumberDot(NumberDotYearParensBibRecordParser.class),
-//      new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
-//      new NumberDot(NumberDotYearNoParensBibRecordParser.class),
-//      new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
-//      new BracketNumber(BracketNumberBibRecordParser.class),
-//      new BracketName(BracketNameBibRecordParser.class)));
+    extractors.addAll(Arrays.asList(
+      new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
+      new NamedYear(NamedYearBibRecordParser.class),
+      new NamedYear(NamedYearInParensBibRecordParser.class),
+      new NumberDot(NumberDotYearParensBibRecordParser.class),
+      new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
+      new NumberDot(NumberDotYearNoParensBibRecordParser.class),
+      new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
+      new BracketNumber(BracketNumberBibRecordParser.class),
+      new BracketName(BracketNameBibRecordParser.class)));
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
       extractors.addAll(Arrays.asList(
@@ -336,7 +336,7 @@ public class ExtractReferences {
         maxLen = f;
       }
     }
-    log.debug("chose " + idx + " with " + maxLen);
+    log.info("chose " + idx + " with " + maxLen);
     return idx;
   }
 
@@ -822,7 +822,8 @@ public class ExtractReferences {
       List<BibRecord> out = new ArrayList<BibRecord>();
       boolean first = true;
       for (String s : cites) {
-        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ").trim();
+        s = s.replaceAll("-<lb>(\\p{Ll})", "$1").replaceAll("<lb>", " ").trim();
+        log.info("trying\r\n" + s);
         out.add(this.recParser.parseRecord(s));
       }
       out = removeNulls(out);
