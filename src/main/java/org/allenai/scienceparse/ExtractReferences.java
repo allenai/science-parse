@@ -73,24 +73,46 @@ public class ExtractReferences {
   public ExtractReferences(final InputStream is, final DataInputStream bibCRFModel) throws IOException {
     cr = new CheckReferences(is);
     extractors = new ArrayList<>();
-    extractors.addAll(Arrays.asList(
-      new BracketNumber(BracketNumberInitialsQuotedBibRecordParser.class),
-      new NamedYear(NamedYearBibRecordParser.class),
-      new NamedYear(NamedYearInParensBibRecordParser.class),
-      new NumberDot(NumberDotYearParensBibRecordParser.class),
-      new NumberDot(NumberDotAuthorNoTitleBibRecordParser.class),
-      new NumberDot(NumberDotYearNoParensBibRecordParser.class),
-      new BracketNumber(BracketNumberInitialsYearParensCOMMAS.class),
-      new BracketNumber(BracketNumberBibRecordParser.class),
-      new BracketName(BracketNameBibRecordParser.class)));
+    
     if(bibCRFModel != null) {
       bibCRF = loadModel(bibCRFModel);
       extractors.addAll(Arrays.asList(
-        new BracketNumber(CRFBibRecordParser.class),
-          new NumberDot(CRFBibRecordParser.class),
-        new NumberDotNaturalLineBreaks(CRFBibRecordParser.class),
-        new NamedYear(CRFBibRecordParser.class),
-        new BracketName(CRFBibRecordParser.class)));
+          new BracketNumber(new Class [] {BracketNumberInitialsQuotedBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new NamedYear(new Class [] {NamedYearBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new NamedYear(new Class [] {NamedYearInParensBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new NumberDot(new Class [] {NumberDotYearParensBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new NumberDot(new Class [] {NumberDotAuthorNoTitleBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new NumberDot(new Class [] {NumberDotYearNoParensBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new BracketNumber(new Class [] {BracketNumberInitialsYearParensCOMMAS.class,
+              CRFBibRecordParser.class}),
+          new BracketNumber(new Class [] {BracketNumberBibRecordParser.class,
+              CRFBibRecordParser.class}),
+          new BracketName(new Class [] {BracketNameBibRecordParser.class,
+              CRFBibRecordParser.class})));
+      extractors.addAll(Arrays.asList(
+        new BracketNumber(new Class [] {CRFBibRecordParser.class}),
+          new NumberDot(new Class [] {CRFBibRecordParser.class}),
+        new NumberDotNaturalLineBreaks(new Class [] {CRFBibRecordParser.class}),
+        new NamedYear(new Class [] {CRFBibRecordParser.class}),
+        new BracketName(new Class [] {CRFBibRecordParser.class})));
+    }
+    else {
+      extractors.addAll(Arrays.asList(
+          new BracketNumber(new Class [] {BracketNumberInitialsQuotedBibRecordParser.class}),
+          new NamedYear(new Class [] {NamedYearBibRecordParser.class}),
+          new NamedYear(new Class [] {NamedYearInParensBibRecordParser.class}),
+          new NumberDot(new Class [] {NumberDotYearParensBibRecordParser.class}),
+          new NumberDot(new Class [] {NumberDotAuthorNoTitleBibRecordParser.class}),
+          new NumberDot(new Class [] {NumberDotYearNoParensBibRecordParser.class}),
+          new BracketNumber(new Class [] {BracketNumberInitialsYearParensCOMMAS.class}),
+          new BracketNumber(new Class [] {BracketNumberBibRecordParser.class}),
+          new BracketName(new Class [] {BracketNameBibRecordParser.class})));
     }
   }
 
@@ -336,7 +358,7 @@ public class ExtractReferences {
         maxLen = f;
       }
     }
-    log.info("chose " + idx + " with " + maxLen);
+//    log.info("chose " + idx + " with " + maxLen);
     return idx;
   }
 
@@ -378,20 +400,23 @@ public class ExtractReferences {
   }
 
   public abstract class BibStractor {
-    final BibRecordParser recParser;
+    final BibRecordParser [] recParser;
 
-    BibStractor(Class c) {
+    BibStractor(Class [] c) {
       BibRecordParser b = null;
-      if(c == CRFBibRecordParser.class) { //special case, requires arg
-        b = new CRFBibRecordParser(bibCRF);
-      } else {
-        try {
-          b = (BibRecordParser) c.newInstance();
-        } catch (final Exception e) {
-          log.warn("Exception while creating BibStractor", e);
+      recParser = new BibRecordParser[c.length];
+      for(int i=0; i<c.length; i++) {
+        if(c[i] == CRFBibRecordParser.class) { //special case, requires arg
+          b = new CRFBibRecordParser(bibCRF);
+        } else {
+          try {
+            b = (BibRecordParser) c[i].newInstance();
+          } catch (final Exception e) {
+            log.warn("Exception while creating BibStractor", e);
+          }
         }
+        recParser[i] = b;
       }
-      recParser = b;
     }
 
     public abstract List<BibRecord> parse(String source);
@@ -687,7 +712,7 @@ public class ExtractReferences {
     private final static String shortCiteRegex = "(?:\\[|\\()([1-2][0-9]{3}[a-z]?)(?:\\]|\\))";
     private final static String citeDelimiter = "; ?";
 
-    NamedYear(Class c) {
+    NamedYear(Class [] c) {
       super(c);
     }
 
@@ -723,7 +748,13 @@ public class ExtractReferences {
                 first = false;
               }
         }
-        out.add(this.recParser.parseRecord(s));
+        for(int i=0; i<recParser.length;i++) {
+          BibRecord br = this.recParser[i].parseRecord(s);
+          if(br!=null) {
+            out.add(br);
+            break;
+          }
+        }
       }
       out = removeNulls(out);
       return out;
@@ -732,7 +763,7 @@ public class ExtractReferences {
 
   private class NumberDotNaturalLineBreaks extends NumberDot {
 
-    NumberDotNaturalLineBreaks(Class c) {
+    NumberDotNaturalLineBreaks(Class [] c) {
       super(c);
     }
     
@@ -744,7 +775,7 @@ public class ExtractReferences {
   }
   
   private class NumberDot extends BracketNumber {
-    NumberDot(Class c) {
+    NumberDot(Class [] c) {
       super(c);
     }
     
@@ -776,7 +807,13 @@ public class ExtractReferences {
       for (String s : cites) {
         s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ");
         s = s.replaceAll("-<bb>", "").replaceAll("<bb>", " ");
-        out.add(this.recParser.parseRecord(s));
+        for(int j=0; j<recParser.length;j++) {
+          BibRecord br = this.recParser[j].parseRecord(s);
+          if(br!=null) {
+            out.add(br);
+            break;
+          }
+        }
       }
       out = removeNulls(out);
       return out;
@@ -791,7 +828,7 @@ public class ExtractReferences {
     protected final String citeRegex = "\\[([0-9, \\p{Pd}]+)\\]";
     protected final String citeDelimiter = "(,| |;)+";
 
-    BracketNumber(Class c) {
+    BracketNumber(Class [] c) {
       super(c);
     }
 
@@ -823,8 +860,13 @@ public class ExtractReferences {
       boolean first = true;
       for (String s : cites) {
         s = s.replaceAll("-<lb>(\\p{Ll})", "$1").replaceAll("<lb>", " ").trim();
-        log.info("trying\r\n" + s);
-        out.add(this.recParser.parseRecord(s));
+        for(int j=0; j<recParser.length;j++) {
+          BibRecord br = this.recParser[j].parseRecord(s);
+          if(br!=null) {
+            out.add(br);
+            break;
+          }
+        }
       }
       out = removeNulls(out);
       return out;
@@ -835,7 +877,7 @@ public class ExtractReferences {
     protected final String citeRegex = "\\[([^\\]]+)\\]";
     protected final String citeDelimiter = "; ?";
 
-    BracketName(Class c) {
+    BracketName(Class [] c) {
       super(c);
     }
     
@@ -866,7 +908,13 @@ public class ExtractReferences {
                 first = false;
               }
         }
-        out.add(this.recParser.parseRecord(s));
+        for(int i=0; i<recParser.length;i++) {
+          BibRecord br = this.recParser[i].parseRecord(s);
+          if(br!=null) {
+            out.add(br);
+            break;
+          }
+        }
       }
       out = removeNulls(out);
       return out;
