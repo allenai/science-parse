@@ -40,7 +40,7 @@ public class ExtractedMetadata {
   public String title;
   public List<String> authors;
   public List<String> emails; //extracted by special (non-CRF) heuristic process
-  public List<String> raw; //the full paper text
+  public List<Section> sections;
   public List<BibRecord> references;
   public List<CitationRecord> referenceMentions;
   public int year;

@@ -18,16 +18,19 @@ import org.allenai.ml.sequences.crf.CRFFeatureEncoder;
 import org.allenai.ml.sequences.crf.CRFModel;
 import org.allenai.ml.sequences.crf.CRFTrainer;
 import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
-import org.allenai.ml.sequences.crf.conll.ConllFormat;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
+import org.allenai.scienceparse.figureextraction.FigureExtractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.compat.java8.ScalaStreamSupport;
+import scala.compat.java8.OptionConverters;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -41,7 +44,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -67,6 +69,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -1167,60 +1170,86 @@ public class Parser {
 
   public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
     final ExtractedMetadata em;
-    PDFExtractor ext = new PDFExtractor();
-    PDFDoc doc = ext.extractFromInputStream(is);
-    List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
-    seq = seq.subList(0, Math.min(seq.size(), headerMax));
-    seq = PDFToCRFInput.padSequence(seq);
+    final PDDocument pdDoc = PDDocument.load(is);
 
-    { // get title and authors from the CRF
-      List<String> outSeq = model.bestGuess(seq);
-      //the output tag sequence will not include the start/stop states!
-      outSeq = PDFToCRFInput.padTagSequence(outSeq);
-      em = new ExtractedMetadata(seq, outSeq);
-      em.source = ExtractedMetadata.Source.CRF;
-    }
+    //
+    // Run Science-parse
+    //
+    {
+      PDFExtractor ext = new PDFExtractor();
+      PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+      seq = seq.subList(0, Math.min(seq.size(), headerMax));
+      seq = PDFToCRFInput.padSequence(seq);
 
-    // use PDF metadata if it's there
-    if(doc.meta != null) {
-      if (doc.meta.title != null) {
-        em.setTitle(doc.meta.title);
-      em.source = ExtractedMetadata.Source.META;
-    }
-    if (doc.meta.createDate != null)
-      em.setYearFromDate(doc.meta.createDate);
-    }
-
-    clean(em);
-    em.raw = PDFDocToPartitionedText.getRaw(doc);
-    em.creator = doc.meta.creator;
-    // extract references
-    try {
-      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
-      final Pair<List<BibRecord>, List<CitationRecord>> pair =
-              getReferences(em.raw, rawReferences, referenceExtractor);
-      em.references = pair.getOne();
-      List<CitationRecord> crs = new ArrayList<>();
-      for (CitationRecord cr : pair.getTwo()) {
-        crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+      { // get title and authors from the CRF
+        List<String> outSeq = model.bestGuess(seq);
+        //the output tag sequence will not include the start/stop states!
+        outSeq = PDFToCRFInput.padTagSequence(outSeq);
+        em = new ExtractedMetadata(seq, outSeq);
+        em.source = ExtractedMetadata.Source.CRF;
       }
-      em.referenceMentions = crs;
-    } catch(final RegexWithTimeout.RegexTimeout e) {
-      logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
-      if(em.references == null)
-        em.references = Collections.emptyList();
-      if(em.referenceMentions == null)
-        em.referenceMentions = Collections.emptyList();
-    }
-    logger.debug(em.references.size() + " refs for " + em.title);
 
-    try {
-      em.abstractText = PDFDocToPartitionedText.getAbstract(em.raw, doc);
-      if(em.abstractText.isEmpty())
+      // use PDF metadata if it's there
+      if (doc.meta != null) {
+        if (doc.meta.title != null) {
+          em.setTitle(doc.meta.title);
+          em.source = ExtractedMetadata.Source.META;
+        }
+        if (doc.meta.createDate != null)
+          em.setYearFromDate(doc.meta.createDate);
+      }
+
+      clean(em);
+      final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
+
+      em.creator = doc.meta.creator;
+      // extract references
+      try {
+        final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+        final Pair<List<BibRecord>, List<CitationRecord>> pair =
+            getReferences(lines, rawReferences, referenceExtractor);
+        em.references = pair.getOne();
+        List<CitationRecord> crs = new ArrayList<>();
+        for (CitationRecord cr : pair.getTwo()) {
+          crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+        }
+        em.referenceMentions = crs;
+      } catch (final RegexWithTimeout.RegexTimeout e) {
+        logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
+        if (em.references == null)
+          em.references = Collections.emptyList();
+        if (em.referenceMentions == null)
+          em.referenceMentions = Collections.emptyList();
+      }
+      logger.debug(em.references.size() + " refs for " + em.title);
+
+      try {
+        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc);
+        if (em.abstractText.isEmpty())
+          em.abstractText = null;
+      } catch (final RegexWithTimeout.RegexTimeout e) {
+        logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
         em.abstractText = null;
-    } catch(final RegexWithTimeout.RegexTimeout e) {
-      logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
-      em.abstractText = null;
+      }
+    }
+
+    //
+    // Run figure extraction to get sections
+    //
+    try {
+      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
+      em.sections = ScalaStreamSupport.stream(doc.sections()).map(documentSection ->
+          new Section(
+              OptionConverters.toJava(documentSection.titleText()).orElse(null),
+              documentSection.bodyText()
+          )
+      ).collect(Collectors.toList());
+    } catch (final Exception e) {
+      logger.warn(
+          "Exception {} while getting sections. Section data will be missing.",
+          e.getMessage());
+      em.sections = null;
     }
 
     return em;
