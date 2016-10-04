@@ -48,7 +48,7 @@ libraryDependencies ++= Seq(
   "org.apache.pdfbox" % "pdfbox" % "2.1.0-AI2-ef339b" exclude ("commons-logging", "commons-logging"),
   "org.apache.pdfbox" % "fontbox" % "2.1.0-AI2-ef339b" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
-  "org.allenai" % "ml" % "0.15" excludeAll (
+  "org.allenai" % "ml" % "0.16" excludeAll (
     ExclusionRule(organization = "args4j"),
     ExclusionRule(organization = "org.slf4j", name="slf4j-simple")
   ),
