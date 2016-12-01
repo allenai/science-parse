@@ -1,12 +1,14 @@
 package org.allenai.scienceparse
 
 import java.io.{FilterInputStream, InputStream}
+import java.nio.file.Files
 import java.util.zip.ZipFile
 
 import org.allenai.common.{Logging, Resource}
 import org.allenai.datastore.Datastores
 import org.apache.commons.io.IOUtils
 import org.apache.pdfbox.pdmodel.PDDocument
+import scala.io.{Codec, Source}
 import scala.xml.{Node, XML}
 
 import scala.collection.JavaConverters._
@@ -14,8 +16,8 @@ import scala.collection.JavaConverters._
 trait LabeledData {
   case class Author(
     name: String,
-    email: Option[String],
-    affiliations: Seq[String]
+    email: Option[String] = None,
+    affiliations: Seq[String] = Seq.empty
   )
 
   case class Section(heading: Option[String], text: String)
@@ -30,10 +32,12 @@ trait LabeledData {
     pageRange: Option[(String, String)]
   )
 
+  case class Range(start: Int, end: Int)
+
   case class Mention(
     reference: Reference,
-    section: Section,
-    characterRange: (Int, Int)
+    text: String,
+    inContext: Option[(Section, Range)]
   )
 
   /** ID to identify this labeled document. Must be unique. */
@@ -56,6 +60,50 @@ trait LabeledData {
   def mentions: Option[Seq[Mention]]
 }
 
+object LabeledData {
+  def dump(labeledData: Iterator[LabeledData]): Unit = {
+    labeledData.foreach { data =>
+      println(data.id)
+
+      println(s"Title: ${data.title}")
+
+      data.authors match {
+        case None => println("No authors")
+        case Some(as) =>
+          println("Authors:")
+          as.foreach { a =>
+            println(s"  ${a.name}")
+            a.email.foreach { e => println(s"    $e") }
+            a.affiliations.foreach { a => println(s"    $a") }
+          }
+      }
+
+      println(s"Title: ${data.title}")
+      println(s"Year: ${data.year}")
+      println(s"Abstract: ${data.abstractText}")
+
+      data.references match {
+        case None => println("No references")
+        case Some(rs) =>
+          println("References:")
+          rs.foreach { r =>
+            println(s"  Label: ${r.label}")
+            println(s"    Title: ${r.title}")
+            println(s"    Authors: ${r.authors.mkString(", ")}")
+            println(s"    Venue: ${r.venue}")
+            println(s"    Year: ${r.year}")
+            println(s"    Volume: ${r.volume}")
+            println(s"    Page range: ${r.pageRange}")
+          }
+      }
+
+      // TODO: sections and mentions
+
+      println()
+    }
+  }
+}
+
 object LabeledDataFromPMC extends Datastores with Logging {
   private val xmlExtension = ".nxml"
 
@@ -75,7 +123,14 @@ object LabeledDataFromPMC extends Datastores with Logging {
     "0c" -> 1,
     "0d" -> 1,
     "0e" -> 1,
-    "0f" -> 1
+    "0f" -> 1,
+    "10" -> 1,
+    "11" -> 1,
+    "12" -> 1,
+    "13" -> 1,
+    "14" -> 1,
+    "15" -> 1,
+    "16" -> 1
   )
 
   private val xmlLoader = {
@@ -240,46 +295,83 @@ object LabeledDataFromPMC extends Datastores with Logging {
     }
   }
 
-  def main(args: Array[String]): Unit = {
-    LabeledDataFromPMC.get.foreach { data =>
-      println(data.id)
+  def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromPMC.get)
+}
 
-      println(s"Title: ${data.title}")
+object LabeledDataFromResources extends Datastores {
+  def apply = get
 
-      data.authors match {
-        case None => println("No authors")
-        case Some(as) =>
-          println("Authors:")
-          as.foreach { a =>
-            println(s"  ${a.name}")
-            a.email.foreach { e => println(s"    $e") }
-            a.affiliations.foreach { a => println(s"    $a") }
-          }
+  def get: Iterator[LabeledData] = {
+    val pdfDirectory = publicDirectory("PapersTestSet", 3)
+
+    def readResourceFile(filename: String): Map[String, Seq[String]] =
+      Resource.using(Source.fromInputStream(getClass.getResourceAsStream(filename))(Codec.UTF8)) { source =>
+        source.getLines().map { line =>
+          val fields = line.trim.split("\t").map(_.trim)
+          val paperId = fields.head.toLowerCase
+          val values = fields.tail.toSeq
+          paperId -> values
+        }.toMap
       }
 
-      println(s"Title: ${data.title}")
-      println(s"Year: ${data.year}")
-      println(s"Abstract: ${data.abstractText}")
+    val allData = Seq(
+      readResourceFile("/golddata/dblp/authorFullName.tsv"),
+      readResourceFile("/golddata/dblp/title.tsv"),
+      readResourceFile("/golddata/isaac/abstracts.tsv"),
+      readResourceFile("/golddata/isaac/bibliographies.tsv")
+    )
 
-      data.references match {
-        case None => println("No references")
-        case Some(rs) =>
-          println("References:")
-          rs.foreach { r =>
-            println(s"  Label: ${r.label}")
-            println(s"    Title: ${r.title}")
-            println(s"    Authors: ${r.authors.mkString(", ")}")
-            println(s"    Venue: ${r.venue}")
-            println(s"    Year: ${r.year}")
-            println(s"    Volume: ${r.volume}")
-            println(s"    Page range: ${r.pageRange}")
+    val Seq(
+      paperId2authors,
+      paperId2titles,
+      paperId2abstracts,
+      paperId2bibliographies
+    ) = allData
+
+    val allPaperIds = allData.map(_.keySet).reduce(_ ++ _)
+
+    allPaperIds.iterator.map { paperId =>
+      new LabeledData {
+        override val id: String = s"Resources:$paperId"
+
+        override def inputStream: InputStream =
+          Files.newInputStream(pdfDirectory.resolve(s"$paperId.pdf"))
+
+
+        override val title: Option[String] = paperId2titles.get(paperId).flatMap(_.headOption)
+
+        override val authors: Option[Seq[Author]] =
+          paperId2authors.get(paperId).map { authorNames =>
+            authorNames.map { authorName => Author(authorName) }
           }
+
+        override val year: Option[Int] = None
+
+        override val venue: Option[String] = None
+
+        override val abstractText: Option[String] =
+          paperId2abstracts.get(paperId).flatMap(_.headOption)
+
+        override val sections: Option[Seq[Section]] = None
+
+        override val references: Option[Seq[Reference]] = paperId2bibliographies.get(paperId).map { bibStrings =>
+          bibStrings.map { bibString =>
+            val Array(title, year, venue, authors) = bibString.split("\\|", -1)
+            Reference(
+              None,
+              Some(title),
+              authors.split(":").toSeq,
+              Some(venue),
+              Some(year.toInt),
+              None,
+              None)
+          }
+        }
+
+        override val mentions: Option[Seq[Mention]] = None  // TODO: we might be able to get mentions from the data that Isaac created back in the day
       }
-
-      // TODO: sections and mentions
-
-      val did = data.id
-      println()
     }
   }
+
+  def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromResources.get)
 }
