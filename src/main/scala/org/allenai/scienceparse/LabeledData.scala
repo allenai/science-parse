@@ -2,6 +2,7 @@ package org.allenai.scienceparse
 
 import java.io.{FilterInputStream, InputStream}
 import java.nio.file.Files
+import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.ZipFile
 
 import org.allenai.common.{Logging, Resource}
@@ -374,4 +375,68 @@ object LabeledDataFromResources extends Datastores {
   }
 
   def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromResources.get)
+}
+
+object LabeledDataFromScienceParse {
+  private val sha1HexLength = 40
+  private def toHex(bytes: Array[Byte]): String = {
+    val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
+    bytes.foreach { byte => sb.append(f"$byte%02x") }
+    sb.toString
+  }
+
+  def get(input: => InputStream, parser: Parser = Parser.getInstance()) = {
+    val digest = MessageDigest.getInstance("SHA-1")
+    digest.reset()
+    val output = Resource.using(new DigestInputStream(input, digest))(parser.doParse)
+    val id = toHex(digest.digest())
+
+    new LabeledData {
+      override def inputStream: InputStream = input
+
+      override val id: String = s"SP:$id"
+
+      override val title: Option[String] = Option(output.title)
+
+      override val authors: Option[Seq[Author]] =  Option(output.authors).map { as =>
+        as.asScala.map { a =>
+          Author(a)
+        }
+      }
+
+      override val year: Option[Int] = if(output.year == 0) None else Some(output.year)
+
+      override val venue: Option[String] = None
+
+      override val abstractText: Option[String] = Option(output.abstractText)
+
+      override val sections: Option[Seq[Section]] = Option(output.sections).map { ss =>
+        ss.asScala.map { s =>
+          Section(Option(s.heading), s.text)
+        }
+      }
+
+      override val references: Option[Seq[Reference]] = Option(output.references).map { rs =>
+        rs.asScala.map { r =>
+          Reference(
+            None,
+            Option(r.title),
+            Option(r.author).map(_.asScala.toSeq).getOrElse(Seq.empty),
+            Option(r.venue),
+            if(r.year == 0) None else Some(r.year),
+            None,
+            None
+          )
+        }
+      }
+
+      override def mentions: Option[Seq[Mention]] = ???
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val fromResources = LabeledDataFromResources.get
+    val fromSp = fromResources.map(labeledDataFromResources => get(labeledDataFromResources.inputStream))
+    LabeledData.dump(fromSp)
+  }
 }
