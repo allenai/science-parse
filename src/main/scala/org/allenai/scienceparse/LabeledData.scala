@@ -1,6 +1,7 @@
 package org.allenai.scienceparse
 
-import java.io.{FilterInputStream, InputStream}
+import java.io._
+import java.net.URL
 import java.nio.file.Files
 import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.ZipFile
@@ -13,6 +14,7 @@ import scala.io.{Codec, Source}
 import scala.xml.{Node, XML}
 
 import scala.collection.JavaConverters._
+import scalaj.http.{MultiPart, Http}
 
 trait LabeledData {
   case class Author(
@@ -462,5 +464,153 @@ object LabeledDataFromScienceParse {
     val fromResources = LabeledDataFromResources.get
     val fromSp = fromResources.map(labeledDataFromResources => get(labeledDataFromResources.inputStream))
     LabeledData.dump(fromSp)
+  }
+}
+
+class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
+  private val sha1HexLength = 40
+  private def toHex(bytes: Array[Byte]): String = {
+    val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
+    bytes.foreach { byte => sb.append(f"$byte%02x") }
+    sb.toString
+  }
+
+  def get(input: => InputStream) = {
+    val digest = MessageDigest.getInstance("SHA-1")
+    digest.reset()
+    val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
+    val paperId = toHex(digest.digest())
+
+    val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
+    val response =
+      Http(grobidServerUrl + "/processFulltextDocument").timeout(30000, 30000).postMulti(multipart).asBytes
+    if(!response.isSuccess)
+      throw new IOException(s"Grobid server returned ${response.statusLine}")
+
+    val xml = XML.load(new ByteArrayInputStream(response.body))
+
+    println(xml.toString)
+
+    new LabeledData {
+      override def inputStream: InputStream = input
+
+      override val id: String = s"Grobid:$grobidServerUrl/$paperId"
+
+      private val fileDesc = xml \ "teiHeader" \ "fileDesc"
+
+      override val title: Option[String] = (fileDesc \ "titleStmt" \ "title").headOption.map(_.text)
+
+      override val authors: Option[Seq[Author]] = Some(
+        (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
+          val name = authorNameFromNode(authorNode)
+          val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
+            (affiliationNode \ "orgName").map(_.text).mkString(", ")
+          }
+
+          // TODO: email
+
+          Author(name, None, affiliations)
+        }
+      )
+
+      override val year: Option[Int] = None // TODO
+
+      override val venue: Option[String] = None // TODO
+
+      override val abstractText: Option[String] =
+        (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
+
+      override val sections: Option[Seq[Section]] = Some {
+        (xml \ "text" \ "body" \ "div").map { div =>
+          val bodyPlusHeaderText = div.text
+
+          val head = (div \ "head").headOption.map(_.text)
+          val body = head match {
+            case Some(h) => bodyPlusHeaderText.drop(h.length)
+            case None => bodyPlusHeaderText
+          }
+
+          Section(head, body)
+        }
+      }
+
+      override val references: Option[Seq[Reference]] =
+        (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
+          (listBiblNode \ "biblStruct").map { biblStructNode =>
+            val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
+              headOption.
+              map { node =>
+                node.text.takeWhile(c => c >= '0' && c <= '9').toInt
+              }
+
+            val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
+            val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
+            val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
+              val from = (node \ "@from").headOption.map(_.text)
+              val to = (node \ "@to").headOption.map(_.text)
+              (from, to) match {
+                case (Some(a), Some(b)) => Some((a, b))
+                case _ => None
+              }
+            }
+
+            (biblStructNode \ "analytic").headOption.map { analyticNode =>
+              // This is the case where we have an article (in the "analytic" section) inside a
+              // collection (in the "monogr" section.
+
+              val title = (analyticNode \ "title").headOption.map(_.text)
+              val authors = (analyticNode \ "author").map(authorNameFromNode)
+              val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+
+              Reference(
+                None,
+                title,
+                authors,
+                venue,
+                year,
+                volume,
+                pageRange
+              )
+            } getOrElse {
+              // This is the case where we have no article as part of a collection, just a whole
+              // work, like a book.
+
+              val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+              val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
+
+              Reference(
+                None,
+                title,
+                authors,
+                None,
+                year,
+                volume,
+                pageRange
+              )
+            }
+          }
+        }
+
+      override def mentions: Option[Seq[Mention]] = ??? // TODO
+
+      private def authorNameFromNode(authorNode: Node) = {
+        val nameNodes =
+          (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
+        nameNodes.map(_.text).mkString(" ").trim
+      }
+    }
+  }
+}
+
+object LabeledDataFromGrobidServer {
+  def main(args: Array[String]): Unit = {
+    val url = new URL(args(0))
+    val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
+
+    val fromResources = LabeledDataFromResources.get
+    val fromGrobid = fromResources.map { labeledDataFromResources =>
+      labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
+    }
+    LabeledData.dump(fromGrobid)
   }
 }
