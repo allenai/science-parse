@@ -79,7 +79,6 @@ object LabeledData {
           }
       }
 
-      println(s"Title: ${data.title}")
       println(s"Year: ${data.year}")
       println(s"Abstract: ${data.abstractText}")
 
