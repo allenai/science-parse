@@ -7,11 +7,13 @@ import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.ZipFile
 
 import org.allenai.common.{Logging, Resource}
+import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
 import org.apache.commons.io.IOUtils
 import org.apache.pdfbox.pdmodel.PDDocument
 import scala.io.{Codec, Source}
 import scala.xml.{Node, XML}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.collection.JavaConverters._
 import scalaj.http.{MultiPart, Http}
@@ -61,6 +63,19 @@ trait LabeledData {
   def sections: Option[Seq[Section]]
   def references: Option[Seq[Reference]]
   def mentions: Option[Seq[Mention]]
+}
+
+class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledData {
+  override def inputStream = input
+
+  override def title: Option[String] = None
+  override def authors: Option[Seq[Author]] = None
+  override def abstractText: Option[String] = None
+  override def year: Option[Int] = None
+  override def venue: Option[String] = None
+  override def sections: Option[Seq[Section]] = None
+  override def references: Option[Seq[Reference]] = None
+  override def mentions: Option[Seq[Mention]] = None
 }
 
 object LabeledData {
@@ -462,7 +477,8 @@ object LabeledDataFromScienceParse {
 
   def main(args: Array[String]): Unit = {
     val fromResources = LabeledDataFromResources.get
-    val fromSp = fromResources.map(labeledDataFromResources => get(labeledDataFromResources.inputStream))
+    val fromSp =
+      fromResources.parMap(labeledDataFromResources => get(labeledDataFromResources.inputStream))
     LabeledData.dump(fromSp)
   }
 }
@@ -480,123 +496,127 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
     digest.reset()
     val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
     val paperId = toHex(digest.digest())
+    val labeledDataId = s"Grobid:$grobidServerUrl/$paperId"
 
     val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
     val response =
       Http(grobidServerUrl + "/processFulltextDocument").timeout(30000, 30000).postMulti(multipart).asBytes
-    if(!response.isSuccess)
-      throw new IOException(s"Grobid server returned ${response.statusLine}")
+    if(response.is5xx) {
+      logger.warn(s"Error from Grobid: ${response.statusLine}")
+      new EmptyLabeledData(labeledDataId, input)
+    } else {
+      if (!response.isSuccess)
+        throw new IOException(s"Grobid server returned ${response.statusLine}")
 
-    val xml = XML.load(new ByteArrayInputStream(response.body))
+      val xml = XML.load(new ByteArrayInputStream(response.body))
 
-    println(xml.toString)
+      new LabeledData {
+        override def inputStream: InputStream = input
 
-    new LabeledData {
-      override def inputStream: InputStream = input
+        override val id: String = labeledDataId
 
-      override val id: String = s"Grobid:$grobidServerUrl/$paperId"
+        private val fileDesc = xml \ "teiHeader" \ "fileDesc"
 
-      private val fileDesc = xml \ "teiHeader" \ "fileDesc"
+        override val title: Option[String] = (fileDesc \ "titleStmt" \ "title").headOption.map(_.text)
 
-      override val title: Option[String] = (fileDesc \ "titleStmt" \ "title").headOption.map(_.text)
-
-      override val authors: Option[Seq[Author]] = Some(
-        (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
-          val name = authorNameFromNode(authorNode)
-          val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
-            (affiliationNode \ "orgName").map(_.text).mkString(", ")
-          }
-
-          // TODO: email
-
-          Author(name, None, affiliations)
-        }
-      )
-
-      override val year: Option[Int] = None // TODO
-
-      override val venue: Option[String] = None // TODO
-
-      override val abstractText: Option[String] =
-        (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
-
-      override val sections: Option[Seq[Section]] = Some {
-        (xml \ "text" \ "body" \ "div").map { div =>
-          val bodyPlusHeaderText = div.text
-
-          val head = (div \ "head").headOption.map(_.text)
-          val body = head match {
-            case Some(h) => bodyPlusHeaderText.drop(h.length)
-            case None => bodyPlusHeaderText
-          }
-
-          Section(head, body)
-        }
-      }
-
-      override val references: Option[Seq[Reference]] =
-        (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
-          (listBiblNode \ "biblStruct").map { biblStructNode =>
-            val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
-              headOption.
-              map { node =>
-                node.text.takeWhile(c => c >= '0' && c <= '9').toInt
-              }
-
-            val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
-            val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
-            val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
-              val from = (node \ "@from").headOption.map(_.text)
-              val to = (node \ "@to").headOption.map(_.text)
-              (from, to) match {
-                case (Some(a), Some(b)) => Some((a, b))
-                case _ => None
-              }
+        override val authors: Option[Seq[Author]] = Some(
+          (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
+            val name = authorNameFromNode(authorNode)
+            val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
+              (affiliationNode \ "orgName").map(_.text).mkString(", ")
             }
 
-            (biblStructNode \ "analytic").headOption.map { analyticNode =>
-              // This is the case where we have an article (in the "analytic" section) inside a
-              // collection (in the "monogr" section.
+            // TODO: email
 
-              val title = (analyticNode \ "title").headOption.map(_.text)
-              val authors = (analyticNode \ "author").map(authorNameFromNode)
-              val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+            Author(name, None, affiliations)
+          }
+        )
 
-              Reference(
-                None,
-                title,
-                authors,
-                venue,
-                year,
-                volume,
-                pageRange
-              )
-            } getOrElse {
-              // This is the case where we have no article as part of a collection, just a whole
-              // work, like a book.
+        override val year: Option[Int] = None // TODO
 
-              val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-              val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
+        override val venue: Option[String] = None // TODO
 
-              Reference(
-                None,
-                title,
-                authors,
-                None,
-                year,
-                volume,
-                pageRange
-              )
+        override val abstractText: Option[String] =
+          (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
+
+        override val sections: Option[Seq[Section]] = Some {
+          (xml \ "text" \ "body" \ "div").map { div =>
+            val bodyPlusHeaderText = div.text
+
+            val head = (div \ "head").headOption.map(_.text)
+            val body = head match {
+              case Some(h) => bodyPlusHeaderText.drop(h.length)
+              case None => bodyPlusHeaderText
             }
+
+            Section(head, body)
           }
         }
 
-      override def mentions: Option[Seq[Mention]] = ??? // TODO
+        override val references: Option[Seq[Reference]] =
+          (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
+            (listBiblNode \ "biblStruct").map { biblStructNode =>
+              val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
+                headOption.
+                map { node =>
+                  node.text.takeWhile(c => c >= '0' && c <= '9').toInt
+                }
 
-      private def authorNameFromNode(authorNode: Node) = {
-        val nameNodes =
-          (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
-        nameNodes.map(_.text).mkString(" ").trim
+              val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
+              val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
+              val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
+                val from = (node \ "@from").headOption.map(_.text)
+                val to = (node \ "@to").headOption.map(_.text)
+                (from, to) match {
+                  case (Some(a), Some(b)) => Some((a, b))
+                  case _ => None
+                }
+              }
+
+              (biblStructNode \ "analytic").headOption.map { analyticNode =>
+                // This is the case where we have an article (in the "analytic" section) inside a
+                // collection (in the "monogr" section.
+
+                val title = (analyticNode \ "title").headOption.map(_.text)
+                val authors = (analyticNode \ "author").map(authorNameFromNode)
+                val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+
+                Reference(
+                  None,
+                  title,
+                  authors,
+                  venue,
+                  year,
+                  volume,
+                  pageRange
+                )
+              } getOrElse {
+                // This is the case where we have no article as part of a collection, just a whole
+                // work, like a book.
+
+                val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+                val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
+
+                Reference(
+                  None,
+                  title,
+                  authors,
+                  None,
+                  year,
+                  volume,
+                  pageRange
+                )
+              }
+            }
+          }
+
+        override def mentions: Option[Seq[Mention]] = ??? // TODO
+
+        private def authorNameFromNode(authorNode: Node) = {
+          val nameNodes =
+            (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
+          nameNodes.map(_.text).mkString(" ").trim
+        }
       }
     }
   }
@@ -608,7 +628,7 @@ object LabeledDataFromGrobidServer {
     val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
 
     val fromResources = LabeledDataFromResources.get
-    val fromGrobid = fromResources.map { labeledDataFromResources =>
+    val fromGrobid = fromResources.parMap { labeledDataFromResources =>
       labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
     }
     LabeledData.dump(fromGrobid)
