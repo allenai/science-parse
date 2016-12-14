@@ -12,6 +12,7 @@ import org.allenai.datastore.Datastores
 import org.apache.commons.io.IOUtils
 import org.apache.pdfbox.pdmodel.PDDocument
 import scala.io.{Codec, Source}
+import scala.util.control.NonFatal
 import scala.xml.{Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -63,6 +64,50 @@ trait LabeledData {
   def sections: Option[Seq[Section]]
   def references: Option[Seq[Reference]]
   def mentions: Option[Seq[Mention]]
+
+  // This is not the same as toString, because it contains newline and is generally intended to be
+  // read by humans.
+  def readableString = {
+    val builder = new StringBuilder
+
+    builder ++= id
+    builder += '\n'
+
+    builder ++= s"Title: $title\n"
+
+    authors match {
+      case None => builder ++= "No authors\n"
+      case Some(as) =>
+        builder ++= "Authors:\n"
+        as.foreach { a =>
+          builder ++= s"  ${a.name}\n"
+          a.email.foreach { e => builder ++= s"    $e\n" }
+          a.affiliations.foreach { a => builder ++= s"    $a\n" }
+        }
+    }
+
+    builder ++= s"Year: $year\n"
+    builder ++= s"Abstract: $abstractText\n"
+
+    references match {
+      case None => builder ++= "No references\n"
+      case Some(rs) =>
+        builder ++= "References:\n"
+        rs.foreach { r =>
+          builder ++= s"  Label: ${r.label}\n"
+          builder ++= s"    Title: ${r.title}\n"
+          builder ++= s"    Authors: ${r.authors.mkString(", ")}\n"
+          builder ++= s"    Venue: ${r.venue}\n"
+          builder ++= s"    Year: ${r.year}\n"
+          builder ++= s"    Volume: ${r.volume}\n"
+          builder ++= s"    Page range: ${r.pageRange}\n"
+        }
+    }
+
+    // TODO: sections and mentions
+
+    builder.toString
+  }
 }
 
 class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledData {
@@ -80,44 +125,14 @@ class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledDat
 
 object LabeledData {
   def dump(labeledData: Iterator[LabeledData]): Unit = {
-    labeledData.foreach { data =>
-      println(data.id)
+    // We don't time the first one, because it might load models.
+    println(labeledData.next().readableString)
 
-      println(s"Title: ${data.title}")
+    val startTime = System.currentTimeMillis()
+    labeledData.map(_.readableString).foreach(println)
+    val endTime = System.currentTimeMillis()
 
-      data.authors match {
-        case None => println("No authors")
-        case Some(as) =>
-          println("Authors:")
-          as.foreach { a =>
-            println(s"  ${a.name}")
-            a.email.foreach { e => println(s"    $e") }
-            a.affiliations.foreach { a => println(s"    $a") }
-          }
-      }
-
-      println(s"Year: ${data.year}")
-      println(s"Abstract: ${data.abstractText}")
-
-      data.references match {
-        case None => println("No references")
-        case Some(rs) =>
-          println("References:")
-          rs.foreach { r =>
-            println(s"  Label: ${r.label}")
-            println(s"    Title: ${r.title}")
-            println(s"    Authors: ${r.authors.mkString(", ")}")
-            println(s"    Venue: ${r.venue}")
-            println(s"    Year: ${r.year}")
-            println(s"    Volume: ${r.volume}")
-            println(s"    Page range: ${r.pageRange}")
-          }
-      }
-
-      // TODO: sections and mentions
-
-      println()
-    }
+    println(s"Completed in ${endTime - startTime} milliseconds")
   }
 }
 
@@ -418,7 +433,7 @@ object LabeledDataFromResources extends Datastores {
   def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromResources.get)
 }
 
-object LabeledDataFromScienceParse {
+object LabeledDataFromScienceParse extends Logging {
   private val sha1HexLength = 40
   private def toHex(bytes: Array[Byte]): String = {
     val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
@@ -429,56 +444,68 @@ object LabeledDataFromScienceParse {
   def get(input: => InputStream, parser: Parser = Parser.getInstance()) = {
     val digest = MessageDigest.getInstance("SHA-1")
     digest.reset()
-    val output = Resource.using(new DigestInputStream(input, digest))(parser.doParse)
+    val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
     val id = toHex(digest.digest())
+    val labeledPaperId = s"SP:$id"
 
-    new LabeledData {
-      override def inputStream: InputStream = input
+    try {
+      val output = Resource.using(new ByteArrayInputStream(bytes))(parser.doParse)
 
-      override val id: String = s"SP:$id"
+      new LabeledData {
+        override def inputStream: InputStream = input
 
-      override val title: Option[String] = Option(output.title)
+        override val id: String = labeledPaperId
 
-      override val authors: Option[Seq[Author]] =  Option(output.authors).map { as =>
-        as.asScala.map { a =>
-          Author(a)
+        override val title: Option[String] = Option(output.title)
+
+        override val authors: Option[Seq[Author]] =  Option(output.authors).map { as =>
+          as.asScala.map { a =>
+            Author(a)
+          }
         }
-      }
 
-      override val year: Option[Int] = if(output.year == 0) None else Some(output.year)
+        override val year: Option[Int] = if(output.year == 0) None else Some(output.year)
 
-      override val venue: Option[String] = None
+        override val venue: Option[String] = None
 
-      override val abstractText: Option[String] = Option(output.abstractText)
+        override val abstractText: Option[String] = Option(output.abstractText)
 
-      override val sections: Option[Seq[Section]] = Option(output.sections).map { ss =>
-        ss.asScala.map { s =>
-          Section(Option(s.heading), s.text)
+        override val sections: Option[Seq[Section]] = Option(output.sections).map { ss =>
+          ss.asScala.map { s =>
+            Section(Option(s.heading), s.text)
+          }
         }
-      }
 
-      override val references: Option[Seq[Reference]] = Option(output.references).map { rs =>
-        rs.asScala.map { r =>
-          Reference(
-            None,
-            Option(r.title),
-            Option(r.author).map(_.asScala.toSeq).getOrElse(Seq.empty),
-            Option(r.venue),
-            if(r.year == 0) None else Some(r.year),
-            None,
-            None
-          )
+        override val references: Option[Seq[Reference]] = Option(output.references).map { rs =>
+          rs.asScala.map { r =>
+            Reference(
+              None,
+              Option(r.title),
+              Option(r.author).map(_.asScala.toSeq).getOrElse(Seq.empty),
+              Option(r.venue),
+              if(r.year == 0) None else Some(r.year),
+              None,
+              None
+            )
+          }
         }
-      }
 
-      override def mentions: Option[Seq[Mention]] = ???
+        override def mentions: Option[Seq[Mention]] = ???
+      }
+    } catch {
+      case NonFatal(e) =>
+        logger.warn(s"Error while science-parsing: $e")
+        new EmptyLabeledData(labeledPaperId, input)
     }
   }
 
   def main(args: Array[String]): Unit = {
     val fromResources = LabeledDataFromResources.get
     val fromSp =
-      fromResources.parMap(labeledDataFromResources => get(labeledDataFromResources.inputStream))
+      fromResources.parMap(
+        labeledDataFromResources => get(labeledDataFromResources.inputStream),
+        Runtime.getRuntime.availableProcessors() * 2
+      )
     LabeledData.dump(fromSp)
   }
 }
@@ -628,9 +655,9 @@ object LabeledDataFromGrobidServer {
     val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
 
     val fromResources = LabeledDataFromResources.get
-    val fromGrobid = fromResources.parMap { labeledDataFromResources =>
-      labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
-    }
+    val fromGrobid = fromResources.parMap(
+      labeledDataFromResources => labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream),
+      Runtime.getRuntime.availableProcessors() * 2)
     LabeledData.dump(fromGrobid)
   }
 }
