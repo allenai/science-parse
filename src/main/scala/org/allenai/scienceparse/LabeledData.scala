@@ -503,8 +503,7 @@ object LabeledDataFromScienceParse extends Logging {
     val fromResources = LabeledDataFromResources.get
     val fromSp =
       fromResources.parMap(
-        labeledDataFromResources => get(labeledDataFromResources.inputStream),
-        Runtime.getRuntime.availableProcessors() * 2
+        labeledDataFromResources => get(labeledDataFromResources.inputStream)
       )
     LabeledData.dump(fromSp)
   }
@@ -655,9 +654,9 @@ object LabeledDataFromGrobidServer {
     val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
 
     val fromResources = LabeledDataFromResources.get
-    val fromGrobid = fromResources.parMap(
-      labeledDataFromResources => labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream),
-      Runtime.getRuntime.availableProcessors() * 2)
+    val fromGrobid = fromResources.parMap { labeledDataFromResources =>
+      labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
+    }
     LabeledData.dump(fromGrobid)
   }
 }
