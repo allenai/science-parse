@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
+import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import com.gs.collections.impl.tuple.Tuples;
 
 import lombok.Data;
@@ -42,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.FileSystems;
@@ -493,6 +495,34 @@ public class Parser {
           new File(opts.backgroundDirectory),
           opts.backgroundSamples);
       predExtractor = new ReferencesPredicateExtractor(plf);
+      //throw-away code to check how many missing titles are in DB:
+      String evalFile = "c:\\git\\science-parse\\EvalErrors-bak.log";
+      BufferedReader brIn = new BufferedReader(new InputStreamReader(new FileInputStream(evalFile), "UTF-8"));
+      String sLine;
+      int totalMissing = 0;
+      int missingAndInDB = 0;
+      LongHashSet paperHashCodes = new LongHashSet();
+      for(int i=0; i<gaz.papers.size(); i++) {
+        String ttl = Parser.processTitle(gaz.papers.get(i).title);
+        paperHashCodes.add(StringLongHash.hash(ttl));
+      }
+      logger.info("added " + paperHashCodes.size() + " hash codes.");
+      while((sLine = brIn.readLine())!= null) {
+        String [] fields = sLine.split("\t");
+        if(fields[0].equals("bibTitles")&&fields[1].equals("recall")) {
+          totalMissing++;
+          String ttl = Parser.processTitle(fields[4]);
+          if(paperHashCodes.contains(StringLongHash.hash(ttl))) {
+            logger.info("hit on " + fields[4] + "\t" + fields[2]);
+            missingAndInDB++;
+          }
+          else {
+            //logger.info("miss on " + fields[4]);
+          }
+        }
+      }
+      logger.info("Missing: " + totalMissing + " in DB: " + missingAndInDB);
+      brIn.close();
     } else {
       predExtractor = new ReferencesPredicateExtractor();
     }
@@ -1110,6 +1140,7 @@ public class Parser {
       logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
       logger.info("blank abstracts: " + blankAbstracts);
+            
     }
     else if(args[0].equalsIgnoreCase("learnBibCRF")) {
       ParseOpts opts = new ParseOpts();
@@ -1117,7 +1148,7 @@ public class Parser {
       opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
       opts.gazetteerDir = Parser.getDefaultGazetteerDir().toString();
       opts.backgroundDirectory = args[3];
-      opts.iterations = 600;
+      opts.iterations = 20;
       opts.threads = Runtime.getRuntime().availableProcessors();
       opts.backgroundSamples = 5;
       opts.trainFraction = 0.9;

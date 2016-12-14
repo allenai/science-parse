@@ -27,6 +27,7 @@ import org.allenai.ml.sequences.crf.CRFModel;
 import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
+import org.allenai.scienceparse.ExtractReferences.BibStractor;
 
 @Slf4j
 public class ExtractReferences {
@@ -370,6 +371,12 @@ public class ExtractReferences {
       return false;
   }
   
+  private static void clean(List<BibRecord> brs) {
+    for(BibRecord b : brs) {
+      b.title = b.title.replaceAll("^\\p{P}", "").replaceAll("\\p{P}$", "");
+    }
+  }
+  
   /**
    * Returns the list of BibRecords, plus the extractor that produced them (in order to enable
    * citation parsing)
@@ -389,6 +396,7 @@ public class ExtractReferences {
     String text = sb.toString();
     for (int i = 0; i < results.length; i++) {
       results[i] = extractors.get(i).parse(text);
+      clean(results[i]);
     }
     int idx = longestIdx(results);
     //log.info("references: " + results[idx].toString());
@@ -419,6 +427,10 @@ public class ExtractReferences {
       }
     }
 
+    BibStractor() {
+      recParser = null;
+    }
+    
     public abstract List<BibRecord> parse(String source);
 
     public abstract String getCiteRegex();
@@ -433,7 +445,7 @@ public class ExtractReferences {
       return new BibRecord(line, null, null, null, null, 0);
     }
   }
-
+  
   private static class BracketNumberInitialsQuotedBibRecordParser implements BibRecordParser {
     private static final String regEx =
       "\\[([0-9]+)\\] (.*)(?:,|\\.|:) [\\p{Pi}\"\']+(.*),[\\p{Pf}\"\']+ (?:(?:I|i)n )?(.*)\\.?";
@@ -704,6 +716,59 @@ public class ExtractReferences {
       return cleanAuthString(getAuthorLastName(authors.get(0))) + " and " + cleanAuthString(getAuthorLastName(authors.get(1)));
     }
     return null;
+  }
+  
+  public class DataMatchBibStractor extends BibStractor {
+
+    DataMatchBibStractor (Class[] c) {
+      if(c != null) {
+        log.error("BibRecordParsers not supported in DataMatchBibStractor.  Ignoring.");
+      }
+    }
+
+    @Override
+    public List<BibRecord> parse(String line) {
+      List<BibRecord> out = new ArrayList<BibRecord>();
+      
+      boolean first = true;
+      /*for (String s : cites) {
+        s = s.replaceAll("-<lb>", "").replaceAll("<lb>", " ").trim();
+        if(first) { //don't overwrite number-bracket or number-dot
+          if(s.length() > 0)
+              if(RegexWithTimeout.matcher(pBracket, s).matches() ||
+            RegexWithTimeout.matcher(pDot, s).matches()) {
+                return removeNulls(out);
+              }
+              else {
+                first = false;
+              }
+        }
+        for(int i=0; i<recParser.length;i++) {
+          BibRecord br = this.recParser[i].parseRecord(s);
+          if(br!=null) {
+            out.add(br);
+            break;
+          }
+        }
+      }
+      out = removeNulls(out);*/
+      return out;
+    }
+
+    @Override
+    public String getCiteRegex() {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public String getCiteDelimiter() {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    
+    
   }
   
   public class NamedYear extends BibStractor {

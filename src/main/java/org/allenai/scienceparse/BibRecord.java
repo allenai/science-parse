@@ -47,7 +47,7 @@ public class BibRecord {
             year);
   }
 
-  public final String title;
+  public String title;
   public final List<String> author;
   public final String venue;
   public final Pattern citeRegEx;

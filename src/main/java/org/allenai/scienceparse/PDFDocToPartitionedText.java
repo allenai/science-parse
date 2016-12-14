@@ -253,7 +253,6 @@ public class PDFDocToPartitionedText {
             }
             else if(lenient) { //used if we don't find refs on first pass
               if(lenientRefStart(l, prevLine, qLineBreak)) {
-                log.info("in refs from lenient pass.");
                 inRefs = true;
                 foundRefs = true;
                 //DON'T skip this line.

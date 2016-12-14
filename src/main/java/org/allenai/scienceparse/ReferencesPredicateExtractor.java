@@ -28,6 +28,8 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
   private ParserLMFeatures lmFeats;
   private final Searcher word2vecSearcher;
   
+  public static final Pattern yearPattern = Pattern.compile("((?:19|20)[0-9][0-9])");
+  
   @Setter private GazetteerFeatures gf;
   
   public ReferencesPredicateExtractor() {
@@ -104,8 +106,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
       m.put("%pRange", 1.0);
       ct++;
     }
-    Pattern pProbableYear = Pattern.compile("(19|20)[0-9][0-9]");
-    if(RegexWithTimeout.matcher(pProbableYear, tok).find()) {
+    if(RegexWithTimeout.matcher(yearPattern, tok).find()) {
       m.put("%hasYear", 1.0);
     }
     Pattern pVolume = Pattern.compile("[0-9](\\([0-9]+\\))?\\p{P}?");

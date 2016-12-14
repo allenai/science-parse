@@ -188,7 +188,6 @@ public class CRFBibRecordParser implements BibRecordParser {
     line = line.trim();
     if(line.isEmpty())
       return null;
-//    log.info("parsing " + line);
     ArrayList<String> toks = new ArrayList<String>();
     toks.add("<S>");
     toks.addAll(tokenize(line));
@@ -227,9 +226,15 @@ public class CRFBibRecordParser implements BibRecordParser {
 //    log.info("year first extracted: " + year);
     
     int iYear = -1;
+    if(year == null) { //backoff to any year-like string
+      Matcher mY = RegexWithTimeout.matcher(ReferencesPredicateExtractor.yearPattern, line);
+      while(mY.find()) {
+        year = mY.group(1);
+      }
+    }
     if(year != null)
      iYear = ExtractReferences.extractRefYear(year);
-    
+
     if(citeRegEx == null && year != null) {
       shortCiteRegEx = ExtractReferences.getCiteAuthorFromAuthors(authors);
       citeRegEx = shortCiteRegEx + ",? " + ((iYear > 0)?Pattern.quote(iYear + ""):"");
