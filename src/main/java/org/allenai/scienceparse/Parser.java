@@ -1176,6 +1176,7 @@ public class Parser {
     //
     // Run figure extraction to get sections
     //
+    /*
     try {
       final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
       em.sections = ScalaStreamSupport.stream(doc.sections()).map(documentSection ->
@@ -1190,6 +1191,7 @@ public class Parser {
           e.getMessage());
       em.sections = null;
     }
+    */
 
     return em;
   }
