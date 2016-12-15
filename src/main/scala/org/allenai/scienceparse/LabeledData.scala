@@ -1,7 +1,7 @@
 package org.allenai.scienceparse
 
 import java.io._
-import java.net.URL
+import java.net.{SocketTimeoutException, URL}
 import java.nio.file.Files
 import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.ZipFile
@@ -12,13 +12,14 @@ import org.allenai.datastore.Datastores
 import org.apache.commons.io.IOUtils
 import org.apache.pdfbox.pdmodel.PDDocument
 import scala.io.{Codec, Source}
+import scala.util.{Success, Failure, Try, Random}
 import scala.util.control.NonFatal
 import scala.xml.{Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.allenai.common.StringUtils._
 
 import scala.collection.JavaConverters._
-import scalaj.http.{MultiPart, Http}
+import scalaj.http.{HttpResponse, MultiPart, Http}
 
 trait LabeledData {
   import LabeledData._
@@ -535,6 +536,38 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
     sb.toString
   }
 
+  private val random = new Random
+  /** Gets a response from an HTTP server given a request. Retries if we think retrying might fix it. */
+  private def withRetries[T](f: () => HttpResponse[T], retries: Int = 10): HttpResponse[T] = if (retries <= 0) {
+    f()
+  } else {
+    val sleepTime = random.nextInt(1000) + 2500 // sleep between 2.5 and 3.5 seconds
+    // If something goes wrong, we sleep a random amount of time, to make sure that we don't slam
+    // the server, get timeouts, wait for exactly the same amount of time on all threads, and then
+    // slam the server again.
+
+    Try(f()) match {
+      case Failure(e: SocketTimeoutException) =>
+        logger.warn(s"$e while querying Grobid. $retries retries left.")
+        Thread.sleep(sleepTime)
+        withRetries(f, retries - 1)
+
+      case Failure(e: IOException) =>
+        logger.warn(s"Got IOException '${e.getMessage}' while querying Grobid. $retries retries left.")
+        Thread.sleep(sleepTime)
+        withRetries(f, retries - 1)
+
+      case Success(response) if response.isServerError =>
+        logger.warn(s"Got response code ${response.statusLine} while querying Grobid. $retries retries left.")
+        Thread.sleep(sleepTime)
+        withRetries(f, retries - 1)
+
+      case Failure(e) => throw e
+
+      case Success(response) => response
+    }
+  }
+
   def get(input: => InputStream) = {
     val digest = MessageDigest.getInstance("SHA-1")
     digest.reset()
@@ -542,9 +575,10 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
     val paperId = toHex(digest.digest())
     val labeledDataId = s"Grobid:$grobidServerUrl/$paperId"
 
-    val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
-    val response =
-      Http(grobidServerUrl + "/processFulltextDocument").timeout(30000, 30000).postMulti(multipart).asBytes
+    val response = withRetries { () =>
+      val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
+      Http(grobidServerUrl + "/processFulltextDocument").timeout(60000, 60000).postMulti(multipart).asBytes
+    }
     if(response.is5xx) {
       logger.warn(s"Error from Grobid: ${response.statusLine}")
       new EmptyLabeledData(labeledDataId, input)
