@@ -221,13 +221,19 @@ object LabeledDataFromPMC extends Datastores with Logging {
       }
   }
 
+  private def pdfNameForXmlName(xmlName: String) =
+    xmlName.dropRight(xmlExtension.length) + ".pdf"
+
   def get: Iterator[LabeledData] = set2version.iterator.flatMap { case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { case zipFile =>
-      zipFile.entries().asScala.filter { entry =>
-        !entry.isDirectory && entry.getName.endsWith(xmlExtension)
-      }.map { entry =>
-        (zipFilePath, entry.getName)
+      def allNames = zipFile.entries().asScala.filterNot(_.isDirectory).map(_.getName)
+      val pdfNames = allNames.filter(_.endsWith(".pdf")).toSet
+
+      allNames.filter { name =>
+        name.endsWith(xmlExtension) && pdfNames.contains(pdfNameForXmlName(name))
+      }.map { name =>
+        (zipFilePath, name)
       }.toArray
     }
   }.map { case (zipFilePath, xmlEntryName) =>
@@ -247,12 +253,11 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
     new LabeledData {
       // input
-      override def inputStream: InputStream =
-        getEntryAsInputStream(xmlEntryName.dropRight(xmlExtension.length) + ".pdf")
+      override def inputStream: InputStream = getEntryAsInputStream(pdfNameForXmlName(xmlEntryName))
 
       override lazy val pdDoc: PDDocument = super.pdDoc // Overriding this to make it into a lazy val
 
-      override def id = s"PMC:$xmlEntryName"
+      override val id = s"PMC:$xmlEntryName"
 
       private def parseInt(n: Node): Option[Int] = {
         try {
