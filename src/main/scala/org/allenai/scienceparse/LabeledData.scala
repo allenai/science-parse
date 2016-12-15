@@ -15,36 +15,13 @@ import scala.io.{Codec, Source}
 import scala.util.control.NonFatal
 import scala.xml.{Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
+import org.allenai.common.StringUtils._
 
 import scala.collection.JavaConverters._
 import scalaj.http.{MultiPart, Http}
 
 trait LabeledData {
-  case class Author(
-    name: String,
-    email: Option[String] = None,
-    affiliations: Seq[String] = Seq.empty
-  )
-
-  case class Section(heading: Option[String], text: String)
-
-  case class Reference(
-    label: Option[String],  // This is the "1" in "[1]", or "Etzioni2016"
-    title: Option[String],
-    authors: Seq[String],
-    venue: Option[String],
-    year: Option[Int],
-    volume: Option[String],
-    pageRange: Option[(String, String)]
-  )
-
-  case class Range(start: Int, end: Int)
-
-  case class Mention(
-    reference: Reference,
-    text: String,
-    inContext: Option[(Section, Range)]
-  )
+  import LabeledData._
 
   /** ID to identify this labeled document. Must be unique. */
   def id: String
@@ -110,20 +87,33 @@ trait LabeledData {
   }
 }
 
-class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledData {
-  override def inputStream = input
-
-  override def title: Option[String] = None
-  override def authors: Option[Seq[Author]] = None
-  override def abstractText: Option[String] = None
-  override def year: Option[Int] = None
-  override def venue: Option[String] = None
-  override def sections: Option[Seq[Section]] = None
-  override def references: Option[Seq[Reference]] = None
-  override def mentions: Option[Seq[Mention]] = None
-}
-
 object LabeledData {
+  case class Author(
+    name: String,
+    email: Option[String] = None,
+    affiliations: Seq[String] = Seq.empty
+  )
+
+  case class Section(heading: Option[String], text: String)
+
+  case class Reference(
+    label: Option[String],  // This is the "1" in "[1]", or "Etzioni2016"
+    title: Option[String],
+    authors: Seq[String],
+    venue: Option[String],
+    year: Option[Int],
+    volume: Option[String],
+    pageRange: Option[(String, String)]
+  )
+
+  case class Range(start: Int, end: Int)
+
+  case class Mention(
+    reference: Reference,
+    text: String,
+    inContext: Option[(Section, Range)]
+  )
+
   def dump(labeledData: Iterator[LabeledData]): Unit = {
     // We don't time the first one, because it might load models.
     println(labeledData.next().readableString)
@@ -136,7 +126,24 @@ object LabeledData {
   }
 }
 
+class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledData {
+  import LabeledData._
+
+  override def inputStream = input
+
+  override def title: Option[String] = None
+  override def authors: Option[Seq[Author]] = None
+  override def abstractText: Option[String] = None
+  override def year: Option[Int] = None
+  override def venue: Option[String] = None
+  override def sections: Option[Seq[Section]] = None
+  override def references: Option[Seq[Reference]] = None
+  override def mentions: Option[Seq[Mention]] = None
+}
+
 object LabeledDataFromPMC extends Datastores with Logging {
+  import LabeledData._
+
   private val xmlExtension = ".nxml"
 
   private val set2version = Map(
@@ -356,6 +363,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
 }
 
 object LabeledDataFromResources extends Datastores {
+  import LabeledData._
+
   def apply = get
 
   def get: Iterator[LabeledData] = {
@@ -434,6 +443,8 @@ object LabeledDataFromResources extends Datastores {
 }
 
 object LabeledDataFromScienceParse extends Logging {
+  import LabeledData._
+
   private val sha1HexLength = 40
   private def toHex(bytes: Array[Byte]): String = {
     val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
@@ -510,6 +521,8 @@ object LabeledDataFromScienceParse extends Logging {
 }
 
 class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
+  import LabeledData._
+
   private val sha1HexLength = 40
   private def toHex(bytes: Array[Byte]): String = {
     val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
@@ -543,7 +556,8 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
 
         private val fileDesc = xml \ "teiHeader" \ "fileDesc"
 
-        override val title: Option[String] = (fileDesc \ "titleStmt" \ "title").headOption.map(_.text)
+        override val title: Option[String] =
+          (fileDesc \ "titleStmt" \ "title").headOption.map(_.text.trim.titleCase)
 
         override val authors: Option[Seq[Author]] = Some(
           (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
@@ -599,6 +613,15 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
                 }
               }
 
+              def sanitizeTitleText(title: String) = {
+                val trimmed = title.trimChars(",.")
+                trimmed.find(c => Character.isAlphabetic(c)) match {
+                  case None => None
+                  case Some(_) => Some(trimmed)
+                }
+              }
+
+
               (biblStructNode \ "analytic").headOption.map { analyticNode =>
                 // This is the case where we have an article (in the "analytic" section) inside a
                 // collection (in the "monogr" section.
@@ -609,7 +632,7 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
 
                 Reference(
                   None,
-                  title,
+                  title.flatMap(sanitizeTitleText),
                   authors,
                   venue,
                   year,
@@ -625,7 +648,7 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
 
                 Reference(
                   None,
-                  title,
+                  title.flatMap(sanitizeTitleText),
                   authors,
                   None,
                   year,
@@ -641,7 +664,9 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
         private def authorNameFromNode(authorNode: Node) = {
           val nameNodes =
             (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
-          nameNodes.map(_.text).mkString(" ").trim
+
+          def addDot(x: String) = if (x.length == 1) s"$x." else x
+          nameNodes.map(_.text).filter(_.nonEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
         }
       }
     }
