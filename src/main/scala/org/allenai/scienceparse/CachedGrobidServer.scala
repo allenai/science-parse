@@ -1,13 +1,13 @@
 package org.allenai.scienceparse
 
-import java.io.{ByteArrayInputStream, IOException, InputStream}
+import java.io.{ByteArrayInputStream, IOException}
 import java.net.{SocketTimeoutException, URL}
 import java.nio.file.{NoSuchFileException, Paths, Files}
-import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.{GZIPOutputStream, GZIPInputStream}
 
 import org.allenai.common.{Logging, Resource}
 import org.apache.commons.io.IOUtils
+import org.xml.sax.SAXParseException
 
 import scala.util.control.NonFatal
 import scala.util.{Success, Failure, Try, Random}
@@ -50,7 +50,7 @@ class CachedGrobidServer(url: URL) extends Logging {
         withRetries(f, retries - 1)
 
       case Success(response) if response.isServerError =>
-        logger.warn(s"Got response code ${response.statusLine} while querying Grobid. $retries retries left.")
+        logger.warn(s"Got response code '${response.statusLine}' while querying Grobid. $retries retries left.")
         Thread.sleep(sleepTime)
         withRetries(f, retries - 1)
 
@@ -62,44 +62,51 @@ class CachedGrobidServer(url: URL) extends Logging {
 
   // Note: This is not thread safe if you have two threads or processes ask for the same file at
   // the same time.
-  def getIdAndExtractions(input: InputStream): (String, Try[Node]) = {
-    val digest = MessageDigest.getInstance("SHA-1")
-    digest.reset()
-    val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
-    val paperId = toHex(digest.digest())
+  def getExtractions(bytes: Array[Byte]): Node = {
+    val paperId = Utilities.shaForBytes(bytes)
 
     val cacheFile = cacheDir.resolve(paperId + ".xml.gz")
-    val result = Try {
-      try {
-        if (Files.size(cacheFile) == 0)
-          throw new IOException(s"Paper $paperId is tombstoned")
-        else
-          Resource.using(new GZIPInputStream(Files.newInputStream(cacheFile)))(XML.load)
-      } catch {
-        case _: NoSuchFileException =>
-          logger.debug(s"Cache miss for $paperId")
+    try {
+      if (Files.size(cacheFile) == 0)
+        throw new IOException(s"Paper $paperId is tombstoned")
+      else
+        Resource.using(new GZIPInputStream(Files.newInputStream(cacheFile)))(XML.load)
+    } catch {
+      case _: NoSuchFileException =>
+        logger.debug(s"Cache miss for $paperId")
+        try {
+          val response = withRetries { () =>
+            val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
+            Http(url + "/processFulltextDocument").timeout(60000, 60000).postMulti(multipart).asBytes
+          }
+          val bais = new ByteArrayInputStream(response.body)
+          Resource.using(new GZIPOutputStream(Files.newOutputStream(cacheFile))) { os =>
+            IOUtils.copy(bais, os)
+          }
+          bais.reset()
           try {
-            val response = withRetries { () =>
-              val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
-              Http(url + "/processFulltextDocument").timeout(60000, 60000).postMulti(multipart).asBytes
-            }
-            val bais = new ByteArrayInputStream(response.body)
-            Resource.using(new GZIPOutputStream(Files.newOutputStream(cacheFile))) { os =>
-              IOUtils.copy(bais, os)
-            }
-            bais.reset()
             XML.load(bais)
           } catch {
-            case NonFatal(e) =>
-              logger.warn(s"Tombstoning $paperId because of the following error:", e)
-              Files.deleteIfExists(cacheFile)
-              Files.createFile(cacheFile)
-              throw e
-          }
-      }
-    }
+            case e: SAXParseException if e.getMessage == "Content is not allowed in prolog." =>
+              val prefix = response.body.takeWhile(_ != '<').take(32)
+              val prefixString = toHex(prefix)
 
-    (paperId, result)
+              throw new SAXParseException(
+                s"Content '$prefixString' is not allowed in prolog.",
+                e.getPublicId,
+                e.getSystemId,
+                e.getLineNumber,
+                e.getColumnNumber,
+                e)
+          }
+        } catch {
+          case NonFatal(e) =>
+            logger.warn(s"Tombstoning $paperId because of the following error:", e)
+            Files.deleteIfExists(cacheFile)
+            Files.createFile(cacheFile)
+            throw e
+        }
+    }
   }
 }
 

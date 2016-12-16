@@ -55,12 +55,15 @@ object LabeledDataEvaluation {
 
       // read the data
       val goldData = LabeledDataFromResources.get
-      
+
+      val oldGrobid = LabeledDataFromOldGrobid.get.map(ld => ld.paperId -> ld).toMap
+
       val extractions = goldData.parMap { gold =>
-        val grobid = labeledDataFromGrobidServer.get(gold.inputStream)
-        val sp = LabeledDataFromScienceParse.get(gold.inputStream)
-        (gold, sp, grobid)
-      }.toSeq
+        oldGrobid.get(gold.paperId).map { grobid =>
+          val sp = LabeledDataFromScienceParse.get(gold.inputStream)
+          (gold, sp, grobid)
+        }
+      }.flatten.toSeq
 
       // calculate title metrics
       {

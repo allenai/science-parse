@@ -1,7 +1,7 @@
 package org.allenai.scienceparse
 
 import java.io._
-import java.net.{SocketTimeoutException, URL}
+import java.net.URL
 import java.nio.file.Files
 import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.ZipFile
@@ -9,17 +9,15 @@ import java.util.zip.ZipFile
 import org.allenai.common.{Logging, Resource}
 import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
 import scala.io.{Codec, Source}
-import scala.util.{Success, Failure, Try, Random}
 import scala.util.control.NonFatal
 import scala.xml.{Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.allenai.common.StringUtils._
 
 import scala.collection.JavaConverters._
-import scalaj.http.{HttpResponse, MultiPart, Http}
 
 trait LabeledData {
   import LabeledData._
@@ -29,8 +27,9 @@ trait LabeledData {
 
   // input
   def inputStream: InputStream
-  def bytes: Array[Byte] = Resource.using(inputStream) { IOUtils.toByteArray }
-  def pdDoc: PDDocument = Resource.using(inputStream) { PDDocument.load }
+  lazy val bytes: Array[Byte] = Resource.using(inputStream) { IOUtils.toByteArray }
+  lazy val paperId: String = Utilities.shaForBytes(bytes)
+  lazy val pdDoc: PDDocument = Resource.using(inputStream) { PDDocument.load }
 
   // expected output
   // These are all Options. If they are not set, we don't have that field labeled for this paper.
@@ -114,6 +113,49 @@ object LabeledData {
     text: String,
     inContext: Option[(Section, Range)]
   )
+
+  def fromExtractedMetadata(input: => InputStream, labeledDataId: String, em: ExtractedMetadata) =
+    new LabeledData {
+      override def inputStream: InputStream = input
+
+      override val id: String = labeledDataId
+
+      override val title: Option[String] = Option(em.title)
+
+      override val authors: Option[Seq[Author]] =  Option(em.authors).map { as =>
+        as.asScala.map { a =>
+          Author(a)
+        }
+      }
+
+      override val year: Option[Int] = if(em.year == 0) None else Some(em.year)
+
+      override val venue: Option[String] = None
+
+      override val abstractText: Option[String] = Option(em.abstractText)
+
+      override val sections: Option[Seq[Section]] = Option(em.sections).map { ss =>
+        ss.asScala.map { s =>
+          Section(Option(s.heading), s.text)
+        }
+      }
+
+      override val references: Option[Seq[Reference]] = Option(em.references).map { rs =>
+        rs.asScala.map { r =>
+          Reference(
+            None,
+            Option(r.title),
+            Option(r.author).map(_.asScala.toSeq).getOrElse(Seq.empty),
+            Option(r.venue),
+            if(r.year == 0) None else Some(r.year),
+            None,
+            None
+          )
+        }
+      }
+
+      override def mentions: Option[Seq[Mention]] = ???
+    }
 
   def dump(labeledData: Iterator[LabeledData]): Unit = {
     // We don't time the first one, because it might load models.
@@ -255,8 +297,6 @@ object LabeledDataFromPMC extends Datastores with Logging {
     new LabeledData {
       // input
       override def inputStream: InputStream = getEntryAsInputStream(pdfNameForXmlName(xmlEntryName))
-
-      override lazy val pdDoc: PDDocument = super.pdDoc // Overriding this to make it into a lazy val
 
       override val id = s"PMC:$xmlEntryName"
 
@@ -402,8 +442,10 @@ object LabeledDataFromResources extends Datastores {
 
     val allPaperIds = allData.map(_.keySet).reduce(_ ++ _)
 
-    allPaperIds.iterator.map { paperId =>
+    allPaperIds.iterator.map { pid =>
       new LabeledData {
+        override lazy val paperId = pid
+
         override val id: String = s"Resources:$paperId"
 
         override def inputStream: InputStream =
@@ -451,64 +493,16 @@ object LabeledDataFromResources extends Datastores {
 object LabeledDataFromScienceParse extends Logging {
   import LabeledData._
 
-  private val sha1HexLength = 40
-  private def toHex(bytes: Array[Byte]): String = {
-    val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
-    bytes.foreach { byte => sb.append(f"$byte%02x") }
-    sb.toString
-  }
-
   def get(input: => InputStream, parser: Parser = Parser.getInstance()) = {
     val digest = MessageDigest.getInstance("SHA-1")
     digest.reset()
     val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
-    val id = toHex(digest.digest())
+    val id = Utilities.toHex(digest.digest())
     val labeledPaperId = s"SP:$id"
 
     try {
       val output = Resource.using(new ByteArrayInputStream(bytes))(parser.doParse)
-
-      new LabeledData {
-        override def inputStream: InputStream = input
-
-        override val id: String = labeledPaperId
-
-        override val title: Option[String] = Option(output.title)
-
-        override val authors: Option[Seq[Author]] =  Option(output.authors).map { as =>
-          as.asScala.map { a =>
-            Author(a)
-          }
-        }
-
-        override val year: Option[Int] = if(output.year == 0) None else Some(output.year)
-
-        override val venue: Option[String] = None
-
-        override val abstractText: Option[String] = Option(output.abstractText)
-
-        override val sections: Option[Seq[Section]] = Option(output.sections).map { ss =>
-          ss.asScala.map { s =>
-            Section(Option(s.heading), s.text)
-          }
-        }
-
-        override val references: Option[Seq[Reference]] = Option(output.references).map { rs =>
-          rs.asScala.map { r =>
-            Reference(
-              None,
-              Option(r.title),
-              Option(r.author).map(_.asScala.toSeq).getOrElse(Seq.empty),
-              Option(r.venue),
-              if(r.year == 0) None else Some(r.year),
-              None,
-              None
-            )
-          }
-        }
-
-        override def mentions: Option[Seq[Mention]] = ???
-      }
+      LabeledData.fromExtractedMetadata(input, labeledPaperId, output)
     } catch {
       case NonFatal(e) =>
         logger.warn(s"Error while science-parsing: $e")
@@ -526,143 +520,155 @@ object LabeledDataFromScienceParse extends Logging {
   }
 }
 
-class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
+abstract class LabeledDataFromGrobid extends Logging {
   import LabeledData._
 
-  private val cachedGrobidServer = new CachedGrobidServer(grobidServerUrl)
+  protected def xmlForPdf(pdf: Array[Byte]): Node
+  protected def labeledDataId(paperId: String): String
 
   def get(input: => InputStream) = {
-    val (paperId, tryXml) = cachedGrobidServer.getIdAndExtractions(input)
+    val bytes = IOUtils.toByteArray(input)
+    val pid = Utilities.shaForBytes(bytes)
+    try {
+      val xml = xmlForPdf(bytes)
+      new LabeledData {
+        override def inputStream: InputStream = input
 
-    val labeledDataId = s"Grobid:$grobidServerUrl/$paperId"
+        override lazy val paperId = pid
 
-    tryXml match {
-      case Failure(e) =>
-        logger.warn(s"Error '${e.getMessage}' from Grobid for paper $paperId")
-        new EmptyLabeledData(labeledDataId, input)
-      case Success(xml) =>
-        new LabeledData {
-          override def inputStream: InputStream = input
+        override val id: String = labeledDataId(paperId)
 
-          override val id: String = labeledDataId
+        private val fileDesc = xml \ "teiHeader" \ "fileDesc"
 
-          private val fileDesc = xml \ "teiHeader" \ "fileDesc"
+        override val title: Option[String] =
+          (fileDesc \ "titleStmt" \ "title").headOption.map(_.text.trim.titleCase)
 
-          override val title: Option[String] =
-            (fileDesc \ "titleStmt" \ "title").headOption.map(_.text.trim.titleCase)
-
-          override val authors: Option[Seq[Author]] = Some(
-            (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
-              val name = authorNameFromNode(authorNode)
-              val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
-                (affiliationNode \ "orgName").map(_.text).mkString(", ")
-              }
-
-              // TODO: email
-
-              Author(name, None, affiliations)
+        override val authors: Option[Seq[Author]] = Some(
+          (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
+            val name = authorNameFromNode(authorNode)
+            val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
+              (affiliationNode \ "orgName").map(_.text).mkString(", ")
             }
-          )
 
-          override val year: Option[Int] = None // TODO
+            // TODO: email
 
-          override val venue: Option[String] = None // TODO
-
-          override val abstractText: Option[String] =
-            (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
-
-          override val sections: Option[Seq[Section]] = Some {
-            (xml \ "text" \ "body" \ "div").map { div =>
-              val bodyPlusHeaderText = div.text
-
-              val head = (div \ "head").headOption.map(_.text)
-              val body = head match {
-                case Some(h) => bodyPlusHeaderText.drop(h.length)
-                case None => bodyPlusHeaderText
-              }
-
-              Section(head, body)
-            }
+            Author(name, None, affiliations)
           }
+        )
 
-          override val references: Option[Seq[Reference]] =
-            (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
-              (listBiblNode \ "biblStruct").map { biblStructNode =>
-                val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
-                  headOption.
-                  map { node =>
-                    node.text.takeWhile(c => c >= '0' && c <= '9').toInt
-                  }
+        override val year: Option[Int] = None // TODO
 
-                val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
-                val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
-                val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
-                  val from = (node \ "@from").headOption.map(_.text)
-                  val to = (node \ "@to").headOption.map(_.text)
-                  (from, to) match {
-                    case (Some(a), Some(b)) => Some((a, b))
-                    case _ => None
-                  }
-                }
+        override val venue: Option[String] = None // TODO
 
-                def sanitizeTitleText(title: String) = {
-                  val trimmed = title.trimChars(",.")
-                  trimmed.find(c => Character.isAlphabetic(c)) match {
-                    case None => None
-                    case Some(_) => Some(trimmed)
-                  }
-                }
+        override val abstractText: Option[String] =
+          (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
 
+        override val sections: Option[Seq[Section]] = Some {
+          (xml \ "text" \ "body" \ "div").map { div =>
+            val bodyPlusHeaderText = div.text
 
-                (biblStructNode \ "analytic").headOption.map { analyticNode =>
-                  // This is the case where we have an article (in the "analytic" section) inside a
-                  // collection (in the "monogr" section.
-
-                  val title = (analyticNode \ "title").headOption.map(_.text)
-                  val authors = (analyticNode \ "author").map(authorNameFromNode)
-                  val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-
-                  Reference(
-                    None,
-                    title.flatMap(sanitizeTitleText),
-                    authors,
-                    venue,
-                    year,
-                    volume,
-                    pageRange
-                  )
-                } getOrElse {
-                  // This is the case where we have no article as part of a collection, just a whole
-                  // work, like a book.
-
-                  val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-                  val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
-
-                  Reference(
-                    None,
-                    title.flatMap(sanitizeTitleText),
-                    authors,
-                    None,
-                    year,
-                    volume,
-                    pageRange
-                  )
-                }
-              }
+            val head = (div \ "head").headOption.map(_.text)
+            val body = head match {
+              case Some(h) => bodyPlusHeaderText.drop(h.length)
+              case None => bodyPlusHeaderText
             }
 
-          override def mentions: Option[Seq[Mention]] = ??? // TODO
-
-          private def authorNameFromNode(authorNode: Node) = {
-            val nameNodes =
-              (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
-
-            def addDot(x: String) = if (x.length == 1) s"$x." else x
-            nameNodes.map(_.text).filter(_.nonEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
+            Section(head, body)
           }
         }
+
+        override val references: Option[Seq[Reference]] =
+          (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
+            (listBiblNode \ "biblStruct").map { biblStructNode =>
+              val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
+                headOption.
+                map { node =>
+                  node.text.takeWhile(c => c >= '0' && c <= '9').toInt
+                }
+
+              val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
+              val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
+              val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
+                val from = (node \ "@from").headOption.map(_.text)
+                val to = (node \ "@to").headOption.map(_.text)
+                (from, to) match {
+                  case (Some(a), Some(b)) => Some((a, b))
+                  case _ => None
+                }
+              }
+
+              def sanitizeTitleText(title: String) = {
+                val trimmed = title.trimChars(",.")
+                trimmed.find(c => Character.isAlphabetic(c)) match {
+                  case None => None
+                  case Some(_) => Some(trimmed)
+                }
+              }
+
+
+              (biblStructNode \ "analytic").headOption.map { analyticNode =>
+                // This is the case where we have an article (in the "analytic" section) inside a
+                // collection (in the "monogr" section.
+
+                val title = (analyticNode \ "title").headOption.map(_.text)
+                val authors = (analyticNode \ "author").map(authorNameFromNode)
+                val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+
+                Reference(
+                  None,
+                  title.flatMap(sanitizeTitleText),
+                  authors,
+                  venue,
+                  year,
+                  volume,
+                  pageRange
+                )
+              } getOrElse {
+                // This is the case where we have no article as part of a collection, just a whole
+                // work, like a book.
+
+                val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+                val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
+
+                Reference(
+                  None,
+                  title.flatMap(sanitizeTitleText),
+                  authors,
+                  None,
+                  year,
+                  volume,
+                  pageRange
+                )
+              }
+            }
+          }
+
+        override def mentions: Option[Seq[Mention]] = ??? // TODO
+
+        private def authorNameFromNode(authorNode: Node) = {
+          val nameNodes =
+            (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
+
+          def addDot(x: String) = if (x.length == 1) s"$x." else x
+          nameNodes.map(_.text).filter(_.nonEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
+        }
+      }
+    } catch {
+      case NonFatal(e) =>
+        logger.warn(s"Error '${e.getMessage}' from Grobid for paper $pid")
+        new EmptyLabeledData(labeledDataId(pid), input)
     }
   }
+}
+
+class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends LabeledDataFromGrobid {
+  private val cachedGrobidServer = new CachedGrobidServer(grobidServerUrl)
+
+  override protected def labeledDataId(paperId: String): String =
+    s"Grobid:$grobidServerUrl/$paperId"
+
+  override protected def xmlForPdf(pdf: Array[Byte]): Node =
+    cachedGrobidServer.getExtractions(pdf)
 }
 
 object LabeledDataFromGrobidServer {
@@ -675,5 +681,21 @@ object LabeledDataFromGrobidServer {
       labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
     }
     LabeledData.dump(fromGrobid)
+  }
+}
+
+object LabeledDataFromOldGrobid extends Datastores {
+  def get: Iterator[LabeledData] = {
+    val grobidExtractions = publicDirectory("GrobidExtractions", 1)
+    val pdfDirectory = publicDirectory("PapersTestSet", 3)
+    Files.newDirectoryStream(grobidExtractions, "*.xml").iterator().asScala.map { file =>
+      val paperId = FilenameUtils.getBaseName(file.toString)
+      val em = GrobidParser.parseGrobidXml(file)
+      LabeledData.fromExtractedMetadata(
+        Files.newInputStream(pdfDirectory.resolve(s"$paperId.pdf")),
+        s"OldGrobid:$paperId",
+        em
+      )
+    }
   }
 }
