@@ -529,185 +529,138 @@ object LabeledDataFromScienceParse extends Logging {
 class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
   import LabeledData._
 
-  private val sha1HexLength = 40
-  private def toHex(bytes: Array[Byte]): String = {
-    val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
-    bytes.foreach { byte => sb.append(f"$byte%02x") }
-    sb.toString
-  }
-
-  private val random = new Random
-  /** Gets a response from an HTTP server given a request. Retries if we think retrying might fix it. */
-  private def withRetries[T](f: () => HttpResponse[T], retries: Int = 10): HttpResponse[T] = if (retries <= 0) {
-    f()
-  } else {
-    val sleepTime = random.nextInt(1000) + 2500 // sleep between 2.5 and 3.5 seconds
-    // If something goes wrong, we sleep a random amount of time, to make sure that we don't slam
-    // the server, get timeouts, wait for exactly the same amount of time on all threads, and then
-    // slam the server again.
-
-    Try(f()) match {
-      case Failure(e: SocketTimeoutException) =>
-        logger.warn(s"$e while querying Grobid. $retries retries left.")
-        Thread.sleep(sleepTime)
-        withRetries(f, retries - 1)
-
-      case Failure(e: IOException) =>
-        logger.warn(s"Got IOException '${e.getMessage}' while querying Grobid. $retries retries left.")
-        Thread.sleep(sleepTime)
-        withRetries(f, retries - 1)
-
-      case Success(response) if response.isServerError =>
-        logger.warn(s"Got response code ${response.statusLine} while querying Grobid. $retries retries left.")
-        Thread.sleep(sleepTime)
-        withRetries(f, retries - 1)
-
-      case Failure(e) => throw e
-
-      case Success(response) => response
-    }
-  }
+  private val cachedGrobidServer = new CachedGrobidServer(grobidServerUrl)
 
   def get(input: => InputStream) = {
-    val digest = MessageDigest.getInstance("SHA-1")
-    digest.reset()
-    val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
-    val paperId = toHex(digest.digest())
+    val (paperId, tryXml) = cachedGrobidServer.getIdAndExtractions(input)
+
     val labeledDataId = s"Grobid:$grobidServerUrl/$paperId"
 
-    val response = withRetries { () =>
-      val multipart = MultiPart("input", s"$paperId.pdf", "application/octet-stream", bytes)
-      Http(grobidServerUrl + "/processFulltextDocument").timeout(60000, 60000).postMulti(multipart).asBytes
-    }
-    if(response.is5xx) {
-      logger.warn(s"Error from Grobid: ${response.statusLine}")
-      new EmptyLabeledData(labeledDataId, input)
-    } else {
-      if (!response.isSuccess)
-        throw new IOException(s"Grobid server returned ${response.statusLine}")
+    tryXml match {
+      case Failure(e) =>
+        logger.warn(s"Error '${e.getMessage}' from Grobid for paper $paperId")
+        new EmptyLabeledData(labeledDataId, input)
+      case Success(xml) =>
+        new LabeledData {
+          override def inputStream: InputStream = input
 
-      val xml = XML.load(new ByteArrayInputStream(response.body))
+          override val id: String = labeledDataId
 
-      new LabeledData {
-        override def inputStream: InputStream = input
+          private val fileDesc = xml \ "teiHeader" \ "fileDesc"
 
-        override val id: String = labeledDataId
+          override val title: Option[String] =
+            (fileDesc \ "titleStmt" \ "title").headOption.map(_.text.trim.titleCase)
 
-        private val fileDesc = xml \ "teiHeader" \ "fileDesc"
+          override val authors: Option[Seq[Author]] = Some(
+            (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
+              val name = authorNameFromNode(authorNode)
+              val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
+                (affiliationNode \ "orgName").map(_.text).mkString(", ")
+              }
 
-        override val title: Option[String] =
-          (fileDesc \ "titleStmt" \ "title").headOption.map(_.text.trim.titleCase)
+              // TODO: email
 
-        override val authors: Option[Seq[Author]] = Some(
-          (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
-            val name = authorNameFromNode(authorNode)
-            val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
-              (affiliationNode \ "orgName").map(_.text).mkString(", ")
+              Author(name, None, affiliations)
             }
+          )
 
-            // TODO: email
+          override val year: Option[Int] = None // TODO
 
-            Author(name, None, affiliations)
+          override val venue: Option[String] = None // TODO
+
+          override val abstractText: Option[String] =
+            (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
+
+          override val sections: Option[Seq[Section]] = Some {
+            (xml \ "text" \ "body" \ "div").map { div =>
+              val bodyPlusHeaderText = div.text
+
+              val head = (div \ "head").headOption.map(_.text)
+              val body = head match {
+                case Some(h) => bodyPlusHeaderText.drop(h.length)
+                case None => bodyPlusHeaderText
+              }
+
+              Section(head, body)
+            }
           }
-        )
 
-        override val year: Option[Int] = None // TODO
+          override val references: Option[Seq[Reference]] =
+            (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
+              (listBiblNode \ "biblStruct").map { biblStructNode =>
+                val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
+                  headOption.
+                  map { node =>
+                    node.text.takeWhile(c => c >= '0' && c <= '9').toInt
+                  }
 
-        override val venue: Option[String] = None // TODO
+                val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
+                val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
+                val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
+                  val from = (node \ "@from").headOption.map(_.text)
+                  val to = (node \ "@to").headOption.map(_.text)
+                  (from, to) match {
+                    case (Some(a), Some(b)) => Some((a, b))
+                    case _ => None
+                  }
+                }
 
-        override val abstractText: Option[String] =
-          (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
+                def sanitizeTitleText(title: String) = {
+                  val trimmed = title.trimChars(",.")
+                  trimmed.find(c => Character.isAlphabetic(c)) match {
+                    case None => None
+                    case Some(_) => Some(trimmed)
+                  }
+                }
 
-        override val sections: Option[Seq[Section]] = Some {
-          (xml \ "text" \ "body" \ "div").map { div =>
-            val bodyPlusHeaderText = div.text
 
-            val head = (div \ "head").headOption.map(_.text)
-            val body = head match {
-              case Some(h) => bodyPlusHeaderText.drop(h.length)
-              case None => bodyPlusHeaderText
+                (biblStructNode \ "analytic").headOption.map { analyticNode =>
+                  // This is the case where we have an article (in the "analytic" section) inside a
+                  // collection (in the "monogr" section.
+
+                  val title = (analyticNode \ "title").headOption.map(_.text)
+                  val authors = (analyticNode \ "author").map(authorNameFromNode)
+                  val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+
+                  Reference(
+                    None,
+                    title.flatMap(sanitizeTitleText),
+                    authors,
+                    venue,
+                    year,
+                    volume,
+                    pageRange
+                  )
+                } getOrElse {
+                  // This is the case where we have no article as part of a collection, just a whole
+                  // work, like a book.
+
+                  val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
+                  val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
+
+                  Reference(
+                    None,
+                    title.flatMap(sanitizeTitleText),
+                    authors,
+                    None,
+                    year,
+                    volume,
+                    pageRange
+                  )
+                }
+              }
             }
 
-            Section(head, body)
+          override def mentions: Option[Seq[Mention]] = ??? // TODO
+
+          private def authorNameFromNode(authorNode: Node) = {
+            val nameNodes =
+              (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
+
+            def addDot(x: String) = if (x.length == 1) s"$x." else x
+            nameNodes.map(_.text).filter(_.nonEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
           }
         }
-
-        override val references: Option[Seq[Reference]] =
-          (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
-            (listBiblNode \ "biblStruct").map { biblStructNode =>
-              val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
-                headOption.
-                map { node =>
-                  node.text.takeWhile(c => c >= '0' && c <= '9').toInt
-                }
-
-              val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
-              val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
-              val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
-                val from = (node \ "@from").headOption.map(_.text)
-                val to = (node \ "@to").headOption.map(_.text)
-                (from, to) match {
-                  case (Some(a), Some(b)) => Some((a, b))
-                  case _ => None
-                }
-              }
-
-              def sanitizeTitleText(title: String) = {
-                val trimmed = title.trimChars(",.")
-                trimmed.find(c => Character.isAlphabetic(c)) match {
-                  case None => None
-                  case Some(_) => Some(trimmed)
-                }
-              }
-
-
-              (biblStructNode \ "analytic").headOption.map { analyticNode =>
-                // This is the case where we have an article (in the "analytic" section) inside a
-                // collection (in the "monogr" section.
-
-                val title = (analyticNode \ "title").headOption.map(_.text)
-                val authors = (analyticNode \ "author").map(authorNameFromNode)
-                val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-
-                Reference(
-                  None,
-                  title.flatMap(sanitizeTitleText),
-                  authors,
-                  venue,
-                  year,
-                  volume,
-                  pageRange
-                )
-              } getOrElse {
-                // This is the case where we have no article as part of a collection, just a whole
-                // work, like a book.
-
-                val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-                val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
-
-                Reference(
-                  None,
-                  title.flatMap(sanitizeTitleText),
-                  authors,
-                  None,
-                  year,
-                  volume,
-                  pageRange
-                )
-              }
-            }
-          }
-
-        override def mentions: Option[Seq[Mention]] = ??? // TODO
-
-        private def authorNameFromNode(authorNode: Node) = {
-          val nameNodes =
-            (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
-
-          def addDot(x: String) = if (x.length == 1) s"$x." else x
-          nameNodes.map(_.text).filter(_.nonEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
-        }
-      }
     }
   }
 }
