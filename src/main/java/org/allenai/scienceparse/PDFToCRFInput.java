@@ -215,6 +215,20 @@ public class PDFToCRFInput {
       return l.bounds().get(2);
   }
 
+  public static float getX(PDFToken t, boolean left) {
+    if(left)
+      return t.getBounds().get(0);
+    else
+      return t.getBounds().get(2);
+  }
+  
+  public static float getY(PDFToken t, boolean upper) {
+    if (upper)
+      return t.getBounds().get(1);
+    else
+      return t.getBounds().get(3);
+  }
+  
   public static float getH(PDFLine l) {
     float result = l.bounds().get(3) - l.bounds().get(1);
     if (result < 0) {

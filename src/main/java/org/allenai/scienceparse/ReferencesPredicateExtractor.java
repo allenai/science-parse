@@ -1,26 +1,49 @@
 package org.allenai.scienceparse;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
+import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
+
+import com.gs.collections.api.map.primitive.MutableObjectDoubleMap;
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import com.medallia.word2vec.Searcher;
+import com.medallia.word2vec.Word2VecModel;
+import org.allenai.datastore.Datastore;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 
 public class ReferencesPredicateExtractor implements CRFPredicateExtractor<String, String> {
 
   private ParserLMFeatures lmFeats;
+  private final Searcher word2vecSearcher;
+  
+  public static final Pattern yearPattern = Pattern.compile("((?:19|20)[0-9][0-9])");
+  
+  @Setter private GazetteerFeatures gf;
   
   public ReferencesPredicateExtractor() {
     this(null);
   }
   
   public ReferencesPredicateExtractor(ParserLMFeatures lmf) {
+    try {
+      final Path word2VecModelPath =
+              Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
+      word2vecSearcher = WordVectorCache.searcherForPath(word2VecModelPath);
+    } catch(final IOException e) {
+      throw new RuntimeException(e);
+    }
     lmFeats = lmf;
   }
   
@@ -83,8 +106,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
       m.put("%pRange", 1.0);
       ct++;
     }
-    Pattern pProbableYear = Pattern.compile("(19|20)[0-9][0-9]");
-    if(RegexWithTimeout.matcher(pProbableYear, tok).find()) {
+    if(RegexWithTimeout.matcher(yearPattern, tok).find()) {
       m.put("%hasYear", 1.0);
     }
     Pattern pVolume = Pattern.compile("[0-9](\\([0-9]+\\))?\\p{P}?");
@@ -146,6 +168,34 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
     return true;
   }
   
+  
+  public void addGazetteerSpan(List<ObjectDoubleMap<String>> preds, LabelSpan ls) {
+    if(ls.loc.getOne()==ls.loc.getTwo()-1) {
+      ((ObjectDoubleHashMap<String>)preds.get(ls.loc.getOne())).put("%gaz_W_" + ls.tag, 1.0);
+    }
+    else {
+      ((ObjectDoubleHashMap<String>)preds.get(ls.loc.getOne())).put("%gaz_B_" + ls.tag, 1.0);
+      for(int i=ls.loc.getOne()+1; i<ls.loc.getTwo()-1; i++) {
+        ((ObjectDoubleHashMap<String>)preds.get(i)).put("%gaz_I_" + ls.tag, 1.0);
+      }
+      ((ObjectDoubleHashMap<String>)preds.get(ls.loc.getTwo()-1)).put("%gaz_E_" + ls.tag, 1.0);
+    }
+    //why all the casts here?  Java won't let me upcast to ObjectDoubleMap, but will let me
+    //downcast to MutableObjectDoubleMap.  I am confused by this.
+  }
+  
+  /**
+   * Adds gazetteer predicates to passed-in preds list
+   * @param elems
+   * @param preds
+   */
+  public void addGazetteerPredicates(List<String> elems, List<ObjectDoubleMap<String>> preds) {
+    if(gf != null)
+      for(LabelSpan ls : gf.getSpans(elems)) {
+        addGazetteerSpan(preds, ls);
+      }
+  }
+  
   @Override
   public List<ObjectDoubleMap<String>> nodePredicates(List<String> elems) {
     List<ObjectDoubleMap<String>> out = new ArrayList<>();
@@ -193,6 +243,18 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         m.put("%vlfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.venueLastBow));
         m.put("%bfreq", PDFPredicateExtractor.smoothFreq(tok, this.lmFeats.backgroundBow));
         m.put("%bafreq", PDFPredicateExtractor.smoothFreq(Parser.fixupAuthors(tok), this.lmFeats.backgroundBow));
+        // add word embeddings
+        try {
+          final Iterator<Double> vector = word2vecSearcher.getRawVector(tok).iterator();
+          int j = 0;
+          while(vector.hasNext()) {
+            final double value = vector.next();
+            m.put(String.format("%%emb%03d", j), value);
+            j += 1;
+          }
+        } catch (final Searcher.UnknownWordException e) {
+          // do nothing
+        }
       }
       String locBinFeat = "%locbin" + locationBin(i, elems.size());
       m.put(locBinFeat, 1.0);
@@ -203,6 +265,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
       addPunctuationFeatures(tok, m);
       out.add(m);
     }
+    addGazetteerPredicates(elems, out);
     return out;
   }
 

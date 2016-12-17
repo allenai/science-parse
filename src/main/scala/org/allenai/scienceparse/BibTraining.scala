@@ -35,7 +35,7 @@ object BibTraining extends App with Datastores with Logging {
 
     opt[File]('t', "groundTruth") action { (t, c) =>
       c.copy(groundTruth = Some(t))
-    } text "The ground truth file"
+    } text "The ground truth directory"
 
     opt[Int]("maxIterations") action { (i, c) =>
       c.copy(maxIterations = i)
@@ -65,8 +65,8 @@ object BibTraining extends App with Datastores with Logging {
   }
 
   parser.parse(args, Config()).foreach { config =>
-    val groundTruthFile =
-      config.groundTruth.getOrElse(publicFile("productionBibGroundTruth.txt", 1).toFile)
+    val groundTruthDirectory =
+      config.groundTruth.getOrElse(publicDirectory("productionBibGroundTruth", 2).toFile)
 
     val opts = new ParseOpts
     opts.modelFile = config.output.toString
@@ -84,7 +84,7 @@ object BibTraining extends App with Datastores with Logging {
     opts.trainFraction = config.trainFraction
     opts.minExpectedFeatureCount = config.minExpectedFeatureCount
 
-    Parser.trainBibliographyCRF(groundTruthFile, opts)
+    Parser.trainBibliographyCRF(groundTruthDirectory, opts)
 
     logger.info(s"New model at ${opts.modelFile}")
   }
