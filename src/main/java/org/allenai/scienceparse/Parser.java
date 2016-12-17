@@ -100,8 +100,7 @@ public class Parser {
     return FileSystems.getDefault().getPath("e:\\data\\science-parse\\kermit-gazetteers\\");
   }
   public static Path getDefaultBibModel() {
-    //return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
-    return FileSystems.getDefault().getPath("e:\\data\\science-parse\\model-bib-crf.dat");
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 4);
   }
 
   private static Parser defaultParser = null;
