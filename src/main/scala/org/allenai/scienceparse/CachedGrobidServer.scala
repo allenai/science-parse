@@ -18,14 +18,7 @@ class CachedGrobidServer(url: URL) extends Logging {
     val dirName = url.toString.replaceAll("[^\\w-.:]+", "#")
     Files.createDirectories(CachedGrobidServer.cacheDir.resolve(dirName))
   }
-
-  private val sha1HexLength = 40
-  private def toHex(bytes: Array[Byte]): String = {
-    val sb = new scala.collection.mutable.StringBuilder(sha1HexLength)
-    bytes.foreach { byte => sb.append(f"$byte%02x") }
-    sb.toString
-  }
-
+  
   private val random = new Random
   /** Gets a response from an HTTP server given a request. Retries if we think retrying might fix it. */
   private def withRetries[T](f: () => HttpResponse[T], retries: Int = 10): HttpResponse[T] = if (retries <= 0) {
