@@ -1,17 +1,15 @@
 package org.allenai.scienceparse
 
-import java.io.{ByteArrayInputStream, IOException}
+import java.io.{InputStream, ByteArrayInputStream, IOException}
 import java.net.{SocketTimeoutException, URL}
 import java.nio.file.{NoSuchFileException, Paths, Files}
 import java.util.zip.{GZIPOutputStream, GZIPInputStream}
 
 import org.allenai.common.{Logging, Resource}
 import org.apache.commons.io.IOUtils
-import org.xml.sax.SAXParseException
 
 import scala.util.control.NonFatal
 import scala.util.{Success, Failure, Try, Random}
-import scala.xml.{XML, Node}
 import scalaj.http.{Http, MultiPart, HttpResponse}
 
 
@@ -62,7 +60,7 @@ class CachedGrobidServer(url: URL) extends Logging {
 
   // Note: This is not thread safe if you have two threads or processes ask for the same file at
   // the same time.
-  def getExtractions(bytes: Array[Byte]): Node = {
+  def getExtractions(bytes: Array[Byte]): InputStream = {
     val paperId = Utilities.shaForBytes(bytes)
 
     val cacheFile = cacheDir.resolve(paperId + ".xml.gz")
@@ -70,7 +68,7 @@ class CachedGrobidServer(url: URL) extends Logging {
       if (Files.size(cacheFile) == 0)
         throw new IOException(s"Paper $paperId is tombstoned")
       else
-        Resource.using(new GZIPInputStream(Files.newInputStream(cacheFile)))(XML.load)
+        new GZIPInputStream(Files.newInputStream(cacheFile))
     } catch {
       case _: NoSuchFileException =>
         logger.debug(s"Cache miss for $paperId")
@@ -84,21 +82,7 @@ class CachedGrobidServer(url: URL) extends Logging {
             IOUtils.copy(bais, os)
           }
           bais.reset()
-          try {
-            XML.load(bais)
-          } catch {
-            case e: SAXParseException if e.getMessage == "Content is not allowed in prolog." =>
-              val prefix = response.body.takeWhile(_ != '<').take(32)
-              val prefixString = toHex(prefix)
-
-              throw new SAXParseException(
-                s"Content '$prefixString' is not allowed in prolog.",
-                e.getPublicId,
-                e.getSystemId,
-                e.getLineNumber,
-                e.getColumnNumber,
-                e)
-          }
+          bais
         } catch {
           case NonFatal(e) =>
             logger.warn(s"Tombstoning $paperId because of the following error:", e)

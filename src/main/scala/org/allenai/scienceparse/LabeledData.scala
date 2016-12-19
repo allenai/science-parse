@@ -520,155 +520,29 @@ object LabeledDataFromScienceParse extends Logging {
   }
 }
 
-abstract class LabeledDataFromGrobid extends Logging {
-  import LabeledData._
-
-  protected def xmlForPdf(pdf: Array[Byte]): Node
-  protected def labeledDataId(paperId: String): String
+class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
+  private val cachedGrobidServer = new CachedGrobidServer(grobidServerUrl)
 
   def get(input: => InputStream) = {
     val bytes = IOUtils.toByteArray(input)
     val pid = Utilities.shaForBytes(bytes)
+    val labeledDataId = s"Grobid:$grobidServerUrl/$pid"
+
     try {
-      val xml = xmlForPdf(bytes)
-      new LabeledData {
-        override def inputStream: InputStream = input
-
-        override lazy val paperId = pid
-
-        override val id: String = labeledDataId(paperId)
-
-        private val fileDesc = xml \ "teiHeader" \ "fileDesc"
-
-        override val title: Option[String] =
-          (fileDesc \ "titleStmt" \ "title").headOption.map(_.text.trim.titleCase)
-
-        override val authors: Option[Seq[Author]] = Some(
-          (fileDesc \ "sourceDesc" \ "biblStruct" \ "analytic" \ "author") map { authorNode =>
-            val name = authorNameFromNode(authorNode)
-            val affiliations = (authorNode \ "affiliation").map { affiliationNode =>
-              (affiliationNode \ "orgName").map(_.text).mkString(", ")
-            }
-
-            // TODO: email
-
-            Author(name, None, affiliations)
-          }
-        )
-
-        override val year: Option[Int] = None // TODO
-
-        override val venue: Option[String] = None // TODO
-
-        override val abstractText: Option[String] =
-          (xml \ "teiHeader" \ "profileDesc" \ "abstract").headOption.map(_.text)
-
-        override val sections: Option[Seq[Section]] = Some {
-          (xml \ "text" \ "body" \ "div").map { div =>
-            val bodyPlusHeaderText = div.text
-
-            val head = (div \ "head").headOption.map(_.text)
-            val body = head match {
-              case Some(h) => bodyPlusHeaderText.drop(h.length)
-              case None => bodyPlusHeaderText
-            }
-
-            Section(head, body)
-          }
-        }
-
-        override val references: Option[Seq[Reference]] =
-          (xml \ "text" \ "back" \ "div" \ "listBibl").headOption.map { listBiblNode =>
-            (listBiblNode \ "biblStruct").map { biblStructNode =>
-              val year = (biblStructNode \ "monogr" \ "imprint" \ "date" \ "@when").
-                headOption.
-                map { node =>
-                  node.text.takeWhile(c => c >= '0' && c <= '9').toInt
-                }
-
-              val biblScopeNodes = biblStructNode \ "monogr" \ "imprint" \ "biblScope"
-              val volume = (biblScopeNodes find (_ \@ "unit" == "volume")).map(_.text)
-              val pageRange = (biblScopeNodes find (_ \@ "unit" == "page")).flatMap { node =>
-                val from = (node \ "@from").headOption.map(_.text)
-                val to = (node \ "@to").headOption.map(_.text)
-                (from, to) match {
-                  case (Some(a), Some(b)) => Some((a, b))
-                  case _ => None
-                }
-              }
-
-              def sanitizeTitleText(title: String) = {
-                val trimmed = title.trimChars(",.")
-                trimmed.find(c => Character.isAlphabetic(c)) match {
-                  case None => None
-                  case Some(_) => Some(trimmed)
-                }
-              }
-
-
-              (biblStructNode \ "analytic").headOption.map { analyticNode =>
-                // This is the case where we have an article (in the "analytic" section) inside a
-                // collection (in the "monogr" section.
-
-                val title = (analyticNode \ "title").headOption.map(_.text)
-                val authors = (analyticNode \ "author").map(authorNameFromNode)
-                val venue = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-
-                Reference(
-                  None,
-                  title.flatMap(sanitizeTitleText),
-                  authors,
-                  venue,
-                  year,
-                  volume,
-                  pageRange
-                )
-              } getOrElse {
-                // This is the case where we have no article as part of a collection, just a whole
-                // work, like a book.
-
-                val title = (biblStructNode \ "monogr" \ "title").headOption.map(_.text)
-                val authors = (biblStructNode \ "monogr" \ "author").map(authorNameFromNode)
-
-                Reference(
-                  None,
-                  title.flatMap(sanitizeTitleText),
-                  authors,
-                  None,
-                  year,
-                  volume,
-                  pageRange
-                )
-              }
-            }
-          }
-
-        override def mentions: Option[Seq[Mention]] = ??? // TODO
-
-        private def authorNameFromNode(authorNode: Node) = {
-          val nameNodes =
-            (authorNode \ "persName" \ "forename") ++ (authorNode \ "persName" \ "surname")
-
-          def addDot(x: String) = if (x.length == 1) s"$x." else x
-          nameNodes.map(_.text).filter(_.nonEmpty).map(a => addDot(a.trimNonAlphabetic)).mkString(" ")
-        }
+      val em = Resource.using(cachedGrobidServer.getExtractions(bytes)) { is =>
+        GrobidParser.parseGrobidXml(is, grobidServerUrl.toString)
       }
+      LabeledData.fromExtractedMetadata(
+        input,
+        labeledDataId,
+        em
+      )
     } catch {
       case NonFatal(e) =>
         logger.warn(s"Error '${e.getMessage}' from Grobid for paper $pid")
-        new EmptyLabeledData(labeledDataId(pid), input)
+        new EmptyLabeledData(labeledDataId, input)
     }
   }
-}
-
-class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends LabeledDataFromGrobid {
-  private val cachedGrobidServer = new CachedGrobidServer(grobidServerUrl)
-
-  override protected def labeledDataId(paperId: String): String =
-    s"Grobid:$grobidServerUrl/$paperId"
-
-  override protected def xmlForPdf(pdf: Array[Byte]): Node =
-    cachedGrobidServer.getExtractions(pdf)
 }
 
 object LabeledDataFromGrobidServer {
