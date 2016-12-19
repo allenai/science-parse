@@ -18,7 +18,7 @@ class CachedGrobidServer(url: URL) extends Logging {
     val dirName = url.toString.replaceAll("[^\\w-.:]+", "#")
     Files.createDirectories(CachedGrobidServer.cacheDir.resolve(dirName))
   }
-  
+
   private val random = new Random
   /** Gets a response from an HTTP server given a request. Retries if we think retrying might fix it. */
   private def withRetries[T](f: () => HttpResponse[T], retries: Int = 10): HttpResponse[T] = if (retries <= 0) {
