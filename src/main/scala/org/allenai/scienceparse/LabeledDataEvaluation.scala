@@ -2,6 +2,7 @@ package org.allenai.scienceparse
 
 import java.util.concurrent.{TimeUnit, Executors}
 
+import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
 import java.net.URL
 import org.allenai.scienceparse.LabeledData.{Reference, Author}
@@ -9,10 +10,13 @@ import org.allenai.scienceparse.LabeledData.{Reference, Author}
 import scala.collection.immutable.Set
 import scala.concurrent.ExecutionContext
 
-object LabeledDataEvaluation {
+object LabeledDataEvaluation extends Logging {
   import StringUtils._
 
-  case class PR(precision: Double, recall: Double)
+  case class PR(precision: Double, recall: Double) {
+    def p = precision
+    def r = recall
+  }
 
   object PR {
     def average(prs: Iterable[PR]) = {
@@ -54,19 +58,30 @@ object LabeledDataEvaluation {
       implicit val ec = ExecutionContext.fromExecutor(executor)
 
       // read the data
+      logger.info("Reading in data ...")
       val goldData = LabeledDataFromResources.get
 
-      val oldGrobid = LabeledDataFromOldGrobid.get.map(ld => ld.paperId -> ld).toMap
-
       val extractions = goldData.parMap { gold =>
-        oldGrobid.get(gold.paperId).map { grobid =>
-          val sp = LabeledDataFromScienceParse.get(gold.inputStream)
-          (gold, sp, grobid)
-        }
-      }.flatten.toSeq
+        val grobid = labeledDataFromGrobidServer.get(gold.inputStream)
+        val sp = LabeledDataFromScienceParse.get(gold.inputStream)
+        (gold, sp, grobid)
+      }.toSeq
+
+      // write header
+      // buffer output so that console formatting doesn't get messed up
+      val output = scala.collection.mutable.ArrayBuffer.empty[String]
+      output += f"""${"EVALUATION RESULTS"}%-30s${"PRECISION"}%28s${"RECALL"}%28s${"SAMPLE"}%10s"""
+      output += f"""${""}%-30s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SP"}%10s | ${"Grobid"}%6s | ${"diff"}%6s${"SIZE"}%10s"""
+      output += "-----------------------------------------+--------+------------------+--------+-----------------"
+      def outputLine(metricName: String, spPr: PR, grobidPr: PR, docCount: Int) = {
+        val diffP = spPr.p - grobidPr.p
+        val diffR = spPr.r - grobidPr.r
+        f"$metricName%-30s${spPr.p}%10.3f | ${grobidPr.p}%6.3f | $diffP%+5.3f${spPr.r}%10.3f | ${grobidPr.r}%6.3f | $diffR%+5.3f$docCount%10d"
+      }
 
       // calculate title metrics
       {
+        logger.info("Calculating titlesNormalized ...")
         val titleMetricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
           gold.title.map(normalize).map { normalizedGoldTitle =>
             def score(scoredTitleOption: Option[String]) = scoredTitleOption match {
@@ -78,16 +93,15 @@ object LabeledDataEvaluation {
           }
         }
 
-        val titleCount = titleMetricsPerDocument.size
-        val titleSpScore = titleMetricsPerDocument.map(_._1).sum / titleCount.toDouble
-        val titleGrobidScore = titleMetricsPerDocument.map(_._2).sum / titleCount.toDouble
-
-        println(s"SP      titlesNormalized: $titleSpScore")
-        println(s"Grobid  titlesNormalized: $titleGrobidScore")
+        val count = titleMetricsPerDocument.size
+        val spScore = titleMetricsPerDocument.map(_._1).sum / count.toDouble
+        val grobidScore = titleMetricsPerDocument.map(_._2).sum / count.toDouble
+        output += outputLine("titlesNormalized", PR(spScore, spScore), PR(grobidScore, grobidScore), count)
       }
 
       // calculate author metrics
       {
+        logger.info("Calculating authorFullNameNormalized ...")
         val authorMetricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
           gold.authors.map { goldAuthors =>
             val normalizedGoldAuthors = goldAuthors.map(a => normalizeAuthor(a.name)).toSet
@@ -102,15 +116,16 @@ object LabeledDataEvaluation {
           }
         }
 
-        val prForSp = PR.average(authorMetricsPerDocument.map(_._1))
-        val prForGrobid = PR.average(authorMetricsPerDocument.map(_._2))
-
-        println(s"SP      authorFullNameNormalized: ${prForSp.precision} / ${prForSp.recall}")
-        println(s"Grobid  authorFullNameNormalized: ${prForGrobid.precision} / ${prForGrobid.recall}")
+        output += outputLine(
+          "authorFullNameNormalized",
+          PR.average(authorMetricsPerDocument.map(_._1)),
+          PR.average(authorMetricsPerDocument.map(_._2)),
+          authorMetricsPerDocument.size)
       }
 
       // calculate bib metrics
       {
+        logger.info("Calculating bibAllButVenuesNormalized ...")
         val bibMetricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
           gold.references.map { goldReferences =>
             def normalizeReference(ref: Reference) = Reference(
@@ -135,12 +150,15 @@ object LabeledDataEvaluation {
           }
         }
 
-        val prForSp = PR.average(bibMetricsPerDocument.map(_._1))
-        val prForGrobid = PR.average(bibMetricsPerDocument.map(_._2))
-
-        println(s"SP      bibAllButVenuesNormalized: ${prForSp.precision} / ${prForSp.recall}")
-        println(s"Grobid  bibAllButVenuesNormalized: ${prForGrobid.precision} / ${prForGrobid.recall}")
+        output += outputLine(
+          "bibAllButVenuesNormalized",
+          PR.average(bibMetricsPerDocument.map(_._1)),
+          PR.average(bibMetricsPerDocument.map(_._2)),
+          bibMetricsPerDocument.size
+        )
       }
+
+      println(output.map(line => s"${Console.BOLD}${Console.BLUE}$line${Console.RESET}").mkString("\n"))
     } finally {
       executor.shutdown()
       executor.awaitTermination(10, TimeUnit.MINUTES)
