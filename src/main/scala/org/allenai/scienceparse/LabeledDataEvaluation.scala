@@ -179,7 +179,7 @@ object LabeledDataEvaluation extends Logging {
                   case None => PR(0.0, 0.0)
                   case Some(scored) =>
                     val scoredSet = scored.toSet
-                    val scoredMultiSet = multiSet(scored)
+                    lazy val scoredMultiSet = multiSet(scored)
 
                     val (g: Set[Any], s: Set[Any]) = if(haveToUseMultiSet || scoredSet.size != scoredMultiSet.size) {
                       (goldEntriesMultiSet, scoredMultiSet)
