@@ -33,4 +33,7 @@
   <logger name="org.allenai.scienceparse.Evaluation$.evaluationErrors" additivity="false">
     <appender-ref ref="EVALLOG" />
   </logger>
+  <logger name="org.allenai.scienceparse.LabeledDataEvaluation$.evalErrors" additivity="false">
+    <appender-ref ref="EVALLOG" />
+  </logger>
 </configuration>
