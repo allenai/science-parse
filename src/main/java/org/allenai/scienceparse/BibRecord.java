@@ -32,6 +32,7 @@ public class BibRecord {
   }
 
   static private String normalizeInitialsInAuthor(String author) {
+    author = author.trim();
     author = author.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2");
     author = author.replaceAll("(\\p{Lu}\\.) (\\p{Lu}\\.)", "$1$2"); //twice to catch three-initial seq.
     return author;
@@ -40,7 +41,10 @@ public class BibRecord {
   public BibRecord withNormalizedAuthors() {
     return new BibRecord(
             title,
-            author.stream().map(BibRecord::normalizeInitialsInAuthor).collect(Collectors.toList()),
+            author.stream().
+                map(BibRecord::normalizeInitialsInAuthor).
+                filter(s -> !StringUtils.normalize(s.toLowerCase()).equals("et al")).
+                collect(Collectors.toList()),
             venue,
             citeRegEx,
             shortCiteRegEx,
