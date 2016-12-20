@@ -306,7 +306,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
           if(i >= 1800 && i <= 2100) Some(i) else None
         } catch {
           case e: NumberFormatException =>
-            logger.warn(s"Could not parse '${n.text}' as int")
+            logger.warn(s"Could not parse '${n.text}' as year")
             None
         }
       }
