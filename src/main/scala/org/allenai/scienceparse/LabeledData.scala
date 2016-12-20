@@ -491,8 +491,6 @@ object LabeledDataFromResources extends Datastores {
 }
 
 object LabeledDataFromScienceParse extends Logging {
-  import LabeledData._
-
   def get(input: => InputStream, parser: Parser = Parser.getInstance()) = {
     val digest = MessageDigest.getInstance("SHA-1")
     digest.reset()
