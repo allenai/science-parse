@@ -191,8 +191,8 @@ object LabeledDataEvaluation extends Logging {
                     PR.fromSets(g, s)
                 }
 
-              val spScore = score(extract(sp))
-              val grobidScore = score(extract(grobid), logging = true)
+              val spScore = score(extract(sp), logging = true)
+              val grobidScore = score(extract(grobid))
               errorLogger.info(f"P for $metricName on ${gold.id}: SP: ${spScore.p}%1.3f Grobid: ${grobidScore.p}%1.3f Diff: ${spScore.p - grobidScore.p}%+1.3f")
               errorLogger.info(f"R for $metricName on ${gold.id}: SP: ${spScore.r}%1.3f Grobid: ${grobidScore.r}%1.3f Diff: ${spScore.r - grobidScore.r}%+1.3f")
 
