@@ -300,9 +300,10 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
       override val id = s"PMC:$xmlEntryName"
 
-      private def parseInt(n: Node): Option[Int] = {
+      private def parseYear(n: Node): Option[Int] = {
         try {
-          Some(n.text.toInt)
+          val i = n.text.trim.takeWhile(_.isDigit).toInt
+          if(i >= 1800 && i <= 2100) Some(i) else None
         } catch {
           case e: NumberFormatException =>
             logger.warn(s"Could not parse '${n.text}' as int")
@@ -351,7 +352,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
         ("publication-format", "electronic")
       ).flatMap { case (attrName, attrValue) =>
         (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
-      }.flatMap(_ \ "year").flatMap(parseInt).headOption
+      }.flatMap(_ \ "year").flatMap(parseYear).headOption
 
       private def parseSection(e: Node): Seq[Section] = {
         (e \ "sec") map { s =>
@@ -389,7 +390,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
             s"$givenNames $surname".trim
           }
           val venue = (citation \ "source").headOption.map(_.text)
-          val year = (citation \ "year").flatMap(parseInt).headOption
+          val year = (citation \ "year").flatMap(parseYear).headOption
           val volume = (citation \ "volume").headOption.map(_.text)
           val firstPage = (citation \ "fpage").headOption.map(_.text)
           val lastPage = (citation \ "lpage").headOption.map(_.text)
