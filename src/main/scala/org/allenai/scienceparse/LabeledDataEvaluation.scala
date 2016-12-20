@@ -128,7 +128,7 @@ object LabeledDataEvaluation extends Logging {
 
         // calculate title metrics
         {
-          errorLogger.info("Calculating titlesNormalized ...")
+          logger.info("Calculating titlesNormalized ...")
           val titleMetricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
             gold.title.map(normalize).map { normalizedGoldTitle =>
               def score(scoredTitleOption: Option[String]) = scoredTitleOption match {
