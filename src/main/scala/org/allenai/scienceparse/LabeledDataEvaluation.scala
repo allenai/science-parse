@@ -161,17 +161,41 @@ object LabeledDataEvaluation extends Logging {
 
           val metricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
             extract(gold).map { goldEntries =>
-              val goldEntriesSet = multiSet(goldEntries)
+              // We only use multiset when we have to, to keep the error logs a little cleaner.
+              val goldEntriesSet = goldEntries.toSet
+              val goldEntriesMultiSet = multiSet(goldEntries)
+              val haveToUseMultiSet = goldEntriesSet.size != goldEntriesMultiSet.size
 
-              def score(scoredOption: Option[Iterable[T]]) = scoredOption match {
-                case None => PR(0.0, 0.0)
-                case Some(scored) => PR.fromSets(goldEntriesSet, multiSet(scored))
+              def logPRErrors(goldSet: Set[Any], resultSet: Set[Any]): Unit = {
+                val missingEntries = (goldSet -- resultSet).toSeq.map(_.toString).sorted.mkString(", ")
+                errorLogger.info(s"Missing for $metricName on ${gold.paperId}: $missingEntries")
+
+                val excessEntries = (resultSet -- goldSet).toSeq.map(_.toString).sorted.mkString(", ")
+                errorLogger.info(s"Excess for $metricName on ${gold.paperId}: $excessEntries")
               }
 
+              def score(scoredOption: Option[Iterable[T]], logging: Boolean = false) =
+                scoredOption match {
+                  case None => PR(0.0, 0.0)
+                  case Some(scored) =>
+                    val scoredSet = scored.toSet
+                    val scoredMultiSet = multiSet(scored)
+
+                    val (g: Set[Any], s: Set[Any]) = if(haveToUseMultiSet || scoredSet.size != scoredMultiSet.size) {
+                      (goldEntriesMultiSet, scoredMultiSet)
+                    } else {
+                      (goldEntriesSet, scoredSet)
+                    }
+
+                    if(logging) logPRErrors(g, s)
+                    PR.fromSets(g, s)
+                }
+
               val spScore = score(extract(sp))
-              val grobidScore = score(extract(grobid))
-              errorLogger.info(f"P for $metricName on ${gold.paperId}: SP: ${spScore.p}%1.3f Grobid: ${grobidScore.p}%1.3f Diff: ${spScore.p - grobidScore.p}%1.3f")
-              errorLogger.info(f"R for $metricName on ${gold.paperId}: SP: ${spScore.r}%1.3f Grobid: ${grobidScore.r}%1.3f Diff: ${spScore.r - grobidScore.r}%1.3f")
+              val grobidScore = score(extract(grobid), logging = true)
+              errorLogger.info(f"P for $metricName on ${gold.paperId}: SP: ${spScore.p}%1.3f Grobid: ${grobidScore.p}%1.3f Diff: ${spScore.p - grobidScore.p}%+1.3f")
+              errorLogger.info(f"R for $metricName on ${gold.paperId}: SP: ${spScore.r}%1.3f Grobid: ${grobidScore.r}%1.3f Diff: ${spScore.r - grobidScore.r}%+1.3f")
+
               (spScore, grobidScore)
             }
           }
