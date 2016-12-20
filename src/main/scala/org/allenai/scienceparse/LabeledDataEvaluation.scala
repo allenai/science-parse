@@ -138,7 +138,7 @@ object LabeledDataEvaluation extends Logging {
 
               val spScore = score(sp.title)
               val grobidScore = score(grobid.title)
-              errorLogger.info(f"Score for titlesNormalized on ${gold.paperId}: SP: $spScore Grobid: $grobidScore Diff: ${spScore - grobidScore}%+d")
+              errorLogger.info(f"Score for titlesNormalized on ${gold.id}: SP: $spScore Grobid: $grobidScore Diff: ${spScore - grobidScore}%+d")
               (spScore, grobidScore)
             }
           }
@@ -168,10 +168,10 @@ object LabeledDataEvaluation extends Logging {
 
               def logPRErrors(goldSet: Set[Any], resultSet: Set[Any]): Unit = {
                 val missingEntries = (goldSet -- resultSet).toSeq.map(_.toString).sorted.mkString(", ")
-                errorLogger.info(s"Missing for $metricName on ${gold.paperId}: $missingEntries")
+                errorLogger.info(s"Missing for $metricName on ${gold.id}: $missingEntries")
 
                 val excessEntries = (resultSet -- goldSet).toSeq.map(_.toString).sorted.mkString(", ")
-                errorLogger.info(s"Excess for $metricName on ${gold.paperId}: $excessEntries")
+                errorLogger.info(s"Excess  for $metricName on ${gold.id}: $excessEntries")
               }
 
               def score(scoredOption: Option[Iterable[T]], logging: Boolean = false) =
@@ -193,8 +193,8 @@ object LabeledDataEvaluation extends Logging {
 
               val spScore = score(extract(sp))
               val grobidScore = score(extract(grobid), logging = true)
-              errorLogger.info(f"P for $metricName on ${gold.paperId}: SP: ${spScore.p}%1.3f Grobid: ${grobidScore.p}%1.3f Diff: ${spScore.p - grobidScore.p}%+1.3f")
-              errorLogger.info(f"R for $metricName on ${gold.paperId}: SP: ${spScore.r}%1.3f Grobid: ${grobidScore.r}%1.3f Diff: ${spScore.r - grobidScore.r}%+1.3f")
+              errorLogger.info(f"P for $metricName on ${gold.id}: SP: ${spScore.p}%1.3f Grobid: ${grobidScore.p}%1.3f Diff: ${spScore.p - grobidScore.p}%+1.3f")
+              errorLogger.info(f"R for $metricName on ${gold.id}: SP: ${spScore.r}%1.3f Grobid: ${grobidScore.r}%1.3f Diff: ${spScore.r - grobidScore.r}%+1.3f")
 
               (spScore, grobidScore)
             }
@@ -248,7 +248,7 @@ object LabeledDataEvaluation extends Logging {
 
                 val spScore = spCount / goldCount.toDouble
                 val grobidScore = grobidCount / goldCount.toDouble
-                errorLogger.info(f"Score for bibCount on ${gold.paperId}: SP: $spScore%1.3f Grobid: $grobidScore%1.3f Diff: ${spScore - grobidScore}%+1.3f")
+                errorLogger.info(f"Score for bibCount on ${gold.id}: SP: $spScore%1.3f Grobid: $grobidScore%1.3f Diff: ${spScore - grobidScore}%+1.3f")
 
                 Some((spScore, grobidScore))
               }
