@@ -5,7 +5,7 @@ import java.util.concurrent.{TimeUnit, Executors}
 import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
 import java.net.URL
-import org.allenai.scienceparse.LabeledData.{Reference, Author}
+import org.allenai.scienceparse.LabeledData.Reference
 
 import scala.collection.immutable.Set
 import scala.concurrent.ExecutionContext
@@ -99,63 +99,170 @@ object LabeledDataEvaluation extends Logging {
         output += outputLine("titlesNormalized", PR(spScore, spScore), PR(grobidScore, grobidScore), count)
       }
 
-      // calculate author metrics
-      {
-        logger.info("Calculating authorFullNameNormalized ...")
-        val authorMetricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
-          gold.authors.map { goldAuthors =>
-            val normalizedGoldAuthors = goldAuthors.map(a => normalizeAuthor(a.name)).toSet
-            def score(scoredAuthorsOption: Option[Seq[Author]]) = scoredAuthorsOption match {
+      // infrastructure for metrics that all have the same format
+      // Returns (SP PR, Grobid PR, document count)
+      def evaluateMetric[T](extract: LabeledData => Option[Iterable[T]]): (PR, PR, Int) = {
+        /** Use multi-set to count repetitions -- if Etzioni is cited five times in gold, and we get
+          * three, that’s prec=1.0 but rec=0.6. Just add index # to name for simplicity. This is redundant
+          * when everything is already unique, so you can basically always apply it.
+          */
+        def multiSet[T2](refs: Iterable[T2]) =
+          refs.groupBy(identity).values.flatMap(_.zipWithIndex).toSet
+
+        val metricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
+          extract(gold).map { goldEntries =>
+            val goldEntriesSet = multiSet(goldEntries)
+
+            def score(scoredOption: Option[Iterable[T]]) = scoredOption match {
               case None => PR(0.0, 0.0)
-              case Some(scoredAuthors) =>
-                val normalizedScoredAuthors = scoredAuthors.map(a => normalizeAuthor(a.name)).toSet
-                PR.fromSets(normalizedGoldAuthors, normalizedScoredAuthors)
+              case Some(scored) => PR.fromSets(goldEntriesSet, multiSet(scored))
             }
 
-            (score(sp.authors), score(grobid.authors))
+            (score(extract(sp)), score(extract(grobid)))
           }
         }
 
-        output += outputLine(
-          "authorFullNameNormalized",
-          PR.average(authorMetricsPerDocument.map(_._1)),
-          PR.average(authorMetricsPerDocument.map(_._2)),
-          authorMetricsPerDocument.size)
+        (
+          PR.average(metricsPerDocument.map(_._1)),
+          PR.average(metricsPerDocument.map(_._2)),
+          metricsPerDocument.size
+        )
+      }
+
+      // calculate author metrics
+      {
+        logger.info("Calculating authorFullNameNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.authors.map { as =>
+            as.map(a => normalizeAuthor(a.name))
+          }
+        }
+        output += outputLine("authorFullNameNormalized", sp, grobid, count)
+      }
+
+      {
+        logger.info("Calculating authorLastNameNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.authors.map { as =>
+            def getLastName(name: String) = {
+              val suffixes = Set("Jr.")
+              name.split("\\s+").filterNot(suffixes.contains).lastOption.getOrElse(name)
+            }
+
+            as.map(a => normalize(getLastName(a.name)))
+          }
+        }
+        output += outputLine("authorLastNameNormalized", sp, grobid, count)
       }
 
       // calculate bib metrics
       {
-        logger.info("Calculating bibAllButVenuesNormalized ...")
-        val bibMetricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
-          gold.references.map { goldReferences =>
-            def normalizeReference(ref: Reference) = Reference(
-              None, // ignoring label, because Grobid doesn't have that
-              ref.title.map(normalize),
-              ref.authors.map(normalizeAuthor),
-              None, // ignoring venue
-              ref.year,
-              None, // ignoring volume, because we didn't take that into consideration before
-              None  // ignoring pageRange, because we didn't take that into consideration before
-            )
+        logger.info("Calculating bibCount ...")
 
-            val normalizedGoldBibEntries = goldReferences.map(normalizeReference).toSet
-            def score(scoredBibEntriesOption: Option[Seq[Reference]]) = scoredBibEntriesOption match {
-              case None => PR(0.0, 0.0)
-              case Some(scoredBibEntries) =>
-                val normalizedScoredBibEntries = scoredBibEntries.map(normalizeReference).toSet
-                PR.fromSets(normalizedGoldBibEntries, normalizedScoredBibEntries)
-            }
+        val bibCountsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
+          gold.references.map { refs =>
+            val goldCount = refs.size
+            val spCount = sp.references.map(_.size).getOrElse(0)
+            val grobidCount = grobid.references.map(_.size).getOrElse(0)
 
-            (score(sp.references), score(grobid.references))
+            (spCount / goldCount.toDouble, grobidCount / goldCount.toDouble)
           }
         }
 
-        output += outputLine(
-          "bibAllButVenuesNormalized",
-          PR.average(bibMetricsPerDocument.map(_._1)),
-          PR.average(bibMetricsPerDocument.map(_._2)),
-          bibMetricsPerDocument.size
-        )
+        val count = bibCountsPerDocument.size
+        val spScore = bibCountsPerDocument.map(_._1).sum / count.toDouble
+        val grobidScore = bibCountsPerDocument.map(_._2).sum / count.toDouble
+        output += outputLine("bibCount", PR(spScore, spScore), PR(grobidScore, grobidScore), count)
+      }
+
+      {
+        logger.info("Calculating bibAllNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          def normalizeReference(ref: Reference) = Reference(
+            None, // ignoring label, because Grobid doesn't have that
+            ref.title.map(normalize),
+            ref.authors.map(normalizeAuthor),
+            ref.venue.map(normalize),
+            ref.year,
+            None, // ignoring volume, because we didn't take that into consideration before
+            None  // ignoring pageRange, because we didn't take that into consideration before
+          )
+
+          labeledData.references.map { refs =>
+            refs.map(normalizeReference)
+          }
+        }
+        output += outputLine("bibAllNormalized", sp, grobid, count)
+      }
+
+      {
+        logger.info("Calculating bibAllButVenuesNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          def normalizeReference(ref: Reference) = Reference(
+            None, // ignoring label, because Grobid doesn't have that
+            ref.title.map(normalize),
+            ref.authors.map(normalizeAuthor),
+            None, // ignoring venue
+            ref.year,
+            None, // ignoring volume, because we didn't take that into consideration before
+            None  // ignoring pageRange, because we didn't take that into consideration before
+          )
+
+          labeledData.references.map { refs =>
+            refs.map(normalizeReference)
+          }
+        }
+        output += outputLine("bibAllButVenuesNormalized", sp, grobid, count)
+      }
+
+      {
+        logger.info("Calculating bibTitlesNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.references.map { refs =>
+            refs.flatMap(_.title).map(normalize)
+          }
+        }
+        output += outputLine("bibTitlesNormalized", sp, grobid, count)
+      }
+
+      {
+        logger.info("Calculating bibAuthorsNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.references.map { refs =>
+            refs.flatMap(_.authors).map(normalizeAuthor)
+          }
+        }
+        output += outputLine("bibAuthorsNormalized", sp, grobid, count)
+      }
+
+      {
+        logger.info("Calculating bibVenuesNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.references.map { refs =>
+            refs.flatMap(_.venue).map(normalize)
+          }
+        }
+        output += outputLine("bibVenuesNormalized", sp, grobid, count)
+      }
+
+      {
+        logger.info("Calculating bibYears ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.references.map { refs =>
+            refs.flatMap(_.year)
+          }
+        }
+        output += outputLine("bibYears", sp, grobid, count)
+      }
+
+      // calculate abstract metrics
+      {
+        logger.info("Calculating abstractNormalized ...")
+        val (sp, grobid, count) = evaluateMetric { labeledData =>
+          labeledData.abstractText.map(a => Iterable(normalize(a)))
+        }
+
+        output += outputLine("abstractNormalized", sp, grobid, count)
       }
 
       println(output.map(line => s"${Console.BOLD}${Console.BLUE}$line${Console.RESET}").mkString("\n"))
