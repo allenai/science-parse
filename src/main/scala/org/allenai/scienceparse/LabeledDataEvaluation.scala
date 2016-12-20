@@ -224,7 +224,7 @@ object LabeledDataEvaluation extends Logging {
 
                 val spScore = spCount / goldCount.toDouble
                 val grobidScore = grobidCount / goldCount.toDouble
-                errorLogger.info(f"Score for bibCount on ${gold.paperId}: SP: $spScore%1.3f Grobid: $grobidScore%1.3f Diff: ${spScore - grobidScore}%1.3f")
+                errorLogger.info(f"Score for bibCount on ${gold.paperId}: SP: $spScore%1.3f Grobid: $grobidScore%1.3f Diff: ${spScore - grobidScore}%+1.3f")
 
                 Some((spScore, grobidScore))
               }
