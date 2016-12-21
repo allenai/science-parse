@@ -196,7 +196,6 @@ public class ExtractReferences {
     
     //figure out whether M. Johnson or Johnson, M.:
     boolean firstLast = false;
-    List<String> out = new ArrayList<>();
     if (RegexWithTimeout.matcher(authorStringToListPattern, authString).matches()) {
       firstLast = true;
       //strip trailing punctuation:
@@ -212,21 +211,29 @@ public class ExtractReferences {
     else
       names = authString.split("(,| and | AND | And | & )+");
     if (firstLast) {
-      out = Arrays.asList(names);
+      return Arrays.asList(names);
     } else {
+      final List<String> out = new ArrayList<>(names.length);
       if (semiDelim) {
         for (final String name : names)
           out.add(ParserGroundTruth.invertAroundComma(name));
       } else {
-        for (int i = 0; i < names.length; i += 2) {
-          if (names.length > i + 1)
-            out.add(names[i + 1].trim() + " " + names[i].trim());
-          else
-            out.add(names[i].trim()); //hope for the best
+        // invert around space, i.e., make Johnson M into M Johnson
+        final StringBuilder b = new StringBuilder(128);
+        for(final String name : names) {
+          final String[] split = name.trim().split("\\s");
+          b.append(split[split.length - 1]);
+          b.append(' ');
+          for(int i = 0; i < split.length - 1; ++i) {
+            b.append(split[i]);
+            b.append(' ');
+          }
+          out.add(b.toString().trim());
+          b.setLength(0);
         }
       }
+      return out;
     }
-    return out;
   }
 
   private static <T> List<T> removeNulls(List<T> in) {
