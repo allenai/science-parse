@@ -98,7 +98,7 @@ public class ExtractReferences {
               CRFBibRecordParser.class})));
       extractors.addAll(Arrays.asList(
         new BracketNumber(new Class [] {CRFBibRecordParser.class}),
-          new NumberDot(new Class [] {CRFBibRecordParser.class}),
+        new NumberDot(new Class [] {CRFBibRecordParser.class}),
         new NumberDotNaturalLineBreaks(new Class [] {CRFBibRecordParser.class}),
         new NamedYear(new Class [] {CRFBibRecordParser.class}),
         new BracketName(new Class [] {CRFBibRecordParser.class})));
