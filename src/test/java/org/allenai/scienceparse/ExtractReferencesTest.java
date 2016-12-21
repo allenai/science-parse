@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -54,8 +56,62 @@ public class ExtractReferencesTest {
     String test6 = "E. Agichtein and L.";
     String auth6 = ExtractReferences.authInitialsLastList + "(?:,|\\.)";
     Assert.assertFalse(Pattern.matches(auth6, test6));
+  }
 
+  public void testAuthorStringToList() throws Exception {
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("S Ruzickova, Z Cimburek, T Moravcova");
+      final List<String> expected = Arrays.asList("S Ruzickova", "Z Cimburek", "T Moravcova");
+      Assert.assertEquals(expected, actual);
+    }
 
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("Prokunina L, Castillejo-Lopez C, Oberg F, Gunnarsson I, Berg L, Magnusson V, et al.:");
+      final List<String> expected = Arrays.asList("L Prokunina", "C Castillejo-Lopez", "F Oberg", "I Gunnarsson", "L Berg", "V Magnusson");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("Traber D:");
+      final List<String> expected = Collections.singletonList("D Traber");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("L. J. van’t Veer, H. Dai, M. J. van de Vijver, S. H. Friend, and etc.");
+      final List<String> expected = Arrays.asList("L. J. van’t Veer", "H. Dai", "M. J. van de Vijver", "S. H. Friend");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("J. A. Blakeley, P.-Å Larson, and F. W. Tompa");
+      final List<String> expected = Arrays.asList("J. A. Blakeley", "P.-Å Larson", "F. W. Tompa");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("Sabine Shulte im Walde,");
+      final List<String> expected = Collections.singletonList("Sabine Shulte im Walde");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("Friedman, N., & Goldszmidt, M.");
+      final List<String> expected = Arrays.asList("N. Friedman", "M. Goldszmidt");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("Lieberman, H., Paterno, F., & Wulf, V.");
+      final List<String> expected = Arrays.asList("H. Lieberman", "F. Paterno", "V. Wulf");
+      Assert.assertEquals(expected, actual);
+    }
+
+    {
+      final List<String> actual = ExtractReferences.authorStringToList("K. Apt");
+      final List<String> expected = Collections.singletonList("K. Apt");
+      Assert.assertEquals(expected, actual);
+    }
   }
 
   public void testNumberDotAuthorNoTitleBibRecordParser() {
