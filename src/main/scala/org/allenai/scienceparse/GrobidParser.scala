@@ -1,11 +1,12 @@
 package org.allenai.scienceparse
 
+import java.io.InputStream
 import java.nio.file.Path
 import java.util.Calendar
 
 import org.allenai.common.StringUtils.StringExtras
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{ Element, TextNode }
+import org.jsoup.nodes.{Document, Element, TextNode}
 
 import scala.collection.JavaConverters._
 
@@ -95,6 +96,15 @@ object GrobidParser {
 
   def parseGrobidXml(grobidExtraction: Path): ExtractedMetadata = {
     val doc = Jsoup.parse(grobidExtraction.toFile, "UTF-8")
+    parseGrobidXml(doc)
+  }
+
+  def parseGrobidXml(is: InputStream, baseUrl: String): ExtractedMetadata = {
+    val doc = Jsoup.parse(is, "UTF-8", baseUrl)
+    parseGrobidXml(doc)
+  }
+
+  private def parseGrobidXml(doc: Document): ExtractedMetadata = {
     val year = extractYear(doc.findAttributeValue("teiHeader>fileDesc>sourceDesc>biblStruct>monogr>imprint>date[type=published]", "when"))
     val calendar = Calendar.getInstance()
     calendar.set(Calendar.YEAR, year)

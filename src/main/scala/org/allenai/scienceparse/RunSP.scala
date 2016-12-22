@@ -49,7 +49,7 @@ object RunSP extends Logging {
 
       opt[File]('o', "outputDirectory") required () action {
         (o, c) => c.copy(outputDir = Some(o))
-      } text "Output directory."
+      } text "Output directory"
 
       arg[File]("<pdf>...") unbounded () action {
         (f, c) => c.copy(pdfInputs = c.pdfInputs :+ f)

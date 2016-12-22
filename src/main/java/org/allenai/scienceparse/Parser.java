@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
+import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import com.gs.collections.impl.tuple.Tuples;
 
 import lombok.Data;
@@ -42,8 +43,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -93,8 +96,11 @@ public class Parser {
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
   }
+  public static Path getDefaultGazetteerDir() {
+    return FileSystems.getDefault().getPath("e:\\data\\science-parse\\kermit-gazetteers\\");
+  }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 3);
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 4);
   }
 
   private static Parser defaultParser = null;
@@ -219,7 +225,7 @@ public class Parser {
   ) throws IOException {
     final String paperId = p == null ? null : p.getId();
     if(paperId != null)
-      logger.debug("{}: starting", paperId);
+    logger.debug("{}: starting", paperId);
 
     final PDFDoc doc;
     try {
@@ -452,10 +458,33 @@ public class Parser {
     return out;
   }
 
-  public static void trainBibliographyCRF(File coraTrainFile, ParseOpts opts) throws IOException {
+  public static void trainBibliographyCRF(
+          final File bibsGroundTruthDirectory,
+          final ParseOpts opts
+  ) throws IOException {
+    final File coraTrainFile = new File(bibsGroundTruthDirectory, "cora-citations.txt");
+    final File umassTrainFile = new File(bibsGroundTruthDirectory, "umass-citations.txt");
+    final File kermitTrainFile = new File(bibsGroundTruthDirectory, "kermit-citations.txt");
+    trainBibliographyCRF(coraTrainFile, umassTrainFile, kermitTrainFile, opts);
+  }
+  
+  public static void trainBibliographyCRF(File coraTrainFile, File umassTrainFile, File kermitTrainFile, ParseOpts opts) throws IOException {
     List<List<Pair<String, String>>> labeledData;
     labeledData = CRFBibRecordParser.labelFromCoraFile(coraTrainFile);
+    if(umassTrainFile != null)
+      labeledData.addAll(CRFBibRecordParser.labelFromUMassFile(umassTrainFile));
+    if(kermitTrainFile != null)
+      labeledData.addAll(CRFBibRecordParser.labelFromKermitFile(kermitTrainFile));
     ReferencesPredicateExtractor predExtractor;
+    
+    GazetteerFeatures gf = null;
+    try {
+    if(opts.gazetteerDir != null)
+      gf = new GazetteerFeatures(opts.gazetteerDir);
+    }
+    catch (IOException e) {
+      logger.error("Error importing gazetteer directory, ignoring.");
+    }
     ParserLMFeatures plf = null;
     if(opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
@@ -468,6 +497,7 @@ public class Parser {
     } else {
       predExtractor = new ReferencesPredicateExtractor();
     }
+    predExtractor.setGf(gf);
     
     // Split train/test data
     logger.info("CRF training for bibs with {} threads and {} labeled examples", opts.threads, labeledData.size());
@@ -515,7 +545,7 @@ public class Parser {
 
     val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
     logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf);
+    saveModel(dos, crfModel.featureEncoder, weights, plf, gf, ExtractReferences.DATA_VERSION);
     dos.close();
   }
 
@@ -676,12 +706,22 @@ public class Parser {
   }
 
   public static <T> void saveModel(
+      final DataOutputStream dos,
+      final CRFFeatureEncoder<String, T, String> fe,
+      final Vector weights,
+  final ParserLMFeatures plf,
+  final String dataVersion) throws IOException {
+    saveModel(dos, fe,weights, plf, null, dataVersion);
+  }
+  
+  public static <T> void saveModel(
           final DataOutputStream dos,
           final CRFFeatureEncoder<String, T, String> fe,
           final Vector weights,
-          final ParserLMFeatures plf
-  ) throws IOException {
-    dos.writeUTF(DATA_VERSION);
+      final ParserLMFeatures plf,
+      final GazetteerFeatures gf,
+      final String dataVersion) throws IOException {
+        dos.writeUTF(dataVersion);
     fe.stateSpace.save(dos);
     fe.nodeFeatures.save(dos);
     fe.edgeFeatures.save(dos);
@@ -691,6 +731,18 @@ public class Parser {
     oos.writeObject(plf);
     if(plf!=null)
       plf.logState();
+    logger.debug("Saving gazetteer features");
+    oos.writeObject(gf);
+  }
+
+  
+  public static <T> void saveModel(
+          final DataOutputStream dos,
+          final CRFFeatureEncoder<String, T, String> fe,
+          final Vector weights,
+          final ParserLMFeatures plf
+  ) throws IOException {
+    saveModel(dos, fe, weights, plf, Parser.DATA_VERSION);
   }
 
   @Data
@@ -702,9 +754,10 @@ public class Parser {
   }
 
   public static ModelComponents loadModelComponents(
-          final DataInputStream dis
+    final DataInputStream dis,
+    String dataVersion
   ) throws IOException {
-    IOUtils.ensureVersionMatch(dis, DATA_VERSION);
+    IOUtils.ensureVersionMatch(dis, dataVersion);
     val stateSpace = StateSpace.load(dis);
     Indexer<String> nodeFeatures = Indexer.load(dis);
     Indexer<String> edgeFeatures = Indexer.load(dis);
@@ -727,6 +780,12 @@ public class Parser {
     val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
     val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
     return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
+  }
+
+  public static ModelComponents loadModelComponents(
+          final DataInputStream dis
+  ) throws IOException {
+    return loadModelComponents(dis, DATA_VERSION);
   }
 
   public static CRFModel<String, PaperToken, String> loadModel(
@@ -832,13 +891,13 @@ public class Parser {
       (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
       (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
-      (args.length == 4 && args[0].equalsIgnoreCase("learnBibCRF")))) {
+      ((args.length == 4 || args.length == 6) && args[0].equalsIgnoreCase("learnBibCRF")))) {
       System.err.println("Usage: bootstrap <input dir> <model output file>");
       System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
       System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
       System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
       System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <bib model file>");
-      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir>");
+      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir> [<umass file> <kermit file>]");
     } else if (args[0].equalsIgnoreCase("bootstrap")) {
       File inDir = new File(args[1]);
       List<File> inFiles = Arrays.asList(inDir.listFiles());
@@ -1035,8 +1094,8 @@ public class Parser {
           totalRefs += br.size();
           totalCites += cr.size();
           mapper.writeValue(
-            new File(outDir, f.getName() + ".dat"),
-            Tuples.pair(em.references, em.referenceMentions));
+            new File(outDir, f.getName() + ".dat"), em);
+            //Tuples.pair(em.references, em.referenceMentions));
         } catch (Exception e) {
           logger.info("Parse error: " + f);
           e.printStackTrace();
@@ -1052,17 +1111,22 @@ public class Parser {
       logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
       logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
       logger.info("blank abstracts: " + blankAbstracts);
+            
     }
     else if(args[0].equalsIgnoreCase("learnBibCRF")) {
       ParseOpts opts = new ParseOpts();
       opts.modelFile = args[2];
       opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
+      opts.gazetteerDir = Parser.getDefaultGazetteerDir().toString();
       opts.backgroundDirectory = args[3];
-      opts.iterations = 150;
-      opts.threads = 1;//Runtime.getRuntime().availableProcessors();
+      opts.iterations = 20;
+      opts.threads = Runtime.getRuntime().availableProcessors();
       opts.backgroundSamples = 5;
       opts.trainFraction = 0.9;
-      trainBibliographyCRF(new File(args[1]), opts);
+      if(args.length == 6)
+        trainBibliographyCRF(new File(args[1]), new File(args[4]), new File(args[5]), opts);
+      else
+        trainBibliographyCRF(new File(args[1]), opts);
     }
   }
 
@@ -1164,7 +1228,7 @@ public class Parser {
       logger.debug(em.references.size() + " refs for " + em.title);
 
       try {
-        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc);
+        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
         if (em.abstractText.isEmpty())
           em.abstractText = null;
       } catch (final RegexWithTimeout.RegexTimeout e) {
@@ -1176,6 +1240,7 @@ public class Parser {
     //
     // Run figure extraction to get sections
     //
+    /*
     try {
       final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
       em.sections = ScalaStreamSupport.stream(doc.sections()).map(documentSection ->
@@ -1190,6 +1255,7 @@ public class Parser {
           e.getMessage());
       em.sections = null;
     }
+    */
 
     return em;
   }
@@ -1200,7 +1266,8 @@ public class Parser {
     public int threads;
     public int headerMax;
     public double trainFraction;
-    public String gazetteerFile;
+    public String gazetteerFile; //record of references
+    public String gazetteerDir; //directory of entity lists (universities, person names, etc.)
     public int backgroundSamples;
     public String backgroundDirectory;
     public int minYear; //only process papers this year or later
