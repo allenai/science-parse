@@ -174,11 +174,23 @@ object LabeledDataEvaluation extends Logging {
               val haveToUseMultiSet = goldEntriesSet.size != goldEntriesMultiSet.size
 
               def logPRErrors(goldSet: Set[Any], resultSet: Set[Any]): Unit = {
-                val missingEntries = (goldSet -- resultSet).toSeq.map(_.toString).sorted.mkString(", ")
-                errorLogger.info(s"Missing for $metricName on ${gold.id}: $missingEntries")
+                val missingEntries = (goldSet -- resultSet).toSeq.map(_.toString).sorted
+                if(missingEntries.isEmpty) {
+                  errorLogger.info(s"Missing for $metricName on ${gold.id}: None!")
+                } else {
+                  missingEntries.foreach { missingEntry =>
+                    errorLogger.info(s"Missing for $metricName on ${gold.id}: ${makeSingleLine(missingEntry)}")
+                  }
+                }
 
-                val excessEntries = (resultSet -- goldSet).toSeq.map(_.toString).sorted.mkString(", ")
-                errorLogger.info(s"Excess  for $metricName on ${gold.id}: $excessEntries")
+                val excessEntries = (resultSet -- goldSet).toSeq.map(_.toString).sorted
+                if(excessEntries.isEmpty) {
+                  errorLogger.info(s"Excess for $metricName on ${gold.id}: None!")
+                } else {
+                  excessEntries.foreach { excessEntry =>
+                    errorLogger.info(s"Excess for $metricName on ${gold.id}: ${makeSingleLine(excessEntry)}")
+                  }
+                }
               }
 
               def score(scoredOption: Option[Iterable[T]], logging: Boolean = false) =
