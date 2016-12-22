@@ -273,7 +273,7 @@ object LabeledDataEvaluation extends Logging {
           val (sp, grobid, count) = evaluateMetric("bibAllNormalized") { labeledData =>
             def normalizeReference(ref: Reference) = Reference(
               None, // ignoring label, because Grobid doesn't have that
-              ref.title.map(normalize),
+              ref.title.map(normalizeTitle),
               ref.authors.map(normalizeAuthor),
               ref.venue.map(normalize),
               ref.year,
@@ -293,7 +293,7 @@ object LabeledDataEvaluation extends Logging {
           val (sp, grobid, count) = evaluateMetric("bibAllButVenuesNormalized") { labeledData =>
             def normalizeReference(ref: Reference) = Reference(
               None, // ignoring label, because Grobid doesn't have that
-              ref.title.map(normalize),
+              ref.title.map(normalizeTitle),
               ref.authors.map(normalizeAuthor),
               None, // ignoring venue
               ref.year,
@@ -312,7 +312,7 @@ object LabeledDataEvaluation extends Logging {
           logger.info("Calculating bibTitlesNormalized ...")
           val (sp, grobid, count) = evaluateMetric("bibTitlesNormalized") { labeledData =>
             labeledData.references.map { refs =>
-              refs.flatMap(_.title).map(normalize)
+              refs.flatMap(_.title).map(normalizeTitle)
             }
           }
           output += outputLine("bibTitlesNormalized", sp, grobid, count)

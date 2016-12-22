@@ -51,6 +51,16 @@ public class BibRecord {
             year);
   }
 
+  public BibRecord withTitle(final String newTitle) {
+    return new BibRecord(
+        newTitle,
+        author,
+        venue,
+        citeRegEx,
+        shortCiteRegEx,
+        year);
+  }
+
   public String title;
   public final List<String> author;
   public final String venue;

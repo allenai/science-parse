@@ -428,10 +428,19 @@ public class ExtractReferences {
       return false;
   }
   
-  private static void clean(List<BibRecord> brs) {
+  private static List<BibRecord> clean(final List<BibRecord> brs) {
+    val result = new ArrayList<BibRecord>(brs.size());
+
+    // remove punctuation at the beginning and end of the title
     for(BibRecord b : brs) {
-      b.title = b.title.replaceAll("^\\p{P}", "").replaceAll("\\p{P}$", "");
+      final String newTitle =
+          b.title.trim().replaceAll("^\\p{P}", "").replaceAll("[\\p{P}&&[^)]]$", "");
+      if(!newTitle.isEmpty())
+        result.add(b.withTitle(newTitle));
     }
+
+    // remove bib records with no title
+    return result;
   }
   
   /**
@@ -453,7 +462,7 @@ public class ExtractReferences {
     String text = sb.toString();
     for (int i = 0; i < results.length; i++) {
       results[i] = extractors.get(i).parse(text);
-      clean(results[i]);
+      results[i] = clean(results[i]);
     }
     int idx = longestIdx(results);
     //log.info("references: " + results[idx].toString());
