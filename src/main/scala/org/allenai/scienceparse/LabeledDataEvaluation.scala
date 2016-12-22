@@ -84,6 +84,10 @@ object LabeledDataEvaluation extends Logging {
         c.copy(goldData = LabeledDataFromPMC.getCleaned.take(1000))
       } text "Compare against 1000 documents from PMC"
 
+      opt[Unit]("compareAgainstPMC100") action { (_, c) =>
+        c.copy(goldData = LabeledDataFromPMC.getCleaned.take(100))
+      } text "Compare against 100 documents from PMC"
+
       help("help") text "Prints help text"
     }
 
