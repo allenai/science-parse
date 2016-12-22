@@ -6,17 +6,26 @@ import java.nio.file.{NoSuchFileException, Paths, Files}
 import java.util.zip.{GZIPOutputStream, GZIPInputStream}
 
 import org.allenai.common.{Logging, Resource}
-import org.apache.commons.io.IOUtils
+import org.allenai.datastore.Datastores
+import org.apache.commons.io.{FileUtils, IOUtils}
 
 import scala.util.control.NonFatal
 import scala.util.{Success, Failure, Try, Random}
 import scalaj.http.{Http, MultiPart, HttpResponse}
 
 
-class CachedGrobidServer(url: URL) extends Logging {
+class CachedGrobidServer(url: URL) extends Logging with Datastores {
   private val cacheDir = {
     val dirName = url.toString.replaceAll("[^\\w-.:]+", "#")
-    Files.createDirectories(CachedGrobidServer.cacheDir.resolve(dirName))
+    Files.createDirectories(CachedGrobidServer.cacheDir)
+    val dir = CachedGrobidServer.cacheDir.resolve(dirName)
+    if(!Files.exists(dir)) {
+      // Warm the cache, so for most evaluations we don't need to have a running Grobid server at
+      // all.
+      val warmCacheDir = publicDirectory("GrobidServerCache", 1)
+      FileUtils.copyDirectory(warmCacheDir.toFile, dir.toFile)
+    }
+    dir
   }
 
   private val random = new Random
