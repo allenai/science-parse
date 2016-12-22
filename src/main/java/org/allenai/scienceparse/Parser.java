@@ -1228,7 +1228,7 @@ public class Parser {
       logger.debug(em.references.size() + " refs for " + em.title);
 
       try {
-        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc);
+        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
         if (em.abstractText.isEmpty())
           em.abstractText = null;
       } catch (final RegexWithTimeout.RegexTimeout e) {
