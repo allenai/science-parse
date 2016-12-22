@@ -287,7 +287,7 @@ public class PDFExtractor {
       StringBuilder sb = new StringBuilder();
       int i=0;
       for (TextPosition tp : textPositions) {
-       if(tp.getY() + tp.getHeight() > yThresh)
+       if(tp.getY() > yThresh)
          sb.append(token.charAt(i));
        i++;
       }
@@ -325,11 +325,11 @@ public class PDFExtractor {
         if (x1 > maxX) {
           maxX = x1;
         }
-        float y0 = tp.getY();
+        float y0 = tp.getY() - tp.getHeight();
         if (y0 < minY) {
           minY = y0;
         }
-        float y1 = y0 + tp.getHeight();
+        float y1 = tp.getY();
         if (y1 > maxY) {
           maxY = y1;
         }
