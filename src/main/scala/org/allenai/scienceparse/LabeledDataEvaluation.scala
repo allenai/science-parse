@@ -50,6 +50,9 @@ object LabeledDataEvaluation extends Logging {
   private def normalizeAuthor(s: String) =
     normalize(s).replace('.', ' ').replaceAll("\\s+", " ")
 
+  private def normalizeTitle(s: String) =
+    normalize(s).trim.replaceAll("^\\p{P}", "").replaceAll("[\\p{P}&&[^)]]$", "")
+
   def main(args: Array[String]): Unit = {
     case class Config(
       modelFile: Option[File] = None,
