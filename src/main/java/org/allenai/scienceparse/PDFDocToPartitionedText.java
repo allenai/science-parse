@@ -10,6 +10,7 @@ import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.allenai.scienceparse.pdfapi.PDFToken;
 
 @Slf4j
 public class PDFDocToPartitionedText {
@@ -269,14 +270,22 @@ public class PDFDocToPartitionedText {
             farLeft = Math.min(left, farLeft);
             farRight = Math.max(right, farRight);
             boolean br = false;
-            if (l.tokens != null && l.tokens.size() > 0) {
+            final List<PDFToken> tokens = l.tokens;
+            if (tokens != null && tokens.size() > 0) {
               String sAdd = lineToString(l);
-              if (left > farLeft + l.tokens.get(0).fontMetrics.spaceWidth) {
+              if (left > farLeft + tokens.get(0).fontMetrics.spaceWidth) {
                 br = false;
-              } else if (PDFToCRFInput.getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
-                br = true;
-              } else if (breakSize(l, prevLine) > qLineBreak) {
-                br = true;
+              } else {
+                final double prevLineX = PDFToCRFInput.getX(prevLine, false);
+                final double spaceWidth = tokens.get(0).fontMetrics.spaceWidth;
+                if (prevLineX + spaceWidth < farRight) {
+                  br = true;
+                } else {
+                  final double breakSize = breakSize(l, prevLine);
+                  if (breakSize > qLineBreak) {
+                    br = true;
+                  }
+                }
               }
               if (br) {
                 out.add(cleanLine(sb.toString()));
