@@ -16,7 +16,7 @@ import scalaj.http.{Http, MultiPart, HttpResponse}
 
 class CachedGrobidServer(url: URL) extends Logging with Datastores {
   private val cacheDir = {
-    val dirName = url.toString.replaceAll("[^\\w-.:]+", "#")
+    val dirName = url.toString.replaceAll("[^\\w-.]+", "#")
     Files.createDirectories(CachedGrobidServer.cacheDir)
     val dir = CachedGrobidServer.cacheDir.resolve(dirName)
     if(!Files.exists(dir)) {
