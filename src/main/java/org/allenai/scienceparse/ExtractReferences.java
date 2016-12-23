@@ -98,7 +98,7 @@ public class ExtractReferences {
               CRFBibRecordParser.class})));
       extractors.addAll(Arrays.asList(
         new BracketNumber(new Class [] {CRFBibRecordParser.class}),
-          new NumberDot(new Class [] {CRFBibRecordParser.class}),
+        new NumberDot(new Class [] {CRFBibRecordParser.class}),
         new NumberDotNaturalLineBreaks(new Class [] {CRFBibRecordParser.class}),
         new NamedYear(new Class [] {CRFBibRecordParser.class}),
         new BracketName(new Class [] {CRFBibRecordParser.class})));
@@ -180,8 +180,12 @@ public class ExtractReferences {
     return a;
   }
 
-  private static final Pattern authorStringToListPattern = Pattern.compile("\\p{Lu}\\..*");
-  
+  private static final Pattern firstNamesPattern =
+      Pattern.compile(
+          "\\p{javaUpperCase}{1,3}|" +
+          "(\\p{javaUpperCase}\\.){1,3}|" +
+          "(\\p{javaUpperCase}\\s+){0,2}(\\p{javaUpperCase})|" +
+          "(\\p{javaUpperCase}\\.\\s+){0,2}(\\p{javaUpperCase}\\.)");
   /**
    * Takes in a string mentioning several authors, returns normalized list of authors
    *
@@ -189,44 +193,97 @@ public class ExtractReferences {
    * @return
    */
   public static List<String> authorStringToList(String authString) {
-    boolean semiDelim = false;
-    if (authString.contains(";")) { //assume semi-colon delimiter
-      semiDelim = true;
-    }
-    
-    //figure out whether M. Johnson or Johnson, M.:
-    boolean firstLast = false;
-    List<String> out = new ArrayList<>();
-    if (RegexWithTimeout.matcher(authorStringToListPattern, authString).matches()) {
-      firstLast = true;
-      //strip trailing punctuation:
-      authString = authString.trim().replaceAll("\\p{P}$", "");
-    }
-    else {
-      //replacing trailing punct that's not .
-      authString = authString.trim().replaceAll("(,|:|;)$", "");
-    }
-    String[] names;
-    if (semiDelim)
-      names = authString.split("(;|; and| and | AND | And | & )+");
+    authString = authString.trim();
+
+    // remove punctuation at the end, all punctuation but .
+    authString = authString.replaceAll("[\\p{Punct}&&[^.]]*$", "");
+
+    // remove punctuation at the beginning
+    authString = authString.replaceAll("^\\p{Punct}*", "");
+
+    // remove "et al" at the end
+    authString = authString.replaceAll("[\\s\\p{Punct}]*[eE][tT]\\s+[aA][lL].?$", "");
+
+    // remove "etc" at the end
+    authString = authString.replaceAll("[\\s\\p{Punct}]*[eE][tT][cC].?$", "");
+
+    // find out the top-level separator of names
+    final String mainSplitString;
+    if(authString.contains(";"))
+      mainSplitString = ";";
     else
-      names = authString.split("(,| and | AND | And | & )+");
-    if (firstLast) {
-      out = Arrays.asList(names);
-    } else {
-      if (semiDelim) {
-        for (final String name : names)
-          out.add(ParserGroundTruth.invertAroundComma(name));
-      } else {
-        for (int i = 0; i < names.length; i += 2) {
-          if (names.length > i + 1)
-            out.add(names[i + 1].trim() + " " + names[i].trim());
-          else
-            out.add(names[i].trim()); //hope for the best
+      mainSplitString = ",";
+
+    // replace "and" with the top level separator
+    authString = authString.replaceAll("[aA][nN][dD]|&", mainSplitString);
+
+    // split into names
+    final String[] names = authString.split(mainSplitString);
+
+    // clean up the names
+    for(int i = 0; i < names.length; ++i) {
+      names[i] = names[i].trim().
+        // clean up names that start with punctuation
+        replaceAll("^\\p{Punct}\\s+", "");
+    }
+
+    // Some look like this: "Divakaran, A., Forlines, C., Lanning, T., Shipman, S., Wittenburg, K."
+    // If we split by comma, we need to make sure to glue these back together.
+    if(mainSplitString.equals(",")) {
+      for(int i = 1; i < names.length; ++i) {
+        if(firstNamesPattern.matcher(names[i]).matches()) {
+          names[i - 1] = names[i] + " " + names[i - 1];
+          names[i] = "";  // We'll clean up empty strings later.
+          i += 1;
         }
       }
     }
-    return out;
+
+    // see if we have to reorder first and last names
+    int invertAroundCommaCount = 0;
+    int invertAroundSpaceCount = 0;
+    int doNothingCount = 0;
+    for(final String name : names) {
+      if(name.isEmpty())
+        continue;
+      if(name.contains(",")) {
+        invertAroundCommaCount += 1;
+      } else {
+        final String[] individualNames = name.split("\\s+");
+        // If the last individual name looks like not-a-last-name, we assume we have to invert.
+        if(firstNamesPattern.matcher(individualNames[individualNames.length - 1]).matches())
+          invertAroundSpaceCount += 1;
+        else
+          doNothingCount += 1;
+      }
+    }
+
+    // invert, if we have to
+    if(invertAroundCommaCount > invertAroundSpaceCount && invertAroundCommaCount > doNothingCount) {
+      // invert around comma
+      for(int i = 0; i < names.length; ++i) {
+        final String[] parts = names[i].split("\\s*,\\s*");
+        if(parts.length == 2)
+          names[i] = parts[1] + " " + parts[0];
+      }
+    } else if(invertAroundSpaceCount > invertAroundCommaCount && invertAroundSpaceCount > doNothingCount) {
+      // invert around space, i.e., make Johnson M into M Johnson
+      final StringBuilder b = new StringBuilder(128);
+      for(int i = 0; i < names.length; ++i) {
+        final String[] parts = names[i].split("\\s+");
+        b.append(parts[parts.length - 1]);
+        b.append(' ');
+        for(int j = 0; j < parts.length - 1; ++j) {
+          b.append(parts[j]);
+          b.append(' ');
+        }
+        names[i] = b.toString().trim();
+        b.setLength(0);
+      }
+    }
+
+    // strip out empty strings
+    return Arrays.asList(names).stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());
   }
 
   private static <T> List<T> removeNulls(List<T> in) {
@@ -371,10 +428,19 @@ public class ExtractReferences {
       return false;
   }
   
-  private static void clean(List<BibRecord> brs) {
+  private static List<BibRecord> clean(final List<BibRecord> brs) {
+    val result = new ArrayList<BibRecord>(brs.size());
+
+    // remove punctuation at the beginning and end of the title
     for(BibRecord b : brs) {
-      b.title = b.title.replaceAll("^\\p{P}", "").replaceAll("\\p{P}$", "");
+      final String newTitle =
+          b.title.trim().replaceAll("^\\p{P}", "").replaceAll("[\\p{P}&&[^)]]$", "");
+      if(!newTitle.isEmpty())
+        result.add(b.withTitle(newTitle));
     }
+
+    // remove bib records with no title
+    return result;
   }
   
   /**
@@ -396,7 +462,7 @@ public class ExtractReferences {
     String text = sb.toString();
     for (int i = 0; i < results.length; i++) {
       results[i] = extractors.get(i).parse(text);
-      clean(results[i]);
+      results[i] = clean(results[i]);
     }
     int idx = longestIdx(results);
     //log.info("references: " + results[idx].toString());
