@@ -13,7 +13,8 @@ import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
 import scala.io.{Codec, Source}
 import scala.util.control.NonFatal
-import scala.xml.{Node, XML}
+import scala.xml.factory.XMLLoader
+import scala.xml.{Elem, Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.allenai.common.StringUtils._
 
@@ -240,29 +241,33 @@ object LabeledDataFromPMC extends Datastores with Logging {
     "2f" -> 1
   )
 
-  private val xmlLoader = {
-    val factory = javax.xml.parsers.SAXParserFactory.newInstance()
-    factory.setValidating(false)
-    factory.setNamespaceAware(false)
-    factory.setFeature("http://xml.org/sax/features/validation", false)
-    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-    val parser = factory.newSAXParser()
-    XML.withSAXParser(parser)
+  private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
+    // XML loader factories are not thread safe, so we have to have one per thread
+    override protected def initialValue = {
+      val factory = javax.xml.parsers.SAXParserFactory.newInstance()
+      factory.setValidating(false)
+      factory.setNamespaceAware(false)
+      factory.setFeature("http://xml.org/sax/features/validation", false)
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+      val parser = factory.newSAXParser()
+      XML.withSAXParser(parser)
+    }
   }
 
   def apply = get
 
   /** Returns an iterator of only those documents for which we have title and author for the
     * paper itself, and for all references */
-  def getCleaned = get.filter { labeledData =>
-    labeledData.title.isDefined &&
+  def getCleaned = get.parMap { labeledData =>
+    val keep = labeledData.title.isDefined &&
       labeledData.authors.nonEmpty &&
       labeledData.references.exists { refs =>
         refs.forall { ref =>
           ref.title.exists(_.nonEmpty) && ref.authors.nonEmpty
         }
       }
-  }
+    if(keep) Some(labeledData) else None
+  }.flatten
 
   private def pdfNameForXmlName(xmlName: String) =
     xmlName.dropRight(xmlExtension.length) + ".pdf"
@@ -279,7 +284,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
         (zipFilePath, name)
       }.toArray
     }
-  }.map { case (zipFilePath, xmlEntryName) =>
+  }.parMap { case (zipFilePath, xmlEntryName) =>
     require(xmlEntryName.endsWith(xmlExtension))
 
     def getEntryAsInputStream(entryName: String): InputStream = {
@@ -312,7 +317,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
       }
 
       // expected output
-      private lazy val xml = Resource.using(getEntryAsInputStream(xmlEntryName)) { xmlLoader.load }
+      private lazy val xml = Resource.using(getEntryAsInputStream(xmlEntryName)) { xmlLoader.get.load }
 
       private lazy val articleMeta = xml \ "front" \ "article-meta"
       override lazy val title: Option[String] =
