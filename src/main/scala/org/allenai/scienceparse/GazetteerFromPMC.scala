@@ -5,7 +5,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object GazetteerFromPMC extends App {
   // We use the first 1k of this for testing, so let's drop 10k just to be sure.
-  val labeledDataNotUsedForTesting = LabeledDataFromPMC.getCleaned.drop(10000)
+  val labeledDataNotUsedForTesting = LabeledDataFromPMC.get.drop(10000)
 
   labeledDataNotUsedForTesting.parMap { ld =>
     (ld.title, ld.authors, ld.year) match {
