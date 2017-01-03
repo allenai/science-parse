@@ -11,6 +11,7 @@ import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
+import scala.collection.immutable.SortedMap
 import scala.io.{Codec, Source}
 import scala.util.control.NonFatal
 import scala.xml.factory.XMLLoader
@@ -190,56 +191,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val xmlExtension = ".nxml"
 
-  private val set2version = Map(
-    "00" -> 1,
-    "01" -> 1,
-    "02" -> 1,
-    "03" -> 1,
-    "04" -> 1,
-    "05" -> 1,
-    "06" -> 1,
-    "07" -> 1,
-    "08" -> 1,
-    "09" -> 1,
-    "0a" -> 1,
-    "0b" -> 1,
-    "0c" -> 1,
-    "0d" -> 1,
-    "0e" -> 1,
-    "0f" -> 1,
-    "10" -> 1,
-    "11" -> 1,
-    "12" -> 1,
-    "13" -> 1,
-    "14" -> 1,
-    "15" -> 1,
-    "16" -> 1,
-    "17" -> 1,
-    "18" -> 1,
-    "19" -> 1,
-    "1a" -> 1,
-    "1b" -> 1,
-    "1c" -> 1,
-    "1d" -> 1,
-    "1e" -> 1,
-    "1f" -> 1,
-    "20" -> 1,
-    "21" -> 1,
-    "22" -> 1,
-    "23" -> 1,
-    "24" -> 1,
-    "25" -> 1,
-    "26" -> 1,
-    "27" -> 1,
-    "28" -> 1,
-    "29" -> 1,
-    "2a" -> 1,
-    "2b" -> 1,
-    "2c" -> 1,
-    "2d" -> 1,
-    "2e" -> 1,
-    "2f" -> 1
-  )
+  private val set2version = SortedMap((0 to 0x5b).map(i => f"$i%02x" -> 1): _*)
 
   private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
     // XML loader factories are not thread safe, so we have to have one per thread
