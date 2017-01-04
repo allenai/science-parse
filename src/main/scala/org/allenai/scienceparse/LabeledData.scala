@@ -234,8 +234,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
         val pdfEntryOption = Option(zipFile.getEntry(pdfNameForXmlName(xmlEntry.getName)))
         pdfEntryOption.map((xmlEntry, _))
       }.map { case (xmlEntry, pdfEntry) =>
-        val precalculatedPaperId = Utilities.shaForBytes(
-          Resource.using(zipFile.getInputStream(pdfEntry))(IOUtils.toByteArray))
+        //val precalculatedPaperId = Utilities.shaForBytes(
+        //  Resource.using(zipFile.getInputStream(pdfEntry))(IOUtils.toByteArray))
 
         val xml = Resource.using(zipFile.getInputStream(xmlEntry))(xmlLoader.get.load)
         val articleMeta = xml \ "front" \ "article-meta"
@@ -256,7 +256,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
           override val id = s"PMC:${xmlEntry.getName}"
 
-          override lazy val paperId = precalculatedPaperId
+          //override lazy val paperId = precalculatedPaperId
 
           private def parseYear(n: Node): Option[Int] = {
             try {
