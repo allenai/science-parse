@@ -192,8 +192,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
   private val xmlExtension = ".nxml"
 
   private val set2version =
-    SortedMap((0x00 to 0x26).map(i => f"$i%02x" -> 2): _*) ++
-    SortedMap((0x27 to 0x75).map(i => f"$i%02x" -> 1): _*)
+    SortedMap((0x00 to 0x2e).map(i => f"$i%02x" -> 2): _*) ++
+    SortedMap((0x2f to 0x77).map(i => f"$i%02x" -> 1): _*)
 
   private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
     // XML loader factories are not thread safe, so we have to have one per thread
