@@ -224,7 +224,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
   private def pdfNameForXmlName(xmlName: String) =
     xmlName.dropRight(xmlExtension.length) + ".pdf"
 
-  private val maxZipFilesInParallel = Runtime.getRuntime.availableProcessors()
+  private val maxZipFilesInParallel = 2
   def get: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
