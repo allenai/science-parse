@@ -210,7 +210,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   /** Returns an iterator of only those documents for which we have title and author for the
     * paper itself, and for all references */
-  def getCleaned = get.parMap { labeledData =>
+  def getCleaned = get.flatMap { labeledData =>
     val keep = labeledData.title.isDefined &&
       labeledData.authors.nonEmpty &&
       labeledData.references.exists { refs =>
@@ -219,7 +219,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
         }
       }
     if(keep) Some(labeledData) else None
-  }.flatten
+  }
 
   private def pdfNameForXmlName(xmlName: String) =
     xmlName.dropRight(xmlExtension.length) + ".pdf"
