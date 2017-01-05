@@ -32,12 +32,13 @@ connectInput in run := true
 
 outputStrategy := Some(StdoutOutput)
 
-enablePlugins(LibraryPlugin)
+disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
+
+enablePlugins(LibraryPluginLight)
 
 resolvers ++= Seq(
-  "AllenAI ThirdParty" at "http://utility.allenai.org:8081/nexus/content/repositories/thirdparty",
   "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
-  "AllenAi Bintray Private" at "http://dl.bintray.com/allenai/private",
+  "AllenAI Bintray Private" at "http://dl.bintray.com/allenai/private",
   Resolver.jcenterRepo
 )
 
