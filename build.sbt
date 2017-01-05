@@ -32,6 +32,7 @@ connectInput in run := true
 
 outputStrategy := Some(StdoutOutput)
 
+// We still have to disable these specifically. I'm not sure why.
 disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
 
 enablePlugins(LibraryPluginLight)
@@ -43,7 +44,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
+  "org.allenai.common" %% "common-core" % "1.2.1" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
   "org.apache.pdfbox" % "pdfbox" % "2.1.0-AI2-ef339b" exclude ("commons-logging", "commons-logging"),
