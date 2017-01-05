@@ -32,6 +32,7 @@ connectInput in run := true
 
 outputStrategy := Some(StdoutOutput)
 
+// We still have to disable these specifically. I'm not sure why.
 disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
 
 enablePlugins(LibraryPluginLight)
