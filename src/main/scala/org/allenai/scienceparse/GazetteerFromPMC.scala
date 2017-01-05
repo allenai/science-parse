@@ -19,7 +19,7 @@ object GazetteerFromPMC extends App {
   labeledDataNotUsedForTesting.parMap { ld =>
     (ld.title, ld.authors, ld.year) match {
       case (Some(title), Some(authors), Some(year)) =>
-        Some(GazetteerEntry("skipped", title.replaceAll("\\s+", " "), authors.map(_.name), year))
+        Some(GazetteerEntry(ld.paperId, title.replaceAll("\\s+", " "), authors.map(_.name), year))
       case _ =>
         noneCount.incrementAndGet()
         None

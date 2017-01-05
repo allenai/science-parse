@@ -17,7 +17,7 @@ import scala.util.control.NonFatal
 import scala.xml.factory.XMLLoader
 import scala.xml.{Elem, Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.allenai.common.StringUtils._
+import scala.language.postfixOps
 
 import scala.collection.JavaConverters._
 
@@ -191,7 +191,9 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val xmlExtension = ".nxml"
 
-  private val set2version = SortedMap((0 to 0x73).map(i => f"$i%02x" -> 1): _*)
+  private val set2version =
+    SortedMap((0x00 to 0x03).map(i => f"$i%02x" -> 2): _*) ++
+    SortedMap((0x04 to 0x74).map(i => f"$i%02x" -> 1): _*)
 
   private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
     // XML loader factories are not thread safe, so we have to have one per thread
@@ -225,6 +227,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
     xmlName.dropRight(xmlExtension.length) + ".pdf"
 
   private val maxZipFilesInParallel = 2
+  private val shaRegex = "^[0-9a-f]{40}$"r
   def get: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
@@ -234,8 +237,11 @@ object LabeledDataFromPMC extends Datastores with Logging {
         val pdfEntryOption = Option(zipFile.getEntry(pdfNameForXmlName(xmlEntry.getName)))
         pdfEntryOption.map((xmlEntry, _))
       }.map { case (xmlEntry, pdfEntry) =>
-        //val precalculatedPaperId = Utilities.shaForBytes(
-        //  Resource.using(zipFile.getInputStream(pdfEntry))(IOUtils.toByteArray))
+        // Because calculating the paper id on the fly takes a long time, we parse it out of the
+        // comments in the zip file. If that works, we take it. Otherwise, we fall back to
+        // calculating it on the fly.
+        val precalculatedPaperId =
+          Option(pdfEntry.getComment).flatMap(shaRegex.findFirstMatchIn).map(_.matched)
 
         val xml = Resource.using(zipFile.getInputStream(xmlEntry))(xmlLoader.get.load)
         val articleMeta = xml \ "front" \ "article-meta"
@@ -256,7 +262,10 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
           override val id = s"PMC:${xmlEntry.getName}"
 
-          //override lazy val paperId = precalculatedPaperId
+          override lazy val paperId =
+            precalculatedPaperId.getOrElse(
+              Utilities.shaForBytes(
+                Resource.using(inputStream)(IOUtils.toByteArray)))
 
           private def parseYear(n: Node): Option[Int] = {
             try {
