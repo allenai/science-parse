@@ -61,7 +61,7 @@ libraryDependencies ++= Seq(
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
   "com.github.scopt" %% "scopt" % "3.3.0",
-  "org.allenai" %% "datastore" % "1.0.2" excludeAll(
+  "org.allenai.datastore" %% "datastore" % "1.0.8" excludeAll(
     ExclusionRule(organization = "com.amazonaws")
   ),
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",

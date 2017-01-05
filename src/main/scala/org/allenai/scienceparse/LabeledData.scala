@@ -11,11 +11,13 @@ import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
+import scala.collection.immutable.SortedMap
 import scala.io.{Codec, Source}
 import scala.util.control.NonFatal
-import scala.xml.{Node, XML}
+import scala.xml.factory.XMLLoader
+import scala.xml.{Elem, Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
-import org.allenai.common.StringUtils._
+import scala.language.postfixOps
 
 import scala.collection.JavaConverters._
 
@@ -189,222 +191,186 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val xmlExtension = ".nxml"
 
-  private val set2version = Map(
-    "00" -> 1,
-    "01" -> 1,
-    "02" -> 1,
-    "03" -> 1,
-    "04" -> 1,
-    "05" -> 1,
-    "06" -> 1,
-    "07" -> 1,
-    "08" -> 1,
-    "09" -> 1,
-    "0a" -> 1,
-    "0b" -> 1,
-    "0c" -> 1,
-    "0d" -> 1,
-    "0e" -> 1,
-    "0f" -> 1,
-    "10" -> 1,
-    "11" -> 1,
-    "12" -> 1,
-    "13" -> 1,
-    "14" -> 1,
-    "15" -> 1,
-    "16" -> 1,
-    "17" -> 1,
-    "18" -> 1,
-    "19" -> 1,
-    "1a" -> 1,
-    "1b" -> 1,
-    "1c" -> 1,
-    "1d" -> 1,
-    "1e" -> 1,
-    "1f" -> 1,
-    "20" -> 1,
-    "21" -> 1,
-    "22" -> 1,
-    "23" -> 1,
-    "24" -> 1,
-    "25" -> 1,
-    "26" -> 1,
-    "27" -> 1,
-    "28" -> 1,
-    "29" -> 1,
-    "2a" -> 1,
-    "2b" -> 1,
-    "2c" -> 1,
-    "2d" -> 1,
-    "2e" -> 1,
-    "2f" -> 1
-  )
+  private val set2version =
+    SortedMap((0x00 to 0x26).map(i => f"$i%02x" -> 2): _*) ++
+    SortedMap((0x27 to 0x75).map(i => f"$i%02x" -> 1): _*)
 
-  private val xmlLoader = {
-    val factory = javax.xml.parsers.SAXParserFactory.newInstance()
-    factory.setValidating(false)
-    factory.setNamespaceAware(false)
-    factory.setFeature("http://xml.org/sax/features/validation", false)
-    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-    val parser = factory.newSAXParser()
-    XML.withSAXParser(parser)
+  private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
+    // XML loader factories are not thread safe, so we have to have one per thread
+    override protected def initialValue = {
+      val factory = javax.xml.parsers.SAXParserFactory.newInstance()
+      factory.setValidating(false)
+      factory.setNamespaceAware(false)
+      factory.setFeature("http://xml.org/sax/features/validation", false)
+      factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+      val parser = factory.newSAXParser()
+      XML.withSAXParser(parser)
+    }
   }
 
   def apply = get
 
   /** Returns an iterator of only those documents for which we have title and author for the
     * paper itself, and for all references */
-  def getCleaned = get.filter { labeledData =>
-    labeledData.title.isDefined &&
+  def getCleaned = get.flatMap { labeledData =>
+    val keep = labeledData.title.isDefined &&
       labeledData.authors.nonEmpty &&
       labeledData.references.exists { refs =>
         refs.forall { ref =>
           ref.title.exists(_.nonEmpty) && ref.authors.nonEmpty
         }
       }
+    if(keep) Some(labeledData) else None
   }
 
   private def pdfNameForXmlName(xmlName: String) =
     xmlName.dropRight(xmlExtension.length) + ".pdf"
 
-  def get: Iterator[LabeledData] = set2version.iterator.flatMap { case (set, version) =>
+  private val maxZipFilesInParallel = 2
+  private val shaRegex = "^[0-9a-f]{40}$"r
+  def get: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
-    Resource.using(new ZipFile(zipFilePath.toFile)) { case zipFile =>
-      def allNames = zipFile.entries().asScala.filterNot(_.isDirectory).map(_.getName)
-      val pdfNames = allNames.filter(_.endsWith(".pdf")).toSet
+    Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
+      zipFile.entries().asScala.filter { entry =>
+        !entry.isDirectory && entry.getName.endsWith(xmlExtension)
+      }.flatMap { xmlEntry =>
+        val pdfEntryOption = Option(zipFile.getEntry(pdfNameForXmlName(xmlEntry.getName)))
+        pdfEntryOption.map((xmlEntry, _))
+      }.map { case (xmlEntry, pdfEntry) =>
+        // Because calculating the paper id on the fly takes a long time, we parse it out of the
+        // comments in the zip file. If that works, we take it. Otherwise, we fall back to
+        // calculating it on the fly.
+        val precalculatedPaperId =
+          Option(pdfEntry.getComment).flatMap(shaRegex.findFirstMatchIn).map(_.matched)
 
-      allNames.filter { name =>
-        name.endsWith(xmlExtension) && pdfNames.contains(pdfNameForXmlName(name))
-      }.map { name =>
-        (zipFilePath, name)
+        val xml = Resource.using(zipFile.getInputStream(xmlEntry))(xmlLoader.get.load)
+        val articleMeta = xml \ "front" \ "article-meta"
+
+        new LabeledData {
+          // input
+          override def inputStream: InputStream = {
+            val zipFile = new ZipFile(zipFilePath.toFile)
+            val inputStream = zipFile.getInputStream(zipFile.getEntry(pdfEntry.getName))
+            new FilterInputStream(inputStream) {
+              override def close(): Unit = {
+                super.close()
+                inputStream.close()
+                zipFile.close()
+              }
+            }
+          }
+
+          override val id = s"PMC:${xmlEntry.getName}"
+
+          override lazy val paperId =
+            precalculatedPaperId.getOrElse(
+              Utilities.shaForBytes(
+                Resource.using(inputStream)(IOUtils.toByteArray)))
+
+          private def parseYear(n: Node): Option[Int] = {
+            try {
+              val i = n.text.trim.dropWhile(_ == '(').takeWhile(_.isDigit).toInt
+              if (i >= 1800 && i <= 2100) Some(i) else None
+            } catch {
+              case e: NumberFormatException =>
+                logger.warn(s"Could not parse '${n.text}' as year")
+                None
+            }
+          }
+
+          // expected output
+          override val title: Option[String] =
+            (articleMeta \ "title-group" \ "article-title").headOption.map(_.text)
+
+          override val authors: Option[Seq[Author]] = Some {
+            val affiliationId2affiliation = (for {
+              affiliationElem <- articleMeta \ "aff"
+              id = affiliationElem \@ "id"
+              pcdat <- affiliationElem.child.filter(_.label == "#PCDATA")
+              text = pcdat.text.trim
+              if text.nonEmpty
+            } yield {
+              (id, text)
+            }).toMap
+
+            (articleMeta \ "contrib-group" \ "contrib") filter (_ \@ "contrib-type" == "author") map { e =>
+              val surname = (e \ "name" \ "surname").text
+              val givenNames = (e \ "name" \ "given-names").text
+              val email = (e \ "email").headOption.map(_.text)
+              val affiliationIds = (e \ "xref") filter (_ \@ "ref-type" == "aff") map (_ \@ "rid")
+              val affiliations = affiliationIds flatMap affiliationId2affiliation.get
+
+              Author(s"$givenNames $surname".trim, email, affiliations)
+            }
+          }
+
+          override val venue: Option[String] =
+            (xml \ "front" \ "journal-meta" \ "journal-title-group" \ "journal-title").headOption.map(_.text)
+
+          override val year: Option[Int] = Iterable(
+            ("pub-type", "ppub"),
+            ("pub-type", "collection"),
+            ("pub-type", "epub"),
+            ("pub-type", "pmc-release"),
+            ("publication-format", "print"),
+            ("publication-format", "electronic")
+          ).flatMap { case (attrName, attrValue) =>
+            (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
+          }.flatMap(_ \ "year").flatMap(parseYear).headOption
+
+          private def parseSection(e: Node): Seq[Section] = {
+            (e \ "sec") map { s =>
+              val title = (s \ "title").headOption.map(_.text)
+              val body = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+              Section(title, body)
+            }
+          }
+
+          override val abstractText: Option[String] = (articleMeta \ "abstract").headOption.map { a =>
+            val sections = parseSection(a)
+            if (sections.isEmpty) {
+              (a \\ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+            } else {
+              sections.map(s => s"${s.heading.getOrElse("")}\n${s.text}".trim).mkString("\n\n")
+            }
+          }
+
+          override val sections: Option[Seq[Section]] = (xml \ "body").headOption.map(parseSection)
+
+          override val references: Option[Seq[Reference]] = Some {
+            (xml \ "back" \ "ref-list" \ "ref") map { ref =>
+              val label = (ref \ "label").headOption.map(_.text)
+
+              val citation =
+                Seq("citation", "element-citation", "mixed-citation").flatMap(ref \ _)
+
+              val title = Seq("article-title", "chapter-title").flatMap(citation \ _).headOption.map(_.text)
+              val authors = Seq(
+                citation \ "person-group" filter (_ \@ "person-group-type" != "editor"),
+                citation
+              ).flatMap(_ \ "name") map { e =>
+                val surname = (e \ "surname").text
+                val givenNames = (e \ "given-names").text
+                s"$givenNames $surname".trim
+              }
+              val venue = (citation \ "source").headOption.map(_.text)
+              val year = (citation \ "year").flatMap(parseYear).headOption
+              val volume = (citation \ "volume").headOption.map(_.text)
+              val firstPage = (citation \ "fpage").headOption.map(_.text)
+              val lastPage = (citation \ "lpage").headOption.map(_.text)
+              val pageRange = (firstPage, lastPage) match {
+                case (Some(first), Some(last)) => Some((first, last))
+                case _ => None
+              }
+              Reference(label, title, authors, venue, year, volume, pageRange)
+            }
+          }
+
+          override val mentions: Option[Seq[Mention]] = None // TODO
+        }
       }.toArray
     }
-  }.map { case (zipFilePath, xmlEntryName) =>
-    require(xmlEntryName.endsWith(xmlExtension))
-
-    def getEntryAsInputStream(entryName: String): InputStream = {
-      val zipFile = new ZipFile(zipFilePath.toFile)
-      val inputStream = zipFile.getInputStream(zipFile.getEntry(entryName))
-      new FilterInputStream(inputStream) {
-        override def close(): Unit = {
-          super.close()
-          inputStream.close()
-          zipFile.close()
-        }
-      }
-    }
-
-    new LabeledData {
-      // input
-      override def inputStream: InputStream = getEntryAsInputStream(pdfNameForXmlName(xmlEntryName))
-
-      override val id = s"PMC:$xmlEntryName"
-
-      private def parseYear(n: Node): Option[Int] = {
-        try {
-          val i = n.text.trim.takeWhile(_.isDigit).toInt
-          if(i >= 1800 && i <= 2100) Some(i) else None
-        } catch {
-          case e: NumberFormatException =>
-            logger.warn(s"Could not parse '${n.text}' as year")
-            None
-        }
-      }
-
-      // expected output
-      private lazy val xml = Resource.using(getEntryAsInputStream(xmlEntryName)) { xmlLoader.load }
-
-      private lazy val articleMeta = xml \ "front" \ "article-meta"
-      override lazy val title: Option[String] =
-        (articleMeta \ "title-group" \ "article-title").headOption.map(_.text)
-
-      override lazy val authors: Option[Seq[Author]] = Some {
-        val affiliationId2affiliation = (for {
-          affiliationElem <- articleMeta \ "aff"
-          id = affiliationElem \@ "id"
-          pcdat <- affiliationElem.child.filter(_.label == "#PCDATA")
-          text = pcdat.text.trim
-          if text.nonEmpty
-        } yield {
-          (id, text)
-        }).toMap
-
-        (articleMeta \ "contrib-group" \ "contrib") filter (_ \@ "contrib-type" == "author") map { e =>
-          val surname = (e \ "name" \ "surname").text
-          val givenNames = (e \ "name" \ "given-names").text
-          val email = (e \ "email").headOption.map(_.text)
-          val affiliationIds = (e \ "xref") filter (_ \@ "ref-type" == "aff") map (_ \@ "rid")
-          val affiliations = affiliationIds flatMap affiliationId2affiliation.get
-
-          Author(s"$givenNames $surname".trim, email, affiliations)
-        }
-      }
-
-      override lazy val venue: Option[String] =
-        (xml \ "front" \ "journal-meta" \ "journal-title-group" \ "journal-title").headOption.map(_.text)
-
-      override lazy val year: Option[Int] = Iterable(
-        ("pub-type", "ppub"),
-        ("pub-type", "collection"),
-        ("pub-type", "epub"),
-        ("pub-type", "pmc-release"),
-        ("publication-format", "print"),
-        ("publication-format", "electronic")
-      ).flatMap { case (attrName, attrValue) =>
-        (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
-      }.flatMap(_ \ "year").flatMap(parseYear).headOption
-
-      private def parseSection(e: Node): Seq[Section] = {
-        (e \ "sec") map { s =>
-          val title = (s \ "title").headOption.map(_.text)
-          val body = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-          Section(title, body)
-        }
-      }
-
-      override lazy val abstractText: Option[String] = (articleMeta \ "abstract").headOption.map { a =>
-        val sections = parseSection(a)
-        if(sections.isEmpty) {
-          (a \\ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-        } else {
-          sections.map(s => s"${s.heading.getOrElse("")}\n${s.text}".trim).mkString("\n\n")
-        }
-      }
-
-      override lazy val sections: Option[Seq[Section]] = (xml \ "body").headOption.map(parseSection)
-
-      override lazy val references: Option[Seq[Reference]] = Some {
-        (xml \ "back" \ "ref-list" \ "ref") map { ref =>
-          val label = (ref \ "label").headOption.map(_.text)
-
-          val citation =
-            Seq("citation", "element-citation", "mixed-citation").flatMap(ref \ _)
-
-          val title = Seq("article-title", "chapter-title").flatMap(citation \ _).headOption.map(_.text)
-          val authors = Seq(
-            citation \ "person-group" filter (_ \@ "person-group-type" != "editor"),
-            citation
-          ).flatMap (_ \ "name") map { e =>
-            val surname = (e \ "surname").text
-            val givenNames = (e \ "given-names").text
-            s"$givenNames $surname".trim
-          }
-          val venue = (citation \ "source").headOption.map(_.text)
-          val year = (citation \ "year").flatMap(parseYear).headOption
-          val volume = (citation \ "volume").headOption.map(_.text)
-          val firstPage = (citation \ "fpage").headOption.map(_.text)
-          val lastPage = (citation \ "lpage").headOption.map(_.text)
-          val pageRange = (firstPage, lastPage) match {
-            case (Some(first), Some(last)) => Some((first, last))
-            case _ => None
-          }
-          Reference(label, title, authors, venue, year, volume, pageRange)
-        }
-      }
-
-      override lazy val mentions: Option[Seq[Mention]] = None // TODO
-    }
-  }
+  }, maxZipFilesInParallel).flatten
 
   def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromPMC.get)
 }
