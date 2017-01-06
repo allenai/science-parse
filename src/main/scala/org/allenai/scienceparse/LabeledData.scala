@@ -260,7 +260,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
             }
           }
 
-          override val id = s"PMC:${xmlEntry.getName}"
+          override val id = s"PMC:${pdfEntry.getName}"
 
           override lazy val paperId =
             precalculatedPaperId.getOrElse(
