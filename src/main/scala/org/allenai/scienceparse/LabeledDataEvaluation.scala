@@ -189,10 +189,10 @@ object LabeledDataEvaluation extends Logging {
 
                 val excessEntries = (resultSet -- goldSet).toSeq.map(_.toString).sorted
                 if(excessEntries.isEmpty) {
-                  errorLogger.info(s"Excess for $metricName on ${gold.id}: None!")
+                  errorLogger.info(s"Excess  for $metricName on ${gold.id}: None!")
                 } else {
                   excessEntries.foreach { excessEntry =>
-                    errorLogger.info(s"Excess for $metricName on ${gold.id}: ${makeSingleLine(excessEntry)}")
+                    errorLogger.info(s"Excess  for $metricName on ${gold.id}: ${makeSingleLine(excessEntry)}")
                   }
                 }
               }
