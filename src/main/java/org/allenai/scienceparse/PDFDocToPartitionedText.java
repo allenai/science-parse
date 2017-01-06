@@ -225,7 +225,9 @@ public class PDFDocToPartitionedText {
             "Citations",
             "CITATIONS",
             "Bibliography",
-            "BIBLIOGRAPHY");
+            "BIBLIOGRAPHY",
+            "Reference",
+            "REFERENCE");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
