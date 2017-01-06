@@ -977,7 +977,7 @@ public class ExtractReferences {
       String tag = "[" + (++i) + "]";
       List<String> cites = new ArrayList<String>();
       int st = line.indexOf(tag);
-      while (line.contains(tag)) {
+      while (st > 0) {
         tag = "<lb>[" + (++i) + "]";
         int end = line.indexOf(tag, st);
         if (end > 0) {
