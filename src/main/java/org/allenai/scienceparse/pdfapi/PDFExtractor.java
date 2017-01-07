@@ -284,11 +284,13 @@ public class PDFExtractor {
     
     public String discardSuperscripts(String token, FloatList bounds) {
       double yThresh = (bounds.get(3) + bounds.get(1))/2.0;
+      double yGap = (bounds.get(3) - bounds.get(1));
       StringBuilder sb = new StringBuilder();
       int i=0;
       for (TextPosition tp : textPositions) {
-       if(tp.getY() > yThresh)
-         sb.append(token.charAt(i));
+       if(tp.getY() > yThresh || (yThresh - tp.getY() > yGap / 6.0)) //latter case suggests a height bug (?) so ignore
+//        if(tp.getY() + tp.getHeight() > yThresh)
+         sb.append(tp.getUnicode());
        i++;
       }
       return sb.toString();
@@ -325,11 +327,13 @@ public class PDFExtractor {
         if (x1 > maxX) {
           maxX = x1;
         }
-        float y0 = tp.getY() - tp.getHeight();
+        float y0 = tp.getY() - tp.getHeight(); //getY returns the bottom-left
+//        float y0 = tp.getY();
         if (y0 < minY) {
           minY = y0;
         }
         float y1 = tp.getY();
+//        float y1 = y0 + tp.getHeight();
         if (y1 > maxY) {
           maxY = y1;
         }
