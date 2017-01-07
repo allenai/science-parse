@@ -231,38 +231,35 @@ public class PDFDocToPartitionedText {
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
+    boolean foundRefs = false;
     double qLineBreak = getReferenceLineBreak(pdf);
     StringBuffer sb = new StringBuffer();
-
-    for(int pass=0; pass < 3; pass++) {
+    boolean lenient = false;
+    
+    for(int pass=0;pass<2;pass++) {
+      if(pass==1)
+        if(foundRefs)
+          break;
+        else
+          lenient=true; //try harder this time.
       for (PDFPage p : pdf.getPages()) {
         double farLeft = Double.MAX_VALUE; //of current column
         double farRight = -1.0; //of current column
         for (PDFLine l : p.getLines()) {
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
-            if (
-              l.tokens.get(l.tokens.size() - 1).token != null &&
-              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim())
-            ) {
+            if (l.tokens.get(l.tokens.size() - 1).token != null &&
+              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim())) {
               inRefs = true;
+              foundRefs = true;
               prevLine = l;
               continue; //skip this line
             }
-
-            switch(pass) {
-              case 1:
-                if(lenientRefStart(l, prevLine, qLineBreak))
-                  inRefs = true;
+            else if(lenient) { //used if we don't find refs on first pass
+              if(lenientRefStart(l, prevLine, qLineBreak)) {
+                inRefs = true;
+                foundRefs = true;
                 //DON'T skip this line.
-
-              case 2:
-                // Desperate more: We take the whole last page as the references section
-                if(pdf.getPages().indexOf(p) == pdf.getPages().size() - 1)
-                  inRefs = true;
-                //DON'T skip this line.
-
-              default:
-                assert(false); // This should never happen
+              }
             }
           }
           if (inRefs) {
@@ -312,9 +309,6 @@ public class PDFDocToPartitionedText {
           sb = new StringBuffer();
         }
       }
-
-      if(!out.isEmpty())
-        break;
     }
     return out;
   }
