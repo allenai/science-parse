@@ -208,9 +208,15 @@ public class PDFDocToPartitionedText {
   }
   
   private static boolean lenientRefStart(PDFLine l, PDFLine prevLine, double qLineBreak) {
-    return l.tokens.get(0).token.equals("[1]") && l.tokens.size()>1 &&
-        (PDFToCRFInput.getX(l.tokens.get(1), true) > l.tokens.get(0).fontMetrics.spaceWidth ||
-            breakSize(l, prevLine) > qLineBreak);
+    final PDFToken firstToken = l.tokens.get(0);
+
+    return (
+          firstToken.token.equals("[1]") ||
+          firstToken.token.equals("1.")
+        ) && l.tokens.size() > 1 && (
+            PDFToCRFInput.getX(l.tokens.get(1), true) > firstToken.fontMetrics.spaceWidth ||
+            breakSize(l, prevLine) > qLineBreak
+        );
   }
   
   
