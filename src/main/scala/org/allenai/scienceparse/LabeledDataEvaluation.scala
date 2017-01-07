@@ -50,6 +50,9 @@ object LabeledDataEvaluation extends Logging {
   private def normalizeAuthor(s: String) =
     normalize(s).replace('.', ' ').replaceAll("\\s+", " ")
 
+  private def ignoreAuthorOrder(s: String) : Set[String] =
+    s.split(",").toSet
+
   private def normalizeTitle(s: String) =
     normalize(s).trim.replaceAll("^\\p{P}", "").replaceAll("[\\p{P}&&[^)]]$", "")
 
@@ -110,18 +113,23 @@ object LabeledDataEvaluation extends Logging {
 
         // read the data
         logger.info("Reading in data ...")
-        val goldData = config.goldData
+        val goldData = config.goldData.toArray
 
         val parser = new Parser(
           config.modelFile.getOrElse(Parser.getDefaultProductionModel.toFile),
           config.gazetteerFile.getOrElse(Parser.getDefaultGazetteer.toFile),
           config.bibModelFile.getOrElse(Parser.getDefaultBibModel.toFile))
 
-        val extractions = goldData.parMap { gold =>
-          val grobid = labeledDataFromGrobidServer.get(gold.inputStream)
-          val sp = LabeledDataFromScienceParse.get(gold.inputStream, parser)
-          (gold, sp, grobid)
-        }.toSeq
+        val grobidExtractions = goldData.par.map {
+          gold => labeledDataFromGrobidServer.get(gold.inputStream)
+        }
+
+        val spExtractions = goldData.par.map {
+          gold => LabeledDataFromScienceParse.get(gold.inputStream, parser)
+        }
+
+        val extractions = (goldData.toList, spExtractions.toList, grobidExtractions.toList)
+            .zipped.toList
 
         // write header
         // buffer output so that console formatting doesn't get messed up
@@ -327,13 +335,17 @@ object LabeledDataEvaluation extends Logging {
         val editDistance = LevenshteinDistance.getDefaultInstance()
         val maxEditDistance = 5
 
-        case class PipelineRef(title: Option[String], authors: Seq[String], year: Option[Int]) {
-          override def hashCode(): Int = title.getOrElse("").substring(0, 3).hashCode()
+        case class PipelineRef(title: Option[String], authors: Seq[Set[String]], year: Option[Int]) {
+          override def hashCode(): Int = {
+            val t = title.getOrElse("")
+            t.substring(0, Math.min(t.size, 3)).hashCode
+          }
           override def equals(o: scala.Any): Boolean = {
             val b = o.asInstanceOf[PipelineRef]
             if (this.title.isDefined && b.title.isDefined &&
                 editDistance(this.title.get, b.title .get) < maxEditDistance) {
-              this.authors == b.authors
+//              this.authors == b.authors
+              true
             } else {
               false
             }
@@ -345,7 +357,7 @@ object LabeledDataEvaluation extends Logging {
           val (sp, grobid, count) = evaluateMetric("bibPipelineMatch") { labeledData =>
             def normalizeReference(ref: Reference) = PipelineRef(
               title=ref.title.map(normalizeTitle),
-              authors=ref.authors.map(normalizeAuthor),
+              authors=ref.authors.map(normalizeAuthor).map(ignoreAuthorOrder),
               year=ref.year
             )
 

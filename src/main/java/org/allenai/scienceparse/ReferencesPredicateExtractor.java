@@ -31,7 +31,17 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
   public static final Pattern yearPattern = Pattern.compile("((?:19|20)[0-9][0-9])");
   
   @Setter private GazetteerFeatures gf;
-  
+
+  private String[] makeEmbeddingKeys() {
+    String[] keys = new String[10000];
+    for (int i = 0; i < 10000; ++i) {
+      keys[i] = String.format("%%emb%03d", i);
+    }
+    return keys;
+  }
+
+  private String[] embeddingKeys = makeEmbeddingKeys();
+
   public ReferencesPredicateExtractor() {
     this(null);
   }
@@ -195,7 +205,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         addGazetteerSpan(preds, ls);
       }
   }
-  
+
   @Override
   public List<ObjectDoubleMap<String>> nodePredicates(List<String> elems) {
     List<ObjectDoubleMap<String>> out = new ArrayList<>();
@@ -249,7 +259,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
           int j = 0;
           while(vector.hasNext()) {
             final double value = vector.next();
-            m.put(String.format("%%emb%03d", j), value);
+            m.put(embeddingKeys[j], value);
             j += 1;
           }
         } catch (final Searcher.UnknownWordException e) {
