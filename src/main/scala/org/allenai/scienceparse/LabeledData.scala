@@ -228,7 +228,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val maxZipFilesInParallel = 2
   private val shaRegex = "^[0-9a-f]{40}$"r
-  def get: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
+  def get: Iterator[LabeledData] = set2version.iterator.map({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
       zipFile.entries().asScala.filter { entry =>
@@ -370,7 +370,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
         }
       }.toArray
     }
-  }, maxZipFilesInParallel).flatten
+  }).flatten
 
   def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromPMC.get)
 }

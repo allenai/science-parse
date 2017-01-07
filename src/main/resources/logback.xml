@@ -1,0 +1,19 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date %-5level %logger{36}: %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${logback_rootLevel:-INFO}">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+  <logger name="org.apache.pdfbox" level="OFF" />
+  <logger name="org.apache.fontbox" level="ERROR"/>
+  <logger name="org.allenai.s2.figureextractor" level="ERROR" />
+  <logger name="org.apache.spark.deploy.yarn.YarnAllocator" level="ERROR" />
+  <logger name="org.apache.spark" level="WARN" />
+  <logger name="org.allenai.datastore" level="INFO"/>
+  <logger name="org.allenai" level="${logback_s2Level:-INFO}" />
+</configuration>

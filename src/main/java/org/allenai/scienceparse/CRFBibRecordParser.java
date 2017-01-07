@@ -30,7 +30,7 @@ import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
 
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
-import com.sun.media.jfxmedia.logging.Logger;
+//import com.sun.media.jfxmedia.logging.Logger;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;

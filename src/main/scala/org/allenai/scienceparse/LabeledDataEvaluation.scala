@@ -324,6 +324,38 @@ object LabeledDataEvaluation extends Logging {
           output += outputLine("bibAllButVenuesNormalized", sp, grobid, count)
         }
 
+        val editDistance = LevenshteinDistance.getDefaultInstance()
+        val maxEditDistance = 5
+
+        case class PipelineRef(title: Option[String], authors: Seq[String], year: Option[Int]) {
+          override def hashCode(): Int = title.getOrElse("").substring(0, 3).hashCode()
+          override def equals(o: scala.Any): Boolean = {
+            val b = o.asInstanceOf[PipelineRef]
+            if (this.title.isDefined && b.title.isDefined &&
+                editDistance(this.title.get, b.title .get) < maxEditDistance) {
+              this.authors == b.authors
+            } else {
+              false
+            }
+          }
+        }
+
+        {
+          logger.info("Calculating bibPipelineMatch ...")
+          val (sp, grobid, count) = evaluateMetric("bibPipelineMatch") { labeledData =>
+            def normalizeReference(ref: Reference) = PipelineRef(
+              title=ref.title.map(normalizeTitle),
+              authors=ref.authors.map(normalizeAuthor),
+              year=ref.year
+            )
+
+            labeledData.references.map { refs =>
+              refs.map(normalizeReference)
+            }
+          }
+          output += outputLine("bibAllButVenuesNormalized", sp, grobid, count)
+        }
+
         {
           logger.info("Calculating bibTitlesNormalized ...")
           val (sp, grobid, count) = evaluateMetric("bibTitlesNormalized") { labeledData =>

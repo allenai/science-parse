@@ -1,16 +1,15 @@
 package org.allenai.scienceparse;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.allenai.scienceparse.pdfapi.PDFDoc;
-import org.allenai.scienceparse.pdfapi.PDFLine;
-import org.allenai.scienceparse.pdfapi.PDFPage;
+import org.allenai.scienceparse.pdfapi.*;
 
 import lombok.extern.slf4j.Slf4j;
-import org.allenai.scienceparse.pdfapi.PDFToken;
 
 @Slf4j
 public class PDFDocToPartitionedText {
@@ -62,7 +61,7 @@ public class PDFDocToPartitionedText {
     float h2 = PDFToCRFInput.getH(l2);
     return (PDFToCRFInput.getY(l2, true) - PDFToCRFInput.getY(l1, false)) / Math.min(h1, h2);
   }
-  
+
   private static List<Double> getBreaks(PDFPage p) {
     PDFLine prevLine = null;
     ArrayList<Double> breaks = new ArrayList<>();
@@ -76,7 +75,7 @@ public class PDFDocToPartitionedText {
     breaks.sort(Double::compare);
     return breaks;
   }
-  
+
   private static List<Double> getBreaks(PDFDoc pdf) {
     ArrayList<Double> breaks = new ArrayList<>();
     for (PDFPage p : pdf.getPages()) {
@@ -85,7 +84,7 @@ public class PDFDocToPartitionedText {
     breaks.sort(Double::compare);
     return breaks;
   }
-  
+
   public static double getReferenceLineBreak(PDFDoc pdf) {
     List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
@@ -93,7 +92,7 @@ public class PDFDocToPartitionedText {
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking references
     return breaks.get(idx);
   }
-  
+
   public static double getRawBlockLineBreak(PDFDoc pdf) {
     List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
@@ -101,7 +100,7 @@ public class PDFDocToPartitionedText {
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking papers
     return breaks.get(idx);
   }
-  
+
   public static double getFirstPagePartitionBreak(PDFPage pdf) {
     List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
@@ -197,7 +196,7 @@ public class PDFDocToPartitionedText {
       abs = getFirstTextBlock(pdf);
       abs = RegexWithTimeout.matcher(paragraphAbstractCleaner, abs).replaceFirst("");
     }
-    
+
     // remove keywords, intro from abstract
     for(Pattern p : generalAbstractCleaners) {
       abs = RegexWithTimeout.matcher(p, abs).replaceFirst("");
@@ -206,26 +205,25 @@ public class PDFDocToPartitionedText {
     abs = abs.replaceAll("- ", "");
     return abs;
   }
-  
+
   private static boolean lenientRefStart(PDFLine l, PDFLine prevLine, double qLineBreak) {
     return l.tokens.get(0).token.equals("[1]") && l.tokens.size()>1 &&
         (PDFToCRFInput.getX(l.tokens.get(1), true) > l.tokens.get(0).fontMetrics.spaceWidth ||
             breakSize(l, prevLine) > qLineBreak);
   }
-  
-  
+
+
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
     final List<String> refTags = Arrays.asList(
-            "References",
-            "REFERENCES",
-            "Citations",
-            "CITATIONS",
-            "Bibliography",
-            "BIBLIOGRAPHY");
+            "references",
+            "citations",
+            "bibliography"
+    );
+
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
@@ -233,27 +231,26 @@ public class PDFDocToPartitionedText {
     double qLineBreak = getReferenceLineBreak(pdf);
     StringBuffer sb = new StringBuffer();
     boolean lenient = false;
-    
-    for(int pass=0;pass<2;pass++) {
-      if(pass==1)
-        if(foundRefs)
+
+    for (int pass = 0; pass < 2; pass++) {
+      if (pass == 1)
+        if (foundRefs)
           break;
         else
-          lenient=true; //try harder this time.
+          lenient = true; //try harder this time.
       for (PDFPage p : pdf.getPages()) {
         double farLeft = Double.MAX_VALUE; //of current column
         double farRight = -1.0; //of current column
         for (PDFLine l : p.getLines()) {
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
-            if (l.tokens.get(l.tokens.size() - 1).token != null &&
-              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim())) {
+            String lastWord = l.tokens.get(l.tokens.size() - 1).token;
+            if (lastWord != null && refTags.contains(lastWord.toLowerCase().trim())) {
               inRefs = true;
               foundRefs = true;
               prevLine = l;
               continue; //skip this line
-            }
-            else if(lenient) { //used if we don't find refs on first pass
-              if(lenientRefStart(l, prevLine, qLineBreak)) {
+            } else if (lenient) { //used if we don't find refs on first pass
+              if (lenientRefStart(l, prevLine, qLineBreak)) {
                 inRefs = true;
                 foundRefs = true;
                 //DON'T skip this line.
@@ -310,5 +307,19 @@ public class PDFDocToPartitionedText {
     }
     return out;
   }
-  
+
+  public static void main(String[] args) {
+    PDFExtractor extractor = new PDFExtractor();
+    for (String filename: args) {
+      System.out.println(">>>" + filename);
+      try {
+        PDFDoc doc = extractor.extractFromInputStream(new FileInputStream(filename));
+        for (String ref: getRawReferences(doc)) {
+          System.out.format("%20s %s\n", filename, ref);
+        }
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }
