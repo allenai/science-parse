@@ -353,7 +353,7 @@ object LabeledDataEvaluation extends Logging {
               refs.map(normalizeReference)
             }
           }
-          output += outputLine("bibAllButVenuesNormalized", sp, grobid, count)
+          output += outputLine("bibPipelineMatch", sp, grobid, count)
         }
 
         {
