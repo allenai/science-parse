@@ -220,14 +220,10 @@ public class PDFDocToPartitionedText {
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
     final List<String> refTags = Arrays.asList(
-            "References",
-            "REFERENCES",
-            "Citations",
-            "CITATIONS",
-            "Bibliography",
-            "BIBLIOGRAPHY",
-            "Reference",
-            "REFERENCE");
+            "references",
+            "citations",
+            "bibliography",
+            "reference");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
@@ -247,8 +243,10 @@ public class PDFDocToPartitionedText {
         double farRight = -1.0; //of current column
         for (PDFLine l : p.getLines()) {
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
-            if (l.tokens.get(l.tokens.size() - 1).token != null &&
-              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim())) {
+            if (
+              l.tokens.get(l.tokens.size() - 1).token != null &&
+              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+            ) {
               inRefs = true;
               foundRefs = true;
               prevLine = l;
