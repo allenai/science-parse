@@ -168,9 +168,9 @@ public class CRFBibRecordParser implements BibRecordParser {
   
   public BibRecord parseRecord(String line) {
     line = line.trim();
-    if(line.isEmpty())
+    if(line.isEmpty() || line.length() > 2000)
       return null;
-    Matcher m = RegexWithTimeout.matcher(ExtractReferences.pBracket,  line);
+    Matcher m = RegexWithTimeout.matcher(ExtractReferences.pBracket, line);
     String citeRegEx = null;
     String shortCiteRegEx = null;
     if(m.matches()) {
