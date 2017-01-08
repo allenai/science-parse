@@ -1,12 +1,13 @@
 package org.allenai.scienceparse
 
 import java.io.File
-import java.util.concurrent.{TimeUnit, Executors}
-
+import java.util.concurrent.{Executors, TimeUnit}
 import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
+
 import java.net.URL
 import org.allenai.scienceparse.LabeledData.Reference
+
 import org.slf4j.LoggerFactory
 import scopt.OptionParser
 
@@ -334,21 +335,38 @@ object LabeledDataEvaluation extends Logging {
 
         val editDistance = LevenshteinDistance.getDefaultInstance()
         val maxEditDistance = 5
+        val minTitleMatch = 50
 
-        case class PipelineRef(title: Option[String], authors: Seq[Set[String]], year: Option[Int]) {
+        // We consider authors as matching if _any_ full name matches in any order:
+        // "A Walnut" is a match against "Walnut A".  If "A Walnut" is one author
+        // in a reference, then we consider the references as matching.
+        def pipelineAuthors(authors: Seq[String]): Set[Set[String]] = {
+          authors.map(normalizeAuthor).map(_.trim.split(" ").toSet).toSet
+        }
+
+        case class PipelineRef(title: Option[String], authors: Set[Set[String]], year: Option[Int]) {
           override def hashCode(): Int = {
             val t = title.getOrElse("")
             t.substring(0, Math.min(t.size, 3)).hashCode
           }
+
+          def titleMatch(aTitle: String, bTitle: String) = {
+            val aPrefix = aTitle.substring(0, Math.min(minTitleMatch, aTitle.length))
+            val bPrefix = bTitle.substring(0, Math.min(minTitleMatch, bTitle.length))
+            val aSuffix = aTitle.substring(Math.max(0, aTitle.length - 50))
+            val bSuffix = bTitle.substring(Math.max(0, bTitle.length - 50))
+
+            aPrefix == bPrefix || aSuffix == bSuffix || editDistance(aTitle, bTitle) < maxEditDistance
+          }
+
           override def equals(o: scala.Any): Boolean = {
             val b = o.asInstanceOf[PipelineRef]
-            if (this.title.isDefined && b.title.isDefined &&
-                editDistance(this.title.get, b.title .get) < maxEditDistance) {
-//              this.authors == b.authors
-              true
-            } else {
+            if (!this.title.isDefined || !b.title.isDefined) {
               false
+            } else {
+              titleMatch(this.title.get, b.title.get) && !this.authors.intersect(b.authors).isEmpty
             }
+
           }
         }
 
@@ -357,7 +375,7 @@ object LabeledDataEvaluation extends Logging {
           val (sp, grobid, count) = evaluateMetric("bibPipelineMatch") { labeledData =>
             def normalizeReference(ref: Reference) = PipelineRef(
               title=ref.title.map(normalizeTitle),
-              authors=ref.authors.map(normalizeAuthor).map(ignoreAuthorOrder),
+              authors=pipelineAuthors(ref.authors),
               year=ref.year
             )
 
