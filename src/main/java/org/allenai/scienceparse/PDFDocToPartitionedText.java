@@ -207,9 +207,15 @@ public class PDFDocToPartitionedText {
   }
 
   private static boolean lenientRefStart(PDFLine l, PDFLine prevLine, double qLineBreak) {
-    return l.tokens.get(0).token.equals("[1]") && l.tokens.size()>1 &&
-        (PDFToCRFInput.getX(l.tokens.get(1), true) > l.tokens.get(0).fontMetrics.spaceWidth ||
-            breakSize(l, prevLine) > qLineBreak);
+    final PDFToken firstToken = l.tokens.get(0);
+
+    return (
+          firstToken.token.equals("[1]") ||
+          firstToken.token.equals("1.")
+        ) && l.tokens.size() > 1 && (
+            PDFToCRFInput.getX(l.tokens.get(1), true) > firstToken.fontMetrics.spaceWidth ||
+            breakSize(l, prevLine) > qLineBreak
+        );
   }
 
 
@@ -221,9 +227,8 @@ public class PDFDocToPartitionedText {
     final List<String> refTags = Arrays.asList(
             "references",
             "citations",
-            "bibliography"
-    );
-
+            "bibliography",
+            "reference");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
@@ -243,8 +248,10 @@ public class PDFDocToPartitionedText {
         double farRight = -1.0; //of current column
         for (PDFLine l : p.getLines()) {
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
-            String lastWord = l.tokens.get(l.tokens.size() - 1).token;
-            if (lastWord != null && refTags.contains(lastWord.toLowerCase().trim())) {
+            if (
+              l.tokens.get(l.tokens.size() - 1).token != null &&
+              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+            ) {
               inRefs = true;
               foundRefs = true;
               prevLine = l;
