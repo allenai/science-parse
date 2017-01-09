@@ -107,6 +107,25 @@ public class
     System.out.println("F1: " + f1);
   }
 
+  @Test
+  private void testCoordinates() {
+    String pdfPath = "/coordinate_calibrator.pdf";
+    InputStream pdfInputStream = getClass().getResourceAsStream(pdfPath);
+    PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(true).build();
+    PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(pdfInputStream);
+    
+    for(PDFPage p : doc.pages) {
+      for(PDFLine l : p.lines) {
+        for(PDFToken t : l.tokens) {
+          Assert.assertEquals(t.token, "M"); //should be in upper-left:
+          System.out.println("bounds x0: " + t.bounds.get(0) + " y0: " + t.bounds.get(1));
+          Assert.assertTrue(t.bounds.get(0) < 0.1);
+          Assert.assertTrue(t.bounds.get(1) < 0.1);
+        }
+      }
+    }
+  }
+  
   @SneakyThrows
   private void testPDF(String id) {
     String jsonPath = id + ".extraction.json";
