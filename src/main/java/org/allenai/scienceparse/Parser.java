@@ -94,13 +94,13 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 5);
   }
   public static Path getDefaultGazetteer() {
-    return datastore.filePath("org.allenai.scienceparse", "gazetteer-1m.json", 1);
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 4);
   }
   public static Path getDefaultGazetteerDir() {
     return FileSystems.getDefault().getPath("e:\\data\\science-parse\\kermit-gazetteers\\");
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 4);
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 5);
   }
 
   private static Parser defaultParser = null;

@@ -22,7 +22,7 @@ class CachedGrobidServer(url: URL) extends Logging with Datastores {
     if(!Files.exists(dir)) {
       // Warm the cache, so for most evaluations we don't need to have a running Grobid server at
       // all.
-      val warmCacheDir = publicDirectory("GrobidServerCache", 1)
+      val warmCacheDir = publicDirectory("GrobidServerCache", 2)
       FileUtils.copyDirectory(warmCacheDir.toFile, dir.toFile)
     }
     dir

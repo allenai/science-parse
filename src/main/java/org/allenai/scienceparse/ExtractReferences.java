@@ -56,7 +56,8 @@ public class ExtractReferences {
   public static Pattern pDot = Pattern.compile("([0-9]+)\\.(.*)");
   
   CheckReferences cr;
-  CRFModel<String, String, String> bibCRF = null;
+  final CRFBibRecordParser bibCRFRecordParser;
+
   public static final String DATA_VERSION = "0.2";
   
   public ExtractReferences(String gazFile) throws IOException {
@@ -76,7 +77,8 @@ public class ExtractReferences {
     extractors = new ArrayList<>();
     
     if(bibCRFModel != null) {
-      bibCRF = loadModel(bibCRFModel);
+      final CRFModel<String, String, String> bibCRF = loadModel(bibCRFModel);
+      bibCRFRecordParser = new CRFBibRecordParser(bibCRF);
       extractors.addAll(Arrays.asList(
           new BracketNumber(new Class [] {BracketNumberInitialsQuotedBibRecordParser.class,
               CRFBibRecordParser.class}),
@@ -104,6 +106,7 @@ public class ExtractReferences {
         new BracketName(new Class [] {CRFBibRecordParser.class})));
     }
     else {
+      bibCRFRecordParser = null;
       extractors.addAll(Arrays.asList(
           new BracketNumber(new Class [] {BracketNumberInitialsQuotedBibRecordParser.class}),
           new NamedYear(new Class [] {NamedYearBibRecordParser.class}),
@@ -480,8 +483,8 @@ public class ExtractReferences {
       BibRecordParser b = null;
       recParser = new BibRecordParser[c.length];
       for(int i=0; i<c.length; i++) {
-        if(c[i] == CRFBibRecordParser.class) { //special case, requires arg
-          b = new CRFBibRecordParser(bibCRF);
+        if(c[i] == CRFBibRecordParser.class) { //special case
+          b = bibCRFRecordParser;
         } else {
           try {
             b = (BibRecordParser) c[i].newInstance();
@@ -924,7 +927,7 @@ public class ExtractReferences {
       String tag = preTag + (++i) + ". ";
       List<String> cites = new ArrayList<String>();
       int st = line.indexOf(tag);
-      while (line.contains(tag) && st >= 0) {
+      while (st >= 0) {
         tag = preTag + (++i) + ". ";
         int end = line.indexOf(tag, st);
         if (end > 0) {
@@ -977,7 +980,7 @@ public class ExtractReferences {
       String tag = "[" + (++i) + "]";
       List<String> cites = new ArrayList<String>();
       int st = line.indexOf(tag);
-      while (line.contains(tag)) {
+      while (st >= 0) {
         tag = "<lb>[" + (++i) + "]";
         int end = line.indexOf(tag, st);
         if (end > 0) {

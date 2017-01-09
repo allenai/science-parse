@@ -32,17 +32,19 @@ connectInput in run := true
 
 outputStrategy := Some(StdoutOutput)
 
-enablePlugins(LibraryPlugin)
+// We still have to disable these specifically. I'm not sure why.
+disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
+
+enablePlugins(LibraryPluginLight)
 
 resolvers ++= Seq(
-  "AllenAI ThirdParty" at "http://utility.allenai.org:8081/nexus/content/repositories/thirdparty",
   "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
-  "AllenAi Bintray Private" at "http://dl.bintray.com/allenai/private",
+  "AllenAI Bintray Private" at "http://dl.bintray.com/allenai/private",
   Resolver.jcenterRepo
 )
 
 libraryDependencies ++= Seq(
-  "org.allenai.common" %% "common-core" % "1.1.2" excludeAll (
+  "org.allenai.common" %% "common-core" % "1.2.1" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
   "org.apache.pdfbox" % "pdfbox" % "2.1.0-AI2-ef339b" exclude ("commons-logging", "commons-logging"),
@@ -61,7 +63,7 @@ libraryDependencies ++= Seq(
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
   "com.github.scopt" %% "scopt" % "3.3.0",
-  "org.allenai" %% "datastore" % "1.0.2" excludeAll(
+  "org.allenai.datastore" %% "datastore" % "1.0.8" excludeAll(
     ExclusionRule(organization = "com.amazonaws")
   ),
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",

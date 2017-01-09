@@ -91,6 +91,10 @@ object LabeledDataEvaluation extends Logging {
         c.copy(goldData = LabeledDataFromPMC.getCleaned.take(100))
       } text "Compare against 100 documents from PMC"
 
+      opt[Unit]("compareAgainstPMC10000") action { (_, c) =>
+        c.copy(goldData = LabeledDataFromPMC.getCleaned.take(10000))
+      } text "Compare against 10000 documents from PMC"
+
       help("help") text "Prints help text"
     }
 
@@ -185,10 +189,10 @@ object LabeledDataEvaluation extends Logging {
 
                 val excessEntries = (resultSet -- goldSet).toSeq.map(_.toString).sorted
                 if(excessEntries.isEmpty) {
-                  errorLogger.info(s"Excess for $metricName on ${gold.id}: None!")
+                  errorLogger.info(s"Excess  for $metricName on ${gold.id}: None!")
                 } else {
                   excessEntries.foreach { excessEntry =>
-                    errorLogger.info(s"Excess for $metricName on ${gold.id}: ${makeSingleLine(excessEntry)}")
+                    errorLogger.info(s"Excess  for $metricName on ${gold.id}: ${makeSingleLine(excessEntry)}")
                   }
                 }
               }
