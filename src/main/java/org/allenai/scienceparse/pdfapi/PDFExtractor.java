@@ -289,7 +289,6 @@ public class PDFExtractor {
       int i=0;
       for (TextPosition tp : textPositions) {
        if(tp.getY() > yThresh || (yThresh - tp.getY() > yGap / 6.0)) //latter case suggests a height bug (?) so ignore
-//        if(tp.getY() + tp.getHeight() > yThresh)
          sb.append(tp.getUnicode());
        i++;
       }
@@ -328,12 +327,10 @@ public class PDFExtractor {
           maxX = x1;
         }
         float y0 = tp.getY() - tp.getHeight(); //getY returns the bottom-left
-//        float y0 = tp.getY();
         if (y0 < minY) {
           minY = y0;
         }
         float y1 = tp.getY();
-//        float y1 = y0 + tp.getHeight();
         if (y1 > maxY) {
           maxY = y1;
         }
