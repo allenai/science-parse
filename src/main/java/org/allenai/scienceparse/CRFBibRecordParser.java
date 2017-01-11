@@ -12,10 +12,15 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.allenai.ml.linalg.DenseVector;
 import org.allenai.ml.linalg.Vector;
 import org.allenai.ml.sequences.StateSpace;
@@ -165,7 +170,19 @@ public class CRFBibRecordParser implements BibRecordParser {
     String [] toks = line.split(" "); //otherwise not fancy
     return Arrays.asList(toks);
   }
-  
+
+  private final LoadingCache<ArrayList<String>, List<String>> bestGuessCache = CacheBuilder.newBuilder().
+      maximumSize(10240).
+      recordStats().
+      expireAfterAccess(10, TimeUnit.MINUTES).build(
+        new CacheLoader<ArrayList<String>, List<String>>() {
+          @Override
+          public List<String> load(ArrayList<String> key) throws Exception {
+            return model.bestGuess(key);
+          }
+        }
+  );
+
   public BibRecord parseRecord(String line) {
     line = line.trim();
     if(line.isEmpty() || line.length() > 2000)
@@ -194,7 +211,9 @@ public class CRFBibRecordParser implements BibRecordParser {
     toks.add("</S>");
     List<String> labels;
     try{
-      labels = model.bestGuess(toks);
+      labels = bestGuessCache.get(toks);
+      if(bestGuessCache.stats().requestCount() % 100 == 0)
+        log.info("Hit rate: {}", bestGuessCache.stats().hitRate());
     } catch(final Exception e) {
       return null;
     }
