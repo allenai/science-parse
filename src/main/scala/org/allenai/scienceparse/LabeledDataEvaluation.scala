@@ -7,6 +7,7 @@ import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
 import java.net.URL
 import org.allenai.scienceparse.LabeledData.Reference
+import org.allenai.scienceparse.pipeline.{Normalizers => PipelineNormalizers, Bucketizers => PipelineBucketizers, SimilarityMeasures, TitleAuthors}
 import org.slf4j.LoggerFactory
 import scopt.OptionParser
 
@@ -245,11 +246,6 @@ object LabeledDataEvaluation extends Logging {
           logger.info("Calculating authorLastNameNormalized ...")
           val (sp, grobid, count) = evaluateMetric("authorLastNameNormalized") { labeledData =>
             labeledData.authors.map { as =>
-              def getLastName(name: String) = {
-                val suffixes = Set("Jr.")
-                name.split("\\s+").filterNot(suffixes.contains).lastOption.getOrElse(name)
-              }
-
               as.map(a => normalize(getLastName(a.name)))
             }
           }
@@ -302,6 +298,89 @@ object LabeledDataEvaluation extends Logging {
             }
           }
           output += outputLine("bibAllNormalized", sp, grobid, count)
+        }
+
+        {
+          logger.info("Calculating bibPipeline ...")
+          val (sp, grobid, count) = {
+            val metricsPerDocument = extractions.flatMap { case (gold, sp, grobid) =>
+              def buckets(ref: LabeledData.Reference) = {
+                val title = PipelineNormalizers.truncateWords(ref.title.getOrElse(""))
+                val titleBuckets =
+                  PipelineBucketizers.titleNgrams(title, upto = 1, allowTruncated = false).toSet
+                val lastNames = ref.authors.map(getLastName)
+                val authorBuckets =
+                  PipelineBucketizers.ngrams(lastNames.mkString(" "), 3, None)
+                authorBuckets ++ titleBuckets
+              }
+
+              gold.references.map { goldRefs =>
+                // This gnarly bit of code produces a map Bucket -> Seq[Refs].
+                val bucketToGoldRef =
+                  goldRefs.flatMap { r => buckets(r).map((_, r)) }.groupBy(_._1).mapValues(_.map(_._2))
+
+                val Seq(spScore, grobidScore) = Seq(sp, grobid).map { resultToScore =>
+                  resultToScore.references match {
+                    case None => PR(0.0, 0.0)
+                    case Some(docRefs) if goldRefs.isEmpty && docRefs.isEmpty => PR(1.0, 1.0)
+                    case Some(docRefs) if goldRefs.isEmpty && docRefs.nonEmpty => PR(0.0, 1.0)
+                    case Some(docRefs) if goldRefs.nonEmpty && docRefs.isEmpty => PR(0.0, 0.0)
+                    case Some(docRefs) if docRefs.nonEmpty =>
+                      val scoresPerRef = docRefs.map { docRef =>
+                        val potentialGoldMatches =
+                          buckets(docRef).flatMap(bucket => bucketToGoldRef.getOrElse(bucket, Seq.empty))
+                        val globalScoreThreshold = 0.94
+                        val authorCheckThreshold = 0.8
+
+                        // Just like the pipeline, we now score all the potential matches, and pick
+                        // the highest one.
+                        val docTitleAuthors = TitleAuthors.fromReference(docRef)
+                        val scoreForThisRef = potentialGoldMatches.flatMap { potentialMatchingRef =>
+                          val potentialMatchingTitleAuthors =
+                            TitleAuthors.fromReference(potentialMatchingRef)
+
+                          // This code is stolen almost verbatim from the pipeline project.
+                          SimilarityMeasures.titleNgramSimilarity(docTitleAuthors, potentialMatchingTitleAuthors) match {
+                            case Some(titleMatchScore) if titleMatchScore > authorCheckThreshold =>
+                              val authorMatchScore =
+                                if (
+                                  docTitleAuthors.year.isDefined &&
+                                  docTitleAuthors.year == potentialMatchingTitleAuthors.year
+                                ) {
+                                  val lAuthors = docTitleAuthors.normalizedAuthors
+                                  val rAuthors = potentialMatchingTitleAuthors.normalizedAuthors
+                                  // subtract 0.01 because this should never be as good as a perfect title match
+                                  ((lAuthors intersect rAuthors).size.toDouble / (lAuthors union rAuthors).size) - 0.01
+                                } else {
+                                  0.0
+                                }
+                              Some(math.max(titleMatchScore, authorMatchScore))
+                            case s => s
+                          }
+                        }.filter(_ > globalScoreThreshold).fold(0.0)(_ max _)
+
+                        scoreForThisRef
+                      }
+
+                      val scoreForThisDoc = scoresPerRef.sum
+
+                      PR(
+                        scoreForThisDoc / goldRefs.length,
+                        scoreForThisDoc / docRefs.length)
+                  }
+                }
+
+                (spScore, grobidScore)
+              }
+            }
+
+            (
+              PR.average(metricsPerDocument.map(_._1)),
+              PR.average(metricsPerDocument.map(_._2)),
+              metricsPerDocument.size
+            )
+          }
+          output += outputLine("bibPipeline", sp, grobid, count)
         }
 
         {
