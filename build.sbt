@@ -77,7 +77,7 @@ libraryDependencies ++= Seq(
   "com.github.scopt" %% "scopt" % "3.3.0",
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",
   "com.medallia.word2vec" %% "word2vecjava" % "1.0-ALLENAI-4",
-  "com.google.guava" % "guava" % "18.0", // Medallia needs this, but somehow the dependency isn't transitive.
+  "com.google.guava" % "guava" % "18.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0-RC3",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
   "org.scalaj" %% "scalaj-http" % "2.3.0"
