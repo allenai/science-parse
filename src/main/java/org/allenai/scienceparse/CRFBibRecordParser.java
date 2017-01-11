@@ -171,9 +171,9 @@ public class CRFBibRecordParser implements BibRecordParser {
     return Arrays.asList(toks);
   }
 
-  private final LoadingCache<ArrayList<String>, List<String>> bestGuessCache = CacheBuilder.newBuilder().
+  private final LoadingCache<ArrayList<String>, List<String>> bestGuessCache =
+      CacheBuilder.newBuilder().
       maximumSize(10240).
-      recordStats().
       expireAfterAccess(10, TimeUnit.MINUTES).build(
         new CacheLoader<ArrayList<String>, List<String>>() {
           @Override
@@ -212,8 +212,6 @@ public class CRFBibRecordParser implements BibRecordParser {
     List<String> labels;
     try{
       labels = bestGuessCache.get(toks);
-      if(bestGuessCache.stats().requestCount() % 100 == 0)
-        log.info("Hit rate: {}", bestGuessCache.stats().hitRate());
     } catch(final Exception e) {
       return null;
     }
