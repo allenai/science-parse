@@ -7,10 +7,12 @@ import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
 import java.net.URL
 import org.allenai.scienceparse.LabeledData.Reference
+import org.allenai.scienceparse.pipeline.{Normalizers => PipelineNormalizers, Bucketizers => PipelineBucketizers, SimilarityMeasures, TitleAuthors}
 import org.slf4j.LoggerFactory
 import scopt.OptionParser
 
 import scala.collection.immutable.Set
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
 object LabeledDataEvaluation extends Logging {
@@ -245,11 +247,6 @@ object LabeledDataEvaluation extends Logging {
           logger.info("Calculating authorLastNameNormalized ...")
           val (sp, grobid, count) = evaluateMetric("authorLastNameNormalized") { labeledData =>
             labeledData.authors.map { as =>
-              def getLastName(name: String) = {
-                val suffixes = Set("Jr.")
-                name.split("\\s+").filterNot(suffixes.contains).lastOption.getOrElse(name)
-              }
-
               as.map(a => normalize(getLastName(a.name)))
             }
           }
@@ -302,6 +299,162 @@ object LabeledDataEvaluation extends Logging {
             }
           }
           output += outputLine("bibAllNormalized", sp, grobid, count)
+        }
+
+        {
+          logger.info("Calculating bibPipeline ...")
+          val (sp, grobid, count) = {
+            val metricsPerDocument = extractions.flatMap { case (gold, spExtraction, grobidExtraction) =>
+              def buckets(ref: LabeledData.Reference) = {
+                val title = PipelineNormalizers.truncateWords(ref.title.getOrElse(""))
+                val titleBuckets =
+                  PipelineBucketizers.titleNgrams(title, upto = 1, allowTruncated = false).toSet
+                val lastNames = ref.authors.map(getLastName)
+                val authorBuckets =
+                  PipelineBucketizers.ngrams(lastNames.mkString(" "), 3, None)
+                (authorBuckets ++ titleBuckets).toIterable
+              }
+
+              gold.references.map { goldRefs =>
+                // This gnarly bit of code produces a map Bucket -> Seq[Refs].
+                val bucketToGoldRef =
+                  goldRefs.flatMap { r => buckets(r).map((_, r)) }.groupBy(_._1).mapValues(_.map(_._2))
+
+                val Seq(spScore, grobidScore) = Seq(spExtraction, grobidExtraction).map { resultToScore =>
+                  val loggingEnabled = resultToScore == spExtraction
+
+                  def refAsString(ref: LabeledData.Reference) = {
+                    val builder = new StringBuilder(128)
+                    builder += '\"'
+                    builder ++= ref.title.getOrElse("MISSING TITLE")
+                    builder += '\"'
+                    builder += ' '
+
+                    ref.year.foreach { y =>
+                      builder += '('
+                      builder ++= y.toString
+                      builder += ')'
+                      builder += ' '
+                    }
+
+                    builder ++= "by ("
+                    builder ++= ref.authors.mkString(", ")
+                    builder += ')'
+
+                    builder.toString()
+                  }
+
+                  resultToScore.references match {
+                    case None =>
+                      if(loggingEnabled) {
+                        goldRefs.foreach { goldRef =>
+                          errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                        }
+                      }
+                      PR(0.0, 0.0)
+
+                    case Some(docRefs) if goldRefs.isEmpty && docRefs.isEmpty =>
+                      PR(1.0, 1.0)
+
+                    case Some(docRefs) if goldRefs.isEmpty && docRefs.nonEmpty =>
+                      if(loggingEnabled) {
+                        docRefs.foreach { docRef =>
+                          errorLogger.info(s"Excess     for bibPipeline on ${gold.id}: ${refAsString(docRef)}")
+                        }
+                      }
+                      PR(0.0, 1.0)
+
+                    case Some(docRefs) if goldRefs.nonEmpty && docRefs.isEmpty =>
+                      if(loggingEnabled) {
+                        goldRefs.foreach { goldRef =>
+                          errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                        }
+                      }
+                      PR(0.0, 0.0)
+
+                    case Some(docRefs) if docRefs.nonEmpty =>
+                      val unmatchedGoldRefs = mutable.Set(goldRefs:_*)
+
+                      val scoresPerRef = docRefs.map { docRef =>
+                        val potentialGoldMatches =
+                          buckets(docRef).flatMap(bucket => bucketToGoldRef.getOrElse(bucket, Seq.empty)).toSet
+                        val globalScoreThreshold = 0.94
+                        val authorCheckThreshold = 0.8
+
+                        // Just like the pipeline, we now score all the potential matches, and pick
+                        // the highest one.
+                        val docTitleAuthors = TitleAuthors.fromReference(docRef)
+                        val scoreRefPairsForThisRef = potentialGoldMatches.toSeq.flatMap { potentialMatchingRef =>
+                          val potentialMatchingTitleAuthors =
+                            TitleAuthors.fromReference(potentialMatchingRef)
+
+                          // This code is stolen almost verbatim from the pipeline project.
+                          val matchingScoreOption =
+                            SimilarityMeasures.titleNgramSimilarity(docTitleAuthors, potentialMatchingTitleAuthors) match {
+                              case Some(titleMatchScore) if titleMatchScore > authorCheckThreshold =>
+                                val authorMatchScore =
+                                  if (
+                                    docTitleAuthors.year.isDefined &&
+                                    docTitleAuthors.year == potentialMatchingTitleAuthors.year
+                                  ) {
+                                    val lAuthors = docTitleAuthors.normalizedAuthors
+                                    val rAuthors = potentialMatchingTitleAuthors.normalizedAuthors
+                                    // subtract 0.01 because this should never be as good as a perfect title match
+                                    ((lAuthors intersect rAuthors).size.toDouble / (lAuthors union rAuthors).size) - 0.01
+                                  } else {
+                                    0.0
+                                  }
+                                Some(math.max(titleMatchScore, authorMatchScore))
+                              case s => s
+                            }
+
+                          matchingScoreOption.filter(_ > globalScoreThreshold).map((_, potentialMatchingRef))
+                        }
+
+                        val bestScoreRefPair = scoreRefPairsForThisRef.sortBy(-_._1).headOption
+                        bestScoreRefPair match {
+                          case None =>
+                            if(loggingEnabled)
+                              errorLogger.info(s"Excess     for pipPipeline on ${gold.id}: ${refAsString(docRef)}")
+                            0.0
+                          case Some((scoreForThisRef, matchedGoldRef)) =>
+                            if(scoreForThisRef < 0.999 && loggingEnabled) {
+                              errorLogger.info(f"Score $scoreForThisRef%.2f for bibPipeline on ${gold.id}: got  ${refAsString(docRef)}")
+                              errorLogger.info(f"Score $scoreForThisRef%.2f for bibPipeline on ${gold.id}: gold ${refAsString(matchedGoldRef)}")
+                            }
+                            unmatchedGoldRefs -= matchedGoldRef
+                            scoreForThisRef
+                        }
+                      }
+
+                      if(loggingEnabled) {
+                        unmatchedGoldRefs.foreach { goldRef =>
+                          errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                        }
+                      }
+
+                      val scoreForThisDoc = scoresPerRef.sum
+
+                      PR(
+                        scoreForThisDoc / goldRefs.length,
+                        scoreForThisDoc / docRefs.length)
+                  }
+                }
+
+                errorLogger.info(f"P for bibPipeline on ${gold.id}: SP: ${spScore.p}%1.3f Grobid: ${grobidScore.p}%1.3f Diff: ${spScore.p - grobidScore.p}%+1.3f")
+                errorLogger.info(f"R for bibPipeline on ${gold.id}: SP: ${spScore.r}%1.3f Grobid: ${grobidScore.r}%1.3f Diff: ${spScore.r - grobidScore.r}%+1.3f")
+
+                (spScore, grobidScore)
+              }
+            }
+
+            (
+              PR.average(metricsPerDocument.map(_._1)),
+              PR.average(metricsPerDocument.map(_._2)),
+              metricsPerDocument.size
+            )
+          }
+          output += outputLine("bibPipeline", sp, grobid, count)
         }
 
         {

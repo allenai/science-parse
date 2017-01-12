@@ -7,6 +7,7 @@ import java.util.Calendar
 import org.allenai.common.StringUtils.StringExtras
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element, TextNode}
+import org.jsoup.parser.{Parser => JsoupParser}
 
 import scala.collection.JavaConverters._
 
@@ -100,7 +101,7 @@ object GrobidParser {
   }
 
   def parseGrobidXml(is: InputStream, baseUrl: String): ExtractedMetadata = {
-    val doc = Jsoup.parse(is, "UTF-8", baseUrl)
+    val doc = Jsoup.parse(is, "UTF-8", baseUrl, JsoupParser.xmlParser())
     parseGrobidXml(doc)
   }
 
