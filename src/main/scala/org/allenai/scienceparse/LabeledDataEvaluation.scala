@@ -321,6 +321,8 @@ object LabeledDataEvaluation extends Logging {
                   goldRefs.flatMap { r => buckets(r).map((_, r)) }.groupBy(_._1).mapValues(_.map(_._2))
 
                 val Seq(spScore, grobidScore) = Seq(spExtraction, grobidExtraction).map { resultToScore =>
+                  val loggingEnabled = resultToScore == spExtraction
+
                   def refAsString(ref: LabeledData.Reference) = {
                     val builder = new StringBuilder(128)
                     builder += '\"'
@@ -344,8 +346,10 @@ object LabeledDataEvaluation extends Logging {
 
                   resultToScore.references match {
                     case None =>
-                      goldRefs.foreach { goldRef =>
-                        errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                      if(loggingEnabled) {
+                        goldRefs.foreach { goldRef =>
+                          errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                        }
                       }
                       PR(0.0, 0.0)
 
@@ -353,14 +357,18 @@ object LabeledDataEvaluation extends Logging {
                       PR(1.0, 1.0)
 
                     case Some(docRefs) if goldRefs.isEmpty && docRefs.nonEmpty =>
-                      docRefs.foreach { docRef =>
-                        errorLogger.info(s"Excess     for bibPipeline on ${gold.id}: ${refAsString(docRef)}")
+                      if(loggingEnabled) {
+                        docRefs.foreach { docRef =>
+                          errorLogger.info(s"Excess     for bibPipeline on ${gold.id}: ${refAsString(docRef)}")
+                        }
                       }
                       PR(0.0, 1.0)
 
                     case Some(docRefs) if goldRefs.nonEmpty && docRefs.isEmpty =>
-                      goldRefs.foreach { goldRef =>
-                        errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                      if(loggingEnabled) {
+                        goldRefs.foreach { goldRef =>
+                          errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                        }
                       }
                       PR(0.0, 0.0)
 
@@ -406,18 +414,23 @@ object LabeledDataEvaluation extends Logging {
                         val bestScoreRefPair = scoreRefPairsForThisRef.sortBy(-_._1).headOption
                         bestScoreRefPair match {
                           case None =>
-                            errorLogger.info(s"Excess     for pipPipeline on ${gold.id}: ${refAsString(docRef)}")
+                            if(loggingEnabled)
+                              errorLogger.info(s"Excess     for pipPipeline on ${gold.id}: ${refAsString(docRef)}")
                             0.0
                           case Some((scoreForThisRef, matchedGoldRef)) =>
-                            if(scoreForThisRef < 0.999)
-                              errorLogger.info(f"Score $scoreForThisRef%.2f for bibPipeline on ${gold.id}: ${refAsString(docRef)}")
+                            if(scoreForThisRef < 0.999 && loggingEnabled) {
+                              errorLogger.info(f"Score $scoreForThisRef%.2f for bibPipeline on ${gold.id}: got  ${refAsString(docRef)}")
+                              errorLogger.info(f"Score $scoreForThisRef%.2f for bibPipeline on ${gold.id}: gold ${refAsString(matchedGoldRef)}")
+                            }
                             unmatchedGoldRefs -= matchedGoldRef
                             scoreForThisRef
                         }
                       }
 
-                      unmatchedGoldRefs.foreach { goldRef =>
-                        errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                      if(loggingEnabled) {
+                        unmatchedGoldRefs.foreach { goldRef =>
+                          errorLogger.info(s"Missing    for bibPipeline on ${gold.id}: ${refAsString(goldRef)}")
+                        }
                       }
 
                       val scoreForThisDoc = scoresPerRef.sum
