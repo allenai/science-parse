@@ -497,11 +497,7 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
       val em = Resource.using(cachedGrobidServer.getExtractions(bytes)) { is =>
         GrobidParser.parseGrobidXml(is, grobidServerUrl.toString)
       }
-      LabeledData.fromExtractedMetadata(
-        input,
-        labeledDataId,
-        em
-      )
+      LabeledData.fromExtractedMetadata(input, labeledDataId, em)
     } catch {
       case NonFatal(e) =>
         logger.warn(s"Error '${e.getMessage}' from Grobid for paper $pid")
