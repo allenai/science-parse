@@ -1,6 +1,8 @@
 package org.allenai.scienceparse.figureextraction
 
-object FigureDetector {
+import org.allenai.common.Logging
+
+object FigureDetector extends Logging {
 
   private val MinProposalHeight = 15
   private val MinProposalWidth = 20
@@ -178,12 +180,26 @@ object FigureDetector {
     splitProposals
   }
 
-  /** Yields the cross product of a list of lists, from
-    * http://stackoverflow.com/questions/8217764/cartesian-product-of-two-lists
-    */
-  def cartesianProduct[T](xss: List[List[T]]): List[List[T]] = xss match {
-    case Nil => List(Nil)
-    case h :: t => for (xh <- h; xt <- cartesianProduct(t)) yield xh :: xt
+  /** Yields the cross product of a list of lists */
+  def cartesianProduct[T](xss: Seq[Seq[T]]): Iterator[Seq[T]] = new Iterator[Seq[T]] {
+    private var currentIndex = 0
+    private val elementCount = xss.map(_.size).product
+
+    override def hasNext: Boolean = currentIndex < elementCount
+
+    override def next(): Seq[T] = {
+      if (!hasNext) throw new NoSuchElementException
+
+      val result = xss.foldLeft((Seq.empty[T], currentIndex)) {
+        case ((resultSoFar, index), xs) =>
+          (resultSoFar :+ xs(index % xs.size), index / xs.size)
+      }
+
+      currentIndex += 1
+
+      assert(result._2 == 0)
+      result._1
+    }
   }
 
   /** If a caption does not cross page's center, and the proposal does not contain any elements
@@ -505,8 +521,12 @@ object FigureDetector {
         page.classifiedText, List(), captionsWithNoProposals.map(Caption.apply)
       )
     } else {
-      val bestConfiguration = cartesianProduct(validProposals.toList).view.zipWithIndex.map {
+      val maxConfigurationsConsidered = 500001 // This is a crude cut-off, but this almost never happens.
+      val bestConfiguration = cartesianProduct(validProposals).take(maxConfigurationsConsidered).zipWithIndex.map {
         case (proposalsToUse, index) =>
+          if (index >= maxConfigurationsConsidered - 1)
+            logger.warn(s"More than $index possible configurations for figures on page ${page.pageNumber}. Result may not be optimal.")
+
           var props = splitProposals(proposalsToUse, allContent).toList
           var scored = List[Proposal]()
           var scores = List[Option[Double]]()

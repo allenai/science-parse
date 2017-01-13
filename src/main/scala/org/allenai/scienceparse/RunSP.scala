@@ -7,7 +7,7 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.allenai.common.{ Logging, Resource }
 import scopt.OptionParser
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import language.postfixOps
 
@@ -68,7 +68,7 @@ object RunSP extends Logging {
       }
 
       val files = config.pdfInputs.par.flatMap { f =>
-        if(f.isFile) {
+        if (f.isFile) {
           Seq(f)
         } else if (f.isDirectory) {
           def listFiles(startFile: File): Seq[File] =
@@ -87,10 +87,18 @@ object RunSP extends Logging {
       val parser = Await.result(parserFuture, 15 minutes)
 
       files.foreach { file =>
+        logger.info(s"Processing $file")
+        val start = System.currentTimeMillis()
         Resource.using(new FileInputStream(file)) { is =>
           val metadata = parser.doParse(is)
           printResults(file, config.outputDir.get, metadata)
         }
+        val end = System.currentTimeMillis()
+        val elapsed = (end - start) / 1000
+        if (elapsed > 0)
+          logger.info(s"Finished processing $file in $elapsed seconds")
+        else
+          logger.info(s"Finished processing $file")
       }
     }
   }
