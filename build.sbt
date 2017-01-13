@@ -1,8 +1,15 @@
+import sbtrelease.ReleaseStateTransformations._
+
+// We still have to disable these specifically. I'm not sure why.
+disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
+
+enablePlugins(LibraryPluginLight)
+
 name := "science-parse"
 
-outputStrategy := Some(StdoutOutput)
-
 organization := "org.allenai"
+
+outputStrategy := Some(StdoutOutput)
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
@@ -12,7 +19,27 @@ javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/
 
 sources in (Compile,doc) := Seq.empty
 
-mainClass in assembly := Some("org.allenai.scienceparse.FigureExtractorBatchCli")
+fork := true
+
+connectInput in run := true
+
+//
+// Release settings
+//
+
+releaseProcess := Seq(
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  publishArtifacts,
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
+)
 
 bintrayPackage := s"${organization.value}:${name.value}_${scalaBinaryVersion.value}"
 
@@ -26,16 +53,23 @@ scmInfo := Some(ScmInfo(
 
 bintrayRepository := "private"
 
-fork := true
+publishMavenStyle := true
 
-connectInput in run := true
+publishArtifact in Test := false
 
-outputStrategy := Some(StdoutOutput)
+pomIncludeRepository := { _ => false }
 
-// We still have to disable these specifically. I'm not sure why.
-disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
 
-enablePlugins(LibraryPluginLight)
+pomExtra :=
+  <developers>
+    <developer>
+      <id>allenai-dev-role</id>
+      <name>Allen Institute for Artificial Intelligence</name>
+      <email>dev-role@allenai.org</email>
+    </developer>
+  </developers>
+
 
 resolvers ++= Seq(
   "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
