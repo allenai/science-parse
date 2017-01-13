@@ -24,7 +24,6 @@ import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
-import org.allenai.scienceparse.figureextraction.FigureExtractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;

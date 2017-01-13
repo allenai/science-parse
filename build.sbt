@@ -114,5 +114,6 @@ libraryDependencies ++= Seq(
   "com.google.guava" % "guava" % "18.0",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0-RC3",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-  "org.scalaj" %% "scalaj-http" % "2.3.0"
+  "org.scalaj" %% "scalaj-http" % "2.3.0",
+  "org.allenai" %% "pdffigures2" % "0.0.6"
 )
