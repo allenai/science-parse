@@ -319,9 +319,17 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
           private def parseSection(e: Node): Seq[Section] = {
             (e \ "sec") map { s =>
+              val label = (s \ "label").headOption.map(_.text)
               val title = (s \ "title").headOption.map(_.text)
+              val sectionTitle = (label, title) match {
+                case (None, None) => None
+                case (Some(l), None) => Some(l.trim)
+                case (None, Some(t)) => Some(t.trim)
+                case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
+              }
+
               val body = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-              Section(title, body)
+              Section(sectionTitle, body)
             }
           }
 
