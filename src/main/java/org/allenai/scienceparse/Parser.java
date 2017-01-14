@@ -22,6 +22,7 @@ import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
+import org.allenai.pdffigures2.FigureExtractor;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -1239,7 +1240,6 @@ public class Parser {
     //
     // Run figure extraction to get sections
     //
-    /*
     try {
       final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
       em.sections = ScalaStreamSupport.stream(doc.sections()).map(documentSection ->
@@ -1254,7 +1254,6 @@ public class Parser {
           e.getMessage());
       em.sections = null;
     }
-    */
 
     return em;
   }
