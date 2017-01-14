@@ -9,6 +9,8 @@ name := "science-parse"
 
 organization := "org.allenai"
 
+description := "Java library to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
+
 outputStrategy := Some(StdoutOutput)
 
 javaOptions in Test += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
