@@ -527,6 +527,20 @@ object LabeledDataEvaluation extends Logging {
           output += outputLine("abstractNormalized", sp, grobid, count)
         }
 
+        // calculate sections metrics
+        {
+          logger.info("Calculating sectionsNormalized ...")
+          val (sp, grobid, count) = evaluateMetric("sectionsNormalized") { labeledData =>
+            labeledData.sections.map(_.map { s =>
+              val heading = s.heading.map(h => normalize(h) + " : ")
+              val body = normalize(s.text)
+              heading + body
+            })
+          }
+
+          output += outputLine("sectionsNormalized", sp, grobid, count)
+        }
+
         println(output.map(line => s"${Console.BOLD}${Console.BLUE}$line${Console.RESET}").mkString("\n"))
       } finally {
         executor.shutdown()
