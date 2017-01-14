@@ -96,7 +96,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
-  "com.github.scopt" %% "scopt" % "3.3.0",
   "org.allenai.datastore" %% "datastore" % "1.0.8" excludeAll(
     ExclusionRule(organization = "com.amazonaws")
   ),
@@ -108,7 +107,7 @@ libraryDependencies ++= Seq(
   "org.jsoup" % "jsoup" % "1.8.1",
   "org.apache.commons" % "commons-lang3" % "3.4",
   "org.apache.commons" % "commons-io" % "1.3.2",
-  "com.github.scopt" %% "scopt" % "3.3.0",
+  "com.github.scopt" %% "scopt" % "3.4.0",
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",
   "com.medallia.word2vec" %% "word2vecjava" % "1.0-ALLENAI-4",
   "com.google.guava" % "guava" % "18.0",
