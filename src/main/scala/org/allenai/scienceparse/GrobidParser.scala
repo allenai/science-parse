@@ -5,6 +5,7 @@ import java.nio.file.Path
 import java.util.Calendar
 
 import org.allenai.common.StringUtils.StringExtras
+import org.allenai.scienceparse.{ Section => SPSection }
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element, TextNode}
 import org.jsoup.parser.{Parser => JsoupParser}
@@ -77,8 +78,7 @@ object GrobidParser {
     (div, bodyPlusHeaderText, bodyTextOffset, section)
   }
 
-  def extractReferenceMentions(doc: Element): List[CitationRecord] = {
-    val sectionInfo = doc.select("text>div").asScala.map(extractSectionInfo)
+  def extractReferenceMentions(doc: Element, sectionInfo: Iterable[(Element, String, Int, Section)]): List[CitationRecord] = {
     val bibMentions =
       for {
         ref <- doc.select("ref[type=bibr").asScala
@@ -109,11 +109,21 @@ object GrobidParser {
     val year = extractYear(doc.findAttributeValue("teiHeader>fileDesc>sourceDesc>biblStruct>monogr>imprint>date[type=published]", "when"))
     val calendar = Calendar.getInstance()
     calendar.set(Calendar.YEAR, year)
+
+    val sectionInfo = doc.select("text>body>div").asScala.map(extractSectionInfo)
+
     val em = new ExtractedMetadata(extractTitle(doc), doc.select("teiHeader>fileDesc>sourceDesc>biblStruct>analytic>author").asScala.map(author).asJava, calendar.getTime)
     em.year = year
     em.references = extractBibEntriesWithId(doc).asJava
-    em.referenceMentions = extractReferenceMentions(doc).asJava
+    em.referenceMentions = extractReferenceMentions(doc, sectionInfo).asJava
     em.abstractText = doc.select("teiHeader>profileDesc>abstract").asScala.headOption.map(_.text).getOrElse("")
+
+    em.sections = sectionInfo.map { case (_, _, _, grobidSection) =>
+      new SPSection(
+        Seq(grobidSection.id, grobidSection.header).flatten.map(_.trim).mkString(" "),
+        grobidSection.text)
+    }.asJava
+
     em
   }
 
@@ -177,6 +187,5 @@ object GrobidParser {
       * that it's the word before the comma.
       */
     def lastNameFromFull(): String = str.trim.takeWhile(_ != ',')
-
   }
 }
