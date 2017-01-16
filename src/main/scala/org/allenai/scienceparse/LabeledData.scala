@@ -405,7 +405,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
     }
   }, maxZipFilesInParallel).flatten
 
-  def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromPMC.get)
+  def main(args: Array[String]): Unit =
+    LabeledData.dump(LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId).iterator)
 }
 
 object LabeledDataFromResources extends Datastores {
@@ -509,12 +510,12 @@ object LabeledDataFromScienceParse extends Logging {
   }
 
   def main(args: Array[String]): Unit = {
-    val fromResources = LabeledDataFromResources.get
+    val fromResources = LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId)
     val fromSp =
-      fromResources.parMap(
-        labeledDataFromResources => get(labeledDataFromResources.inputStream)
+      fromResources.par.map(
+        labeledDataFromPMC => get(labeledDataFromPMC.inputStream)
       )
-    LabeledData.dump(fromSp)
+    LabeledData.dump(fromSp.iterator)
   }
 }
 
