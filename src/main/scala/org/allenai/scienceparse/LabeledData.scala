@@ -194,7 +194,7 @@ class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledDat
   override def abstractText: Option[String] = None
   override def year: Option[Int] = None
   override def venue: Option[String] = None
-  override def sections: Option[Seq[Section]] = None
+  override def sections: Option[Seq[LabeledData.Section]] = None
   override def references: Option[Seq[Reference]] = None
   override def mentions: Option[Seq[Mention]] = None
 }
