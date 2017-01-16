@@ -1247,6 +1247,13 @@ public class Parser {
               OptionConverters.toJava(documentSection.titleText()).orElse(null),
               documentSection.bodyText()
           )
+      ).filter(documentSection ->
+          // filter out reference sections
+          !(
+              documentSection.getHeading() != null &&
+              PDFDocToPartitionedText.referenceHeaders.contains(
+                documentSection.getHeading().trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+          )
       ).collect(Collectors.toList());
     } catch (final Exception e) {
       logger.warn(
