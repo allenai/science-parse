@@ -6,6 +6,7 @@ import java.util.concurrent.{TimeUnit, Executors}
 import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
 import java.net.URL
+import org.allenai.nlpstack.tokenize.defaultTokenizer
 import org.allenai.scienceparse.LabeledData.Reference
 import org.allenai.scienceparse.pipeline.{Normalizers => PipelineNormalizers, Bucketizers => PipelineBucketizers, SimilarityMeasures, TitleAuthors}
 import org.slf4j.LoggerFactory
@@ -539,6 +540,19 @@ object LabeledDataEvaluation extends Logging {
           }
 
           output += outputLine("sectionsNormalized", sp, grobid, count)
+        }
+
+        {
+          logger.info("Calculating sectionTokensNormalized ...")
+          val (sp, grobid, count) = evaluateMetric("sectionsTokensNormalized") { labeledData =>
+            labeledData.sections.map(_.flatMap { s =>
+              val heading = s.heading.map(h => normalize(h) + " : ").getOrElse("")
+              val body = normalize(s.text)
+              defaultTokenizer(heading + body).map(_.string)
+            })
+          }
+
+          output += outputLine("sectionsTokensNormalized", sp, grobid, count)
         }
 
         println(output.map(line => s"${Console.BOLD}${Console.BLUE}$line${Console.RESET}").mkString("\n"))
