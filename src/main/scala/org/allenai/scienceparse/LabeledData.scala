@@ -40,7 +40,7 @@ trait LabeledData {
   def venue: Option[String]
   def year: Option[Int]
   def abstractText: Option[String]
-  def sections: Option[Seq[Section]]
+  def sections: Option[Seq[LabeledData.Section]]
   def references: Option[Seq[Reference]]
   def mentions: Option[Seq[Mention]]
 
@@ -335,7 +335,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
             (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
           }.flatMap(_ \ "year").flatMap(parseYear).headOption
 
-          private def parseSection(e: Node): Seq[Section] = {
+          private def parseSection(e: Node): Seq[LabeledData.Section] = {
             (e \ "sec") map { s =>
               val label = (s \ "label").headOption.map(_.text)
               val title = (s \ "title").headOption.map(_.text)
@@ -367,7 +367,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
             }
           }
 
-          override val sections: Option[Seq[Section]] = (xml \ "body").headOption.map(parseSection)
+          override val sections: Option[Seq[LabeledData.Section]] =
+            (xml \ "body").headOption.map(parseSection)
 
           override val references: Option[Seq[Reference]] = Some {
             (xml \ "back" \ "ref-list" \ "ref") map { ref =>
