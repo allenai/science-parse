@@ -49,6 +49,8 @@ trait LabeledData {
   def readableString = {
     val builder = new StringBuilder
 
+    builder ++= paperId
+    builder += '\n'
     builder ++= id
     builder += '\n'
 
@@ -83,7 +85,18 @@ trait LabeledData {
         }
     }
 
-    // TODO: sections and mentions
+    sections match {
+      case None => builder ++= "No sections\n"
+      case Some(ss) =>
+        builder ++= "Sections:\n"
+        ss.foreach { s =>
+          val heading = StringUtils.makeSingleLine(s.heading.getOrElse("NO HEADING"))
+          builder ++= s"  $heading\n"
+          builder ++= s"    ${StringUtils.makeSingleLine(s.text)}\n"
+        }
+    }
+
+    // TODO: mentions
 
     builder.toString
   }
