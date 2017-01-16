@@ -532,7 +532,7 @@ object LabeledDataEvaluation extends Logging {
           logger.info("Calculating sectionsNormalized ...")
           val (sp, grobid, count) = evaluateMetric("sectionsNormalized") { labeledData =>
             labeledData.sections.map(_.map { s =>
-              val heading = s.heading.map(h => normalize(h) + " : ")
+              val heading = s.heading.map(h => normalize(h) + " : ").getOrElse("")
               val body = normalize(s.text)
               heading + body
             })

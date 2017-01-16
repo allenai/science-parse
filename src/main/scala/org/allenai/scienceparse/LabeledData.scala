@@ -333,7 +333,14 @@ object LabeledDataFromPMC extends Datastores with Logging {
                 case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
               }
 
-              val body = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+              val body = {
+                val directBody = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+                if(directBody.nonEmpty) directBody else {
+                  val recursiveSections = parseSection(s)
+                  recursiveSections.flatMap(s => Seq(s.heading, Some(s.text)).flatten).mkString("\n")
+                }
+              }
+
               Section(sectionTitle, body)
             }
           }
