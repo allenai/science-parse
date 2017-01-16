@@ -194,6 +194,10 @@ object LabeledDataFromPMC extends Datastores with Logging {
   private val set2version =
     SortedMap((0x00 to 0x8d).map(i => f"$i%02x" -> 2): _*)
 
+  private val knownBrokenMetadataIds = Set(
+    "PMC:PMCData00/Br_J_Cancer_1981_Dec_44(6)_798-809/brjcancer00447-0026.pdf"
+  )
+
   private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
     // XML loader factories are not thread safe, so we have to have one per thread
     override protected def initialValue = {
@@ -227,7 +231,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val maxZipFilesInParallel = 2
   private val shaRegex = "^[0-9a-f]{40}$"r
-  def get: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
+  def get = getAll.filterNot(ld => knownBrokenMetadataIds.contains(ld.id))
+  def getAll: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
       zipFile.entries().asScala.filter { entry =>
