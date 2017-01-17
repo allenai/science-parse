@@ -337,26 +337,17 @@ object LabeledDataFromPMC extends Datastores with Logging {
           }.flatMap(_ \ "year").flatMap(parseYear).headOption
 
           private def parseSection(e: Node): Seq[LabeledData.Section] = {
-            (e \ "sec") map { s =>
-              val label = (s \ "label").headOption.map(_.text)
-              val title = (s \ "title").headOption.map(_.text)
-              val sectionTitle = (label, title) match {
-                case (None, None) => None
-                case (Some(l), None) => Some(l.trim)
-                case (None, Some(t)) => Some(t.trim)
-                case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
-              }
-
-              val body = {
-                val directBody = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-                if(directBody.nonEmpty) directBody else {
-                  val recursiveSections = parseSection(s)
-                  recursiveSections.flatMap(s => Seq(s.heading, Some(s.text)).flatten).mkString("\n")
-                }
-              }
-
-              Section(sectionTitle, body)
+            val label = (e \ "label").headOption.map(_.text)
+            val title = (e \ "title").headOption.map(_.text)
+            val sectionTitle = (label, title) match {
+              case (None, None) => None
+              case (Some(l), None) => Some(l.trim)
+              case (None, Some(t)) => Some(t.trim)
+              case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
             }
+            val body = (e \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+
+            Section(sectionTitle, body) +: (e \ "sec").flatMap(parseSection)  // parse sections recursively
           }
 
           override val abstractText: Option[String] = (articleMeta \ "abstract").headOption.map { a =>
