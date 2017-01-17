@@ -543,14 +543,15 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
 
 object LabeledDataFromGrobidServer {
   def main(args: Array[String]): Unit = {
-    val url = new URL(args(0))
+    val url = new URL(args.headOption.getOrElse("http://localhost:8080"))
     val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
 
-    val fromResources = LabeledDataFromResources.get
-    val fromGrobid = fromResources.parMap { labeledDataFromResources =>
-      labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
-    }
-    LabeledData.dump(fromGrobid)
+    val fromResources = LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId)
+    val fromGrobid =
+      fromResources.par.map(
+        labeledDataFromPMC => labeledDataFromGrobidServer.get(labeledDataFromPMC.inputStream)
+      )
+    LabeledData.dump(fromGrobid.iterator)
   }
 }
 
