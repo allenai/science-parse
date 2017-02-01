@@ -209,7 +209,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val knownBrokenMetadataIds = Set(
     "PMC:PMCData00/Br_J_Cancer_1981_Dec_44(6)_798-809/brjcancer00447-0026.pdf",
-    "PMC:PMCData00/Cancer_Imaging_2014_Oct_9_14(Suppl_1)_P10/1470-7330-14-S1-P10.pdf"
+    "PMC:PMCData00/Cancer_Imaging_2014_Oct_9_14(Suppl_1)_P10/1470-7330-14-S1-P10.pdf",
+    "PMC:PMCData00/J_Exp_Med_1987_Sep_1_166(3)_668-677/je1663668.pdf"
   )
 
   private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
