@@ -184,6 +184,9 @@ public class CRFBibRecordParser implements BibRecordParser {
   );
 
   public BibRecord parseRecord(String line) {
+    if(Thread.interrupted())
+      throw new Parser.ParsingTimeout();
+
     line = line.trim();
     if(line.isEmpty() || line.length() > 2000)
       return null;

@@ -2,9 +2,10 @@ package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gs.collections.api.set.MutableSet;
+import com.gs.collections.api.set.primitive.MutableIntSet;
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.factory.primitive.IntSets;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import com.gs.collections.impl.tuple.Tuples;
 
 import lombok.Data;
@@ -43,10 +44,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.Normalizer;
@@ -63,6 +62,8 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
@@ -72,7 +73,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.ToDoubleFunction;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -1147,6 +1147,55 @@ public class Parser {
     }
   }
 
+  public static class ParsingTimeout extends RuntimeException { }
+  private final Timer parserKillerTimer = new Timer("Science-parse killer timer", true);
+  private final MutableIntSet parseNumbersInProgress = IntSets.mutable.empty();
+  private final AtomicInteger nextParseNumber = new AtomicInteger();
+  public ExtractedMetadata doParseWithTimeout(final InputStream is, final long timeoutInMs) throws IOException {
+    final int parseNumber = nextParseNumber.getAndIncrement();
+
+    final Thread t = Thread.currentThread();
+    final TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        synchronized (parseNumbersInProgress) {
+          if(parseNumbersInProgress.remove(parseNumber)) {
+            logger.info("Interrupting parsing thread {} because it's taking too long", t.getId());
+            t.interrupt();
+          }
+        }
+      }
+    };
+
+    synchronized (parseNumbersInProgress) {
+      parseNumbersInProgress.add(parseNumber);
+    }
+
+    final ExtractedMetadata result;
+    final boolean wasInterrupted;
+    parserKillerTimer.schedule(task, timeoutInMs);
+    try {
+      result = doParse(is);
+    } finally {
+      synchronized (parseNumbersInProgress) {
+        parseNumbersInProgress.remove(parseNumber);
+      }
+
+      // This clears the interrupted flag, in case it happened after we were already done parsing,
+      // but before we could remove the parse number. We don't want to leave this function with
+      // the interrupted flag set on the thread.
+      // Actually, the window of opportunity is from the last time that doParse() checks the
+      // flag to the time we remove the parse number, which is quite a bit bigger.
+      wasInterrupted = Thread.interrupted();
+    }
+
+    if(wasInterrupted)
+      logger.info("Overriding interruption of parsing thread {} because it finished before we could react", t.getId());
+    assert !Thread.interrupted();
+
+    return result;
+  }
+
   public ExtractedMetadata doParse(final InputStream is) throws IOException {
     return doParse(is, MAXHEADERWORDS);
   }
@@ -1241,7 +1290,11 @@ public class Parser {
     // Run figure extraction to get sections
     //
     try {
-      final FigureExtractor.Document doc = FigureExtractor.Document$.MODULE$.fromPDDocument(pdDoc);
+      final FigureExtractor fe = new FigureExtractor(false, true, true, true, true);
+
+      final FigureExtractor.Document doc =
+          fe.getFiguresWithText(pdDoc, scala.Option.apply(null), scala.Option.apply(null));
+
       em.sections = ScalaStreamSupport.stream(doc.sections()).map(documentSection ->
           new Section(
               OptionConverters.toJava(documentSection.titleText()).orElse(null),
