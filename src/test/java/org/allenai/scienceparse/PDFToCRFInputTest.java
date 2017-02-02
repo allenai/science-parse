@@ -27,7 +27,7 @@ public class PDFToCRFInputTest {
   public void testGetPaperTokens() throws IOException {
     InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-    List<PaperToken> pts = PDFToCRFInput.getSequence(doc, false);
+    List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
     log.info("got " + pts.size() + " things.");
     assert (pts.size() > 50);
   }
@@ -36,7 +36,7 @@ public class PDFToCRFInputTest {
     String target = "How to make words with vectors: Phrase generation in distributional semantics";
     InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-    List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
+    List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
     Pair<Integer, Integer> pos = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), target);
     Pair<Integer, Integer> posNot = PDFToCRFInput.findString(PDFToCRFInput.asStringList(pts), "this string won't be found");
 
@@ -50,7 +50,7 @@ public class PDFToCRFInputTest {
   public void testLabelMetadata() throws IOException {
     InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-    List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
+    List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
       Arrays.asList("Georgiana Dinu", "Marco Baroni"), new Date(1388556000000L));
     val labeledData = PDFToCRFInput.labelMetadata("P14-1059", pts, em);
@@ -94,7 +94,7 @@ public class PDFToCRFInputTest {
   public void testAuthor() throws IOException {
     InputStream pdfInputStream = PDFToCRFInputTest.class.getResourceAsStream("/P14-1059.pdf");
     PDFDoc doc = new PDFExtractor().extractFromInputStream(pdfInputStream);
-    List<PaperToken> pts = PDFToCRFInput.getSequence(doc, true);
+    List<PaperToken> pts = PDFToCRFInput.getSequence(doc);
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
       Arrays.asList("Georgiana Dinu", "Marco C. Baroni"), new Date(1388556000000L));
     val labeledData = PDFToCRFInput.labelMetadata("P14-1059", pts, em);

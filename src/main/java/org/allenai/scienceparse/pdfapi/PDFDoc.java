@@ -14,13 +14,6 @@ public class PDFDoc {
    * <p>
    * This is < 0 if we can't find an appropriate header/main cut.
    */
-  private final int headerStopLinePosition;
   public List<PDFPage> pages;
   public PDFMetadata meta;
-
-  public List<PDFLine> heuristicHeader() {
-    return headerStopLinePosition >= 0 ?
-      pages.get(0).lines.subList(0, headerStopLinePosition) :
-      null;
-  }
 }

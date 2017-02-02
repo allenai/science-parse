@@ -180,7 +180,7 @@ public class Parser {
       FileInputStream fis = new FileInputStream(f);
       PDFDoc doc = (new PDFExtractor()).extractFromInputStream(fis);
       fis.close();
-      val seq = PDFToCRFInput.getSequence(doc, false);
+      val seq = PDFToCRFInput.getSequence(doc);
       return PDFToCRFInput.stringAt(seq, Tuples.pair(0, seq.size()));
     } catch (Exception e) {
       return null;
@@ -207,11 +207,10 @@ public class Parser {
           File pdf,
           Paper p,
           PDFExtractor ext,
-          boolean heuristicHeader,
           int headerMax
   ) throws IOException {
     try(final InputStream is = new BufferedInputStream(new FileInputStream(pdf))) {
-      return getPaperLabels(is, p, ext, heuristicHeader, headerMax, false);
+      return getPaperLabels(is, p, ext, headerMax, false);
     }
   }
 
@@ -219,7 +218,6 @@ public class Parser {
           final InputStream is,
           final Paper p,
           PDFExtractor ext,
-          boolean heuristicHeader,
           int headerMax,
           boolean checkAuthors
   ) throws IOException {
@@ -238,7 +236,7 @@ public class Parser {
       return null;
     }
 
-    List<PaperToken> seq = PDFToCRFInput.getSequence(doc, heuristicHeader);
+    List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
     if (seq.size() == 0)
       return null;
     seq = seq.subList(0, Math.min(seq.size(), headerMax));
@@ -278,7 +276,6 @@ public class Parser {
     final ParserGroundTruth pgt,
     final PaperSource paperSource,
     final int headerMax,
-    final boolean heuristicHeader,
     final int maxFiles,
     final int minYear,
     final boolean checkAuthors,
@@ -326,7 +323,6 @@ public class Parser {
                         is,
                         p,
                         ext,
-                        heuristicHeader,
                         headerMax,
                         checkAuthors);
               }
@@ -433,14 +429,13 @@ public class Parser {
 
   public static List<List<Pair<PaperToken, String>>> bootstrapLabels(
           List<File> files,
-          int headerMax,
-          boolean heuristicHeader
+          int headerMax
   ) throws IOException {
     List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
     PDFExtractor ext = new PDFExtractor();
 
     for (File f : files) {
-      val labeledPaper = getPaperLabels(f, null, ext, heuristicHeader, headerMax);
+      val labeledPaper = getPaperLabels(f, null, ext, headerMax);
       if (labeledPaper != null)
         labeledData.add(labeledPaper);
     }
@@ -585,14 +580,13 @@ public class Parser {
     PDFPredicateExtractor predExtractor;
     if (files != null) {
       labelingOutput = new LabelingOutput(
-        bootstrapLabels(files, opts.headerMax, true),  //don't exclude for pdf meta bootstrap
+        bootstrapLabels(files, opts.headerMax),  //don't exclude for pdf meta bootstrap
         UnifiedSet.newSet());
     } else {
       labelingOutput = labelFromGroundTruth(
               pgt,
               paperSource,
               opts.headerMax,
-              true,
               opts.documentCount > 0 ? opts.documentCount : pgt.papers.size(),
               opts.minYear,
               opts.checkAuthors,
@@ -1230,7 +1224,7 @@ public class Parser {
     {
       PDFExtractor ext = new PDFExtractor();
       PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc, true);
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
       seq = seq.subList(0, Math.min(seq.size(), headerMax));
       seq = PDFToCRFInput.padSequence(seq);
 

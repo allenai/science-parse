@@ -175,18 +175,8 @@ public class PDFExtractor {
       }
       meta.title(title);
 
-      int headerStopIndex = -1;
-      if (!stripper.pages.isEmpty()) {
-        final PDFPage firstPage = stripper.pages.get(0);
-        headerStopIndex = getHeuristicHeaderStopIndex(firstPage);
-      } else {
-        // Anecdotally, when we have no pages, the output is such garbage that we might be
-        // better off throwing an exception. TBD
-      }
-
       PDFDoc doc = PDFDoc.builder()
         .pages(stripper.pages)
-        .headerStopLinePosition(headerStopIndex)
         .meta(meta.build())
         .build();
 
@@ -198,32 +188,6 @@ public class PDFExtractor {
   @SneakyThrows
   public PDFDoc extractFromInputStream(InputStream is) {
     return extractResultFromInputStream(is).document;
-  }
-
-  private int getHeuristicHeaderStopIndex(PDFPage firstPage) {
-    // Find first abstract line
-    OptionalInt abstractIdx = IntStream.range(0, firstPage.lines.size())
-      .filter(idx -> firstPage.lines.get(idx).lineText().trim().toLowerCase().startsWith("abstract"))
-      .findFirst();
-    if (abstractIdx.isPresent()) {
-      return abstractIdx.getAsInt();
-    }
-    // Find smallest line on page and if it appears in acceptable range, take it
-    final OptionalDouble smallestSizeOption =
-      firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min();
-    if (smallestSizeOption.isPresent()) {
-      final double smallestSize = smallestSizeOption.getAsDouble();
-
-      OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
-        .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
-        .findFirst();
-      if (smallIdx.isPresent()) {
-        if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
-          return smallIdx.getAsInt();
-        }
-      }
-    }
-    return -1;
   }
 
   private String getHeuristicTitle(PDFCaptureTextStripper stripper) {
