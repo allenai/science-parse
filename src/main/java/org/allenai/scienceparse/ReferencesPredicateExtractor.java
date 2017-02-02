@@ -11,15 +11,11 @@ import java.util.regex.Pattern;
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
 
-import com.gs.collections.api.map.primitive.MutableObjectDoubleMap;
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
-import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import com.medallia.word2vec.Searcher;
-import com.medallia.word2vec.Word2VecModel;
 import org.allenai.datastore.Datastore;
 
-import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 
@@ -195,7 +191,16 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
         addGazetteerSpan(preds, ls);
       }
   }
-  
+
+  // String.format() ends up taking a very long time at scale, so we pre-compute all the
+  // String.format() calls we might need and re-use them.
+  private static final String[] wordEmbeddingFeatureNames;
+  static {
+    wordEmbeddingFeatureNames = new String[1000];
+    for (int i = 0; i < wordEmbeddingFeatureNames.length; ++i)
+      wordEmbeddingFeatureNames[i] = String.format("%%emb%03d", i);
+  }
+
   @Override
   public List<ObjectDoubleMap<String>> nodePredicates(List<String> elems) {
     List<ObjectDoubleMap<String>> out = new ArrayList<>();
@@ -249,7 +254,7 @@ public class ReferencesPredicateExtractor implements CRFPredicateExtractor<Strin
           int j = 0;
           while(vector.hasNext()) {
             final double value = vector.next();
-            m.put(String.format("%%emb%03d", j), value);
+            m.put(wordEmbeddingFeatureNames[j], value);
             j += 1;
           }
         } catch (final Searcher.UnknownWordException e) {

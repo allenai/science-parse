@@ -40,7 +40,7 @@ trait LabeledData {
   def venue: Option[String]
   def year: Option[Int]
   def abstractText: Option[String]
-  def sections: Option[Seq[Section]]
+  def sections: Option[Seq[LabeledData.Section]]
   def references: Option[Seq[Reference]]
   def mentions: Option[Seq[Mention]]
 
@@ -49,6 +49,8 @@ trait LabeledData {
   def readableString = {
     val builder = new StringBuilder
 
+    builder ++= paperId
+    builder += '\n'
     builder ++= id
     builder += '\n'
 
@@ -83,7 +85,18 @@ trait LabeledData {
         }
     }
 
-    // TODO: sections and mentions
+    sections match {
+      case None => builder ++= "No sections\n"
+      case Some(ss) =>
+        builder ++= "Sections:\n"
+        ss.foreach { s =>
+          val heading = StringUtils.makeSingleLine(s.heading.getOrElse("NO HEADING"))
+          builder ++= s"  $heading\n"
+          builder ++= s"    ${StringUtils.makeSingleLine(s.text)}\n"
+        }
+    }
+
+    // TODO: mentions
 
     builder.toString
   }
@@ -181,7 +194,7 @@ class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledDat
   override def abstractText: Option[String] = None
   override def year: Option[Int] = None
   override def venue: Option[String] = None
-  override def sections: Option[Seq[Section]] = None
+  override def sections: Option[Seq[LabeledData.Section]] = None
   override def references: Option[Seq[Reference]] = None
   override def mentions: Option[Seq[Mention]] = None
 }
@@ -192,8 +205,13 @@ object LabeledDataFromPMC extends Datastores with Logging {
   private val xmlExtension = ".nxml"
 
   private val set2version =
-    SortedMap((0x00 to 0x83).map(i => f"$i%02x" -> 2): _*) ++
-    SortedMap((0x84 to 0x86).map(i => f"$i%02x" -> 1): _*)
+    SortedMap((0x00 to 0xcb).map(i => f"$i%02x" -> 2): _*)
+
+  private val knownBrokenMetadataIds = Set(
+    "PMC:PMCData00/Br_J_Cancer_1981_Dec_44(6)_798-809/brjcancer00447-0026.pdf",
+    "PMC:PMCData00/Cancer_Imaging_2014_Oct_9_14(Suppl_1)_P10/1470-7330-14-S1-P10.pdf",
+    "PMC:PMCData00/J_Exp_Med_1987_Sep_1_166(3)_668-677/je1663668.pdf"
+  )
 
   private val xmlLoader = new ThreadLocal[XMLLoader[Elem]] {
     // XML loader factories are not thread safe, so we have to have one per thread
@@ -228,7 +246,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val maxZipFilesInParallel = 2
   private val shaRegex = "^[0-9a-f]{40}$"r
-  def get: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
+  def get = getAll.filterNot(ld => knownBrokenMetadataIds.contains(ld.id))
+  def getAll: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
       zipFile.entries().asScala.filter { entry =>
@@ -318,12 +337,18 @@ object LabeledDataFromPMC extends Datastores with Logging {
             (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
           }.flatMap(_ \ "year").flatMap(parseYear).headOption
 
-          private def parseSection(e: Node): Seq[Section] = {
-            (e \ "sec") map { s =>
-              val title = (s \ "title").headOption.map(_.text)
-              val body = (s \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-              Section(title, body)
+          private def parseSection(e: Node): Seq[LabeledData.Section] = {
+            val label = (e \ "label").headOption.map(_.text)
+            val title = (e \ "title").headOption.map(_.text)
+            val sectionTitle = (label, title) match {
+              case (None, None) => None
+              case (Some(l), None) => Some(l.trim)
+              case (None, Some(t)) => Some(t.trim)
+              case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
             }
+            val body = (e \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+
+            Section(sectionTitle, body) +: (e \ "sec").flatMap(parseSection)  // parse sections recursively
           }
 
           override val abstractText: Option[String] = (articleMeta \ "abstract").headOption.map { a =>
@@ -335,7 +360,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
             }
           }
 
-          override val sections: Option[Seq[Section]] = (xml \ "body").headOption.map(parseSection)
+          override val sections: Option[Seq[LabeledData.Section]] =
+            (xml \ "body").headOption.map(parseSection)
 
           override val references: Option[Seq[Reference]] = Some {
             (xml \ "back" \ "ref-list" \ "ref") map { ref =>
@@ -372,7 +398,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
     }
   }, maxZipFilesInParallel).flatten
 
-  def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromPMC.get)
+  def main(args: Array[String]): Unit =
+    LabeledData.dump(LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId).iterator)
 }
 
 object LabeledDataFromResources extends Datastores {
@@ -476,12 +503,12 @@ object LabeledDataFromScienceParse extends Logging {
   }
 
   def main(args: Array[String]): Unit = {
-    val fromResources = LabeledDataFromResources.get
+    val fromResources = LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId)
     val fromSp =
-      fromResources.parMap(
-        labeledDataFromResources => get(labeledDataFromResources.inputStream)
+      fromResources.par.map(
+        labeledDataFromPMC => get(labeledDataFromPMC.inputStream)
       )
-    LabeledData.dump(fromSp)
+    LabeledData.dump(fromSp.iterator)
   }
 }
 
@@ -508,14 +535,15 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
 
 object LabeledDataFromGrobidServer {
   def main(args: Array[String]): Unit = {
-    val url = new URL(args(0))
+    val url = new URL(args.headOption.getOrElse("http://localhost:8080"))
     val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
 
-    val fromResources = LabeledDataFromResources.get
-    val fromGrobid = fromResources.parMap { labeledDataFromResources =>
-      labeledDataFromGrobidServer.get(labeledDataFromResources.inputStream)
-    }
-    LabeledData.dump(fromGrobid)
+    val fromResources = LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId)
+    val fromGrobid =
+      fromResources.par.map(
+        labeledDataFromPMC => labeledDataFromGrobidServer.get(labeledDataFromPMC.inputStream)
+      )
+    LabeledData.dump(fromGrobid.iterator)
   }
 }
 

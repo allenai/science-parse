@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import language.postfixOps
+import scala.util.control.NonFatal
 
 object RunSP extends Logging {
   case class MetadataWrapper(filename: String, metadata: ExtractedMetadata)
@@ -87,10 +88,17 @@ object RunSP extends Logging {
       val parser = Await.result(parserFuture, 15 minutes)
 
       files.foreach { file =>
+        logger.info(s"Starting ${file.getName}")
         Resource.using(new FileInputStream(file)) { is =>
-          val metadata = parser.doParse(is)
-          printResults(file, config.outputDir.get, metadata)
+          try {
+            val metadata = parser.doParseWithTimeout(is, 60000)
+            printResults(file, config.outputDir.get, metadata)
+          } catch {
+            case NonFatal(e) =>
+              logger.info(s"Parsing ${file.getName} failed with ${e.toString}")
+          }
         }
+        logger.info(s"Finished ${file.getName}")
       }
     }
   }

@@ -2,7 +2,9 @@ package org.allenai.scienceparse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -219,17 +221,17 @@ public class PDFDocToPartitionedText {
         );
   }
   
-  
+  public static Set<String> referenceHeaders = new HashSet<String>(Arrays.asList(
+      "references",
+      "citations",
+      "bibliography",
+      "reference"));
+
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
-    final List<String> refTags = Arrays.asList(
-            "references",
-            "citations",
-            "bibliography",
-            "reference");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
@@ -251,7 +253,7 @@ public class PDFDocToPartitionedText {
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
             if (
               l.tokens.get(l.tokens.size() - 1).token != null &&
-              refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+              referenceHeaders.contains(l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
             ) {
               inRefs = true;
               foundRefs = true;
