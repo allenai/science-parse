@@ -136,6 +136,15 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     return Math.log(Math.max(y1 - y2, 0.00001f));
   }
 
+  // String.format() ends up taking a very long time at scale, so we pre-compute all the
+  // String.format() calls we might need and re-use them.
+  public static final String[] wordEmbeddingFeatureNames;
+  static {
+    wordEmbeddingFeatureNames = new String[1000];
+    for (int i = 0; i < wordEmbeddingFeatureNames.length; ++i)
+      wordEmbeddingFeatureNames[i] = String.format("%%emb%03d", i);
+  }
+
   //assumes start/stop padded
   @Override
   public List<ObjectDoubleMap<String>> nodePredicates(List<PaperToken> elems) {
@@ -260,7 +269,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           int j = 0;
           while(vector.hasNext()) {
             final double value = vector.next();
-            m.put(String.format("%%emb%03d", j), value);
+            m.put(wordEmbeddingFeatureNames[j], value);
             j += 1;
           }
         } catch (final Searcher.UnknownWordException e) {
