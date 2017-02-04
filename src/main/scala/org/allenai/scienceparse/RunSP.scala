@@ -75,6 +75,7 @@ object RunSP extends Logging {
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
 
       loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
+      loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
 
       val parserFuture = Future {
         new Parser(modelFile, gazetteerFile, bibModelFile)
@@ -147,10 +148,11 @@ object RunSP extends Logging {
 
       val files = config.pdfInputs.iterator.flatMap(stringToInputStreams)
 
+      val parser = Await.result(parserFuture, 15 minutes)
+
       val startTime = System.currentTimeMillis()
       val finishedCount = new AtomicInteger()
       files.parForeach { case (name, is) =>
-        val parser = Await.result(parserFuture, 15 minutes)
 
         logger.info(s"Starting $name")
         try {
