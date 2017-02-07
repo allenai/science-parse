@@ -4,7 +4,6 @@ import java.io._
 import java.util.NoSuchElementException
 import java.util.concurrent.atomic.AtomicInteger
 import ch.qos.logback.classic.Level
-import com.amazonaws.services.cloudfront.model.InvalidArgumentException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -20,16 +19,9 @@ import org.allenai.common.ParIterator._
 object RunSP extends Logging {
   case class MetadataWrapper(name: String, metadata: ExtractedMetadata)
 
-  val objectMapper = new ObjectMapper() with ScalaObjectMapper
-  objectMapper.registerModule(DefaultScalaModule)
-
-  def printResults(name: String, outputDir: File, metadata: ExtractedMetadata): Unit = {
-    val wrapper = MetadataWrapper(name, metadata)
-
-    Resource.using(new FileOutputStream(new File(outputDir, name + ".json"))) { os =>
-      objectMapper.writeValue(os, wrapper)
-    }
-  }
+  val jsonWriter = new ObjectMapper() with ScalaObjectMapper
+  jsonWriter.registerModule(DefaultScalaModule)
+  val prettyJsonWriter = jsonWriter.writerWithDefaultPrettyPrinter()
 
   def main(args: Array[String]) = {
     case class Config(
@@ -38,7 +30,8 @@ object RunSP extends Logging {
       gazetteerFile: Option[File] = None,
       paperDirectory: Option[File] = None,
       pdfInputs: Seq[String] = Seq(),
-      outputDir: Option[File] = None
+      outputDir: Option[File] = None,
+      outputFile: Option[File] = None
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -54,9 +47,13 @@ object RunSP extends Logging {
         c.copy(gazetteerFile = Some(g))
       } text "Specifies the gazetteer file. Defaults to the production one. Take care not to use a gazetteer that you also used to train the model."
 
-      opt[File]('o', "outputDirectory") required () action {
+      opt[File]('o', "outputDirectory") action {
         (o, c) => c.copy(outputDir = Some(o))
-      } text "Output directory"
+      } text "Output directory. Writes one file per document."
+
+      opt[File]('f', "outputFile") action {
+        (f, c) => c.copy(outputFile = Some(f))
+      } text "Output file. Writes one line per document."
 
       opt[File]('p', "paperDirectory") action { (p, c) =>
         c.copy(paperDirectory = Some(p))
@@ -93,38 +90,41 @@ object RunSP extends Logging {
         }
       }
 
-      val shaRegex = "^[0-9a-f]{40}$"r
+      val shaRegex = "^[0-9a-f]{40}$" r
       def stringToInputStreams(s: String): Iterator[(String, InputStream)] = {
         val file = new File(s)
 
-        if(s.endsWith(".pdf")) {
+        if (s.endsWith(".pdf")) {
           Iterator((s, new FileInputStream(file)))
-        } else if(s.endsWith(".txt")) {
+        } else if (s.endsWith(".txt")) {
           val lines = new Iterator[String] {
             private val input = new BufferedReader(
               new InputStreamReader(
                 new FileInputStream(file),
                 "UTF-8"))
+
             def getNextLine: String = {
               val result = input.readLine()
               if (result == null)
                 input.close()
               result
             }
+
             private var nextLine = getNextLine
 
             override def hasNext: Boolean = nextLine != null
+
             override def next(): String = {
               val result = nextLine
-              nextLine = if(nextLine == null) null else getNextLine
-              if(result == null)
+              nextLine = if (nextLine == null) null else getNextLine
+              if (result == null)
                 throw new NoSuchElementException
               else
                 result
             }
           }
           lines.parMap(stringToInputStreams).flatten
-        } else if(file.isDirectory) {
+        } else if (file.isDirectory) {
           def listFiles(startFile: File): Iterator[File] =
             startFile.listFiles.iterator.flatMap {
               case dir if dir.isDirectory => listFiles(dir)
@@ -132,7 +132,7 @@ object RunSP extends Logging {
               case _ => Iterator.empty
             }
           listFiles(file).map(f => (f.getName, new FileInputStream(f)))
-        } else if(shaRegex.findFirstIn(s).isDefined) {
+        } else if (shaRegex.findFirstIn(s).isDefined) {
           try {
             Iterator((s, paperSource.getPdf(s)))
           } catch {
@@ -146,29 +146,46 @@ object RunSP extends Logging {
         }
       }
 
-      val files = config.pdfInputs.iterator.flatMap(stringToInputStreams)
+      val inputStreams = config.pdfInputs.iterator.flatMap(stringToInputStreams)
+      val outputStream = config.outputFile.map(new FileOutputStream(_))
+      try {
+        val parser = Await.result(parserFuture, 15 minutes)
 
-      val parser = Await.result(parserFuture, 15 minutes)
+        val startTime = System.currentTimeMillis()
+        val finishedCount = new AtomicInteger()
+        inputStreams.parForeach { case (name, is) =>
+          logger.info(s"Starting $name")
+          try {
+            val metadata = parser.doParseWithTimeout(is, 60000)
+            val wrapper = MetadataWrapper(name, metadata)
 
-      val startTime = System.currentTimeMillis()
-      val finishedCount = new AtomicInteger()
-      files.parForeach { case (name, is) =>
-        logger.info(s"Starting $name")
-        try {
-          val metadata = parser.doParseWithTimeout(is, 60000)
-          printResults(name, config.outputDir.get, metadata)
-        } catch {
-          case NonFatal(e) =>
-            logger.info(s"Parsing $name failed with ${e.toString}")
+            // write to output directory
+            config.outputDir.foreach { dir =>
+              Resource.using(new FileOutputStream(new File(dir, name + ".json"))) { os =>
+                prettyJsonWriter.writeValue(os, wrapper)
+              }
+            }
+
+            // write to output file
+            outputStream.foreach { os =>
+              jsonWriter.writeValue(os, wrapper)
+            }
+
+          } catch {
+            case NonFatal(e) =>
+              logger.info(s"Parsing $name failed with ${e.toString}")
+          }
+          logger.info(s"Finished $name")
+
+          val newFinishedCount = finishedCount.incrementAndGet()
+          if (newFinishedCount % 1000 == 0) {
+            val elapsedMs = System.currentTimeMillis() - startTime
+            val dps = 1000.0 * newFinishedCount.toDouble / elapsedMs
+            println(f"Finished $newFinishedCount documents. $dps%.2f dps")
+          }
         }
-        logger.info(s"Finished $name")
-
-        val newFinishedCount = finishedCount.incrementAndGet()
-        if(newFinishedCount % 1000 == 0) {
-          val elapsedMs = System.currentTimeMillis() - startTime
-          val dps = 1000.0 * newFinishedCount.toDouble / elapsedMs
-          println(f"Finished $newFinishedCount documents. $dps%.2f dps")
-        }
+      } finally {
+        outputStream.foreach(_.close())
       }
     }
   }
