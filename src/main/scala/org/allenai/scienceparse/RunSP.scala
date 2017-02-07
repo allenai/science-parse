@@ -56,8 +56,8 @@ object RunSP extends Logging {
         (f, c) => c.copy(outputFile = Some(f))
       } text "Output file. Writes one line per document."
 
-      opt[Boolean]('q', "quiet") action {
-        (q, c) => c.copy(quiet = true)
+      opt[Unit]('q', "quiet") action {
+        (_, c) => c.copy(quiet = true)
       } text "Quiet mode, prints only progress reports"
 
       opt[File]('p', "paperDirectory") action { (p, c) =>
@@ -76,6 +76,11 @@ object RunSP extends Logging {
       val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
 
+      loggerConfig.Logger("org.apache.pdfbox").setLevel(Level.OFF)
+      loggerConfig.Logger("org.apache.fontbox").setLevel(Level.OFF)
+      loggerConfig.Logger("org.allenai.pdfbox").setLevel(Level.OFF)
+      loggerConfig.Logger("org.allenai.fontbox").setLevel(Level.OFF)
+      loggerConfig.Logger("org.allenai.pdffigures2.TextExtractor").setLevel(Level.ERROR)
       if(config.quiet) {
         loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
         loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
