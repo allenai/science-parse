@@ -13,6 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import language.postfixOps
+import scala.io.Source
 import scala.util.control.NonFatal
 import org.allenai.common.ParIterator._
 
@@ -102,64 +103,81 @@ object RunSP extends Logging {
         }
       }
 
+      // if the output file already exists, read the names from it to see what we should skip
+      val skipNames = config.outputFile.filter(_.exists()).map { f =>
+        Resource.using(Source.fromFile(f, "UTF-8")) { source =>
+          source.getLines().flatMap { line =>
+            val tree = jsonWriter.readTree(line)
+            Option(tree.get("name").asText()).filter(_.nonEmpty)
+          }.toSet
+        }
+      }.getOrElse(Set.empty)
+
       val shaRegex = "^[0-9a-f]{40}$" r
       def stringToInputStreams(s: String): Iterator[(String, InputStream)] = {
-        val file = new File(s)
-
-        if (s.endsWith(".pdf")) {
-          Iterator((s, new FileInputStream(file)))
-        } else if (s.endsWith(".txt")) {
-          val lines = new Iterator[String] {
-            private val input = new BufferedReader(
-              new InputStreamReader(
-                new FileInputStream(file),
-                "UTF-8"))
-
-            def getNextLine: String = {
-              val result = input.readLine()
-              if (result == null)
-                input.close()
-              result
-            }
-
-            private var nextLine = getNextLine
-
-            override def hasNext: Boolean = nextLine != null
-
-            override def next(): String = {
-              val result = nextLine
-              nextLine = if (nextLine == null) null else getNextLine
-              if (result == null)
-                throw new NoSuchElementException
-              else
-                result
-            }
-          }
-          lines.parMap(stringToInputStreams).flatten
-        } else if (file.isDirectory) {
-          def listFiles(startFile: File): Iterator[File] =
-            startFile.listFiles.iterator.flatMap {
-              case dir if dir.isDirectory => listFiles(dir)
-              case f if f.isFile && f.getName.endsWith(".pdf") => Iterator(f)
-              case _ => Iterator.empty
-            }
-          listFiles(file).map(f => (f.getName, new FileInputStream(f)))
-        } else if (shaRegex.findFirstIn(s).isDefined) {
-          try {
-            Iterator((s, paperSource.getPdf(s)))
-          } catch {
-            case NonFatal(e) =>
-              logger.info(s"Locating $s failed with ${e.toString}. Ignoring.")
-              Iterator.empty
-          }
-        } else {
-          logger.warn(s"Input $s is not something I understand. I'm ignoring it.")
+        if(skipNames.contains(s)) {
           Iterator.empty
+        } else {
+          val file = new File(s)
+
+          if (s.endsWith(".pdf")) {
+            Iterator((s, new FileInputStream(file)))
+          } else if (s.endsWith(".txt")) {
+            val lines = new Iterator[String] {
+              private val input = new BufferedReader(
+                new InputStreamReader(
+                  new FileInputStream(file),
+                  "UTF-8"))
+
+              def getNextLine: String = {
+                val result = input.readLine()
+                if (result == null)
+                  input.close()
+                result
+              }
+
+              private var nextLine = getNextLine
+
+              override def hasNext: Boolean = nextLine != null
+
+              override def next(): String = {
+                val result = nextLine
+                nextLine = if (nextLine == null) null else getNextLine
+                if (result == null)
+                  throw new NoSuchElementException
+                else
+                  result
+              }
+            }
+            lines.parMap(stringToInputStreams, 16).flatten
+          } else if (file.isDirectory) {
+            def listFiles(startFile: File): Iterator[File] =
+              startFile.listFiles.iterator.flatMap {
+                case dir if dir.isDirectory => listFiles(dir)
+                case f if f.isFile && f.getName.endsWith(".pdf") => Iterator(f)
+                case _ => Iterator.empty
+              }
+            listFiles(file).
+              filterNot(f => skipNames.contains(f.getName)).
+              map(f => (f.getName, new FileInputStream(f)))
+          } else if (shaRegex.findFirstIn(s).isDefined) {
+            try {
+              Iterator((s, paperSource.getPdf(s)))
+            } catch {
+              case NonFatal(e) =>
+                logger.info(s"Locating $s failed with ${e.toString}. Ignoring.")
+                Iterator.empty
+            }
+          } else {
+            logger.warn(s"Input $s is not something I understand. I'm ignoring it.")
+            Iterator.empty
+          }
         }
       }
 
       val inputStreams = config.pdfInputs.iterator.flatMap(stringToInputStreams)
-      val outputStream = config.outputFile.map(new FileOutputStream(_))
+
+      val outputStream = config.outputFile.map(new FileOutputStream(_, true))
       try {
         val parser = Await.result(parserFuture, 15 minutes)
 
@@ -182,6 +200,7 @@ object RunSP extends Logging {
               os.synchronized {
                 os.write(bytes)
                 os.write('\n')
+                os.flush()
               }
             }
 
