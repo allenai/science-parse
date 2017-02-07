@@ -31,7 +31,8 @@ object RunSP extends Logging {
       paperDirectory: Option[File] = None,
       pdfInputs: Seq[String] = Seq(),
       outputDir: Option[File] = None,
-      outputFile: Option[File] = None
+      outputFile: Option[File] = None,
+      quiet: Boolean = false
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -55,6 +56,10 @@ object RunSP extends Logging {
         (f, c) => c.copy(outputFile = Some(f))
       } text "Output file. Writes one line per document."
 
+      opt[Boolean]('q', "quiet") action {
+        (q, c) => c.copy(quiet = true)
+      } text "Quiet mode, prints only progress reports"
+
       opt[File]('p', "paperDirectory") action { (p, c) =>
         c.copy(paperDirectory = Some(p))
       } text "Specifies a directory with papers in them. If this is not specified, or a paper can't be found in the directory, we fall back to getting the paper from the bucket."
@@ -71,8 +76,10 @@ object RunSP extends Logging {
       val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
 
-      loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
-      loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
+      if(config.quiet) {
+        loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
+        loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
+      }
 
       val parserFuture = Future {
         new Parser(modelFile, gazetteerFile, bibModelFile)
