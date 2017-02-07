@@ -79,7 +79,7 @@ object RunSP extends Logging {
       implicit val ec =
         ExecutionContext.fromExecutor(
           Executors.newFixedThreadPool(
-            Runtime.getRuntime.availableProcessors() * 2))
+            Runtime.getRuntime.availableProcessors() * 4))
 
       val parserFuture = Future {
         new Parser(modelFile, gazetteerFile, bibModelFile)
