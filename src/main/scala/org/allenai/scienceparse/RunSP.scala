@@ -2,16 +2,15 @@ package org.allenai.scienceparse
 
 import java.io._
 import java.util.NoSuchElementException
+import java.util.concurrent.{Executors, ExecutorService}
 import java.util.concurrent.atomic.AtomicInteger
 import ch.qos.logback.classic.Level
-import com.amazonaws.services.cloudfront.model.InvalidArgumentException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.allenai.common.{ Logging, Resource }
 import scopt.OptionParser
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ExecutionContext, Await, Future}
 import scala.concurrent.duration._
 import language.postfixOps
 import scala.util.control.NonFatal
@@ -70,12 +69,17 @@ object RunSP extends Logging {
     }
 
     parser.parse(args, Config()).foreach { config =>
+      loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
+      loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
+
       val modelFile = config.modelFile.map(_.toPath).getOrElse(Parser.getDefaultProductionModel)
       val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
 
-      loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
-      loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
+      implicit val ec =
+        ExecutionContext.fromExecutor(
+          Executors.newFixedThreadPool(
+            Runtime.getRuntime.availableProcessors() * 2))
 
       val parserFuture = Future {
         new Parser(modelFile, gazetteerFile, bibModelFile)
