@@ -123,7 +123,7 @@ object RunSP extends Logging {
                 result
             }
           }
-          lines.flatMap(stringToInputStreams)
+          lines.parMap(stringToInputStreams).flatten
         } else if(file.isDirectory) {
           def listFiles(startFile: File): Iterator[File] =
             startFile.listFiles.iterator.flatMap {
@@ -153,7 +153,6 @@ object RunSP extends Logging {
       val startTime = System.currentTimeMillis()
       val finishedCount = new AtomicInteger()
       files.parForeach { case (name, is) =>
-
         logger.info(s"Starting $name")
         try {
           val metadata = parser.doParseWithTimeout(is, 60000)
