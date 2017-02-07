@@ -161,14 +161,16 @@ object RunSP extends Logging {
 
             // write to output directory
             config.outputDir.foreach { dir =>
-              Resource.using(new FileOutputStream(new File(dir, name + ".json"))) { os =>
-                prettyJsonWriter.writeValue(os, wrapper)
-              }
+              prettyJsonWriter.writeValue(new File(dir, name + ".json"), wrapper)
             }
 
             // write to output file
             outputStream.foreach { os =>
-              jsonWriter.writeValue(os, wrapper)
+              val bytes = jsonWriter.writeValueAsBytes(wrapper)
+              os.synchronized {
+                os.write(bytes)
+                os.write('\n')
+              }
             }
 
           } catch {
