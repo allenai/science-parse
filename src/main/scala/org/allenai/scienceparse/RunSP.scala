@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.allenai.common.{ Logging, Resource }
+import org.slf4j.Logger
 import scopt.OptionParser
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
@@ -82,6 +83,7 @@ object RunSP extends Logging {
       loggerConfig.Logger("org.allenai.pdfbox").setLevel(Level.OFF)
       loggerConfig.Logger("org.allenai.fontbox").setLevel(Level.OFF)
       loggerConfig.Logger("org.allenai.pdffigures2.TextExtractor").setLevel(Level.ERROR)
+      loggerConfig.Logger(Logger.ROOT_LOGGER_NAME).setLevel(Level.INFO)
       if(config.quiet) {
         loggerConfig.Logger.apply("org.allenai.scienceparse").setLevel(Level.WARN)
         loggerConfig.Logger.apply("org.allenai.scienceparse.Parser").setLevel(Level.ERROR)
