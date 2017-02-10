@@ -33,14 +33,6 @@ mainClass in assembly := Some("org.allenai.scienceparse.RunSP")
 
 test in assembly := {}
 
-/*
-assemblyMergeStrategy in assembly := {
-  case PathList("org", "bouncycastle") => MergeStrategy.last
-  case _ =>
-    val defaultStrategy = (assemblyMergeStrategy in assembly).value
-    defaultStrategy(x)
-}
-*/
 
 //
 // Release settings
@@ -119,13 +111,14 @@ libraryDependencies ++= Seq(
     ExclusionRule(organization = "com.amazonaws")
   ),
   "com.amazonaws" % "aws-java-sdk" % "1.7.4",
+  // We don't seem to be needing these anymore. pdffigures2 brings in libraries with the same
+  // functionality but a different name, so to avoid conflics, we're commenting these.
   //"org.bouncycastle" % "bcprov-jdk16" % "1.46",
   //"org.bouncycastle" % "bcmail-jdk16" % "1.46",
   "com.github.jai-imageio" % "jai-imageio-jpeg2000" % "1.3.0", // For handling jpeg2000 images
   "com.levigo.jbig2" % "levigo-jbig2-imageio" % "1.6.5", // For handling jbig2 images
   "org.jsoup" % "jsoup" % "1.8.1",
   "org.apache.commons" % "commons-lang3" % "3.4",
-  //"org.apache.commons" % "commons-io" % "1.3.2",
   "commons-io" % "commons-io" % "2.4",
   "com.github.scopt" %% "scopt" % "3.4.0",
   "com.amazonaws" % "aws-java-sdk" % "1.7.4" exclude ("commons-logging", "commons-logging"),
