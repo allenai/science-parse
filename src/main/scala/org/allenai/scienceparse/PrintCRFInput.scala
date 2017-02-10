@@ -33,7 +33,7 @@ object PrintCRFInput extends App {
     val seq = Resource.using(paperSource.getPdf(config.paperId)) { is =>
       val ext = new PDFExtractor
       val doc = ext.extractFromInputStream(is)
-      PDFToCRFInput.getSequence(doc, true).asScala
+      PDFToCRFInput.getSequence(doc).asScala
     }
 
     // make a font-to-color map

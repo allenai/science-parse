@@ -36,7 +36,7 @@ public class ParserTest {
   }
 
   public void testBootstrap() throws IOException {
-    List<List<Pair<PaperToken, String>>> labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100, true);
+    List<List<Pair<PaperToken, String>>> labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100);
     PDFPredicateExtractor ppe = new PDFPredicateExtractor();
     //NOTE 6 should be index of P14-1059, because only mooney gets skipped
     List<PaperToken> justTokens = labeledData.get(6).stream().map(p ->

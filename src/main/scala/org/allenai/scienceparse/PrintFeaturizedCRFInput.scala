@@ -47,7 +47,7 @@ object PrintFeaturizedCRFInput extends App {
     val seq = Resource.using(paperSource.getPdf(config.paperId)) { is =>
       val ext = new PDFExtractor
       val doc = ext.extractFromInputStream(is)
-      PDFToCRFInput.getSequence(doc, true)
+      PDFToCRFInput.getSequence(doc)
     }
 
     val paddedSeq = PDFToCRFInput.padSequence(seq).asScala.toSeq

@@ -244,21 +244,15 @@ public class PDFToCRFInput {
    * Returns the PaperToken sequence form of a given PDF document
    *
    * @param pdf             The PDF Document to convert into instances
-   * @param heuristicHeader If true, tries to use heuristic header if found
    * @return The data sequence
    * @throws IOException
    */
-  public static List<PaperToken> getSequence(PDFDoc pdf, boolean heuristicHeader) throws IOException {
+  public static List<PaperToken> getSequence(PDFDoc pdf) throws IOException {
 
     ArrayList<PaperToken> out = new ArrayList<>();
-    if (heuristicHeader && pdf.heuristicHeader() != null) {
-      List<PDFLine> header = pdf.heuristicHeader();
-      addLineTokens(out, header, 0);
-    } else {
-      List<PDFPage> pages = pdf.getPages();
-      for (int pageNum = 0; pageNum < pages.size(); pageNum++) {
-        addLineTokens(out, pages.get(pageNum).lines, pageNum);
-      }
+    List<PDFPage> pages = pdf.getPages();
+    for (int pageNum = 0; pageNum < pages.size(); pageNum++) {
+      addLineTokens(out, pages.get(pageNum).lines, pageNum);
     }
     return out;
   }
