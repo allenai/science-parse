@@ -1283,6 +1283,7 @@ public class Parser {
     //
     // Run figure extraction to get sections
     //
+    /*
     try {
       final FigureExtractor fe = new FigureExtractor(false, true, true, true, true);
 
@@ -1308,6 +1309,7 @@ public class Parser {
           e.getMessage());
       em.sections = null;
     }
+    */
 
     return em;
   }
