@@ -9,6 +9,8 @@ import java.util.zip.ZipFile
 import org.allenai.common.{Logging, Resource}
 import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
+import spray.json.{JsObject, DefaultJsonProtocol}
+
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
 import scala.collection.immutable.SortedMap
@@ -20,6 +22,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
 import scala.collection.JavaConverters._
+
+object LabeledDataJsonProtocol extends DefaultJsonProtocol {
+  implicit val authorFormat = jsonFormat3(LabeledData.Author)
+  implicit val sectionFormat = jsonFormat2(LabeledData.Section)
+  implicit val referenceFormat = jsonFormat7(LabeledData.Reference)
+  implicit val rangeFormat = jsonFormat2(LabeledData.Range)
+  implicit val mentionFormat = jsonFormat3(LabeledData.Mention)
+}
 
 trait LabeledData {
   import LabeledData._
@@ -100,6 +110,27 @@ trait LabeledData {
 
     builder.toString
   }
+
+  def toJson: JsObject = {
+    // This is not using normal Spray serialization, because we don't want to serialize all fields
+    // of LabeledData. In particular, we're not serializing id, or anything related to getting the
+    // raw PDF.
+    import spray.json._
+
+    import LabeledDataJsonProtocol._  // This is needed. IntelliJ is wrong.
+
+    JsObject.apply(Map(
+      "paperId" -> JsString(id),
+      "title" -> title.map(JsString(_)).getOrElse(JsNull),
+      "authors" -> authors.map(a => a.toJson).getOrElse(JsNull),
+      "venue" -> venue.map(JsString(_)).getOrElse(JsNull),
+      "year" -> year.map(JsNumber(_)).getOrElse(JsNull),
+      "abstract" -> abstractText.map(JsString(_)).getOrElse(JsNull),
+      "sections" -> sections.map(a => a.toJson).getOrElse(JsNull),
+      "references" -> references.map(a => a.toJson).getOrElse(JsNull)
+      // TODO: mentions. Mentions have links to references, so this will not be so easy.
+    ))
+  }
 }
 
 object LabeledData {
@@ -174,10 +205,10 @@ object LabeledData {
 
   def dump(labeledData: Iterator[LabeledData]): Unit = {
     // We don't time the first one, because it might load models.
-    println(labeledData.next().readableString)
+    println(labeledData.next().toJson.prettyPrint)
 
     val startTime = System.currentTimeMillis()
-    labeledData.map(_.readableString).foreach(println)
+    labeledData.map(_.toJson.prettyPrint).foreach(println)
     val endTime = System.currentTimeMillis()
 
     println(s"Completed in ${endTime - startTime} milliseconds")
@@ -205,7 +236,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
   private val xmlExtension = ".nxml"
 
   private val set2version =
-    SortedMap((0x00 to 0xcb).map(i => f"$i%02x" -> 2): _*)
+    SortedMap((0x00 to 0xf1).map(i => f"$i%02x" -> 2): _*)
 
   private val knownBrokenMetadataIds = Set(
     "PMC:PMCData00/Br_J_Cancer_1981_Dec_44(6)_798-809/brjcancer00447-0026.pdf",
@@ -460,7 +491,7 @@ object LabeledDataFromResources extends Datastores {
         override val abstractText: Option[String] =
           paperId2abstracts.get(paperId).flatMap(_.headOption)
 
-        override val sections: Option[Seq[Section]] = None
+        override val sections: Option[Seq[LabeledData.Section]] = None
 
         override val references: Option[Seq[Reference]] = paperId2bibliographies.get(paperId).map { bibStrings =>
           bibStrings.map { bibString =>
