@@ -46,22 +46,19 @@ class SPServer(
           response.getWriter.println("format is optional, defaults to LabeledData")
           response.setStatus(200)
         case SPServer.paperIdRegex(paperId) =>
-          lazy val extractedMetadata =
-            scienceParser.doParseWithTimeout(paperSource.getPdf(paperId), 60 * 1000)
-
           val formatString = request.getParameter("format")
           formatString match {
             case "LabeledData" | null =>
               response.setContentType("application/json")
               val labeledData =
-                LabeledData.fromExtractedMetadata(null, paperId, extractedMetadata).toJson.prettyPrint
+                LabeledDataFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).toJson.prettyPrint
               response.getOutputStream.write(labeledData.getBytes("UTF-8"))
               response.setStatus(200)
             case "ExtractedMetadata" =>
               response.setContentType("application/json")
               prettyJsonWriter.writeValue(
                 response.getOutputStream,
-                extractedMetadata)
+                scienceParser.doParse(paperSource.getPdf(paperId)))
               response.setStatus(200)
             case _ =>
               response.setContentType("text/plain;charset=utf-8")
