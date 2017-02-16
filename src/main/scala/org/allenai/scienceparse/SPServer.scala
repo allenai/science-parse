@@ -28,11 +28,9 @@ class SPServer(
   private val scienceParser: Parser
 ) extends AbstractHandler with Logging {
 
-  case class MetadataWrapper(metadata: ExtractedMetadata)
-
-  val jsonWriter = new ObjectMapper() with ScalaObjectMapper
+  private val jsonWriter = new ObjectMapper() with ScalaObjectMapper
   jsonWriter.registerModule(DefaultScalaModule)
-  val prettyJsonWriter = jsonWriter.writerWithDefaultPrettyPrinter()
+  private val prettyJsonWriter = jsonWriter.writerWithDefaultPrettyPrinter()
 
   override def handle(
     target: String,
@@ -55,18 +53,23 @@ class SPServer(
           formatString match {
             case "LabeledData" | null =>
               response.setContentType("application/json")
+              val labeledData =
+                LabeledData.fromExtractedMetadata(null, paperId, extractedMetadata).toJson.prettyPrint
+              response.getOutputStream.write(labeledData.getBytes("UTF-8"))
+              response.setStatus(200)
+            case "ExtractedMetadata" =>
+              response.setContentType("application/json")
               prettyJsonWriter.writeValue(
                 response.getOutputStream,
                 extractedMetadata)
               response.setStatus(200)
             case _ =>
               response.setContentType("text/plain;charset=utf-8")
-              response.getWriter.println(s"Could not understand outout format $formatString.")
+              response.getWriter.println(s"Could not understand output format '$formatString'.")
               response.setStatus(400)
           }
 
           response.setContentType("text/plain;charset=utf-8")
-          response.getWriter.println(paperId)
           response.setStatus(200)
         case _ =>
           response.setContentType("text/plain;charset=utf-8")
