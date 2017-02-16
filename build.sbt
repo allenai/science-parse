@@ -110,7 +110,6 @@ libraryDependencies ++= Seq(
   "org.allenai.datastore" %% "datastore" % "1.0.8" excludeAll(
     ExclusionRule(organization = "com.amazonaws")
   ),
-  "com.amazonaws" % "aws-java-sdk" % "1.7.4",
   // We don't seem to be needing these anymore. pdffigures2 brings in libraries with the same
   // functionality but a different name, so to avoid conflics, we're commenting these.
   //"org.bouncycastle" % "bcprov-jdk16" % "1.46",
@@ -132,5 +131,7 @@ libraryDependencies ++= Seq(
   "org.allenai" %% "pdffigures2" % "0.0.10",
   "org.allenai.nlpstack" %% "nlpstack-tokenize" % "1.17" excludeAll (
     ExclusionRule(organization = "org.allenai.common") // nlpstack depends on ancient versions of these
-  )
+  ),
+  "io.spray" %%  "spray-json" % "1.3.3",
+  "org.eclipse.jetty" % "jetty-server" % "9.4.1.v20170120"
 )
