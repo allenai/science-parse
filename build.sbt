@@ -19,6 +19,8 @@ javaOptions in Test += s"-Xmx12G"
 
 javaOptions in run += s"-Dlogback.configurationFile=${baseDirectory.value}/conf/logback-test.xml"
 
+javaOptions in run += s"-Xmx8G"
+
 sources in (Compile,doc) := Seq.empty
 
 fork := true
