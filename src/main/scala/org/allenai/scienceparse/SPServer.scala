@@ -107,18 +107,26 @@ class SPServer(
           digest.reset()
           val bytes = Resource.using(new DigestInputStream(request.getInputStream, digest))(IOUtils.toByteArray)
           val paperId = Utilities.toHex(digest.digest())
-          response.addHeader("Location", getServer.getURI.toString + "v1/" + paperId)
+
+          val formatString = request.getParameter("format")
+
+          val newLocation = request.getRequestURL
+          newLocation.append(paperId)
+          if(formatString != null)
+            newLocation.append(s"?format=$formatString")
+
           response.setStatus(201)
 
           // parse paper
-          val formatString = request.getParameter("format")
           formatString match {
             case "LabeledData" | null =>
+              response.addHeader("Location", newLocation.toString)
               response.setContentType("application/json")
               val labeledData =
                 LabeledDataFromScienceParse.get(new ByteArrayInputStream(bytes), scienceParser).toJson.prettyPrint
               response.getOutputStream.write(labeledData.getBytes("UTF-8"))
             case "ExtractedMetadata" =>
+              response.addHeader("Location", newLocation.toString)
               response.setContentType("application/json")
               prettyJsonWriter.writeValue(
                 response.getOutputStream,
