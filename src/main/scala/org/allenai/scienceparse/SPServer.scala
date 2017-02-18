@@ -154,6 +154,7 @@ class SPServer(
             val metadata = new ObjectMetadata()
             metadata.setCacheControl("public, immutable")
             metadata.setContentType("application/pdf")
+            metadata.setContentLength(bytes.size)
             s3.putObject(bucket, key, new ByteArrayInputStream(bytes), metadata)
           }
 
