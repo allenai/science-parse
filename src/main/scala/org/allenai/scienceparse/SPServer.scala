@@ -1,9 +1,12 @@
 package org.allenai.scienceparse
 
-import java.io.ByteArrayInputStream
+import java.io.{InputStream, ByteArrayInputStream}
 import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
+import com.amazonaws.AmazonServiceException
+import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -37,8 +40,23 @@ class SPServer(
   jsonWriter.registerModule(DefaultScalaModule)
   private val prettyJsonWriter = jsonWriter.writerWithDefaultPrettyPrinter()
 
+  private val bucket: String = "ai2-s2-pdfs"
+  private val s3: AmazonS3 = new AmazonS3Client
+
   private case class SPServerException(val status: Int, message: String) extends Exception(message) {
     def getStatus = status // because all the other methods are named get*
+  }
+
+  private case class Response(
+    status: Int,
+    contentType: String,
+    content: Array[Byte],
+    headers: Map[String, String] = Map.empty
+  )
+
+  private object Response {
+    def plainText(content: String, status: Int = 200) =
+      Response(status, "text/plain;charset=utf-8", content.getBytes("UTF-8"))
   }
 
   override def handle(
@@ -48,7 +66,12 @@ class SPServer(
     response: HttpServletResponse
   ): Unit = {
     try {
-      handleRequest(target, baseRequest, request, response)
+      val spResponse = handleRequest(target, baseRequest, request)
+      response.setContentType(spResponse.contentType)
+      response.setStatus(spResponse.status)
+      spResponse.headers.foreach { case (k, v) => response.addHeader(k, v) }
+      response.getOutputStream.write(spResponse.content)
+      baseRequest.setHandled(true)
     } catch {
       case e: SPServerException =>
         response.setContentType("text/plain;charset=utf-8")
@@ -67,34 +90,28 @@ class SPServer(
   private def handleRequest(
     target: String,
     baseRequest: Request,
-    request: HttpServletRequest,
-    response: HttpServletResponse
-  ): Unit = {
+    request: HttpServletRequest
+  ): Response = {
     baseRequest.getMethod match {
       case "GET" => target match {
         case "" | "/" =>
-          response.setContentType("text/plain;charset=utf-8")
-          response.getWriter.println("Usage: GET /v1/<paperid>[?format={LabeledData,ExtractedMetadata}]")
-          response.getWriter.println("format is optional, defaults to LabeledData")
-          response.setStatus(200)
+          Response.plainText(
+            "Usage: GET /v1/<paperid>[?format={LabeledData,ExtractedMetadata}]\n" +
+            "format is optional, defaults to LabeledData")
 
         case SPServer.paperIdRegex(paperId) =>
           val formatString = request.getParameter("format")
-          formatString match {
+          val content = formatString match {
             case "LabeledData" | null =>
-              response.setContentType("application/json")
               val labeledData =
                 LabeledDataFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).toJson.prettyPrint
-              response.getOutputStream.write(labeledData.getBytes("UTF-8"))
+              labeledData.getBytes("UTF-8")
             case "ExtractedMetadata" =>
-              response.setContentType("application/json")
-              prettyJsonWriter.writeValue(
-                response.getOutputStream,
-                scienceParser.doParse(paperSource.getPdf(paperId)))
+              prettyJsonWriter.writeValueAsBytes(scienceParser.doParse(paperSource.getPdf(paperId)))
             case _ =>
               throw SPServerException(400, s"Could not understand output format '$formatString'.")
           }
-          response.setStatus(200)
+          Response(200, "application/json", content)
 
         case _ =>
           throw SPServerException(404, "When someone is searching, said Siddhartha, then it might easily happen that the only thing his eyes still see is that what he searches for, that he is unable to find anything, to let anything enter his mind, because he always thinks of nothing but the object of his search, because he has a goal, because he is obsessed by the goal. Searching means: having a goal. But finding means: being free, being open, having no goal. You, oh venerable one, are perhaps indeed a searcher, because, striving for your goal, there are many things you don't see, which are directly in front of your eyes.")
@@ -108,41 +125,65 @@ class SPServer(
           val bytes = Resource.using(new DigestInputStream(request.getInputStream, digest))(IOUtils.toByteArray)
           val paperId = Utilities.toHex(digest.digest())
 
-          val formatString = request.getParameter("format")
-
-          val newLocation = request.getRequestURL
-          newLocation.append(paperId)
-          if(formatString != null)
-            newLocation.append(s"?format=$formatString")
-
-          response.setStatus(201)
-
           // parse paper
-          formatString match {
+          val formatString = request.getParameter("format")
+          val content = formatString match {
             case "LabeledData" | null =>
-              response.addHeader("Location", newLocation.toString)
-              response.setContentType("application/json")
               val labeledData =
-                LabeledDataFromScienceParse.get(new ByteArrayInputStream(bytes), scienceParser).toJson.prettyPrint
-              response.getOutputStream.write(labeledData.getBytes("UTF-8"))
+                LabeledDataFromScienceParse.get(
+                  new ByteArrayInputStream(bytes), scienceParser).toJson.prettyPrint
+              labeledData.getBytes("UTF-8")
             case "ExtractedMetadata" =>
-              response.addHeader("Location", newLocation.toString)
-              response.setContentType("application/json")
-              prettyJsonWriter.writeValue(
-                response.getOutputStream,
-                scienceParser.doParse(new ByteArrayInputStream(bytes)))
+              prettyJsonWriter.writeValueAsBytes(
+                scienceParser.doParse(
+                  new ByteArrayInputStream(bytes)))
             case _ =>
               throw SPServerException(400, s"Could not understand output format '$formatString'.")
           }
 
-          // TODO: upload paper
+          // upload to S3
+          val key = paperId.substring(0, 4) + "/" + paperId.substring(4) + ".pdf"
+          val alreadyUploaded = try {
+            s3.getObjectMetadata(bucket, key)
+            true
+          } catch {
+            case e: AmazonServiceException if e.getStatusCode == 404 =>
+              false
+          }
+          if(!alreadyUploaded) {
+            val metadata = new ObjectMetadata()
+            metadata.setCacheControl("public, immutable")
+            metadata.setContentType("application/pdf")
+            s3.putObject(bucket, key, new ByteArrayInputStream(bytes), metadata)
+          }
+
+          // set new location
+          val newLocation = request.getRequestURL
+          newLocation.append('/')
+          newLocation.append(paperId)
+          if(formatString != null)
+            newLocation.append(s"?format=$formatString")
+          val headers = scala.collection.mutable.Map[String, String]()
+          headers.update("Location", newLocation.toString)
+
+          // Turns out you are allowed to return a 200 from a POST, if you have a Content-Location
+          // header. https://tools.ietf.org/html/rfc7231#section-4.3.3
+          headers.update("Content-Location", newLocation.toString)
+          Response(
+            200,
+            "application/json",
+            content,
+            headers.toMap
+          )
       }
 
       case _ =>
-        response.addHeader("Allow", "GET")
-        throw SPServerException(405, "Method not allowed")
+        Response(
+          405,
+          "text/plain;charset=utf-8",
+          "Method not allowed".getBytes("UTF-8"),
+          Map("Allow" -> "GET")
+        )
     }
-
-    baseRequest.setHandled(true)
   }
 }
