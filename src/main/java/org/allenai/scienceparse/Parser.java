@@ -64,6 +64,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
@@ -72,6 +73,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -135,17 +137,39 @@ public class Parser {
           final File gazetteerFile,
           final File bibModelFile
   ) throws Exception {
-    logger.info("Loading model from {}", modelFile);
+    // Load main model in one thread, and the rest in another thread, to speed up startup.
+    final AtomicReference<Exception> exceptionThrownByModelLoaderThread = new AtomicReference<>();
+    final Thread modelLoaderThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        logger.info("Loading model from {}", modelFile);
+        try(
+            final DataInputStream modelIs =
+                new DataInputStream(new FileInputStream(modelFile));
+        ) {
+          model = loadModel(modelIs);
+        } catch(final Exception e) {
+          exceptionThrownByModelLoaderThread.compareAndSet(null, e);
+        }
+      }
+    }, "ModelLoaderThread");
+    modelLoaderThread.start();
+
+    // Load non-main model stuff
     logger.info("Loading gazetteer from {}", gazetteerFile);
     logger.info("Loading bib model from {}", bibModelFile);
     try(
-      final DataInputStream modelIs = new DataInputStream(new FileInputStream(modelFile));
       final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
       final DataInputStream bibModelIs = new DataInputStream(new FileInputStream(bibModelFile))
     ) {
-      model = loadModel(modelIs);
       referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
     }
+
+    // Close out the model loader thread and make sure the results are OK.
+    modelLoaderThread.join();
+    if(exceptionThrownByModelLoaderThread.get() != null)
+      throw exceptionThrownByModelLoaderThread.get();
+    assert(model != null);
   }
 
   public Parser(
