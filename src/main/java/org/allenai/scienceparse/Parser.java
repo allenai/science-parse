@@ -151,6 +151,7 @@ public class Parser {
         } catch(final Exception e) {
           exceptionThrownByModelLoaderThread.compareAndSet(null, e);
         }
+        logger.info("Loaded model from {}", modelFile);
       }
     }, "ModelLoaderThread");
     modelLoaderThread.start();
@@ -164,6 +165,8 @@ public class Parser {
     ) {
       referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
     }
+    logger.info("Loaded gazetteer from {}", gazetteerFile);
+    logger.info("Loaded bib model from {}", bibModelFile);
 
     // Close out the model loader thread and make sure the results are OK.
     modelLoaderThread.join();
