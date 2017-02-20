@@ -1,0 +1,39 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- deny all events with a level below INFO, that is TRACE and DEBUG -->
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${logback_stdoutLevel:-DEBUG}</level>
+    </filter>
+    <encoder>
+      <pattern>%-5level %logger{36}: %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="EVALLOG" class="ch.qos.logback.core.FileAppender">
+    <append>false</append>
+    <file>EvalErrors.log</file>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${logback_rootLevel:-INFO}">
+    <appender-ref ref="STDOUT" />
+  </root>
+  <logger name="org.allenai" level="${logback_s2Level:-INFO}" />
+  <logger name="org.apache.spark" level="${logback_s2Level:-WARN}" />
+  <logger name="org.spark-project.jetty" level="${logback_s2Level:-WARN}" />
+  <logger name="org.apache.pdfbox" level="OFF" />
+  <logger name="org.apache.fontbox" level="OFF" />
+  <logger name="org.allenai.pdfbox" level="OFF" />
+  <logger name="org.allenai.fontbox" level="OFF" />
+  <logger name="org.allenai.pdffigures2.TextExtractor" level="ERROR" />
+  <logger name="org.allenai.scienceparse.Parser" level="INFO" />
+  <logger name="org.allenai.scienceparse.ParserLMFeatures" level="INFO" />
+  <logger name="org.allenai.scienceparse.Evaluation$.evaluationErrors" additivity="false">
+    <appender-ref ref="EVALLOG" />
+  </logger>
+  <logger name="org.allenai.scienceparse.LabeledDataEvaluation$.evalErrors" additivity="false">
+    <appender-ref ref="EVALLOG" />
+  </logger>
+</configuration>
