@@ -1,6 +1,6 @@
 package org.allenai.scienceparse
 
-import java.io.{InputStream, ByteArrayInputStream}
+import java.io.ByteArrayInputStream
 import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 

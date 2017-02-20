@@ -3,20 +3,22 @@ package org.allenai.scienceparse
 import java.io._
 import java.util.NoSuchElementException
 import java.util.concurrent.atomic.AtomicInteger
+
 import ch.qos.logback.classic.Level
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.allenai.common.{ Logging, Resource }
+import org.allenai.common.{Resource, Logging}
+import org.allenai.common.ParIterator._
 import org.slf4j.Logger
 import scopt.OptionParser
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
-import language.postfixOps
+import scala.concurrent.{Await, Future}
 import scala.io.Source
+import scala.language.postfixOps
 import scala.util.control.NonFatal
-import org.allenai.common.ParIterator._
 
 object RunSP extends Logging {
   case class MetadataWrapper(name: String, metadata: ExtractedMetadata)
