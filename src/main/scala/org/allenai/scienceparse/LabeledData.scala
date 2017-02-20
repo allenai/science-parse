@@ -236,7 +236,7 @@ object LabeledDataFromPMC extends Datastores with Logging {
   private val xmlExtension = ".nxml"
 
   private val set2version =
-    SortedMap((0x00 to 0xf1).map(i => f"$i%02x" -> 2): _*)
+    SortedMap((0x00 to 0xff).map(i => f"$i%02x" -> 2): _*)
 
   private val knownBrokenMetadataIds = Set(
     "PMC:PMCData00/Br_J_Cancer_1981_Dec_44(6)_798-809/brjcancer00447-0026.pdf",
