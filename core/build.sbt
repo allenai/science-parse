@@ -15,6 +15,8 @@ sources in (Compile,doc) := Seq.empty
 
 fork := true
 
+assemblyJarName in assembly := s"science-parse-${version.value}.jar"
+
 libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.4.9" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")

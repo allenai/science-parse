@@ -10,7 +10,7 @@ lazy val commonSettings = Seq(
     Resolver.jcenterRepo
   ),
   // assembly settings
-  assemblyJarName in assembly := s"science-parse-${name.value}-${version.value}",
+  assemblyJarName in assembly := s"science-parse-${name.value}-${version.value}.jar",
   // release settings
   releaseProcess := Seq(
     checkSnapshotDependencies,
