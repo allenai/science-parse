@@ -1,11 +1,52 @@
+import sbtrelease.ReleaseStateTransformations._
+
+ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
+
 lazy val commonSettings = Seq(
   organization := "org.allenai",
   resolvers ++= Seq(
     "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
     "AllenAI Bintray Private" at "http://dl.bintray.com/allenai/private",
     Resolver.jcenterRepo
-  )
+  ),
+  // assembly settings
+  assemblyJarName in assembly := s"science-parse-${name.value}-${version.value}",
+  // release settings
+  releaseProcess := Seq(
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    setNextVersion,
+    commitNextVersion,
+    pushChanges
+  ),
+  bintrayPackage := s"${organization.value}:${name.value}_${scalaBinaryVersion.value}",
+  licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")),
+  homepage := Some(url("https://github.com/allenai/science-parse")),
+  scmInfo := Some(ScmInfo(
+    url("https://github.com/allenai/science-parse"),
+    "https://github.com/allenai/science-parse.git")),
+  bintrayRepository := "private",
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  pomExtra :=
+    <developers>
+      <developer>
+        <id>allenai-dev-role</id>
+        <name>Allen Institute for Artificial Intelligence</name>
+        <email>dev-role@allenai.org</email>
+      </developer>
+    </developers>
 )
+
+releaseProcess := Seq.empty // no releasing the root project
 
 lazy val core = (project in file("core")).
   settings(
