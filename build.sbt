@@ -46,7 +46,11 @@ lazy val commonSettings = Seq(
     </developers>
 )
 
-releaseProcess := Seq.empty // no releasing the root project
+// disable release in the root project
+publishArtifact := false
+publishTo := Some("dummy" at "nowhere")
+publish := { }
+publishLocal := { }
 
 lazy val core = (project in file("core")).
   settings(
