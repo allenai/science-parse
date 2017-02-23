@@ -1,6 +1,6 @@
 package org.allenai.scienceparse
 
-import java.io.ByteArrayInputStream
+import java.io.{InputStream, ByteArrayInputStream}
 import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
@@ -16,6 +16,8 @@ import org.eclipse.jetty.server.{Request, Server}
 import org.eclipse.jetty.server.handler.AbstractHandler
 
 import scala.util.control.NonFatal
+import scala.util.matching.Regex
+import scala.collection.JavaConverters._
 
 object SPServer {
   def main(args: Array[String]): Unit = {
@@ -43,21 +45,111 @@ class SPServer(
   private val bucket: String = "ai2-s2-pdfs"
   private val s3: AmazonS3 = new AmazonS3Client
 
+
+  //
+  // Request / response stuff
+  //
+
   private case class SPServerException(val status: Int, message: String) extends Exception(message) {
     def getStatus = status // because all the other methods are named get*
   }
 
-  private case class Response(
+  private case class SPRequest(
+    target: String,
+    method: String,
+    queryParams: Map[String, String],
+
+    inputStream: () => InputStream,
+    requestUrl: () => StringBuffer
+  )
+
+  private object SPRequest {
+    def apply(target: String, baseRequest: Request, request: HttpServletRequest): SPRequest = {
+      val parameterMap = baseRequest.getParameterMap.asScala.map { case (key, values) =>
+        if(values.length != 1)
+          throw SPServerException(400, s"Two values for query parameter $key")
+        key -> values.head
+      }.toMap
+
+      new SPRequest(
+        target,
+        baseRequest.getMethod,
+        parameterMap,
+        request.getInputStream,
+        request.getRequestURL)
+    }
+  }
+
+  private case class SPResponse(
     status: Int,
     contentType: String,
     content: Array[Byte],
     headers: Map[String, String] = Map.empty
   )
 
-  private object Response {
+  private object SPResponse {
     def plainText(content: String, status: Int = 200) =
-      Response(status, "text/plain;charset=utf-8", content.getBytes("UTF-8"))
+      SPResponse(status, "text/plain;charset=utf-8", content.getBytes("UTF-8"))
   }
+
+
+  //
+  // Routing stuff
+  //
+
+  private trait Route {
+    def canHandleTarget(target: String): Boolean
+    def canHandle(request: SPRequest): Boolean
+    def handle(request: SPRequest): Option[SPResponse]
+
+    def method: String
+  }
+
+  private case class StringRoute(
+    path: String,
+    method: String = "GET"
+  )(
+    f: SPRequest => SPResponse
+  ) extends Route {
+    override def canHandleTarget(target: String): Boolean =
+      path == target
+
+    override def canHandle(request: SPRequest): Boolean =
+      canHandleTarget(request.target) && method == request.method
+
+    override def handle(request: SPRequest): Option[SPResponse] =
+      if(canHandle(request)) Some(f(request)) else None
+  }
+
+  private case class RegexRoute(
+    regex: Regex,
+    method: String = "GET"
+  )(
+    f: (SPRequest, Map[String, String]) => SPResponse
+  ) extends Route {
+    override def canHandleTarget(target: String): Boolean =
+      regex.findFirstMatchIn(target).isDefined
+
+    override def canHandle(request: SPRequest): Boolean =
+      canHandleTarget(request.target) && request.method == method
+
+    override def handle(request: SPRequest): Option[SPResponse] = {
+      val capturedGroups = regex.findFirstMatchIn(request.target).map { m =>
+        m.groupNames.map(groupName => groupName -> m.group(groupName)).toMap
+      }
+      capturedGroups.map(cg => f(request, cg))
+    }
+  }
+
+  private val routes = Seq(
+    RegexRoute("^$|^/$".r) { case _ =>
+      SPResponse.plainText(
+        "Usage: GET /v1/<paperid>[?format={LabeledData,ExtractedMetadata}]\n" +
+        "format is optional, defaults to LabeledData")
+    },
+    RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"))(handlePaperId),
+    StringRoute("/v1", "POST")(handlePost)
+  )
 
   override def handle(
     target: String,
@@ -66,7 +158,24 @@ class SPServer(
     response: HttpServletResponse
   ): Unit = {
     try {
-      val spResponse = handleRequest(target, baseRequest, request)
+      val spResponse = {
+        val spRequest = SPRequest(target, baseRequest, request)
+        // weird construction to make sure it tries one route at a time only
+        routes.iterator.flatMap(_.handle(spRequest)).take(1).toSeq.headOption
+      }.getOrElse {
+        val allowedMethods = routes.filter(_.canHandleTarget(target)).map(_.method).toSet
+        if (allowedMethods.isEmpty) {
+          throw SPServerException(404, "When someone is searching, said Siddhartha, then it might easily happen that the only thing his eyes still see is that what he searches for, that he is unable to find anything, to let anything enter his mind, because he always thinks of nothing but the object of his search, because he has a goal, because he is obsessed by the goal. Searching means: having a goal. But finding means: being free, being open, having no goal. You, oh venerable one, are perhaps indeed a searcher, because, striving for your goal, there are many things you don't see, which are directly in front of your eyes.")
+        } else {
+          SPResponse(
+            405,
+            "text/plain;charset=utf-8",
+            "Method not allowed".getBytes("UTF-8"),
+            Map("Allow" -> allowedMethods.mkString(", "))
+          )
+        }
+      }
+
       response.setContentType(spResponse.contentType)
       response.setStatus(spResponse.status)
       spResponse.headers.foreach { case (k, v) => response.addHeader(k, v) }
@@ -87,104 +196,84 @@ class SPServer(
     }
   }
 
-  private def handleRequest(
-    target: String,
-    baseRequest: Request,
-    request: HttpServletRequest
-  ): Response = {
-    baseRequest.getMethod match {
-      case "GET" => target match {
-        case "" | "/" =>
-          Response.plainText(
-            "Usage: GET /v1/<paperid>[?format={LabeledData,ExtractedMetadata}]\n" +
-            "format is optional, defaults to LabeledData")
 
-        case SPServer.paperIdRegex(paperId) =>
-          val formatString = request.getParameter("format")
-          val content = formatString match {
-            case "LabeledData" | null =>
-              val labeledData =
-                LabeledDataFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).toJson.prettyPrint
-              labeledData.getBytes("UTF-8")
-            case "ExtractedMetadata" =>
-              prettyJsonWriter.writeValueAsBytes(scienceParser.doParse(paperSource.getPdf(paperId)))
-            case _ =>
-              throw SPServerException(400, s"Could not understand output format '$formatString'.")
-          }
-          Response(200, "application/json", content)
+  //
+  // Specific handlers
+  //
 
-        case _ =>
-          throw SPServerException(404, "When someone is searching, said Siddhartha, then it might easily happen that the only thing his eyes still see is that what he searches for, that he is unable to find anything, to let anything enter his mind, because he always thinks of nothing but the object of his search, because he has a goal, because he is obsessed by the goal. Searching means: having a goal. But finding means: being free, being open, having no goal. You, oh venerable one, are perhaps indeed a searcher, because, striving for your goal, there are many things you don't see, which are directly in front of your eyes.")
-      }
-
-      case "POST" => target match {
-        case "/v1" =>
-          // calculate SHA of paper
-          val digest = MessageDigest.getInstance("SHA-1")
-          digest.reset()
-          val bytes = Resource.using(new DigestInputStream(request.getInputStream, digest))(IOUtils.toByteArray)
-          val paperId = Utilities.toHex(digest.digest())
-
-          // parse paper
-          val formatString = request.getParameter("format")
-          val content = formatString match {
-            case "LabeledData" | null =>
-              val labeledData =
-                LabeledDataFromScienceParse.get(
-                  new ByteArrayInputStream(bytes), scienceParser).toJson.prettyPrint
-              labeledData.getBytes("UTF-8")
-            case "ExtractedMetadata" =>
-              prettyJsonWriter.writeValueAsBytes(
-                scienceParser.doParse(
-                  new ByteArrayInputStream(bytes)))
-            case _ =>
-              throw SPServerException(400, s"Could not understand output format '$formatString'.")
-          }
-
-          // upload to S3
-          val key = paperId.substring(0, 4) + "/" + paperId.substring(4) + ".pdf"
-          val alreadyUploaded = try {
-            s3.getObjectMetadata(bucket, key)
-            true
-          } catch {
-            case e: AmazonServiceException if e.getStatusCode == 404 =>
-              false
-          }
-          if(!alreadyUploaded) {
-            val metadata = new ObjectMetadata()
-            metadata.setCacheControl("public, immutable")
-            metadata.setContentType("application/pdf")
-            metadata.setContentLength(bytes.size)
-            s3.putObject(bucket, key, new ByteArrayInputStream(bytes), metadata)
-          }
-
-          // set new location
-          val newLocation = request.getRequestURL
-          newLocation.append('/')
-          newLocation.append(paperId)
-          if(formatString != null)
-            newLocation.append(s"?format=$formatString")
-          val headers = scala.collection.mutable.Map[String, String]()
-          headers.update("Location", newLocation.toString)
-
-          // Turns out you are allowed to return a 200 from a POST, if you have a Content-Location
-          // header. https://tools.ietf.org/html/rfc7231#section-4.3.3
-          headers.update("Content-Location", newLocation.toString)
-          Response(
-            200,
-            "application/json",
-            content,
-            headers.toMap
-          )
-      }
-
+  private def handlePaperId(request: SPRequest, regexGroups: Map[String, String]) = {
+    val paperId = regexGroups("paperId")
+    val formatString = request.queryParams.getOrElse("format", "LabeledData")
+    val content = formatString match {
+      case "LabeledData" =>
+        val labeledData =
+          LabeledDataFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).toJson.prettyPrint
+        labeledData.getBytes("UTF-8")
+      case "ExtractedMetadata" =>
+        prettyJsonWriter.writeValueAsBytes(scienceParser.doParse(paperSource.getPdf(paperId)))
       case _ =>
-        Response(
-          405,
-          "text/plain;charset=utf-8",
-          "Method not allowed".getBytes("UTF-8"),
-          Map("Allow" -> "GET")
-        )
+        throw SPServerException(400, s"Could not understand output format '$formatString'.")
     }
+    SPResponse(200, "application/json", content)
+  }
+
+  private def handlePost(request: SPRequest) = {
+    // calculate SHA of paper
+    val digest = MessageDigest.getInstance("SHA-1")
+    digest.reset()
+    val bytes = Resource.using(new DigestInputStream(request.inputStream(), digest))(IOUtils.toByteArray)
+    val paperId = Utilities.toHex(digest.digest())
+
+    // parse paper
+    val formatString = request.queryParams.getOrElse("format", "LabeledData")
+    val content = formatString match {
+      case "LabeledData" =>
+        val labeledData =
+          LabeledDataFromScienceParse.get(
+            new ByteArrayInputStream(bytes), scienceParser).toJson.prettyPrint
+        labeledData.getBytes("UTF-8")
+      case "ExtractedMetadata" =>
+        prettyJsonWriter.writeValueAsBytes(
+          scienceParser.doParse(
+            new ByteArrayInputStream(bytes)))
+      case _ =>
+        throw SPServerException(400, s"Could not understand output format '$formatString'.")
+    }
+
+    // upload to S3
+    val key = paperId.substring(0, 4) + "/" + paperId.substring(4) + ".pdf"
+    val alreadyUploaded = try {
+      s3.getObjectMetadata(bucket, key)
+      true
+    } catch {
+      case e: AmazonServiceException if e.getStatusCode == 404 =>
+        false
+    }
+    if(!alreadyUploaded) {
+      val metadata = new ObjectMetadata()
+      metadata.setCacheControl("public, immutable")
+      metadata.setContentType("application/pdf")
+      metadata.setContentLength(bytes.size)
+      s3.putObject(bucket, key, new ByteArrayInputStream(bytes), metadata)
+    }
+
+    // set new location
+    val newLocation = request.requestUrl()
+    newLocation.append('/')
+    newLocation.append(paperId)
+    if(formatString != null)
+      newLocation.append(s"?format=$formatString")
+    val headers = scala.collection.mutable.Map[String, String]()
+    headers.update("Location", newLocation.toString)
+
+    // Turns out you are allowed to return a 200 from a POST, if you have a Content-Location
+    // header. https://tools.ietf.org/html/rfc7231#section-4.3.3
+    headers.update("Content-Location", newLocation.toString)
+    SPResponse(
+      200,
+      "application/json",
+      content,
+      headers.toMap
+    )
   }
 }
