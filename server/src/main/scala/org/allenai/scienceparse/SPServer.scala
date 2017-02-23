@@ -1,6 +1,6 @@
 package org.allenai.scienceparse
 
-import java.io.{InputStream, ByteArrayInputStream}
+import java.io.{StringWriter, InputStream, ByteArrayInputStream}
 import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
@@ -38,9 +38,9 @@ class SPServer(
   private val scienceParser: Parser
 ) extends AbstractHandler with Logging {
 
-  private val jsonWriter = new ObjectMapper() with ScalaObjectMapper
-  jsonWriter.registerModule(DefaultScalaModule)
-  private val prettyJsonWriter = jsonWriter.writerWithDefaultPrettyPrinter()
+  private val jsonMapper = new ObjectMapper() with ScalaObjectMapper
+  jsonMapper.registerModule(DefaultScalaModule)
+  private val prettyJsonWriter = jsonMapper.writerWithDefaultPrettyPrinter()
 
   private val bucket: String = "ai2-s2-pdfs"
   private val s3: AmazonS3 = new AmazonS3Client
@@ -60,13 +60,14 @@ class SPServer(
     queryParams: Map[String, String],
 
     inputStream: () => InputStream,
+    contentType: String,
     requestUrl: () => StringBuffer
   )
 
   private object SPRequest {
     def apply(target: String, baseRequest: Request, request: HttpServletRequest): SPRequest = {
       val parameterMap = baseRequest.getParameterMap.asScala.map { case (key, values) =>
-        if(values.length != 1)
+        if (values.length != 1)
           throw SPServerException(400, s"Two values for query parameter $key")
         key -> values.head
       }.toMap
@@ -76,6 +77,7 @@ class SPServer(
         baseRequest.getMethod,
         parameterMap,
         request.getInputStream,
+        request.getContentType,
         request.getRequestURL)
     }
   }
@@ -118,7 +120,7 @@ class SPServer(
       canHandleTarget(request.target) && method == request.method
 
     override def handle(request: SPRequest): Option[SPResponse] =
-      if(canHandle(request)) Some(f(request)) else None
+      if (canHandle(request)) Some(f(request)) else None
   }
 
   private case class RegexRoute(
@@ -145,10 +147,11 @@ class SPServer(
     RegexRoute("^$|^/$".r) { case _ =>
       SPResponse.plainText(
         "Usage: GET /v1/<paperid>[?format={LabeledData,ExtractedMetadata}]\n" +
-        "format is optional, defaults to LabeledData")
+          "format is optional, defaults to LabeledData")
     },
     RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"))(handlePaperId),
-    StringRoute("/v1", "POST")(handlePost)
+    StringRoute("/v1", "POST")(handlePost),
+    RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"), "PUT")(handlePutPaperId)
   )
 
   override def handle(
@@ -249,7 +252,7 @@ class SPServer(
       case e: AmazonServiceException if e.getStatusCode == 404 =>
         false
     }
-    if(!alreadyUploaded) {
+    if (!alreadyUploaded) {
       val metadata = new ObjectMetadata()
       metadata.setCacheControl("public, immutable")
       metadata.setContentType("application/pdf")
@@ -261,7 +264,7 @@ class SPServer(
     val newLocation = request.requestUrl()
     newLocation.append('/')
     newLocation.append(paperId)
-    if(formatString != null)
+    if (formatString != null)
       newLocation.append(s"?format=$formatString")
     val headers = scala.collection.mutable.Map[String, String]()
     headers.update("Location", newLocation.toString)
@@ -275,5 +278,28 @@ class SPServer(
       content,
       headers.toMap
     )
+  }
+
+  private def handlePaperId(request: SPRequest, regexGroups: Map[String, String]) = {
+    if(request.contentType != "application/json")
+      throw SPServerException(400, "Content type for PUT must be application/json.")
+
+    val paperId = regexGroups("paperId")
+    val formatString = request.queryParams.getOrElse("format", "LabeledData")
+    val inputString = Resource.using(request.inputStream()) { is =>
+      IOUtils.toString(is, "UTF-8")
+    }
+
+    // We de-serialize and then re-serialize the posted data to check for errors and validity.
+    val input: LabeledData = formatString match {
+      case "LabeledData" =>
+        import spray.json._
+        LabeledData.fromJson(inputString.parseJson, paperSource.getPdf(paperId))
+      case "ExtractedMetadata" =>
+        val em = jsonMapper.readValue(inputString, classOf[ExtractedMetadata])
+        LabeledData.fromExtractedMetadata(paperSource.getPdf(paperId), paperId, em)
+    }
+
+
   }
 }
