@@ -9,7 +9,7 @@ import java.util.zip.ZipFile
 import org.allenai.common.{Logging, Resource}
 import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
-import spray.json.{JsObject, DefaultJsonProtocol}
+import spray.json.{JsValue, JsObject, DefaultJsonProtocol}
 
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -116,11 +116,10 @@ trait LabeledData {
     // of LabeledData. In particular, we're not serializing id, or anything related to getting the
     // raw PDF.
     import spray.json._
-
-    import LabeledDataJsonProtocol._  // This is needed. IntelliJ is wrong.
+    import LabeledDataJsonProtocol._
 
     JsObject.apply(Map(
-      "paperId" -> JsString(id),
+      "paperId" -> JsString(paperId),
       "title" -> title.map(JsString(_)).getOrElse(JsNull),
       "authors" -> authors.map(a => a.toJson).getOrElse(JsNull),
       "venue" -> venue.map(JsString(_)).getOrElse(JsNull),
@@ -202,6 +201,47 @@ object LabeledData {
 
       override def mentions: Option[Seq[Mention]] = ???
     }
+
+  def fromJson(json: JsValue, input: => InputStream) = {
+    val fields = json.asJsObject.fields
+
+    new LabeledData {
+      import spray.json._
+      import LabeledDataJsonProtocol._
+
+      override def inputStream: InputStream = input
+
+      override lazy val paperId: String = fields("paperId").convertTo[String]
+      require(
+        paperId.length == 40 &&
+          paperId.forall(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')))
+
+      override val id: String = s"json:$paperId"
+
+      override val title: Option[String] =
+        fields.get("title").map(_.convertTo[String])
+
+      override val authors: Option[Seq[Author]] =
+        fields.get("authors").map(_.convertTo[Seq[Author]])
+
+      override val year: Option[Int] =
+        fields.get("year").map(_.convertTo[Int])
+
+      override val venue: Option[String] =
+        fields.get("venue").map(_.convertTo[String])
+
+      override val abstractText: Option[String] =
+        fields.get("abstract").map(_.convertTo[String])
+
+      override val sections: Option[Seq[Section]] =
+        fields.get("sections").map(_.convertTo[Seq[Section]])
+
+      override val references: Option[Seq[Reference]] =
+        fields.get("references").map(_.convertTo[Seq[Reference]])
+
+      override def mentions: Option[Seq[Mention]] = ???
+    }
+  }
 
   def dump(labeledData: Iterator[LabeledData]): Unit = {
     // We don't time the first one, because it might load models.
