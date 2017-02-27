@@ -21,6 +21,12 @@ object FeedbackStore extends Logging {
       warningLogLevel = 'WARN
     )
 
+    val dbUrl = dbConfig.getString("url")
+    val dbUser = dbConfig.getString("user")
+    val dbPassword = dbConfig.get[String]("password").getOrElse(
+      throw new IllegalArgumentException("Password for DB not set. Please set org.allenai.scienceparse.Server.db.password."))
+    ConnectionPool.singleton(dbUrl, dbUser, dbPassword)
+
     // upgrade the schema if necessary
     {
       val dbConfig: Config = config[Config]("org.allenai.scienceparse.Server.db-as-root")
@@ -75,12 +81,6 @@ object FeedbackStore extends Logging {
         }
       }
     }
-
-    val dbUrl = dbConfig.getString("url")
-    val dbUser = dbConfig.getString("user")
-    val dbPassword = dbConfig.get[String]("password").getOrElse(
-      throw new IllegalArgumentException("Password for DB not set. Please set org.allenai.scienceparse.Server.db.password."))
-    ConnectionPool.singleton(dbUrl, dbUser, dbPassword)
   }
 
   def addFeedback(paperId: String, data: LabeledData): Unit = {
