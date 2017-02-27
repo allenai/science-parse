@@ -1,6 +1,6 @@
 package org.allenai.scienceparse
 
-import java.io.{StringWriter, InputStream, ByteArrayInputStream}
+import java.io.{File, StringWriter, InputStream, ByteArrayInputStream}
 import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
@@ -14,20 +14,67 @@ import org.allenai.common.{Resource, Logging}
 import org.apache.commons.io.IOUtils
 import org.eclipse.jetty.server.{Request, Server}
 import org.eclipse.jetty.server.handler.AbstractHandler
+import scopt.OptionParser
 
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.collection.JavaConverters._
 
-object SPServer {
+object SPServer extends Logging {
   def main(args: Array[String]): Unit = {
-    val paperSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
-    val scienceParser = Parser.getInstance()
+    case class Config(
+      modelFile: Option[File] = None,
+      bibModelFile: Option[File] = None,
+      gazetteerFile: Option[File] = None,
+      paperDirectory: Option[File] = None
+    )
 
-    val server = new Server(8080)
-    server.setHandler(new SPServer(paperSource, scienceParser))
-    server.start()
-    server.join()
+    val parser = new OptionParser[Config](this.getClass.getSimpleName) {
+      opt[File]('m', "model") action { (m, c) =>
+        c.copy(modelFile = Some(m))
+      } text "Specifies the model file to evaluate. Defaults to the production model"
+
+      opt[File]('b', "bibModel") action { (m, c) =>
+        c.copy(bibModelFile = Some(m))
+      } text "Specifies the model for bibliography parsing. Defaults to the production model"
+
+      opt[File]('g', "gazetteer") action { (g, c) =>
+        c.copy(gazetteerFile = Some(g))
+      } text "Specifies the gazetteer file. Defaults to the production one. Take care not to use a gazetteer that you also used to train the model."
+
+      opt[File]('p', "paperDirectory") action { (p, c) =>
+        c.copy(paperDirectory = Some(p))
+      } text "Specifies a directory with papers in them. If this is not specified, or a paper can't be found in the directory, we fall back to getting the paper from the bucket."
+
+      help("help") text "Prints help text"
+    }
+
+    parser.parse(args, Config()).foreach { config =>
+      val start = System.currentTimeMillis()
+      val modelFile = config.modelFile.map(_.toPath).getOrElse(Parser.getDefaultProductionModel)
+      val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
+      val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
+      val scienceParser = new Parser(modelFile, gazetteerFile, bibModelFile)
+      val end = System.currentTimeMillis()
+      logger.info(s"Loaded science parser in ${end - start}ms")
+
+      val paperSource = {
+        val bucketSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
+        config.paperDirectory match {
+          case None => bucketSource
+          case Some(dir) =>
+            new FallbackPaperSource(
+              new DirectoryPaperSource(dir),
+              bucketSource
+            )
+        }
+      }
+
+      val server = new Server(8080)
+      server.setHandler(new SPServer(paperSource, scienceParser))
+      server.start()
+      server.join()
+    }
   }
 
   val paperIdRegex = "^/v1/([a-f0-9]{40})$".r
