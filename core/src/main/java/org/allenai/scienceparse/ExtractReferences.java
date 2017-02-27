@@ -28,6 +28,7 @@ import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
 import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
+import org.nustaq.serialization.FSTObjectInput;
 
 @Slf4j
 public class ExtractReferences {
@@ -58,7 +59,7 @@ public class ExtractReferences {
   CheckReferences cr;
   final CRFBibRecordParser bibCRFRecordParser;
 
-  public static final String DATA_VERSION = "0.2";
+  public static final String DATA_VERSION = "0.3-BIB";  // Faster serialization
   
   public ExtractReferences(String gazFile) throws IOException {
     this(new FileInputStream(gazFile));
@@ -121,40 +122,44 @@ public class ExtractReferences {
   }
 
   public static CRFModel<String, String, String> loadModel(
-      DataInputStream dis
+    DataInputStream dis
   ) throws IOException {
-      IOUtils.ensureVersionMatch(dis, ExtractReferences.DATA_VERSION);
-      val stateSpace = StateSpace.load(dis);
-      Indexer<String> nodeFeatures = Indexer.load(dis);
-      Indexer<String> edgeFeatures = Indexer.load(dis);
-      Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
-      ObjectInputStream ois = new ObjectInputStream(dis);
-      ParserLMFeatures plf = null;
-      GazetteerFeatures gf = null;
+    IOUtils.ensureVersionMatch(dis, ExtractReferences.DATA_VERSION);
+    val stateSpace = StateSpace.load(dis);
+    Indexer<String> nodeFeatures = Indexer.load(dis);
+    Indexer<String> edgeFeatures = Indexer.load(dis);
+    Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
+
+    ParserLMFeatures plf = null;
+    GazetteerFeatures gf = null;
+    try(FSTObjectInput in = new FSTObjectInput(dis)) {
       try {
-        plf = (ParserLMFeatures)ois.readObject();
-      } catch(final Exception e) {
+        plf = (ParserLMFeatures)in.readObject();
+      } catch (final Exception e) {
         // do nothing
         // but now plf is NULL. Is that OK?
       }
+
       try {
-        gf = (GazetteerFeatures)ois.readObject();
-      } catch(final Exception e) {
-        log.info(e.getStackTrace().toString());
+        gf = (GazetteerFeatures)in.readObject();
+      } catch (final Exception e) {
+        log.info("Failed to load kermit gazetteer with this error:", e);
       }
-      if(gf != null)
+      if (gf != null)
         log.info("kermit gazetteer successfully loaded.");
       else
         log.info("could not load kermit gazetter");
-      
-      val predExtractor = new ReferencesPredicateExtractor(plf);
-      predExtractor.setGf(gf);
-      val featureEncoder = new CRFFeatureEncoder<String, String, String>
-        (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
-      val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
-
-      return new CRFModel<String, String, String>(featureEncoder, weightsEncoder, weights);
     }
+      
+    val predExtractor = new ReferencesPredicateExtractor(plf);
+    predExtractor.setGf(gf);
+    val featureEncoder =
+        new CRFFeatureEncoder<String, String, String>(predExtractor, stateSpace, nodeFeatures, edgeFeatures);
+    val weightsEncoder =
+        new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
+
+    return new CRFModel<String, String, String>(featureEncoder, weightsEncoder, weights);
+  }
   
   public static Pattern authStrToPat(String s) {
     if(s == null || s.length() == 0)
