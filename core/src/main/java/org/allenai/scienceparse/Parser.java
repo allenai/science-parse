@@ -29,6 +29,8 @@ import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.nustaq.serialization.FSTObjectInput;
+import org.nustaq.serialization.FSTObjectOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.compat.java8.ScalaStreamSupport;
@@ -82,7 +84,7 @@ import static java.util.stream.Collectors.toList;
 public class Parser {
 
   public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
-  public static final String DATA_VERSION = "0.2";
+  public static final String DATA_VERSION = "0.3";  // faster serialization
   private CRFModel<String, PaperToken, String> model;
   private ExtractReferences referenceExtractor;
 
@@ -148,10 +150,11 @@ public class Parser {
                 new DataInputStream(new FileInputStream(modelFile));
         ) {
           model = loadModel(modelIs);
+          logger.info("Loaded model from {}", modelFile);
         } catch(final Exception e) {
           exceptionThrownByModelLoaderThread.compareAndSet(null, e);
+          logger.warn("Failed loading model from {}", modelFile);
         }
-        logger.info("Loaded model from {}", modelFile);
       }
     }, "ModelLoaderThread");
     modelLoaderThread.start();
@@ -697,8 +700,8 @@ public class Parser {
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
 
     try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
-    logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf);
+      logger.info("Writing model to {}", opts.modelFile);
+      saveModel(dos, crfModel.featureEncoder, weights, plf);
     }
 
     // log test and training data
@@ -709,7 +712,6 @@ public class Parser {
       labeledDataLogger.info("Test data after:");
       logLabeledData(testLabeledData);
     }
-
   }
 
   private static void logLabeledData(final List<List<Pair<PaperToken, String>>> data) {
@@ -727,41 +729,45 @@ public class Parser {
   }
 
   public static <T> void saveModel(
-      final DataOutputStream dos,
-      final CRFFeatureEncoder<String, T, String> fe,
-      final Vector weights,
-  final ParserLMFeatures plf,
-  final String dataVersion) throws IOException {
+    final DataOutputStream dos,
+    final CRFFeatureEncoder<String, T, String> fe,
+    final Vector weights,
+    final ParserLMFeatures plf,
+    final String dataVersion
+  ) throws IOException {
     saveModel(dos, fe,weights, plf, null, dataVersion);
   }
   
   public static <T> void saveModel(
-          final DataOutputStream dos,
-          final CRFFeatureEncoder<String, T, String> fe,
-          final Vector weights,
-      final ParserLMFeatures plf,
-      final GazetteerFeatures gf,
-      final String dataVersion) throws IOException {
-        dos.writeUTF(dataVersion);
+    final DataOutputStream dos,
+    final CRFFeatureEncoder<String, T, String> fe,
+    final Vector weights,
+    final ParserLMFeatures plf,
+    final GazetteerFeatures gf,
+    final String dataVersion
+  ) throws IOException {
+    dos.writeUTF(dataVersion);
     fe.stateSpace.save(dos);
     fe.nodeFeatures.save(dos);
     fe.edgeFeatures.save(dos);
     IOUtils.saveDoubles(dos, weights.toDoubles());
-    ObjectOutputStream oos = new ObjectOutputStream(dos);
+
     logger.debug("Saving ParserLMFeatures");
-    oos.writeObject(plf);
-    if(plf!=null)
-      plf.logState();
-    logger.debug("Saving gazetteer features");
-    oos.writeObject(gf);
+    try(final FSTObjectOutput out = new FSTObjectOutput(dos)) {
+      out.writeObject(plf);
+      if (plf != null)
+        plf.logState();
+
+      logger.debug("Saving gazetteer features");
+      out.writeObject(gf);
+    }
   }
 
-  
   public static <T> void saveModel(
-          final DataOutputStream dos,
-          final CRFFeatureEncoder<String, T, String> fe,
-          final Vector weights,
-          final ParserLMFeatures plf
+    final DataOutputStream dos,
+    final CRFFeatureEncoder<String, T, String> fe,
+    final Vector weights,
+    final ParserLMFeatures plf
   ) throws IOException {
     saveModel(dos, fe, weights, plf, Parser.DATA_VERSION);
   }
@@ -783,16 +789,17 @@ public class Parser {
     Indexer<String> nodeFeatures = Indexer.load(dis);
     Indexer<String> edgeFeatures = Indexer.load(dis);
     Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
-    ObjectInputStream ois = new ObjectInputStream(dis);
 
     logger.debug("Loading ParserLMFeatures");
     final ParserLMFeatures plf;
-    try {
-      plf = (ParserLMFeatures) ois.readObject();
-    } catch (final ClassNotFoundException e) {
-      throw new IOException("Model file contains unknown class.", e);
+    try(final FSTObjectInput in = new FSTObjectInput(dis)) {
+      try {
+        plf = (ParserLMFeatures) in.readObject();
+      } catch (final ClassNotFoundException e) {
+        throw new IOException("Model file contains unknown class.", e);
+      }
     }
-    if(plf!=null)
+    if(plf != null)
       plf.logState();
 
     val predExtractor = new PDFPredicateExtractor(plf);
@@ -804,13 +811,13 @@ public class Parser {
   }
 
   public static ModelComponents loadModelComponents(
-          final DataInputStream dis
+    final DataInputStream dis
   ) throws IOException {
     return loadModelComponents(dis, DATA_VERSION);
   }
 
   public static CRFModel<String, PaperToken, String> loadModel(
-    DataInputStream dis
+    final DataInputStream dis
   ) throws IOException {
     return loadModelComponents(dis).model;
   }

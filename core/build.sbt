@@ -60,5 +60,6 @@ libraryDependencies ++= Seq(
   "org.allenai.nlpstack" %% "nlpstack-tokenize" % "1.17" excludeAll (
     ExclusionRule(organization = "org.allenai.common") // nlpstack depends on ancient versions of these
   ),
-  "io.spray" %%  "spray-json" % "1.3.3"
+  "io.spray" %%  "spray-json" % "1.3.3",
+  "de.ruedigermoeller" % "fst" % "2.47"
 )
