@@ -84,14 +84,16 @@ class SPServer(
 
   private case class SPResponse(
     status: Int,
-    contentType: String,
-    content: Array[Byte],
+    contentType: String = "",
+    content: Array[Byte] = Array.empty,
     headers: Map[String, String] = Map.empty
   )
 
   private object SPResponse {
     def plainText(content: String, status: Int = 200) =
       SPResponse(status, "text/plain;charset=utf-8", content.getBytes("UTF-8"))
+
+    lazy val Success = SPResponse(200)
   }
 
 
@@ -136,10 +138,14 @@ class SPServer(
       canHandleTarget(request.target) && request.method == method
 
     override def handle(request: SPRequest): Option[SPResponse] = {
-      val capturedGroups = regex.findFirstMatchIn(request.target).map { m =>
-        m.groupNames.map(groupName => groupName -> m.group(groupName)).toMap
+      if(canHandle(request)) {
+        val capturedGroups = regex.findFirstMatchIn(request.target).map { m =>
+          m.groupNames.map(groupName => groupName -> m.group(groupName)).toMap
+        }
+        capturedGroups.map(cg => f(request, cg))
+      } else {
+        None
       }
-      capturedGroups.map(cg => f(request, cg))
     }
   }
 
@@ -151,7 +157,7 @@ class SPServer(
     },
     RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"))(handlePaperId),
     StringRoute("/v1", "POST")(handlePost),
-    RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"), "PUT")(handlePutPaperId)
+    RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"), "PUT")(handlePut)
   )
 
   override def handle(
@@ -179,21 +185,23 @@ class SPServer(
         }
       }
 
-      response.setContentType(spResponse.contentType)
       response.setStatus(spResponse.status)
+      if(spResponse.contentType.nonEmpty)
+        response.setContentType(spResponse.contentType)
       spResponse.headers.foreach { case (k, v) => response.addHeader(k, v) }
-      response.getOutputStream.write(spResponse.content)
+      if(spResponse.content.nonEmpty)
+        response.getOutputStream.write(spResponse.content)
       baseRequest.setHandled(true)
     } catch {
       case e: SPServerException =>
-        response.setContentType("text/plain;charset=utf-8")
         response.setStatus(e.getStatus)
+        response.setContentType("text/plain;charset=utf-8")
         response.getWriter.println(e.getMessage)
         baseRequest.setHandled(true)
       case NonFatal(e) =>
         logger.warn(s"Uncaught exception: ${e.getMessage}", e)
-        response.setContentType("text/plain;charset=utf-8")
         response.setStatus(500)
+        response.setContentType("text/plain;charset=utf-8")
         response.getWriter.println(e.getMessage)
         baseRequest.setHandled(true)
     }
@@ -280,7 +288,8 @@ class SPServer(
     )
   }
 
-  private def handlePaperId(request: SPRequest, regexGroups: Map[String, String]) = {
+  private val feedbackStore = FeedbackStore // We're triggering this early, so that the FeedbackStore initializes before the first request
+  private def handlePut(request: SPRequest, regexGroups: Map[String, String]) = {
     if(request.contentType != "application/json")
       throw SPServerException(400, "Content type for PUT must be application/json.")
 
@@ -300,6 +309,8 @@ class SPServer(
         LabeledData.fromExtractedMetadata(paperSource.getPdf(paperId), paperId, em)
     }
 
+    feedbackStore.addFeedback(paperId, input)
 
+    SPResponse.Success
   }
 }

@@ -21,5 +21,8 @@ assemblyMergeStrategy in assembly := {
 
 libraryDependencies ++= Seq(
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
-  "org.eclipse.jetty" % "jetty-server" % "9.4.1.v20170120"
+  "org.eclipse.jetty" % "jetty-server" % "9.4.1.v20170120",
+  "com.typesafe" % "config" % "1.3.1",
+  "org.scalikejdbc" %% "scalikejdbc" % "2.5.0",
+  "org.postgresql" % "postgresql" % "42.0.0"
 )

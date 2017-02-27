@@ -9,7 +9,7 @@ import java.util.zip.ZipFile
 import org.allenai.common.{Logging, Resource}
 import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
-import spray.json.{JsValue, JsObject, DefaultJsonProtocol}
+import spray.json.{JsNull, JsValue, JsObject, DefaultJsonProtocol}
 
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -202,8 +202,8 @@ object LabeledData {
       override def mentions: Option[Seq[Mention]] = ???
     }
 
-  def fromJson(json: JsValue, input: => InputStream) = {
-    val fields = json.asJsObject.fields
+  def fromJson(json: JsValue, input: => InputStream): LabeledData = {
+    val fields = json.asJsObject.fields.filterNot(_._2 == JsNull)
 
     new LabeledData {
       import spray.json._
