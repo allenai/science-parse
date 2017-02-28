@@ -206,6 +206,7 @@ class SPServer(
     },
     RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"))(handlePaperId),
     StringRoute("/v1", "POST")(handlePost),
+    StringRoute("/v1/corrections")(correctionsGetAll),
     RegexRoute("^/v1/corrections/([a-f0-9]{40})$".r("paperId"), "GET")(correctionsGet),
     RegexRoute("^/v1/corrections/([a-f0-9]{40})$".r("paperId"), "PUT")(correctionsPut)
   )
@@ -378,5 +379,14 @@ class SPServer(
     feedbackStore.addFeedback(paperId, input)
 
     SPResponse.Success
+  }
+
+  private def correctionsGetAll(request: SPRequest) = {
+    val result = feedbackStore.getAllFeedback
+    SPResponse(
+      200,
+      "application/json",
+      result.map(_.toJson.compactPrint).mkString("\n").getBytes("UTF-8")
+    )
   }
 }
