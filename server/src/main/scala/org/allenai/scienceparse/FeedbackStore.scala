@@ -114,7 +114,7 @@ object FeedbackStore extends Logging {
     DB.readOnly { implicit t =>
       sql"""
         SELECT a.paperId AS paperId, a.value AS value FROM feedback AS a JOIN (
-          SELECT paperId, MAX(timestamp) AS timeAdded FROM feedback GROUP BY paperId
+          SELECT paperId, MAX(timeAdded) AS timeAdded FROM feedback GROUP BY paperId
         ) AS b ON a.paperId = b.paperId AND a.timeAdded = b.timeAdded
       """.map { result =>
         val paperId = result.string("paperId")
