@@ -187,7 +187,7 @@ class SPServer(
       canHandleTarget(request.target) && request.method == method
 
     override def handle(request: SPRequest): Option[SPResponse] = {
-      if(canHandle(request)) {
+      if (canHandle(request)) {
         val capturedGroups = regex.findFirstMatchIn(request.target).map { m =>
           m.groupNames.map(groupName => groupName -> m.group(groupName)).toMap
         }
@@ -237,10 +237,10 @@ class SPServer(
       }
 
       response.setStatus(spResponse.status)
-      if(spResponse.contentType.nonEmpty)
+      if (spResponse.contentType.nonEmpty)
         response.setContentType(spResponse.contentType)
       spResponse.headers.foreach { case (k, v) => response.addHeader(k, v) }
-      if(spResponse.content.nonEmpty)
+      if (spResponse.content.nonEmpty)
         response.getOutputStream.write(spResponse.content)
       baseRequest.setHandled(true)
     } catch {
@@ -355,7 +355,7 @@ class SPServer(
   }
 
   private def correctionsPut(request: SPRequest, regexGroups: Map[String, String]) = {
-    if(request.contentType != "application/json")
+    if (request.contentType != "application/json")
       throw SPServerException(400, "Content type for PUT must be application/json.")
 
     val paperId = regexGroups("paperId")
