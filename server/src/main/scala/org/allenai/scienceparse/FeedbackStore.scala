@@ -88,7 +88,7 @@ object FeedbackStore extends Logging {
     DB.localTx { implicit t =>
       sql"""
         INSERT INTO feedback (paperId, timeAdded, value) VALUES
-        $paperId, current_timestamp, $jsonString::jsonb
+        ($paperId, current_timestamp, $jsonString::jsonb)
       """.update().apply()
     }
   }
