@@ -841,7 +841,7 @@ public class Parser {
         throw new IOException("Model file contains unknown class.", e);
       }
     }
-    if(plf != null)
+    if(plf != null && logger.isDebugEnabled())
       plf.logState();
 
     val predExtractor = new PDFPredicateExtractor(plf);
