@@ -30,6 +30,8 @@ object SPServer extends Logging {
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
+      override def errorOnUnknownArgument = false
+
       opt[File]('m', "model") action { (m, c) =>
         c.copy(modelFile = Some(m))
       } text "Specifies the model file to evaluate. Defaults to the production model"
