@@ -206,7 +206,8 @@ class SPServer(
     },
     RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"))(handlePaperId),
     StringRoute("/v1", "POST")(handlePost),
-    RegexRoute("^/v1/([a-f0-9]{40})$".r("paperId"), "PUT")(handlePut)
+    RegexRoute("^/v1/corrections/([a-f0-9]{40})$".r("paperId"), "GET")(correctionsGet),
+    RegexRoute("^/v1/corrections/([a-f0-9]{40})$".r("paperId"), "PUT")(correctionsPut)
   )
 
   override def handle(
@@ -338,7 +339,21 @@ class SPServer(
   }
 
   private val feedbackStore = FeedbackStore // We're triggering this early, so that the FeedbackStore initializes before the first request
-  private def handlePut(request: SPRequest, regexGroups: Map[String, String]) = {
+
+  private def correctionsGet(request: SPRequest, regexGroups: Map[String, String]) = {
+    val paperId = regexGroups("paperId")
+    val formatString = request.queryParams.getOrElse("format", "LabeledData")
+    val feedback = feedbackStore.getFeedback(paperId).getOrElse(
+      throw new SPServerException(404, s"No feedback collected for $paperId"))
+    formatString match {
+      case "LabeledData" =>
+        SPResponse(200, "application/json", feedback.toJson.prettyPrint.getBytes("UTF-8"))
+      case _ =>
+        throw SPServerException(400, s"Could not understand output format '$formatString'.")
+    }
+  }
+
+  private def correctionsPut(request: SPRequest, regexGroups: Map[String, String]) = {
     if(request.contentType != "application/json")
       throw SPServerException(400, "Content type for PUT must be application/json.")
 
@@ -356,6 +371,8 @@ class SPServer(
       case "ExtractedMetadata" =>
         val em = jsonMapper.readValue(inputString, classOf[ExtractedMetadata])
         LabeledData.fromExtractedMetadata(paperSource.getPdf(paperId), paperId, em)
+      case _ =>
+        throw SPServerException(400, s"Could not understand input format '$formatString'")
     }
 
     feedbackStore.addFeedback(paperId, input)

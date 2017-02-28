@@ -95,7 +95,20 @@ object FeedbackStore extends Logging {
 
   private val paperSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
 
-  def getFeedback: Traversable[LabeledData] = {
+  def getFeedback(paperId: String): Option[LabeledData] = {
+    import spray.json._
+
+    DB.readOnly { implicit t =>
+      sql"""
+        SELECT value FROM feedback WHERE paperId=$paperId ORDER BY timeAdded DESC LIMIT 1
+      """.map { result =>
+        val jsonString = result.string("value")
+        LabeledData.fromJson(jsonString.parseJson, paperSource.getPdf(paperId))
+      }.first().apply()
+    }
+  }
+
+  def getAllFeedback: Traversable[LabeledData] = {
     import spray.json._
 
     DB.readOnly { implicit t =>
