@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.nustaq.serialization.FSTObjectInput;
+import org.nustaq.serialization.FSTObjectOutput;
 
 @Slf4j
 public class ExtractReferences {
@@ -72,9 +74,27 @@ public class ExtractReferences {
   public ExtractReferences(final InputStream is) throws IOException {
     this(is, null);
   }
-  
+
   public ExtractReferences(final InputStream is, final DataInputStream bibCRFModel) throws IOException {
-    cr = new CheckReferences(is);
+    this(is, bibCRFModel, null);
+  }
+
+  public ExtractReferences(
+      final InputStream is,
+      final DataInputStream bibCRFModel,
+      final InputStream gazCacheInputStream
+  ) throws IOException {
+    if(gazCacheInputStream != null) {
+      try(final FSTObjectInput in = new FSTObjectInput(gazCacheInputStream)) {
+        cr = (CheckReferences)in.readObject();
+      } catch(final Exception e) {
+        log.warn("Could not load gazetteer from cache. Loading it slowly instead.", e);
+      }
+    }
+
+    if(cr == null)
+      cr = new CheckReferences(is);
+
     extractors = new ArrayList<>();
     
     if(bibCRFModel != null) {
@@ -119,6 +139,20 @@ public class ExtractReferences {
           new BracketNumber(new Class [] {BracketNumberBibRecordParser.class}),
           new BracketName(new Class [] {BracketNameBibRecordParser.class})));
     }
+  }
+
+  public static ExtractReferences createAndWriteGazCache(
+      final InputStream is,
+      final DataInputStream bibCRFModel,
+      final OutputStream gazCacheFileOutputStream
+  ) throws IOException {
+    val result = new ExtractReferences(is, bibCRFModel);
+
+    try(final FSTObjectOutput out = new FSTObjectOutput(gazCacheFileOutputStream)) {
+      out.writeObject(result.cr);
+    }
+
+    return result;
   }
 
   public static CRFModel<String, String, String> loadModel(

@@ -48,8 +48,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -166,7 +174,41 @@ public class Parser {
       final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
       final DataInputStream bibModelIs = new DataInputStream(new FileInputStream(bibModelFile))
     ) {
-      referenceExtractor = new ExtractReferences(gazetteerIs, bibModelIs);
+      // Loading the gazetteer takes a long time, so we create a cached binary version of it that
+      // loads very quickly. If that version is already there, we use it. Otherwise, we create it.
+      val gazCacheFilename = String.format(
+          "%s-%08x.gazetteerCache.bin",
+          gazetteerFile.getName(),
+          gazetteerFile.getCanonicalPath().hashCode());
+      val gazCachePath = Paths.get(System.getProperty("java.io.tmpdir"), gazCacheFilename);
+      try (
+        final RandomAccessFile gazCacheFile = new RandomAccessFile(gazCachePath.toFile(), "rw");
+        final FileChannel gazCacheChannel = gazCacheFile.getChannel();
+        final FileLock gazCacheLock = gazCacheChannel.lock();
+      ) {
+        if (gazCacheChannel.size() == 0) {
+          logger.info("Creating gazetteer cache at {}", gazCachePath);
+
+          // We create it to a temp file first, and then move it over, so that aborting doesn't mean
+          // we end up with a half-written file.
+          val tempFilePath =
+              Paths.get(System.getProperty("java.io.tmpdir"), gazCacheFilename + ".tmp");
+          try(final OutputStream tempFileStream = Files.newOutputStream(tempFilePath)) {
+            referenceExtractor =
+                ExtractReferences.createAndWriteGazCache(
+                    gazetteerIs,
+                    bibModelIs,
+                    tempFileStream);
+          }
+          Files.move(tempFilePath, gazCachePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+          logger.info("Reading from gazetteer cache at {}", gazCachePath);
+          referenceExtractor = new ExtractReferences(
+              gazetteerIs,
+              bibModelIs,
+              Channels.newInputStream(gazCacheChannel));
+        }
+      }
     }
     logger.info("Loaded gazetteer from {}", gazetteerFile);
     logger.info("Loaded bib model from {}", bibModelFile);

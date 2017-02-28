@@ -5,11 +5,12 @@ import org.allenai.scienceparse.ParserGroundTruth.Paper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CheckReferences {
+public class CheckReferences implements Serializable {
   private LongHashSet paperHashCodes = new LongHashSet();
 
   public CheckReferences(String jsonFile) throws IOException {
