@@ -383,6 +383,9 @@ class SPServer(
 
   private def correctionsGetAll(request: SPRequest) = {
     val result = feedbackStore.getAllFeedback
+    // This keeps the whole result set in memory, which is bad. It should be streamed.
+    // ScalikeJDBC already insists on keeping it in memory, so I didn't take the time to optimize
+    // it here.
     SPResponse(
       200,
       "application/json",
