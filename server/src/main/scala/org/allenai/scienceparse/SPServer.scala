@@ -302,41 +302,7 @@ class SPServer(
         throw SPServerException(400, s"Could not understand output format '$formatString'.")
     }
 
-    // upload to S3
-    val key = paperId.substring(0, 4) + "/" + paperId.substring(4) + ".pdf"
-    val alreadyUploaded = try {
-      s3.getObjectMetadata(bucket, key)
-      true
-    } catch {
-      case e: AmazonServiceException if e.getStatusCode == 404 =>
-        false
-    }
-    if (!alreadyUploaded) {
-      val metadata = new ObjectMetadata()
-      metadata.setCacheControl("public, immutable")
-      metadata.setContentType("application/pdf")
-      metadata.setContentLength(bytes.size)
-      s3.putObject(bucket, key, new ByteArrayInputStream(bytes), metadata)
-    }
-
-    // set new location
-    val newLocation = request.requestUrl()
-    newLocation.append('/')
-    newLocation.append(paperId)
-    if (formatString != null)
-      newLocation.append(s"?format=$formatString")
-    val headers = scala.collection.mutable.Map[String, String]()
-    headers.update("Location", newLocation.toString)
-
-    // Turns out you are allowed to return a 200 from a POST, if you have a Content-Location
-    // header. https://tools.ietf.org/html/rfc7231#section-4.3.3
-    headers.update("Content-Location", newLocation.toString)
-    SPResponse(
-      200,
-      "application/json",
-      content,
-      headers.toMap
-    )
+    SPResponse(200, "application/json", content)
   }
 
   private val feedbackStore = FeedbackStore // We're triggering this early, so that the FeedbackStore initializes before the first request
