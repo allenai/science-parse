@@ -62,7 +62,7 @@ object LabeledDataEvaluation extends Logging {
       gazetteerFile: Option[File] = None,
       bibModelFile: Option[File] = None,
       grobidServerUrl: Option[String] = None,
-      goldData: Iterator[LabeledData] = LabeledDataFromResources.get
+      goldData: Iterator[LabeledPaper] = LabeledPapersFromResources.get
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -83,19 +83,19 @@ object LabeledDataEvaluation extends Logging {
       } text "URL for the Grobid Server. Defaults to http://localhost:8080."
 
       opt[Unit]("compareAgainstGold") action { (_, c) =>
-        c.copy(goldData = LabeledDataFromResources.get)
+        c.copy(goldData = LabeledPapersFromResources.get)
       } text "Compare against the gold data we have from Isaac. This is the default."
 
       opt[Unit]("compareAgainstPMC") action { (_, c) =>
-        c.copy(goldData = LabeledDataFromPMC.getCleaned.take(1000))
+        c.copy(goldData = LabeledPapersFromPMC.getCleaned.take(1000))
       } text "Compare against 1000 documents from PMC"
 
       opt[Unit]("compareAgainstPMC100") action { (_, c) =>
-        c.copy(goldData = LabeledDataFromPMC.getCleaned.take(100))
+        c.copy(goldData = LabeledPapersFromPMC.getCleaned.take(100))
       } text "Compare against 100 documents from PMC"
 
       opt[Unit]("compareAgainstPMC10000") action { (_, c) =>
-        c.copy(goldData = LabeledDataFromPMC.getCleaned.take(10000))
+        c.copy(goldData = LabeledPapersFromPMC.getCleaned.take(10000))
       } text "Compare against 10000 documents from PMC"
 
       help("help") text "Prints help text"
@@ -104,7 +104,7 @@ object LabeledDataEvaluation extends Logging {
     parser.parse(args, Config()).foreach { config =>
       val labeledDataFromGrobidServer = {
         val grobidServerUrl = new URL(config.grobidServerUrl.getOrElse("http://localhost:8080"))
-        new LabeledDataFromGrobidServer(grobidServerUrl)
+        new LabeledPapersFromGrobidServer(grobidServerUrl)
       }
 
       val executor = Executors.newFixedThreadPool(32)
@@ -121,9 +121,9 @@ object LabeledDataEvaluation extends Logging {
           config.bibModelFile.getOrElse(Parser.getDefaultBibModel.toFile))
 
         val extractions = goldData.parMap { gold =>
-          val grobid = labeledDataFromGrobidServer.get(gold.inputStream)
-          val sp = LabeledDataFromScienceParse.get(gold.inputStream, parser)
-          (gold, sp, grobid)
+          val grobid = labeledDataFromGrobidServer.get(gold.inputStream).labels
+          val sp = LabeledPapersFromScienceParse.get(gold.inputStream, parser).labels
+          (gold.labels, sp, grobid)
         }.toSeq
 
         // write header

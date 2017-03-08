@@ -29,30 +29,19 @@ object LabeledDataJsonProtocol extends DefaultJsonProtocol {
   implicit val referenceFormat = jsonFormat7(LabeledData.Reference)
   implicit val rangeFormat = jsonFormat2(LabeledData.Range)
   implicit val mentionFormat = jsonFormat3(LabeledData.Mention)
+  implicit val labeledDataFormat = jsonFormat9(LabeledData.apply)
 }
 
-trait LabeledData {
-  import LabeledData._
-
-  /** ID to identify this labeled document. Must be unique. */
-  def id: String
-
+class LabeledPaper(
+  inputStreamFn: => InputStream,
+  val labels: LabeledData,
+  paperIdOption: Option[String] = None
+) {
   // input
-  def inputStream: InputStream
+  def inputStream = inputStreamFn
   lazy val bytes: Array[Byte] = Resource.using(inputStream) { IOUtils.toByteArray }
-  lazy val paperId: String = Utilities.shaForBytes(bytes)
+  lazy val paperId: String = paperIdOption.getOrElse(Utilities.shaForBytes(bytes))
   lazy val pdDoc: PDDocument = Resource.using(inputStream) { PDDocument.load }
-
-  // expected output
-  // These are all Options. If they are not set, we don't have that field labeled for this paper.
-  def title: Option[String]
-  def authors: Option[Seq[Author]]
-  def venue: Option[String]
-  def year: Option[Int]
-  def abstractText: Option[String]
-  def sections: Option[Seq[LabeledData.Section]]
-  def references: Option[Seq[Reference]]
-  def mentions: Option[Seq[Mention]]
 
   // This is not the same as toString, because it contains newline and is generally intended to be
   // read by humans.
@@ -61,12 +50,12 @@ trait LabeledData {
 
     builder ++= paperId
     builder += '\n'
-    builder ++= id
+    builder ++= labels.id
     builder += '\n'
 
-    builder ++= s"Title: $title\n"
+    builder ++= s"Title: ${labels.title}\n"
 
-    authors match {
+    labels.authors match {
       case None => builder ++= "No authors\n"
       case Some(as) =>
         builder ++= "Authors:\n"
@@ -77,10 +66,10 @@ trait LabeledData {
         }
     }
 
-    builder ++= s"Year: $year\n"
-    builder ++= s"Abstract: $abstractText\n"
+    builder ++= s"Year: ${labels.year}\n"
+    builder ++= s"Abstract: ${labels.abstractText}\n"
 
-    references match {
+    labels.references match {
       case None => builder ++= "No references\n"
       case Some(rs) =>
         builder ++= "References:\n"
@@ -95,7 +84,7 @@ trait LabeledData {
         }
     }
 
-    sections match {
+    labels.sections match {
       case None => builder ++= "No sections\n"
       case Some(ss) =>
         builder ++= "Sections:\n"
@@ -110,27 +99,23 @@ trait LabeledData {
 
     builder.toString
   }
-
-  def toJson: JsObject = {
-    // This is not using normal Spray serialization, because we don't want to serialize all fields
-    // of LabeledData. In particular, we're not serializing id, or anything related to getting the
-    // raw PDF.
-    import spray.json._
-    import LabeledDataJsonProtocol._
-
-    JsObject.apply(Map(
-      "paperId" -> JsString(paperId),
-      "title" -> title.map(JsString(_)).getOrElse(JsNull),
-      "authors" -> authors.map(a => a.toJson).getOrElse(JsNull),
-      "venue" -> venue.map(JsString(_)).getOrElse(JsNull),
-      "year" -> year.map(JsNumber(_)).getOrElse(JsNull),
-      "abstract" -> abstractText.map(JsString(_)).getOrElse(JsNull),
-      "sections" -> sections.map(a => a.toJson).getOrElse(JsNull),
-      "references" -> references.map(a => a.toJson).getOrElse(JsNull)
-      // TODO: mentions. Mentions have links to references, so this will not be so easy.
-    ))
-  }
 }
+
+case class LabeledData(
+  /** ID to identify this labeled document. Must be unique. */
+  val id: String,
+
+  // expected output
+  // These are all Options. If they are not set, we don't have that field labeled for this paper.
+  val title: Option[String],
+  val authors: Option[Seq[LabeledData.Author]],
+  val venue: Option[String],
+  val year: Option[Int],
+  val abstractText: Option[String],
+  val sections: Option[Seq[LabeledData.Section]],
+  val references: Option[Seq[LabeledData.Reference]],
+  val mentions: Option[Seq[LabeledData.Mention]]
+)
 
 object LabeledData {
   case class Author(
@@ -159,91 +144,45 @@ object LabeledData {
     inContext: Option[(Section, Range)]
   )
 
-  def fromExtractedMetadata(input: => InputStream, labeledDataId: String, em: ExtractedMetadata) =
-    new LabeledData {
-      override def inputStream: InputStream = input
+  val empty = LabeledData("empty", None, None, None, None, None, None, None, None)
 
-      override val id: String = labeledDataId
-
-      override val title: Option[String] = Option(em.title)
-
-      override val authors: Option[Seq[Author]] =  Option(em.authors).map { as =>
+  def fromExtractedMetadata(labeledDataId: String, em: ExtractedMetadata) =
+    LabeledData(
+      labeledDataId,
+      title = Option(em.title),
+      authors = Option(em.authors).map { as =>
         as.asScala.map { a =>
           Author(a)
         }
-      }
-
-      override val year: Option[Int] = if(em.year == 0) None else Some(em.year)
-
-      override val venue: Option[String] = None
-
-      override val abstractText: Option[String] = Option(em.abstractText)
-
-      override val sections: Option[Seq[Section]] = Option(em.sections).map { ss =>
+      },
+      year = if(em.year == 0) None else Some(em.year),
+      venue = None,
+      abstractText = Option(em.abstractText),
+      sections = Option(em.sections).map { ss =>
         ss.asScala.map { s =>
           Section(Option(s.heading), s.text)
         }
-      }
-
-      override val references: Option[Seq[Reference]] = Option(em.references).map { rs =>
+      },
+      references = Option(em.references).map { rs =>
         rs.asScala.map { r =>
           Reference(
             None,
             Option(r.title),
             Option(r.author).map(_.asScala.toSeq).getOrElse(Seq.empty),
             Option(r.venue),
-            if(r.year == 0) None else Some(r.year),
+            if (r.year == 0) None else Some(r.year),
             None,
             None
           )
         }
-      }
-
-      override def mentions: Option[Seq[Mention]] = ???
-    }
-
-  def fromJson(json: JsValue, input: => InputStream): LabeledData = {
-    val fields = json.asJsObject.fields.filterNot(_._2 == JsNull)
-
-    new LabeledData {
-      import spray.json._
-      import LabeledDataJsonProtocol._
-
-      override def inputStream: InputStream = input
-
-      override lazy val paperId: String = fields("paperId").convertTo[String]
-      require(
-        paperId.length == 40 &&
-          paperId.forall(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')))
-
-      override val id: String = s"json:$paperId"
-
-      override val title: Option[String] =
-        fields.get("title").map(_.convertTo[String])
-
-      override val authors: Option[Seq[Author]] =
-        fields.get("authors").map(_.convertTo[Seq[Author]])
-
-      override val year: Option[Int] =
-        fields.get("year").map(_.convertTo[Int])
-
-      override val venue: Option[String] =
-        fields.get("venue").map(_.convertTo[String])
-
-      override val abstractText: Option[String] =
-        fields.get("abstract").map(_.convertTo[String])
-
-      override val sections: Option[Seq[Section]] =
-        fields.get("sections").map(_.convertTo[Seq[Section]])
-
-      override val references: Option[Seq[Reference]] =
-        fields.get("references").map(_.convertTo[Seq[Reference]])
-
-      override def mentions: Option[Seq[Mention]] = ???
-    }
-  }
+      },
+      mentions = None // TODO
+    )
 
   def dump(labeledData: Iterator[LabeledData]): Unit = {
+    import spray.json._
+    import LabeledDataJsonProtocol._
+
     // We don't time the first one, because it might load models.
     println(labeledData.next().toJson.prettyPrint)
 
@@ -255,22 +194,7 @@ object LabeledData {
   }
 }
 
-class EmptyLabeledData(val id: String, input: => InputStream) extends LabeledData {
-  import LabeledData._
-
-  override def inputStream = input
-
-  override def title: Option[String] = None
-  override def authors: Option[Seq[Author]] = None
-  override def abstractText: Option[String] = None
-  override def year: Option[Int] = None
-  override def venue: Option[String] = None
-  override def sections: Option[Seq[LabeledData.Section]] = None
-  override def references: Option[Seq[Reference]] = None
-  override def mentions: Option[Seq[Mention]] = None
-}
-
-object LabeledDataFromPMC extends Datastores with Logging {
+object LabeledPapersFromPMC extends Datastores with Logging {
   import LabeledData._
 
   private val xmlExtension = ".nxml"
@@ -301,15 +225,15 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   /** Returns an iterator of only those documents for which we have title and author for the
     * paper itself, and for all references */
-  def getCleaned = get.flatMap { labeledData =>
-    val keep = labeledData.title.isDefined &&
-      labeledData.authors.nonEmpty &&
-      labeledData.references.exists { refs =>
+  def getCleaned = get.flatMap { labeledPaper =>
+    val keep = labeledPaper.labels.title.isDefined &&
+      labeledPaper.labels.authors.nonEmpty &&
+      labeledPaper.labels.references.exists { refs =>
         refs.forall { ref =>
           ref.title.exists(_.nonEmpty) && ref.authors.nonEmpty
         }
       }
-    if(keep) Some(labeledData) else None
+    if(keep) Some(labeledPaper) else None
   }
 
   private def pdfNameForXmlName(xmlName: String) =
@@ -317,8 +241,8 @@ object LabeledDataFromPMC extends Datastores with Logging {
 
   private val maxZipFilesInParallel = 2
   private val shaRegex = "^[0-9a-f]{40}$"r
-  def get = getAll.filterNot(ld => knownBrokenMetadataIds.contains(ld.id))
-  def getAll: Iterator[LabeledData] = set2version.iterator.parMap({ case (set, version) =>
+  def get = getAll.filterNot(ld => knownBrokenMetadataIds.contains(ld.labels.id))
+  def getAll: Iterator[LabeledPaper] = set2version.iterator.parMap({ case (set, version) =>
     val zipFilePath = publicFile(s"PMCData$set.zip", version)
     Resource.using(new ZipFile(zipFilePath.toFile)) { zipFile =>
       zipFile.entries().asScala.filter { entry =>
@@ -336,149 +260,144 @@ object LabeledDataFromPMC extends Datastores with Logging {
         val xml = Resource.using(zipFile.getInputStream(xmlEntry))(xmlLoader.get.load)
         val articleMeta = xml \ "front" \ "article-meta"
 
-        new LabeledData {
-          // input
-          override def inputStream: InputStream = {
-            val zipFile = new ZipFile(zipFilePath.toFile)
-            val inputStream = zipFile.getInputStream(zipFile.getEntry(pdfEntry.getName))
-            new FilterInputStream(inputStream) {
-              override def close(): Unit = {
-                super.close()
-                inputStream.close()
-                zipFile.close()
-              }
+        def inputStream: InputStream = {
+          val zipFile = new ZipFile(zipFilePath.toFile)
+          val inputStream = zipFile.getInputStream(zipFile.getEntry(pdfEntry.getName))
+          new FilterInputStream(inputStream) {
+            override def close(): Unit = {
+              super.close()
+              inputStream.close()
+              zipFile.close()
             }
           }
-
-          override val id = s"PMC:${pdfEntry.getName}"
-
-          override lazy val paperId =
-            precalculatedPaperId.getOrElse(
-              Utilities.shaForBytes(
-                Resource.using(inputStream)(IOUtils.toByteArray)))
-
-          private def parseYear(n: Node): Option[Int] = {
-            try {
-              val i = n.text.trim.dropWhile(_ == '(').takeWhile(_.isDigit).toInt
-              if (i >= 1800 && i <= 2100) Some(i) else None
-            } catch {
-              case e: NumberFormatException =>
-                logger.warn(s"Could not parse '${n.text}' as year")
-                None
-            }
-          }
-
-          // expected output
-          override val title: Option[String] =
-            (articleMeta \ "title-group" \ "article-title").headOption.map(_.text)
-
-          override val authors: Option[Seq[Author]] = Some {
-            val affiliationId2affiliation = (for {
-              affiliationElem <- articleMeta \ "aff"
-              id = affiliationElem \@ "id"
-              pcdat <- affiliationElem.child.filter(_.label == "#PCDATA")
-              text = pcdat.text.trim
-              if text.nonEmpty
-            } yield {
-              (id, text)
-            }).toMap
-
-            (articleMeta \ "contrib-group" \ "contrib") filter (_ \@ "contrib-type" == "author") map { e =>
-              val surname = (e \ "name" \ "surname").text
-              val givenNames = (e \ "name" \ "given-names").text
-              val email = (e \ "email").headOption.map(_.text)
-              val affiliationIds = (e \ "xref") filter (_ \@ "ref-type" == "aff") map (_ \@ "rid")
-              val affiliations = affiliationIds flatMap affiliationId2affiliation.get
-
-              Author(s"$givenNames $surname".trim, email, affiliations)
-            }
-          }
-
-          override val venue: Option[String] =
-            (xml \ "front" \ "journal-meta" \ "journal-title-group" \ "journal-title").headOption.map(_.text)
-
-          override val year: Option[Int] = Iterable(
-            ("pub-type", "ppub"),
-            ("pub-type", "collection"),
-            ("pub-type", "epub"),
-            ("pub-type", "pmc-release"),
-            ("publication-format", "print"),
-            ("publication-format", "electronic")
-          ).flatMap { case (attrName, attrValue) =>
-            (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
-          }.flatMap(_ \ "year").flatMap(parseYear).headOption
-
-          private def parseSection(e: Node): Seq[LabeledData.Section] = {
-            val label = (e \ "label").headOption.map(_.text)
-            val title = (e \ "title").headOption.map(_.text)
-            val sectionTitle = (label, title) match {
-              case (None, None) => None
-              case (Some(l), None) => Some(l.trim)
-              case (None, Some(t)) => Some(t.trim)
-              case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
-            }
-            val body = (e \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-
-            Section(sectionTitle, body) +: (e \ "sec").flatMap(parseSection)  // parse sections recursively
-          }
-
-          override val abstractText: Option[String] = (articleMeta \ "abstract").headOption.map { a =>
-            val sections = parseSection(a)
-            if (sections.isEmpty) {
-              (a \\ "p").map(_.text.replace('\n', ' ')).mkString("\n")
-            } else {
-              sections.map(s => s"${s.heading.getOrElse("")}\n${s.text}".trim).mkString("\n\n")
-            }
-          }
-
-          override val sections: Option[Seq[LabeledData.Section]] =
-            (xml \ "body").headOption.map(parseSection)
-
-          override val references: Option[Seq[Reference]] = Some {
-            (xml \ "back" \ "ref-list" \ "ref") map { ref =>
-              val label = (ref \ "label").headOption.map(_.text)
-
-              val citation =
-                Seq("citation", "element-citation", "mixed-citation").flatMap(ref \ _)
-
-              val title = Seq("article-title", "chapter-title").flatMap(citation \ _).headOption.map(_.text)
-              val authors = Seq(
-                citation \ "person-group" filter (_ \@ "person-group-type" != "editor"),
-                citation
-              ).flatMap(_ \ "name") map { e =>
-                val surname = (e \ "surname").text
-                val givenNames = (e \ "given-names").text
-                s"$givenNames $surname".trim
-              }
-              val venue = (citation \ "source").headOption.map(_.text)
-              val year = (citation \ "year").flatMap(parseYear).headOption
-              val volume = (citation \ "volume").headOption.map(_.text)
-              val firstPage = (citation \ "fpage").headOption.map(_.text)
-              val lastPage = (citation \ "lpage").headOption.map(_.text)
-              val pageRange = (firstPage, lastPage) match {
-                case (Some(first), Some(last)) => Some((first, last))
-                case _ => None
-              }
-              Reference(label, title, authors, venue, year, volume, pageRange)
-            }
-          }
-
-          override val mentions: Option[Seq[Mention]] = None // TODO
         }
+
+        val id = s"PMC:${pdfEntry.getName}"
+
+        def parseYear(n: Node): Option[Int] = {
+          try {
+            val i = n.text.trim.dropWhile(_ == '(').takeWhile(_.isDigit).toInt
+            if (i >= 1800 && i <= 2100) Some(i) else None
+          } catch {
+            case e: NumberFormatException =>
+              logger.warn(s"Could not parse '${n.text}' as year")
+              None
+          }
+        }
+
+        val title: Option[String] =
+          (articleMeta \ "title-group" \ "article-title").headOption.map(_.text)
+
+        val authors: Option[Seq[Author]] = Some {
+          val affiliationId2affiliation = (for {
+            affiliationElem <- articleMeta \ "aff"
+            id = affiliationElem \@ "id"
+            pcdat <- affiliationElem.child.filter(_.label == "#PCDATA")
+            text = pcdat.text.trim
+            if text.nonEmpty
+          } yield {
+            (id, text)
+          }).toMap
+
+          (articleMeta \ "contrib-group" \ "contrib") filter (_ \@ "contrib-type" == "author") map { e =>
+            val surname = (e \ "name" \ "surname").text
+            val givenNames = (e \ "name" \ "given-names").text
+            val email = (e \ "email").headOption.map(_.text)
+            val affiliationIds = (e \ "xref") filter (_ \@ "ref-type" == "aff") map (_ \@ "rid")
+            val affiliations = affiliationIds flatMap affiliationId2affiliation.get
+
+            Author(s"$givenNames $surname".trim, email, affiliations)
+          }
+        }
+
+        val venue: Option[String] =
+          (xml \ "front" \ "journal-meta" \ "journal-title-group" \ "journal-title").headOption.map(_.text)
+
+        val year: Option[Int] = Iterable(
+          ("pub-type", "ppub"),
+          ("pub-type", "collection"),
+          ("pub-type", "epub"),
+          ("pub-type", "pmc-release"),
+          ("publication-format", "print"),
+          ("publication-format", "electronic")
+        ).flatMap { case (attrName, attrValue) =>
+          (articleMeta \ "pub-date") filter (_ \@ attrName == attrValue)
+        }.flatMap(_ \ "year").flatMap(parseYear).headOption
+
+        def parseSection(e: Node): Seq[LabeledData.Section] = {
+          val label = (e \ "label").headOption.map(_.text)
+          val title = (e \ "title").headOption.map(_.text)
+          val sectionTitle = (label, title) match {
+            case (None, None) => None
+            case (Some(l), None) => Some(l.trim)
+            case (None, Some(t)) => Some(t.trim)
+            case (Some(l), Some(t)) => Some(l.trim + " " + t.trim)
+          }
+          val body = (e \ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+
+          Section(sectionTitle, body) +: (e \ "sec").flatMap(parseSection)  // parse sections recursively
+        }
+
+        val abstractText: Option[String] = (articleMeta \ "abstract").headOption.map { a =>
+          val sections = parseSection(a)
+          if (sections.isEmpty) {
+            (a \\ "p").map(_.text.replace('\n', ' ')).mkString("\n")
+          } else {
+            sections.map(s => s"${s.heading.getOrElse("")}\n${s.text}".trim).mkString("\n\n")
+          }
+        }
+
+        val sections: Option[Seq[LabeledData.Section]] =
+          (xml \ "body").headOption.map(parseSection)
+
+        val references: Option[Seq[Reference]] = Some {
+          (xml \ "back" \ "ref-list" \ "ref") map { ref =>
+            val label = (ref \ "label").headOption.map(_.text)
+
+            val citation =
+              Seq("citation", "element-citation", "mixed-citation").flatMap(ref \ _)
+
+            val title = Seq("article-title", "chapter-title").flatMap(citation \ _).headOption.map(_.text)
+            val authors = Seq(
+              citation \ "person-group" filter (_ \@ "person-group-type" != "editor"),
+              citation
+            ).flatMap(_ \ "name") map { e =>
+              val surname = (e \ "surname").text
+              val givenNames = (e \ "given-names").text
+              s"$givenNames $surname".trim
+            }
+            val venue = (citation \ "source").headOption.map(_.text)
+            val year = (citation \ "year").flatMap(parseYear).headOption
+            val volume = (citation \ "volume").headOption.map(_.text)
+            val firstPage = (citation \ "fpage").headOption.map(_.text)
+            val lastPage = (citation \ "lpage").headOption.map(_.text)
+            val pageRange = (firstPage, lastPage) match {
+              case (Some(first), Some(last)) => Some((first, last))
+              case _ => None
+            }
+            Reference(label, title, authors, venue, year, volume, pageRange)
+          }
+        }
+
+        val mentions: Option[Seq[Mention]] = None // TODO
+
+        new LabeledPaper(inputStream, LabeledData(
+          id, title, authors, venue, year, abstractText, sections, references, mentions
+        ), precalculatedPaperId)
       }.toArray
     }
   }, maxZipFilesInParallel).flatten
 
   def main(args: Array[String]): Unit =
-    LabeledData.dump(LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId).iterator)
+    LabeledData.dump(LabeledPapersFromPMC.get.take(100).toSeq.sortBy(_.paperId).map(_.labels).iterator)
 }
 
-object LabeledDataFromResources extends Datastores {
+object LabeledPapersFromResources extends Datastores {
   import LabeledData._
 
   def apply = get
 
-  def get: Iterator[LabeledData] = {
+  def get: Iterator[LabeledPaper] = {
     val pdfDirectory = publicDirectory("PapersTestSet", 3)
 
     def readResourceFile(filename: String): Map[String, Seq[String]] =
@@ -508,32 +427,17 @@ object LabeledDataFromResources extends Datastores {
     val allPaperIds = allData.map(_.keySet).reduce(_ ++ _)
 
     allPaperIds.iterator.map { pid =>
-      new LabeledData {
-        override lazy val paperId = pid
-
-        override val id: String = s"Resources:$paperId"
-
-        override def inputStream: InputStream =
-          Files.newInputStream(pdfDirectory.resolve(s"$paperId.pdf"))
-
-
-        override val title: Option[String] = paperId2titles.get(paperId).flatMap(_.headOption)
-
-        override val authors: Option[Seq[Author]] =
-          paperId2authors.get(paperId).map { authorNames =>
-            authorNames.map { authorName => Author(authorName) }
-          }
-
-        override val year: Option[Int] = None
-
-        override val venue: Option[String] = None
-
-        override val abstractText: Option[String] =
-          paperId2abstracts.get(paperId).flatMap(_.headOption)
-
-        override val sections: Option[Seq[LabeledData.Section]] = None
-
-        override val references: Option[Seq[Reference]] = paperId2bibliographies.get(paperId).map { bibStrings =>
+      val ld = LabeledData(
+        id = s"Resources:$pid",
+        title = paperId2titles.get(pid).flatMap(_.headOption),
+        authors = paperId2authors.get(pid).map { authorNames =>
+          authorNames.map { authorName => Author(authorName) }
+        },
+        year = None,
+        venue = None,
+        abstractText = paperId2abstracts.get(pid).flatMap(_.headOption),
+        sections = None,
+        references = paperId2bibliographies.get(pid).map { bibStrings =>
           bibStrings.map { bibString =>
             val Array(title, year, venue, authors) = bibString.split("\\|", -1)
             Reference(
@@ -545,45 +449,50 @@ object LabeledDataFromResources extends Datastores {
               None,
               None)
           }
-        }
+        },
+        mentions = None // TODO: we might be able to get mentions from the data that Isaac created back in the day
+      )
 
-        override val mentions: Option[Seq[Mention]] = None  // TODO: we might be able to get mentions from the data that Isaac created back in the day
-      }
+      new LabeledPaper(
+        Files.newInputStream(pdfDirectory.resolve(s"$pid.pdf")),
+        ld,
+        Some(pid)
+      )
     }
   }
 
-  def main(args: Array[String]): Unit = LabeledData.dump(LabeledDataFromResources.get)
+  def main(args: Array[String]): Unit = LabeledData.dump(LabeledPapersFromResources.get.map(_.labels))
 }
 
-object LabeledDataFromScienceParse extends Logging {
+object LabeledPapersFromScienceParse extends Logging {
   def get(input: => InputStream, parser: Parser = Parser.getInstance()) = {
+
     val digest = MessageDigest.getInstance("SHA-1")
     digest.reset()
     val bytes = Resource.using(new DigestInputStream(input, digest))(IOUtils.toByteArray)
     val id = Utilities.toHex(digest.digest())
     val labeledPaperId = s"SP:$id"
 
-    try {
+    val ld = try {
       val output = Resource.using(new ByteArrayInputStream(bytes))(parser.doParse)
-      LabeledData.fromExtractedMetadata(input, labeledPaperId, output)
+      LabeledData.fromExtractedMetadata(labeledPaperId, output)
     } catch {
       case NonFatal(e) =>
         logger.warn(s"Error while science-parsing: $e")
-        new EmptyLabeledData(labeledPaperId, input)
+        LabeledData.empty
     }
+
+    new LabeledPaper(input, ld, Some(id))
   }
 
   def main(args: Array[String]): Unit = {
-    val fromResources = LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId)
-    val fromSp =
-      fromResources.par.map(
-        labeledDataFromPMC => get(labeledDataFromPMC.inputStream)
-      )
-    LabeledData.dump(fromSp.iterator)
+    val fromPMC = LabeledPapersFromPMC.get.take(100).toSeq.sortBy(_.paperId)
+    val fromSp = fromPMC.par.map(labeledPaper => get(labeledPaper.inputStream))
+    LabeledData.dump(fromSp.iterator.map(_.labels))
   }
 }
 
-class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
+class LabeledPapersFromGrobidServer(grobidServerUrl: URL) extends Logging {
   private val cachedGrobidServer = new CachedGrobidServer(grobidServerUrl)
 
   def get(input: => InputStream) = {
@@ -591,45 +500,47 @@ class LabeledDataFromGrobidServer(grobidServerUrl: URL) extends Logging {
     val pid = Utilities.shaForBytes(bytes)
     val labeledDataId = s"Grobid:$grobidServerUrl/$pid"
 
-    try {
+    val ld = try {
       val em = Resource.using(cachedGrobidServer.getExtractions(bytes)) { is =>
         GrobidParser.parseGrobidXml(is, grobidServerUrl.toString)
       }
-      LabeledData.fromExtractedMetadata(input, labeledDataId, em)
+      LabeledData.fromExtractedMetadata(labeledDataId, em)
     } catch {
       case NonFatal(e) =>
         logger.warn(s"Error '${e.getMessage}' from Grobid for paper $pid")
-        new EmptyLabeledData(labeledDataId, input)
+        LabeledData.empty
     }
+
+    new LabeledPaper(input, ld, Some(pid))
   }
 }
 
-object LabeledDataFromGrobidServer {
+object LabeledPapersFromGrobidServer {
   def main(args: Array[String]): Unit = {
     val url = new URL(args.headOption.getOrElse("http://localhost:8080"))
-    val labeledDataFromGrobidServer = new LabeledDataFromGrobidServer(url)
+    val labeledDataFromGrobidServer = new LabeledPapersFromGrobidServer(url)
 
-    val fromResources = LabeledDataFromPMC.get.take(100).toSeq.sortBy(_.paperId)
-    val fromGrobid =
-      fromResources.par.map(
-        labeledDataFromPMC => labeledDataFromGrobidServer.get(labeledDataFromPMC.inputStream)
-      )
-    LabeledData.dump(fromGrobid.iterator)
+    val fromPMC = LabeledPapersFromPMC.get.take(100).toSeq.sortBy(_.paperId)
+    val fromGrobid = fromPMC.par.map(
+      labeledDataFromPMC => labeledDataFromGrobidServer.get(labeledDataFromPMC.inputStream))
+    LabeledData.dump(fromGrobid.iterator.map(_.labels))
   }
 }
 
-object LabeledDataFromOldGrobid extends Datastores {
-  def get: Iterator[LabeledData] = {
+object LabeledPapersFromOldGrobid extends Datastores {
+  def get: Iterator[LabeledPaper] = {
     val grobidExtractions = publicDirectory("GrobidExtractions", 1)
     val pdfDirectory = publicDirectory("PapersTestSet", 3)
     Files.newDirectoryStream(grobidExtractions, "*.xml").iterator().asScala.map { file =>
       val paperId = FilenameUtils.getBaseName(file.toString)
       val em = GrobidParser.parseGrobidXml(file)
-      LabeledData.fromExtractedMetadata(
+      new LabeledPaper(
         Files.newInputStream(pdfDirectory.resolve(s"$paperId.pdf")),
-        s"OldGrobid:$paperId",
-        em
-      )
+        LabeledData.fromExtractedMetadata(
+          s"OldGrobid:$paperId",
+          em
+        ),
+        Some(paperId))
     }
   }
 }

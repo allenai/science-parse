@@ -84,6 +84,9 @@ object FeedbackStore extends Logging {
   }
 
   def addFeedback(paperId: String, data: LabeledData): Unit = {
+    import spray.json._
+    import LabeledDataJsonProtocol._
+
     val jsonString = data.toJson.compactPrint
     DB.localTx { implicit t =>
       sql"""
@@ -97,19 +100,21 @@ object FeedbackStore extends Logging {
 
   def getFeedback(paperId: String): Option[LabeledData] = {
     import spray.json._
+    import LabeledDataJsonProtocol._
 
     DB.readOnly { implicit t =>
       sql"""
         SELECT value FROM feedback WHERE paperId=$paperId ORDER BY timeAdded DESC LIMIT 1
       """.map { result =>
         val jsonString = result.string("value")
-        LabeledData.fromJson(jsonString.parseJson, paperSource.getPdf(paperId))
+        jsonString.parseJson.convertTo[LabeledData]
       }.first().apply()
     }
   }
 
-  def getAllFeedback: Traversable[LabeledData] = {
+  def getAllFeedback: Traversable[(String, LabeledData)] = {
     import spray.json._
+    import LabeledDataJsonProtocol._
 
     DB.readOnly { implicit t =>
       sql"""
@@ -119,7 +124,7 @@ object FeedbackStore extends Logging {
       """.map { result =>
         val paperId = result.string("paperId")
         val jsonString = result.string("value")
-        LabeledData.fromJson(jsonString.parseJson, paperSource.getPdf(paperId))
+        (paperId, jsonString.parseJson.convertTo[LabeledData])
       }.traversable.apply()
     }
   }

@@ -20,6 +20,9 @@ import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.collection.JavaConverters._
 
+import spray.json._
+import LabeledDataJsonProtocol._
+
 object SPServer extends Logging {
   def main(args: Array[String]): Unit = {
     case class Config(
@@ -269,7 +272,7 @@ class SPServer(
     val content = formatString match {
       case "LabeledData" =>
         val labeledData =
-          LabeledDataFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).toJson.prettyPrint
+          LabeledPapersFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).labels.toJson.prettyPrint
         labeledData.getBytes("UTF-8")
       case "ExtractedMetadata" =>
         prettyJsonWriter.writeValueAsBytes(scienceParser.doParse(paperSource.getPdf(paperId)))
@@ -291,8 +294,8 @@ class SPServer(
     val content = formatString match {
       case "LabeledData" =>
         val labeledData =
-          LabeledDataFromScienceParse.get(
-            new ByteArrayInputStream(bytes), scienceParser).toJson.prettyPrint
+          LabeledPapersFromScienceParse.get(
+            new ByteArrayInputStream(bytes), scienceParser).labels.toJson.prettyPrint
         labeledData.getBytes("UTF-8")
       case "ExtractedMetadata" =>
         prettyJsonWriter.writeValueAsBytes(
@@ -305,7 +308,7 @@ class SPServer(
     SPResponse(200, "application/json", content)
   }
 
-  private val feedbackStore = FeedbackStore // We're triggering this early, so that the FeedbackStore initializes before the first request
+  private val feedbackStore = FeedbackStore // We're triggering this early, so that the FeedbackStore initializes before the first request.
 
   private def correctionsGet(request: SPRequest, regexGroups: Map[String, String]) = {
     val paperId = regexGroups("paperId")
@@ -334,10 +337,11 @@ class SPServer(
     val input: LabeledData = formatString match {
       case "LabeledData" =>
         import spray.json._
-        LabeledData.fromJson(inputString.parseJson, paperSource.getPdf(paperId))
+        import LabeledDataJsonProtocol._
+        inputString.parseJson.convertTo[LabeledData]
       case "ExtractedMetadata" =>
         val em = jsonMapper.readValue(inputString, classOf[ExtractedMetadata])
-        LabeledData.fromExtractedMetadata(paperSource.getPdf(paperId), paperId, em)
+        LabeledData.fromExtractedMetadata(paperId, em)
       case _ =>
         throw SPServerException(400, s"Could not understand input format '$formatString'")
     }

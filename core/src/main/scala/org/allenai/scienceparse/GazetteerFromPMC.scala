@@ -12,14 +12,15 @@ object GazetteerFromPMC extends App {
   implicit val gazetteerEntryFormat = jsonFormat4(GazetteerEntry.apply)
 
   // We use the first 1k of this for testing, so let's drop 10k just to be sure.
-  val labeledDataNotUsedForTesting = LabeledDataFromPMC.get.drop(10000)
+  val labeledDataNotUsedForTesting = LabeledPapersFromPMC.get.drop(10000)
 
   val noneCount = new AtomicInteger()
 
-  labeledDataNotUsedForTesting.parMap { ld =>
+  labeledDataNotUsedForTesting.parMap { lp =>
+    val ld = lp.labels
     (ld.title, ld.authors, ld.year) match {
       case (Some(title), Some(authors), Some(year)) =>
-        Some(GazetteerEntry(ld.paperId, title.replaceAll("\\s+", " "), authors.map(_.name), year))
+        Some(GazetteerEntry(lp.paperId, title.replaceAll("\\s+", " "), authors.map(_.name), year))
       case _ =>
         noneCount.incrementAndGet()
         None
