@@ -75,12 +75,13 @@ object Evaluation extends Datastores with Logging {
       Option(itemOrNull).map(f).getOrElse(null.asInstanceOf[Out])
 
     new BibRecord(
-        nullMap(bibRecord.title, normalize),
-        bibRecord.author.asScala.map(normalize).asJava,
-        nullMap(bibRecord.venue, normalize),
-        bibRecord.citeRegEx,
-        bibRecord.shortCiteRegEx,
-        bibRecord.year)
+      nullMap(bibRecord.title, normalize),
+      bibRecord.author.asScala.map(normalize).asJava,
+      nullMap(bibRecord.venue, normalize),
+      bibRecord.citeRegEx,
+      bibRecord.shortCiteRegEx,
+      bibRecord.year
+    )
   }
 
   private def normalizeBRstripVenues(bibRecord: BibRecord) = {
@@ -92,7 +93,8 @@ object Evaluation extends Datastores with Logging {
       null,
       normalized.citeRegEx,
       normalized.shortCiteRegEx,
-      normalized.year)
+      normalized.year
+    )
   }
 
   private def strictNormalize(s: String) = s.toLowerCase.replaceAll("[^a-z0-9]", "")
@@ -260,7 +262,7 @@ object Evaluation extends Datastores with Logging {
   private def bibYearsExtractor(metadata: ExtractedMetadata) =
     metadata.references.flatMapItems { r =>
       val year = r.year
-      if(year == 0) None else Some(year.toString)
+      if (year == 0) None else Some(year.toString)
     }
 
   private def bibMentionsExtractor(metadata: ExtractedMetadata) =
@@ -334,7 +336,8 @@ object Evaluation extends Datastores with Logging {
   def main(args: Array[String]): Unit = {
     case class Config(
       modelFile: Option[File] = None,
-      gazetteerFile: Option[File] = None
+      gazetteerFile: Option[File] = None,
+      bibModelFile: Option[File] = None
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -346,14 +349,19 @@ object Evaluation extends Datastores with Logging {
         c.copy(gazetteerFile = Some(g))
       } text "Specifies the gazetteer file. Defaults to the production one. Take care not to use a gazetteer that you also used to train the model."
 
+      opt[File]('b', "bibModel") action { (b, c) =>
+        c.copy(bibModelFile = Some(b))
+      } text "Specified the bibliography model file to evaluate. Defaults to the production model"
+
       help("help") text "Prints help text"
     }
 
     parser.parse(args, Config()).foreach { config =>
       val modelFile = config.modelFile.map(_.toPath).getOrElse(Parser.getDefaultProductionModel)
       val gazetteerFile = config.gazetteerFile.map(_.toPath).getOrElse(Parser.getDefaultGazetteer)
+      val bibModelFile = config.bibModelFile.map(_.toPath).getOrElse(Parser.getDefaultBibModel)
 
-      val parser = new Parser(modelFile, gazetteerFile)
+      val parser = new Parser(modelFile, gazetteerFile, bibModelFile)
       val results = evaluate(parser)
       printResults(results)
     }
@@ -397,6 +405,7 @@ object Evaluation extends Datastores with Logging {
 
       val result = goldDocIds.par.map { docid =>
         val pdf = pdfDirectory.resolve(s"$docid.pdf")
+        logger.debug(s"Processing $pdf")
         val result = Resource.using(Files.newInputStream(pdf)) { is =>
           docid -> Try(parser.doParse(is))
         }

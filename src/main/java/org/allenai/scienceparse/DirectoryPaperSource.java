@@ -22,4 +22,3 @@ public class DirectoryPaperSource implements PaperSource {
         return new BufferedInputStream(new FileInputStream(file));
     }
 }
-

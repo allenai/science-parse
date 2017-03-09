@@ -7,14 +7,14 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.allenai.pdfbox.pdmodel.PDDocument;
-import org.allenai.pdfbox.pdmodel.PDPage;
-import org.allenai.pdfbox.pdmodel.common.PDRectangle;
-import org.allenai.pdfbox.pdmodel.font.PDFont;
-import org.allenai.pdfbox.cos.COSName;
-import org.allenai.pdfbox.util.DateConverter;
-import org.allenai.pdfbox.text.PDFTextStripper;
-import org.allenai.pdfbox.text.TextPosition;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.util.DateConverter;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -175,18 +175,8 @@ public class PDFExtractor {
       }
       meta.title(title);
 
-      int headerStopIndex = -1;
-      if (!stripper.pages.isEmpty()) {
-        final PDFPage firstPage = stripper.pages.get(0);
-        headerStopIndex = getHeuristicHeaderStopIndex(firstPage);
-      } else {
-        // Anecdotally, when we have no pages, the output is such garbage that we might be
-        // better off throwing an exception. TBD
-      }
-
       PDFDoc doc = PDFDoc.builder()
         .pages(stripper.pages)
-        .headerStopLinePosition(headerStopIndex)
         .meta(meta.build())
         .build();
 
@@ -198,32 +188,6 @@ public class PDFExtractor {
   @SneakyThrows
   public PDFDoc extractFromInputStream(InputStream is) {
     return extractResultFromInputStream(is).document;
-  }
-
-  private int getHeuristicHeaderStopIndex(PDFPage firstPage) {
-    // Find first abstract line
-    OptionalInt abstractIdx = IntStream.range(0, firstPage.lines.size())
-      .filter(idx -> firstPage.lines.get(idx).lineText().trim().toLowerCase().startsWith("abstract"))
-      .findFirst();
-    if (abstractIdx.isPresent()) {
-      return abstractIdx.getAsInt();
-    }
-    // Find smallest line on page and if it appears in acceptable range, take it
-    final OptionalDouble smallestSizeOption =
-      firstPage.lines.stream().mapToDouble(PDFLine::avgFontSize).min();
-    if (smallestSizeOption.isPresent()) {
-      final double smallestSize = smallestSizeOption.getAsDouble();
-
-      OptionalInt smallIdx = IntStream.range(0, firstPage.lines.size())
-        .filter(idx -> firstPage.lines.get(idx).avgFontSize() == smallestSize)
-        .findFirst();
-      if (smallIdx.isPresent()) {
-        if (smallIdx.getAsInt() > 1 && smallIdx.getAsInt() < 10) {
-          return smallIdx.getAsInt();
-        }
-      }
-    }
-    return -1;
   }
 
   private String getHeuristicTitle(PDFCaptureTextStripper stripper) {
@@ -281,6 +245,19 @@ public class PDFExtractor {
   private final static class RawChunk {
     // The PDFBox class doesn't get exposed outside of this class
     public final List<TextPosition> textPositions;
+    
+    public String discardSuperscripts(String token, FloatList bounds) {
+      double yThresh = (bounds.get(3) + bounds.get(1))/2.0;
+      double yGap = (bounds.get(3) - bounds.get(1));
+      StringBuilder sb = new StringBuilder();
+      int i=0;
+      for (TextPosition tp : textPositions) {
+       if(tp.getY() > yThresh || (yThresh - tp.getY() > yGap / 6.0)) //latter case suggests a height bug (?) so ignore
+         sb.append(tp.getUnicode());
+       i++;
+      }
+      return sb.toString();
+    }
 
     public String discardSuperscripts(String token, FloatList bounds) {
       double yThresh = (bounds.get(3) + bounds.get(1))/2.0;
@@ -325,11 +302,11 @@ public class PDFExtractor {
         if (x1 > maxX) {
           maxX = x1;
         }
-        float y0 = tp.getY();
+        float y0 = tp.getY() - tp.getHeight(); //getY returns the bottom-left
         if (y0 < minY) {
           minY = y0;
         }
-        float y1 = y0 + tp.getHeight();
+        float y1 = tp.getY();
         if (y1 > maxY) {
           maxY = y1;
         }

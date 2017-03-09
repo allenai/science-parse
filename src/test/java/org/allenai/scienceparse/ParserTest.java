@@ -36,7 +36,7 @@ public class ParserTest {
   }
 
   public void testBootstrap() throws IOException {
-    List<List<Pair<PaperToken, String>>> labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100, true);
+    List<List<Pair<PaperToken, String>>> labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100);
     PDFPredicateExtractor ppe = new PDFPredicateExtractor();
     //NOTE 6 should be index of P14-1059, because only mooney gets skipped
     List<PaperToken> justTokens = labeledData.get(6).stream().map(p ->
@@ -107,7 +107,10 @@ public class ParserTest {
     File f = new File(opts.modelFile);
     f.deleteOnExit();
     Parser.trainParser(resolveKeys(pdfKeys), null, null, opts);
-    final Parser p = new Parser(testModelFile, Parser.getDefaultGazetteer().toFile());
+    final Parser p = new Parser(
+            testModelFile,
+            Parser.getDefaultGazetteer().toFile(),
+            Parser.getDefaultBibModel().toFile());
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;
@@ -149,7 +152,10 @@ public class ParserTest {
             pgt,
             new DirectoryPaperSource(new File(resourceDirectory("/groundTruth.json"))),
             opts); //assumes pdfs in same dir as groundTruth
-    final Parser p = new Parser(testModelFile, Parser.getDefaultGazetteer().toFile());
+    final Parser p = new Parser(
+            testModelFile,
+            Parser.getDefaultGazetteer().toFile(),
+            Parser.getDefaultBibModel().toFile());
     double avgTitlePrec = 0.0;
     double avgAuthorRec = 0.0;
     double cases = 0.0;

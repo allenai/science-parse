@@ -225,6 +225,20 @@ public class PDFToCRFInput {
       return l.bounds().get(2);
   }
 
+  public static float getX(PDFToken t, boolean left) {
+    if(left)
+      return t.getBounds().get(0);
+    else
+      return t.getBounds().get(2);
+  }
+  
+  public static float getY(PDFToken t, boolean upper) {
+    if (upper)
+      return t.getBounds().get(1);
+    else
+      return t.getBounds().get(3);
+  }
+  
   public static float getH(PDFLine l) {
     float result = l.bounds().get(3) - l.bounds().get(1);
     if (result < 0) {
@@ -301,22 +315,16 @@ public class PDFToCRFInput {
    * Returns the PaperToken sequence form of a given PDF document
    *
    * @param pdf             The PDF Document to convert into instances
-   * @param heuristicHeader If true, tries to use heuristic header if found
    * @return The data sequence
    * @throws IOException
    */
-  public static List<PaperToken> getSequence(PDFDoc pdf, boolean heuristicHeader) throws IOException {
-    final ArrayList<PaperToken> rawTokens = new ArrayList<>();
-    if (heuristicHeader && pdf.heuristicHeader() != null) {
-      List<PDFLine> header = pdf.heuristicHeader();
-      addLineTokens(rawTokens, header, 0);
-    } else {
-      int pg = 0;
-      for (PDFPage p : pdf.getPages()) {
-        addLineTokens(rawTokens, p.getLines(), pg);
-      }
+  public static List<PaperToken> getSequence(PDFDoc pdf) throws IOException {
+    ArrayList<PaperToken> rawTokens = new ArrayList<>();
+    List<PDFPage> pages = pdf.getPages();
+    for (int pageNum = 0; pageNum < pages.size(); pageNum++) {
+      addLineTokens(rawTokens, pages.get(pageNum).lines, pageNum);
     }
-
+    
     // split tokens according to tokenization rules
     final ArrayList<PaperToken> splitTokens = new ArrayList<>(3 * rawTokens.size());
     for(final PaperToken rawToken : rawTokens) {
@@ -446,12 +454,21 @@ public class PDFToCRFInput {
   public static String stringAt(List<PaperToken> toks, Pair<Integer, Integer> span) {
     List<PaperToken> pts = toks.subList(span.getOne(), span.getTwo());
     List<String> words = pts.stream().map(pt -> (pt.getLine() == -1) ? "<S>" : pt.getPdfToken().token).collect(Collectors.toList());
+    return appendStringList(words).trim();
+  }
+  
+  public static String stringAtForStringList(List<String> toks, Pair<Integer, Integer> span) {
+    List<String> words = toks.subList(span.getOne(), span.getTwo());
+    return appendStringList(words).trim();
+  }
+  
+  public static String appendStringList(List<String> toks) {
     StringBuilder sb = new StringBuilder();
-    for (String s : words) {
+    for (String s : toks) {
       sb.append(s);
       sb.append(" ");
     }
-    return sb.toString().trim();
+    return sb.toString();
   }
 
   public static String getLabelString(List<Pair<PaperToken, String>> seq) {

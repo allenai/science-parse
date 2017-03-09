@@ -2,7 +2,9 @@ package org.allenai.scienceparse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -10,6 +12,7 @@ import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.allenai.scienceparse.pdfapi.PDFToken;
 
 @Slf4j
 public class PDFDocToPartitionedText {
@@ -62,7 +65,7 @@ public class PDFDocToPartitionedText {
     return (PDFToCRFInput.getY(l2, true) - PDFToCRFInput.getY(l1, false)) / Math.min(h1, h2);
   }
   
-  private static ArrayList<Double> getBreaks(PDFPage p) {
+  private static List<Double> getBreaks(PDFPage p) {
     PDFLine prevLine = null;
     ArrayList<Double> breaks = new ArrayList<>();
     for (PDFLine l : p.getLines()) {
@@ -72,11 +75,11 @@ public class PDFDocToPartitionedText {
       }
       prevLine = l;
     }
-    breaks.sort((d1, d2) -> Double.compare(d1, d2));
+    breaks.sort(Double::compare);
     return breaks;
   }
   
-  private static ArrayList<Double> getBreaks(PDFDoc pdf) {
+  private static List<Double> getBreaks(PDFDoc pdf) {
     ArrayList<Double> breaks = new ArrayList<>();
     for (PDFPage p : pdf.getPages()) {
       breaks.addAll(getBreaks(p));
@@ -86,7 +89,7 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getReferenceLineBreak(PDFDoc pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf);
+    List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
       return 1.0;
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking references
@@ -94,7 +97,7 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getRawBlockLineBreak(PDFDoc pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf);
+    List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
       return 1.0;
     int idx = (7 * breaks.size()) / 9; //hand-tuned threshold good for breaking papers
@@ -102,7 +105,7 @@ public class PDFDocToPartitionedText {
   }
   
   public static double getFirstPagePartitionBreak(PDFPage pdf) {
-    ArrayList<Double> breaks = getBreaks(pdf);
+    List<Double> breaks = getBreaks(pdf);
     if(breaks.isEmpty())
       return 1.0;
     int idx = (3 * breaks.size()) / 6; //hand-tuned threshold good for breaking first pages (abstracts)
@@ -125,7 +128,7 @@ public class PDFDocToPartitionedText {
   public static String getFirstTextBlock(PDFDoc pdf) {
     PDFPage fp = pdf.pages.get(0);
     double fpp = getFirstPagePartitionBreak(fp);
-    StringBuffer out = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     PDFLine prevLine = null;
     boolean first = true;
     for(PDFLine l : fp.lines) {
@@ -138,11 +141,13 @@ public class PDFDocToPartitionedText {
           return out.toString().trim();
         } else {
           out.delete(0, out.length());
-          out.append(" " + cleanLine(lineToString(l)));
+          out.append(' ');
+          out.append(cleanLine(lineToString(l)));
         }
       }
       else {
-        out.append(" " + cleanLine(lineToString(l)));
+        out.append(' ');
+        out.append(cleanLine(lineToString(l)));
       }
       prevLine = l;
     }
@@ -204,66 +209,114 @@ public class PDFDocToPartitionedText {
     return abs;
   }
   
+  private static boolean lenientRefStart(PDFLine l, PDFLine prevLine, double qLineBreak) {
+    final PDFToken firstToken = l.tokens.get(0);
+
+    return (
+          firstToken.token.equals("[1]") ||
+          firstToken.token.equals("1.")
+        ) && l.tokens.size() > 1 && (
+            PDFToCRFInput.getX(l.tokens.get(1), true) > firstToken.fontMetrics.spaceWidth ||
+            breakSize(l, prevLine) > qLineBreak
+        );
+  }
+  
+  public static Set<String> referenceHeaders = new HashSet<String>(Arrays.asList(
+      "references",
+      "citations",
+      "bibliography",
+      "reference"));
+
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
-    final List<String> refTags = Arrays.asList("References", "REFERENCES", "Citations", "CITATIONS", "Bibliography",
-      "BIBLIOGRAPHY");
     List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
+    boolean foundRefs = false;
     double qLineBreak = getReferenceLineBreak(pdf);
     StringBuffer sb = new StringBuffer();
-    for (PDFPage p : pdf.getPages()) {
-      double farLeft = Double.MAX_VALUE; //of current column
-      double farRight = -1.0; //of current column
-      for (PDFLine l : p.getLines()) {
-        if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
-          if (l.tokens.get(l.tokens.size() - 1).token != null &&
-            refTags.contains(l.tokens.get(l.tokens.size() - 1).token.trim())) {
-            inRefs = true;
-          }
-        } else if (inRefs) {
-          double left = PDFToCRFInput.getX(l, true);
-          double right = PDFToCRFInput.getX(l, false);
-          if (farRight >= 0 && right > farRight) { //new column, reset
-            farLeft = Double.MAX_VALUE;
-            farRight = -1.0;
-          }
-          farLeft = Math.min(left, farLeft);
-          farRight = Math.max(right, farRight);
-          boolean br = false;
-          if (l.tokens != null && l.tokens.size() > 0) {
-            String sAdd = lineToString(l);
-            if (left > farLeft + l.tokens.get(0).fontMetrics.spaceWidth) {
-              br = false;
-            } else if (PDFToCRFInput.getX(prevLine, false) + l.tokens.get(0).fontMetrics.spaceWidth < farRight) {
-              br = true;
-            } else if (breakSize(l, prevLine) > qLineBreak) {
-              br = true;
+    boolean lenient = false;
+    
+    for(int pass=0;pass<2;pass++) {
+      if(pass==1)
+        if(foundRefs)
+          break;
+        else
+          lenient=true; //try harder this time.
+      for (PDFPage p : pdf.getPages()) {
+        double farLeft = Double.MAX_VALUE; //of current column
+        double farRight = -1.0; //of current column
+        for (PDFLine l : p.getLines()) {
+          if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
+            if (
+              l.tokens.get(l.tokens.size() - 1).token != null &&
+              referenceHeaders.contains(l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+            ) {
+              inRefs = true;
+              foundRefs = true;
+              prevLine = l;
+              continue; //skip this line
             }
-            if (br) {
-              out.add(cleanLine(sb.toString()));
-              sb = new StringBuffer(sAdd);
-            } else {
-              sb.append("<lb>");
-              sb.append(sAdd);
+            else if(lenient) { //used if we don't find refs on first pass
+              if(lenientRefStart(l, prevLine, qLineBreak)) {
+                inRefs = true;
+                foundRefs = true;
+                //DON'T skip this line.
+              }
             }
           }
+          if (inRefs) {
+            double left = PDFToCRFInput.getX(l, true);
+            double right = PDFToCRFInput.getX(l, false);
+            if (farRight >= 0 && right > farRight) { //new column, reset
+              farLeft = Double.MAX_VALUE;
+              farRight = -1.0;
+            }
+            farLeft = Math.min(left, farLeft);
+            farRight = Math.max(right, farRight);
+            boolean br = false;
+            final List<PDFToken> tokens = l.tokens;
+            if (tokens != null && tokens.size() > 0) {
+              String sAdd = lineToString(l);
+              if (left > farLeft + tokens.get(0).fontMetrics.spaceWidth) {
+                br = false;
+              } else {
+                final double prevLineX = PDFToCRFInput.getX(prevLine, false);
+                final double spaceWidth = tokens.get(0).fontMetrics.spaceWidth;
+                if (prevLineX + spaceWidth < farRight) {
+                  br = true;
+                } else {
+                  final double breakSize = breakSize(l, prevLine);
+                  if (breakSize > qLineBreak) {
+                    br = true;
+                  }
+                }
+              }
+              if (br) {
+                out.add(cleanLine(sb.toString()));
+                sb = new StringBuffer(sAdd);
+              } else {
+                sb.append("<lb>");
+                sb.append(sAdd);
+              }
+            }
+          }
+          prevLine = l;
         }
-        prevLine = l;
-      }
-      //HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
-      if (sb.length() > 0) {
-        String sAdd = sb.toString();
-        if (sAdd.endsWith("<lb>"))
-          sAdd = sAdd.substring(0, sAdd.length() - 4);
-        out.add(cleanLine(sAdd));
-        sb = new StringBuffer();
+        //HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
+        if (sb.length() > 0) {
+          String sAdd = sb.toString();
+          if (sAdd.endsWith("<lb>"))
+            sAdd = sAdd.substring(0, sAdd.length() - 4);
+          out.add(cleanLine(sAdd));
+          sb = new StringBuffer();
+        }
       }
     }
     return out;
   }
+  
 }

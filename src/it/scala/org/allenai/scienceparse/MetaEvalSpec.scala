@@ -9,26 +9,27 @@ class MetaEvalSpec extends UnitSpec {
     Evaluation.printResults(evaluationResult)
 
     val minimumPR = Map(
-      "abstract                ".trim -> ((0.856, 0.856)),
-      "abstractNormalized      ".trim -> ((0.856, 0.856)),
-      "authorFullName          ".trim -> ((0.725, 0.693)),
-      "authorFullNameNormalized".trim -> ((0.753, 0.718)),
-      "authorLastName          ".trim -> ((0.833, 0.788)),
-      "authorLastNameNormalized".trim -> ((0.855, 0.808)),
-      "bibAll                  ".trim -> ((0.020, 0.011)),
-      "bibAllNormalized        ".trim -> ((0.024, 0.012)),
-      "bibAuthors              ".trim -> ((0.504, 0.346)),
-      "bibAuthorsNormalized    ".trim -> ((0.683, 0.497)),
-      "bibCounts               ".trim -> ((1.000, 0.654)),
-      "bibMentions             ".trim -> ((0.230, 0.202)),
-      "bibMentionsNormalized   ".trim -> ((0.257, 0.213)),
-      "bibTitles               ".trim -> ((0.832, 0.603)),
-      "bibTitlesNormalized     ".trim -> ((0.834, 0.604)),
-      "bibVenues               ".trim -> ((0.049, 0.017)),
-      "bibVenuesNormalized     ".trim -> ((0.049, 0.017)),
-      "bibYears                ".trim -> ((0.909, 0.654)),
-      "title                   ".trim -> ((0.408, 0.408)),
-      "titleNormalized         ".trim -> ((0.807, 0.807))
+      "abstract                 ".trim -> ((0.856, 0.856)),
+      "abstractNormalized       ".trim -> ((0.856, 0.856)),
+      "authorFullName           ".trim -> ((0.821, 0.805)),
+      "authorFullNameNormalized ".trim -> ((0.851, 0.831)),
+      "authorLastName           ".trim -> ((0.871, 0.847)),
+      "authorLastNameNormalized ".trim -> ((0.889, 0.862)),
+      "bibAll                   ".trim -> ((0.033, 0.031)),
+      "bibAllButVenuesNormalized".trim -> ((0.619, 0.560)),
+      "bibAllNormalized         ".trim -> ((0.044, 0.041)),
+      "bibAuthors               ".trim -> ((0.726, 0.637)),
+      "bibAuthorsNormalized     ".trim -> ((0.840, 0.743)),
+      "bibCounts                ".trim -> ((1.000, 0.826)),
+      "bibMentions              ".trim -> ((0.232, 0.218)),
+      "bibMentionsNormalized    ".trim -> ((0.273, 0.245)),
+      "bibTitles                ".trim -> ((0.795, 0.709)),
+      "bibTitlesNormalized      ".trim -> ((0.796, 0.710)),
+      "bibVenues                ".trim -> ((0.062, 0.051)),
+      "bibVenuesNormalized      ".trim -> ((0.063, 0.052)),
+      "bibYears                 ".trim -> ((0.933, 0.835)),
+      "title                    ".trim -> ((0.427, 0.427)),
+      "titleNormalized          ".trim -> ((0.842, 0.842))
       )
 
     val tolerance = 0.002

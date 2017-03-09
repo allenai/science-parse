@@ -1,10 +1,10 @@
 package org.allenai.scienceparse
 
 import java.awt.Desktop
-import java.io.{PrintWriter, File}
+import java.io.{ PrintWriter, File }
 
 import org.allenai.common.Resource
-import org.allenai.scienceparse.pdfapi.{PDFFontMetrics, PDFExtractor}
+import org.allenai.scienceparse.pdfapi.{ PDFFontMetrics, PDFExtractor }
 import org.apache.commons.lang3.StringEscapeUtils
 import scopt.OptionParser
 import scala.collection.JavaConverters._
@@ -20,7 +20,7 @@ object PrintCRFInput extends App {
       c.copy(paperDir = Some(d))
     } text "The directory that contains the papers"
 
-    arg[String]("<paperId>") required() action { (p, c) =>
+    arg[String]("<paperId>") required () action { (p, c) =>
       c.copy(paperId = p)
     } text "The ID of the paper whose CRF input you want to see"
   }
@@ -33,7 +33,7 @@ object PrintCRFInput extends App {
     val seq = Resource.using(paperSource.getPdf(config.paperId)) { is =>
       val ext = new PDFExtractor
       val doc = ext.extractFromInputStream(is)
-      PDFToCRFInput.getSequence(doc, true).asScala
+      PDFToCRFInput.getSequence(doc).asScala
     }
 
     // make a font-to-color map
@@ -52,8 +52,9 @@ object PrintCRFInput extends App {
         out.println("<head>")
         out.println(s"<title>CRF input for ${config.paperId}</title>")
         out.println("<style type=\"text/css\">")
-        font2color.foreach { case (style, color) =>
-          out.println(s".$style { background-color: $color; }")
+        font2color.foreach {
+          case (style, color) =>
+            out.println(s".$style { background-color: $color; }")
         }
         out.println("</style>")
         out.println("</head>")
@@ -61,11 +62,11 @@ object PrintCRFInput extends App {
         var line = 0
         var page = 0
         seq.foreach { token =>
-          if(token.getPage != page) {
+          if (token.getPage != page) {
             out.println("<hr>")
             line = 0
             page = token.getPage
-          } else if(token.getLine != line) {
+          } else if (token.getLine != line) {
             out.println("<br>")
             line = token.getLine
           }

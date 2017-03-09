@@ -12,7 +12,6 @@ import org.allenai.datastore.Datastore;
 import org.allenai.ml.sequences.crf.CRFPredicateExtractor;
 import org.allenai.scienceparse.pdfapi.PDFToken;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, String> {
@@ -29,22 +29,22 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     "to");
   public static final HashSet<String> stopHash = new HashSet<String>(stopWords);
 
-  private ParserLMFeatures lmFeats;
+  private final ParserLMFeatures lmFeats;
   private final Searcher word2vecSearcher;
 
   public PDFPredicateExtractor() {
-    try {
-      final Path word2VecModelPath =
-              Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
-      final Word2VecModel word2VecModel = Word2VecModel.fromBinFile(word2VecModelPath.toFile());
-      word2vecSearcher = word2VecModel.forSearch();
-    } catch(final IOException e) {
-      throw new RuntimeException(e);
-    }
+    this(null);
   }
 
   public PDFPredicateExtractor(ParserLMFeatures plf) {
-    this();
+    try {
+      final Path word2VecModelPath =
+              Datastore.apply().filePath("org.allenai.scienceparse", "Word2VecModel.bin", 1);
+      word2vecSearcher = WordVectorCache.searcherForPath(word2VecModelPath);
+    } catch(final IOException e) {
+      throw new RuntimeException(e);
+    }
+
     lmFeats = plf;
   }
 
@@ -89,15 +89,15 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     return Math.log10(freq + 0.1);
   }
 
-  private float height(PDFToken t) {
+  private static float height(PDFToken t) {
     return t.bounds.get(3) - t.bounds.get(1);
   }
 
-  private float width(PDFToken t) {
+  private static float width(PDFToken t) {
     return t.bounds.get(0) - t.bounds.get(2);
   }
 
-  public float getExtreme(List<PaperToken> toks, TokenPropertySelector s, boolean max) {
+  public static float getExtreme(List<PaperToken> toks, TokenPropertySelector s, boolean max) {
     float adj = -1.0f;
     float extremeSoFar = Float.NEGATIVE_INFINITY;
     if (max) {
@@ -112,19 +112,19 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
     return extremeSoFar * adj;
   }
 
-  public float linearNormalize(float f, Pair<Float, Float> rng) {
+  public static float linearNormalize(float f, Pair<Float, Float> rng) {
     if (Math.abs(rng.getTwo() - rng.getOne()) < 0.00000001)
       return 0.5f;
     else
       return (f - rng.getOne()) / (rng.getTwo() - rng.getOne());
   }
 
-  public Pair<Float, Float> getExtrema(List<PaperToken> toks, TokenPropertySelector s) {
+  public static Pair<Float, Float> getExtrema(List<PaperToken> toks, TokenPropertySelector s) {
     Pair<Float, Float> out = Tuples.pair(getExtreme(toks, s, false), getExtreme(toks, s, true));
     return out;
   }
 
-  public float getFixedFont(PaperToken t) {
+  public static float getFixedFont(PaperToken t) {
     float s = t.getPdfToken().fontMetrics.ptSize;
     if (s > 30.0f) //assume it's an error
       return 11.0f;
@@ -134,6 +134,15 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 
   public double logYDelt(float y1, float y2) {
     return Math.log(Math.max(y1 - y2, 0.00001f));
+  }
+
+  // String.format() ends up taking a very long time at scale, so we pre-compute all the
+  // String.format() calls we might need and re-use them.
+  public static final String[] wordEmbeddingFeatureNames;
+  static {
+    wordEmbeddingFeatureNames = new String[1000];
+    for (int i = 0; i < wordEmbeddingFeatureNames.length; ++i)
+      wordEmbeddingFeatureNames[i] = String.format("%%emb%03d", i);
   }
 
   //assumes start/stop padded
@@ -183,23 +192,23 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 
         //font-change forward (fcf) or backward (fcb):
         if (font != prevFont)
-          m.put("%fcb", 1.0);
+          m.put("%fcb", 1.0); //binary, 1.0 if there is a font change forward, 0.0 otherwise
         if (font != nextFont)
-          m.put("%fcf", 1.0);
+          m.put("%fcf", 1.0); //font change backward
         if (line != prevLine) {
-          m.put("%lcb", 1.0);
-          m.put("%hGapB", logYDelt(getY(elems.get(i), true), prevY));
+          m.put("%lcb", 1.0); //line change backward
+          m.put("%hGapB", logYDelt(getY(elems.get(i), true), prevY)); //height gap backward
         }
         if (line != nextLine) {
-          m.put("%lcf", 1.0);
-          m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false)));
+          m.put("%lcf", 1.0); //line change forward
+          m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false))); //height gap forward
         }
 
         // change in height
         if (Math.abs(Math.abs(nextHeight - h) / Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% change
           m.put("%hcf", 1.0);
         }
-        if (Math.abs(Math.abs(prevHeight - h) / Math.abs(prevHeight + h)) > 0.1) {
+        if (Math.abs(Math.abs(prevHeight - h) / Math.abs(prevHeight + h)) > 0.1) { //larger than ~20% height change backward
           m.put("%hcb", 1.0);
         }
 
@@ -218,33 +227,33 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
 
         //font value:
         float relativeF = linearNormalize(font, fBounds);
-        m.put("%font", relativeF);
+        m.put("%font", relativeF); //font size normalized relative to doc
 
         m.put("%line", Math.min(line, 10.0)); //cap to max 10 lines
         float relativeH = linearNormalize(h, hBounds);
-        m.put("%h", relativeH);
+        m.put("%h", relativeH); //normalized line height
 
         //word features:
         String tok = elems.get(i).getPdfToken().token;
 
         getCaseMasks(tok).forEach(
-          (String s) -> m.put(s, 1.0));
+          (String s) -> m.put(s, 1.0)); //case masks
         if (isStopWord(tok)) {
-          m.put("%stop", 1.0);
+          m.put("%stop", 1.0); //stop word
           if (line != prevLine && (m.containsKey("%XXX") || m.containsKey("%Xxx")))
-            m.put("%startCapStop", 1.0);
+            m.put("%startCapStop", 1.0); //is a stop word that starts with a capital letter
         } else {
           if (m.containsKey("%xxx")) {
-            m.put("%uncapns", 1.0);
+            m.put("%uncapns", 1.0); //is an uncapitalized stop word
           }
         }
         double adjLen = Math.min(tok.length(), 10.0) / 10.0;
         double adjLenSq = (adjLen - 0.5) * (adjLen - 0.5);
-        m.put("%adjLen", adjLen);
-        m.put("%adjLenSq", adjLenSq);
+        m.put("%adjLen", adjLen); //adjusted word length
+        m.put("%adjLenSq", adjLenSq); //adjusted word length squared (?)
         if (line <= 2)
-          m.put("%first3lines", 1.0);
-        if (lmFeats != null) {
+          m.put("%first3lines", 1.0); //is it in the first three lines:
+        if (lmFeats != null) { //how well does token match title/author gazeetters
           m.put("%tfreq", smoothFreq(tok, this.lmFeats.titleBow));
           m.put("%tffreq", smoothFreq(tok, this.lmFeats.titleFirstBow));
           m.put("%tlfreq", smoothFreq(tok, this.lmFeats.titleLastBow));
@@ -282,11 +291,11 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         
         // add word embeddings
         try {
-          final Iterator<Double> vector = word2vecSearcher.getRawVector("token").iterator();
+          final Iterator<Double> vector = word2vecSearcher.getRawVector(tok).iterator();
           int j = 0;
           while(vector.hasNext()) {
             final double value = vector.next();
-            m.put(String.format("%%emb%03d", j), value);
+            m.put(wordEmbeddingFeatureNames[j], value);
             j += 1;
           }
         } catch (final Searcher.UnknownWordException e) {
@@ -295,6 +304,25 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
       }
       out.add(m);
     }
+
+    // print extensive debug information
+    if(log.isDebugEnabled()) {
+      // calculate a hash out of the tokens, so we can match feature values from different runs
+      // based on the tokens
+      final String tokens =
+              out.stream().map(features ->
+                      features.
+                              keysView().
+                              select(key -> key.startsWith("%t=")).
+                              collect(featureName -> featureName.substring(3)).
+                              makeString("-")
+              ).collect(Collectors.joining(" "));
+      final String tokensHashPrefix = String.format("%x", tokens.hashCode());
+
+      log.debug("{} CRF Input for {}", tokensHashPrefix, tokens);
+      PrintFeaturizedCRFInput.stringsFromFeaturizedSeq(out, tokensHashPrefix).stream().forEach(log::debug);
+    }
+
     return out;
   }
 

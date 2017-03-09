@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 public class ExtractedMetadata {
   public static final String titleTag = "T"; //label used in labeled data
   public static final String authorTag = "A"; //label used in labeled data
+  public static final String yearTag = "Y"; //label used in labeled data (bibliography only)
+  public static final String venueTag = "V"; //label used in labeled data (bibliography only)
 
   transient private static Pattern emailDelimitersRegex = Pattern.compile(",|\\||;");
 
@@ -38,7 +40,7 @@ public class ExtractedMetadata {
   public String title;
   public List<String> authors;
   public List<String> emails; //extracted by special (non-CRF) heuristic process
-  public List<String> raw; //the full paper text
+  public List<Section> sections;
   public List<BibRecord> references;
   public List<CitationRecord> referenceMentions;
   public int year;
