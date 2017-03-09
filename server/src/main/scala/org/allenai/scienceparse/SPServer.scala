@@ -341,7 +341,7 @@ class SPServer(
     }
 
     // We de-serialize and then re-serialize the posted data to check for errors and validity.
-    val input: LabeledData = formatString match {
+    var input: LabeledData = formatString match {
       case "LabeledData" =>
         import spray.json._
         import LabeledDataJsonProtocol._
@@ -352,6 +352,8 @@ class SPServer(
       case _ =>
         throw SPServerException(400, s"Could not understand input format '$formatString'")
     }
+    if(!input.id.startsWith("feedback:"))
+      input = input.copy(id = s"feedback:${input.id}")
 
     feedbackStore.addFeedback(paperId, input)
 
