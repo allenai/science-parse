@@ -259,18 +259,6 @@ public class PDFExtractor {
       return sb.toString();
     }
 
-    public String discardSuperscripts(String token, FloatList bounds) {
-      double yThresh = (bounds.get(3) + bounds.get(1))/2.0;
-      StringBuilder sb = new StringBuilder();
-      int i=0;
-      for (TextPosition tp : textPositions) {
-        if(tp.getY() + tp.getHeight() > yThresh)
-          sb.append(token.charAt(i));
-        i++;
-      }
-      return sb.toString();
-    }
-
     public PDFToken toPDFToken() {
       val builder = PDFToken.builder();
       String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));

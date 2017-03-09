@@ -60,7 +60,6 @@ object Matching extends App with Datastores with Logging {
       pgt,
       paperSource,
       config.maxHeaderWords,
-      true,
       config.maxPaperCount,
       config.minYear,
       true,
