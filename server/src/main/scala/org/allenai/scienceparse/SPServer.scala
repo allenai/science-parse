@@ -269,13 +269,20 @@ class SPServer(
   private def handlePaperId(request: SPRequest, regexGroups: Map[String, String]) = {
     val paperId = regexGroups("paperId")
     val formatString = request.queryParams.getOrElse("format", "LabeledData")
+    val skipFields = request.queryParams.getOrElse("skipFields", "").split(",").map(_.trim).toSet
     val content = formatString match {
       case "LabeledData" =>
-        val labeledData =
-          LabeledPapersFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).labels.toJson.prettyPrint
-        labeledData.getBytes("UTF-8")
-      case "ExtractedMetadata" =>
+        val labeledDataJson =
+          LabeledPapersFromScienceParse.get(paperSource.getPdf(paperId), scienceParser).labels.toJson
+        val strippedFields = skipFields.foldLeft(labeledDataJson.asJsObject.fields) {
+          case (fields, skipField) =>
+            fields - skipField
+          }
+        JsObject(strippedFields).prettyPrint.getBytes("UTF-8")
+      case "ExtractedMetadata" if skipFields.isEmpty =>
         prettyJsonWriter.writeValueAsBytes(scienceParser.doParse(paperSource.getPdf(paperId)))
+      case "ExtractedMetadata" if skipFields.nonEmpty =>
+        throw SPServerException(400, s"'skipFields' only works with output format 'LabeledData'.")
       case _ =>
         throw SPServerException(400, s"Could not understand output format '$formatString'.")
     }
