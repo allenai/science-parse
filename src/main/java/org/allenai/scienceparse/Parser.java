@@ -1272,12 +1272,12 @@ public class Parser {
 
     try {
         em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
-      if(em.abstractText.isEmpty())
-        em.abstractText = null;
-    } catch(final RegexWithTimeout.RegexTimeout e) {
-      logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
-      em.abstractText = null;
-    }
+        if(em.abstractText.isEmpty())
+          em.abstractText = null;
+        } catch(final RegexWithTimeout.RegexTimeout e) {
+          logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
+          em.abstractText = null;
+        }
     }
 
     //
