@@ -189,6 +189,7 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         float font = getFixedFont(elems.get(i));
         float h = height(elems.get(i).getPdfToken());
         int line = elems.get(i).getLine();
+
         //font-change forward (fcf) or backward (fcb):
         if (font != prevFont)
           m.put("%fcb", 1.0); //binary, 1.0 if there is a font change forward, 0.0 otherwise
@@ -202,11 +203,26 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.put("%lcf", 1.0); //line change forward
           m.put("%hGapF", logYDelt(nextY, getY(elems.get(i), false))); //height gap forward
         }
-        if (Math.abs(Math.abs(nextHeight - h) / Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% height change forward
+
+        // change in height
+        if (Math.abs(Math.abs(nextHeight - h) / Math.abs(nextHeight + h)) > 0.1) { //larger than ~20% change
           m.put("%hcf", 1.0);
         }
         if (Math.abs(Math.abs(prevHeight - h) / Math.abs(prevHeight + h)) > 0.1) { //larger than ~20% height change backward
           m.put("%hcb", 1.0);
+        }
+
+        // distance to previous token
+        if(line == prevLine && i > 1) {
+          final float prevEnd = elems.get(i - 1).getPdfToken().bounds.get(2);
+          final float thisStart = elems.get(i).getPdfToken().bounds.get(0);
+          m.put("%dxb", logYDelt(thisStart, prevEnd));
+        }
+        // distance to next token
+        if(line == nextLine && i < elems.size() - 2) {
+          final float thisEnd = elems.get(i).getPdfToken().bounds.get(2);
+          final float nextStart = elems.get(i + 1).getPdfToken().bounds.get(0);
+          m.put("%dxf", logYDelt(nextStart, thisEnd));
         }
 
         //font value:
@@ -255,6 +271,9 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
         if(token.equals("and") || token.equals(","))
           m.put("%and", 1.0);
 
+        //if(token.equals("-"))
+        //  m.put("%dash", 1.0);
+
         // add trigram features
         final String trigramSourceToken = token + "$";
         for(int j = 0; j <= trigramSourceToken.length() - 3; ++j) {
@@ -263,6 +282,13 @@ public class PDFPredicateExtractor implements CRFPredicateExtractor<PaperToken, 
           m.updateValue(feature, 0.0, d -> d + 1);
         }
 
+        // add bigram features
+        for(int j = 0; j <= trigramSourceToken.length() - 2; ++j) {
+          final String trigram = trigramSourceToken.substring(j, j + 2);
+          final String feature = "%bi=" + trigram;
+          m.updateValue(feature, 0.0, d -> d + 1);
+        }
+        
         // add word embeddings
         try {
           final Iterator<Double> vector = word2vecSearcher.getRawVector(tok).iterator();

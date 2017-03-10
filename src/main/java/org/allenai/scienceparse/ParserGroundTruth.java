@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,10 +37,6 @@ public class ParserGroundTruth {
     ObjectMapper om = new ObjectMapper();
     ObjectReader r = om.reader(new TypeReference<List<Paper>>() {});
 
-//    int c = isr.read();
-//    if(c != 0xfeff) {
-//      isr.reset();
-//    }
     papers = r.readValue(isr);
     log.info("Read " + papers.size() + " papers.");
     isr.close();
@@ -52,6 +50,18 @@ public class ParserGroundTruth {
 
   public ParserGroundTruth(String jsonFile) throws IOException {
     this(new FileInputStream(jsonFile));
+  }
+
+  public static ParserGroundTruth fromFile(final File file) throws IOException {
+    final ParserGroundTruth pgt;
+    try(final InputStream is = new FileInputStream(file)) {
+      pgt = new ParserGroundTruth(is);
+    }
+    return pgt;
+  }
+
+  public static ParserGroundTruth fromPath(final Path path) throws IOException {
+    return fromFile(path.toFile());
   }
 
   public static String invertAroundComma(String in) {

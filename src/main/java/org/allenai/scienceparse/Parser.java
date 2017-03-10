@@ -91,7 +91,7 @@ public class Parser {
 
   private static final Datastore datastore = Datastore.apply();
   public static Path getDefaultProductionModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 7);
+    return datastore.filePath("org.allenai.scienceparse", "productionModel-with-tokenization.dat", 1);
   }
   public static Path getDefaultGazetteer() {
     return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 4);
@@ -100,7 +100,7 @@ public class Parser {
     return datastore.directoryPath("org.allenai.scienceparse", "kermit-gazetteers", 1);
   }
   public static Path getDefaultBibModel() {
-    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 6);
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel-with-tokenization.dat", 1);
   }
 
   private static Parser defaultParser = null;
@@ -272,7 +272,7 @@ public class Parser {
     public final Set<String> usedPaperIds;
   }
 
-  private static LabelingOutput labelFromGroundTruth(
+  public static LabelingOutput labelFromGroundTruth(
     final ParserGroundTruth pgt,
     final PaperSource paperSource,
     final int headerMax,
@@ -670,8 +670,8 @@ public class Parser {
     Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
 
     try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
-    logger.info("Writing model to {}", opts.modelFile);
-    saveModel(dos, crfModel.featureEncoder, weights, plf);
+      logger.info("Writing model to {}", opts.modelFile);
+      saveModel(dos, crfModel.featureEncoder, weights, plf);
     }
 
     // log test and training data
@@ -681,7 +681,7 @@ public class Parser {
 
       labeledDataLogger.info("Test data after:");
       logLabeledData(testLabeledData);
-    }
+  }
 
   }
 
@@ -770,7 +770,7 @@ public class Parser {
 
     val predExtractor = new PDFPredicateExtractor(plf);
     val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
-            (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
+      (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
     val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
     val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
     return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
@@ -1222,62 +1222,62 @@ public class Parser {
     // Run Science-parse
     //
     {
-      PDFExtractor ext = new PDFExtractor();
+    PDFExtractor ext = new PDFExtractor();
       PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
       List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
-      seq = seq.subList(0, Math.min(seq.size(), headerMax));
-      seq = PDFToCRFInput.padSequence(seq);
+    seq = seq.subList(0, Math.min(seq.size(), headerMax));
+    seq = PDFToCRFInput.padSequence(seq);
 
-      { // get title and authors from the CRF
-        List<String> outSeq = model.bestGuess(seq);
-        //the output tag sequence will not include the start/stop states!
-        outSeq = PDFToCRFInput.padTagSequence(outSeq);
-        em = new ExtractedMetadata(seq, outSeq);
-        em.source = ExtractedMetadata.Source.CRF;
+    { // get title and authors from the CRF
+      List<String> outSeq = model.bestGuess(seq);
+      //the output tag sequence will not include the start/stop states!
+      outSeq = PDFToCRFInput.padTagSequence(outSeq);
+      em = new ExtractedMetadata(seq, outSeq);
+      em.source = ExtractedMetadata.Source.CRF;
+    }
+
+    // use PDF metadata if it's there
+    if(doc.meta != null) {
+      if (doc.meta.title != null) {
+        em.setTitle(doc.meta.title);
+        em.source = ExtractedMetadata.Source.META;
       }
+      if (doc.meta.createDate != null)
+        em.setYearFromDate(doc.meta.createDate);
+    }
 
-      // use PDF metadata if it's there
-      if (doc.meta != null) {
-        if (doc.meta.title != null) {
-          em.setTitle(doc.meta.title);
-          em.source = ExtractedMetadata.Source.META;
-        }
-        if (doc.meta.createDate != null)
-          em.setYearFromDate(doc.meta.createDate);
-      }
-
-      clean(em);
+    clean(em);
       final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
 
-      em.creator = doc.meta.creator;
-      // extract references
-      try {
-        final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
-        final Pair<List<BibRecord>, List<CitationRecord>> pair =
+    em.creator = doc.meta.creator;
+    // extract references
+    try {
+      final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+      final Pair<List<BibRecord>, List<CitationRecord>> pair =
             getReferences(lines, rawReferences, referenceExtractor);
-        em.references = pair.getOne();
-        List<CitationRecord> crs = new ArrayList<>();
-        for (CitationRecord cr : pair.getTwo()) {
-          crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
-        }
-        em.referenceMentions = crs;
-      } catch (final RegexWithTimeout.RegexTimeout e) {
-        logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
-        if (em.references == null)
-          em.references = Collections.emptyList();
-        if (em.referenceMentions == null)
-          em.referenceMentions = Collections.emptyList();
+      em.references = pair.getOne();
+      List<CitationRecord> crs = new ArrayList<>();
+      for (CitationRecord cr : pair.getTwo()) {
+        crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
       }
+      em.referenceMentions = crs;
+    } catch(final RegexWithTimeout.RegexTimeout e) {
+      logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
+      if(em.references == null)
+        em.references = Collections.emptyList();
+      if(em.referenceMentions == null)
+        em.referenceMentions = Collections.emptyList();
+    }
       logger.debug(em.references.size() + " refs for " + em.title);
 
-      try {
+    try {
         em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
-        if (em.abstractText.isEmpty())
+        if(em.abstractText.isEmpty())
           em.abstractText = null;
-      } catch (final RegexWithTimeout.RegexTimeout e) {
-        logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
-        em.abstractText = null;
-      }
+        } catch(final RegexWithTimeout.RegexTimeout e) {
+          logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
+          em.abstractText = null;
+        }
     }
 
     //
