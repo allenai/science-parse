@@ -346,11 +346,11 @@ public class ExtractReferences {
   private static int refStart(List<String> paper) {
     for (int i = paper.size() / 3; i < paper.size(); i++) { //heuristic, assume refs start at least 1/3 into doc
       String s = paper.get(i);
-      if (s.endsWith("References") || s.endsWith("Citations") || s.endsWith("Bibliography") ||
-        s.endsWith("REFERENCES") || s.endsWith("CITATIONS") || s.endsWith("BIBLIOGRAPHY"))
+      if (s.endsWith("References") || s.endsWith("Citations") || s.endsWith("Bibliography") || s.endsWith("Bibliographie") ||
+        s.endsWith("REFERENCES") || s.endsWith("CITATIONS") || s.endsWith("BIBLIOGRAPHY") || s.endsWith("BIBLIOGRAPHIE"))
         return i;
-      else if (s.contains("References<lb>") || s.contains("Citations<lb>") || s.contains("Bibliography<lb>") ||
-        s.contains("REFERENCES<lb>") || s.contains("CITATIONS<lb>") || s.contains("BIBLIOGRAPHY<lb>")) {
+      else if (s.contains("References<lb>") || s.contains("Citations<lb>") || s.contains("Bibliography<lb>") || s.contains("Bibliographie<lb>") ||
+        s.contains("REFERENCES<lb>") || s.contains("CITATIONS<lb>") || s.contains("BIBLIOGRAPHY<lb>") || s.contains("BIBLIOGRAPHIE<lb>")) {
         return i - 1;
       }
     }
