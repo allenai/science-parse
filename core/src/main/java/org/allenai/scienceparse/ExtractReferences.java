@@ -257,7 +257,7 @@ public class ExtractReferences {
       mainSplitString = ",";
 
     // replace "and" with the top level separator
-    authString = authString.replaceAll("[aA][nN][dD]|&", mainSplitString);
+    authString = authString.replaceAll("\\b[aA][nN][dD]\\b|&", mainSplitString);
 
     // split into names
     final String[] names = authString.split(mainSplitString);
