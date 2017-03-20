@@ -76,6 +76,7 @@ object SPServer extends Logging {
       }
 
       val server = new Server(8080)
+      server.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize", 10000000)
       server.setHandler(new SPServer(paperSource, scienceParser))
       server.start()
       server.join()
