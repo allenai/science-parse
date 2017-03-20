@@ -208,6 +208,13 @@ object RunSP extends Logging {
               }
             }
 
+            // write to stdout
+            if(config.outputDir.isEmpty && outputStream.isEmpty) {
+              System.out.synchronized {
+                prettyJsonWriter.writeValue(System.out, wrapper)
+              }
+            }
+
           } catch {
             case NonFatal(e) =>
               logger.info(s"Parsing $name failed with ${e.toString}")
