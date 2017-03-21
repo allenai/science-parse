@@ -1,0 +1,1406 @@
+package org.allenai.scienceparse;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gs.collections.api.set.MutableSet;
+import com.gs.collections.api.set.primitive.MutableIntSet;
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.factory.primitive.IntSets;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
+import com.gs.collections.impl.tuple.Tuples;
+
+import lombok.Data;
+import lombok.val;
+import org.allenai.datastore.Datastore;
+import org.allenai.ml.eval.TrainCriterionEval;
+import org.allenai.ml.linalg.DenseVector;
+import org.allenai.ml.linalg.Vector;
+import org.allenai.ml.sequences.Evaluation;
+import org.allenai.ml.sequences.StateSpace;
+import org.allenai.ml.sequences.crf.CRFFeatureEncoder;
+import org.allenai.ml.sequences.crf.CRFModel;
+import org.allenai.ml.sequences.crf.CRFTrainer;
+import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
+import org.allenai.ml.util.IOUtils;
+import org.allenai.ml.util.Indexer;
+import org.allenai.ml.util.Parallel;
+import org.allenai.pdffigures2.FigureExtractor;
+import org.allenai.scienceparse.ExtractReferences.BibStractor;
+import org.allenai.scienceparse.ParserGroundTruth.Paper;
+import org.allenai.scienceparse.pdfapi.PDFDoc;
+import org.allenai.scienceparse.pdfapi.PDFExtractor;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.nustaq.serialization.FSTObjectInput;
+import org.nustaq.serialization.FSTObjectOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.compat.java8.ScalaStreamSupport;
+import scala.compat.java8.OptionConverters;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+
+public class Parser {
+
+  public static final int MAXHEADERWORDS = 500; //set to something high for author/title parsing
+  public static final String DATA_VERSION = "0.3";  // faster serialization
+  private CRFModel<String, PaperToken, String> model;
+  private ExtractReferences referenceExtractor;
+
+  private final static Logger logger =
+          LoggerFactory.getLogger(Parser.class);
+  private final static Logger labeledDataLogger =
+          LoggerFactory.getLogger(logger.getName() + ".labeledData");
+
+  private static final Datastore datastore = Datastore.apply();
+  public static Path getDefaultProductionModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 8);
+  }
+  public static Path getDefaultGazetteer() {
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 4);
+  }
+  public static Path getDefaultGazetteerDir() {
+    return datastore.directoryPath("org.allenai.scienceparse", "kermit-gazetteers", 1);
+  }
+  public static Path getDefaultBibModel() {
+    return datastore.filePath("org.allenai.scienceparse", "productionBibModel.dat", 7);
+  }
+
+  private static Parser defaultParser = null;
+  public synchronized static Parser getInstance() throws Exception {
+    if(defaultParser == null)
+      defaultParser = new Parser();
+    return defaultParser;
+  }
+
+  public Parser() throws Exception {
+    this(getDefaultProductionModel(), getDefaultGazetteer(), getDefaultBibModel());
+  }
+
+  public Parser(
+          final String modelFile,
+          final String gazetteerFile,
+          final String bibModelFile
+  ) throws Exception {
+    this(new File(modelFile), new File(gazetteerFile), new File(bibModelFile));
+  }
+
+  public Parser(
+          final Path modelFile,
+          final Path gazetteerFile,
+          final Path bibModelFile
+  ) throws Exception {
+    this(modelFile.toFile(), gazetteerFile.toFile(), bibModelFile.toFile());
+  }
+
+  public Parser(
+          final File modelFile,
+          final File gazetteerFile,
+          final File bibModelFile
+  ) throws Exception {
+    // Load main model in one thread, and the rest in another thread, to speed up startup.
+    final AtomicReference<Exception> exceptionThrownByModelLoaderThread = new AtomicReference<>();
+    final Thread modelLoaderThread = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        logger.info("Loading model from {}", modelFile);
+        try(
+            final DataInputStream modelIs =
+                new DataInputStream(new FileInputStream(modelFile));
+        ) {
+          model = loadModel(modelIs);
+          logger.info("Loaded model from {}", modelFile);
+        } catch(final Exception e) {
+          exceptionThrownByModelLoaderThread.compareAndSet(null, e);
+          logger.warn("Failed loading model from {}", modelFile);
+        }
+      }
+    }, "ModelLoaderThread");
+    modelLoaderThread.start();
+
+    // Load non-main model stuff
+    logger.info("Loading gazetteer from {}", gazetteerFile);
+    logger.info("Loading bib model from {}", bibModelFile);
+    try(
+      final InputStream gazetteerIs = new FileInputStream(gazetteerFile);
+      final DataInputStream bibModelIs = new DataInputStream(new FileInputStream(bibModelFile))
+    ) {
+      // Loading the gazetteer takes a long time, so we create a cached binary version of it that
+      // loads very quickly. If that version is already there, we use it. Otherwise, we create it.
+      val gazCacheFilename = String.format(
+          "%s-%08x.gazetteerCache.bin",
+          gazetteerFile.getName(),
+          gazetteerFile.getCanonicalPath().hashCode());
+      val gazCachePath = Paths.get(System.getProperty("java.io.tmpdir"), gazCacheFilename);
+      try (
+        final RandomAccessFile gazCacheFile = new RandomAccessFile(gazCachePath.toFile(), "rw");
+        final FileChannel gazCacheChannel = gazCacheFile.getChannel();
+        final FileLock gazCacheLock = gazCacheChannel.lock();
+      ) {
+        if (gazCacheChannel.size() == 0) {
+          logger.info("Creating gazetteer cache at {}", gazCachePath);
+
+          // We create it to a temp file first, and then move it over, so that aborting doesn't mean
+          // we end up with a half-written file.
+          val tempFilePath =
+              Paths.get(System.getProperty("java.io.tmpdir"), gazCacheFilename + ".tmp");
+          try(final OutputStream tempFileStream = Files.newOutputStream(tempFilePath)) {
+            referenceExtractor =
+                ExtractReferences.createAndWriteGazCache(
+                    gazetteerIs,
+                    bibModelIs,
+                    tempFileStream);
+          }
+          Files.move(tempFilePath, gazCachePath, StandardCopyOption.REPLACE_EXISTING);
+        } else {
+          logger.info("Reading from gazetteer cache at {}", gazCachePath);
+          referenceExtractor = new ExtractReferences(
+              gazetteerIs,
+              bibModelIs,
+              Channels.newInputStream(gazCacheChannel));
+        }
+      }
+    }
+    logger.info("Loaded gazetteer from {}", gazetteerFile);
+    logger.info("Loaded bib model from {}", bibModelFile);
+
+    // Close out the model loader thread and make sure the results are OK.
+    modelLoaderThread.join();
+    if(exceptionThrownByModelLoaderThread.get() != null)
+      throw exceptionThrownByModelLoaderThread.get();
+    assert(model != null);
+  }
+
+  public Parser(
+          final InputStream modelStream,
+          final InputStream gazetteerStream,
+          final InputStream bibModelStream
+  ) throws Exception {
+    final DataInputStream dis = new DataInputStream(modelStream);
+    model = loadModel(dis);
+    referenceExtractor =
+            new ExtractReferences(
+                    gazetteerStream,
+                    new DataInputStream(bibModelStream));
+  }
+
+  public static Pair<List<BibRecord>, List<CitationRecord>> getReferences(
+    final List<String> raw,
+    final List<String> rawReferences,
+    final ExtractReferences er
+  ) throws IOException {
+    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
+    final List<BibRecord> brs =
+            fnd.getOne().stream().map(BibRecord::withNormalizedAuthors).collect(Collectors.toList());
+    final BibStractor bs = fnd.getTwo();
+    final List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs, bs);
+    return Tuples.pair(brs, crs);
+  }
+
+  //slow
+  public static String paperToString(File f) {
+    try {
+      FileInputStream fis = new FileInputStream(f);
+      PDFDoc doc = (new PDFExtractor()).extractFromInputStream(fis);
+      fis.close();
+      val seq = PDFToCRFInput.getSequence(doc);
+      return PDFToCRFInput.stringAt(seq, Tuples.pair(0, seq.size()));
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  //from conll.Trainer:
+  private static <T> Pair<List<T>, List<T>> splitData(List<T> original, double splitForSecond) {
+    List<T> first = new ArrayList<>();
+    List<T> second = new ArrayList<>();
+    if (splitForSecond > 0.0) {
+      Collections.shuffle(original, new Random(0L));
+      int numFirst = (int) ((1.0 - splitForSecond) * original.size());
+      first.addAll(original.subList(0, numFirst));
+      second.addAll(original.subList(numFirst, original.size()));
+    } else {
+      first.addAll(original);
+      // second stays empty
+    }
+    return Tuples.pair(first, second);
+  }
+
+  public static List<Pair<PaperToken, String>> getPaperLabels(
+          File pdf,
+          Paper p,
+          PDFExtractor ext,
+          int headerMax
+  ) throws IOException {
+    try(final InputStream is = new BufferedInputStream(new FileInputStream(pdf))) {
+      return getPaperLabels(is, p, ext, headerMax, false);
+    }
+  }
+
+  public static List<Pair<PaperToken, String>> getPaperLabels(
+          final InputStream is,
+          final Paper p,
+          PDFExtractor ext,
+          int headerMax,
+          boolean checkAuthors
+  ) throws IOException {
+    final String paperId = p == null ? null : p.getId();
+    if(paperId != null)
+    logger.debug("{}: starting", paperId);
+
+    final PDFDoc doc;
+    try {
+      doc = ext.extractFromInputStream(is);
+    } catch(final Exception e) {
+      logger.warn("{} failed: {}", paperId, e.toString());
+      return null;
+    }
+    if (doc == null) {
+      return null;
+    }
+
+    List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
+    if (seq.size() == 0)
+      return null;
+    seq = seq.subList(0, Math.min(seq.size(), headerMax));
+    ExtractedMetadata em = null;
+    if (p == null) { //bootstrap:
+      em = new ExtractedMetadata(
+              doc.getMeta().getTitle(),
+              doc.getMeta().getAuthors(),
+        doc.getMeta().getCreateDate());
+      if (em.title == null)
+        return null;
+    } else {
+      em = new ExtractedMetadata(p);
+    }
+    List<Pair<PaperToken, String>> labeledPaper = PDFToCRFInput.labelMetadata(paperId, seq, em);
+    if (labeledPaper != null && checkAuthors) {
+      ExtractedMetadata checkEM =
+              new ExtractedMetadata(
+                      labeledPaper.stream().map(Pair::getOne).collect(Collectors.toList()),
+                      labeledPaper.stream().map(Pair::getTwo).collect(Collectors.toList()));
+      if (checkEM.authors.size() != em.authors.size()) {
+        logger.debug("{}: author mismatch, discarding. Expected {}, got {}.", paperId, em.authors, checkEM.authors);
+        labeledPaper = null;
+      }
+    }
+
+    return labeledPaper;
+  }
+
+  @Data
+  private static class LabelingOutput {
+    public final List<List<Pair<PaperToken, String>>> labeledData;
+    public final Set<String> usedPaperIds;
+  }
+
+  private static LabelingOutput labelFromGroundTruth(
+    final ParserGroundTruth pgt,
+    final PaperSource paperSource,
+    final int headerMax,
+    final int maxFiles,
+    final int minYear,
+    final boolean checkAuthors,
+    final Set<String> excludeIDs
+  ) throws IOException {
+    final PDFExtractor ext = new PDFExtractor();
+
+    // input we need
+    final int parallelism = Runtime.getRuntime().availableProcessors() * 2;
+    final int queueSize = parallelism * 4;
+    final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(queueSize);
+    final Iterator<Paper> papers = pgt.papers.iterator();
+
+    // stuff we need while processing
+    final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
+    final AtomicInteger triedCount = new AtomicInteger();
+    final ConcurrentMap<String, Long> paperId2startTime = new ConcurrentSkipListMap<>();
+
+    // capturing results
+    final ArrayList<List<Pair<PaperToken, String>>> results =
+            new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
+    final MutableSet<String> usedPaperIds = new UnifiedSet<String>().asSynchronized();
+
+    try {
+      if(maxFiles > 0)
+        logger.info("Will be labeling {} papers in {} threads.", maxFiles, parallelism);
+      else
+        logger.info("Will be labeling all papers in {} threads.", parallelism);
+
+      while (papers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
+        // fill up the queue
+        while (papers.hasNext() && workQueue.size() < queueSize) {
+          val p = papers.next();
+        if (minYear > 0 && p.year < minYear)
+          continue;
+        if (excludeIDs.contains(p.id))
+          continue;
+
+          final Future<List<Pair<PaperToken, String>>> future = executor.submit(() -> {
+            try {
+              paperId2startTime.put(p.id, System.currentTimeMillis());
+              final List<Pair<PaperToken, String>> result;
+              try(final InputStream is = paperSource.getPdf(p.id)) {
+                result = getPaperLabels(
+                        is,
+                        p,
+                        ext,
+                        headerMax,
+                        checkAuthors);
+              }
+
+              int tried = triedCount.incrementAndGet();
+              if (result != null)
+                usedPaperIds.add(p.id);
+              if (tried % 100 == 0) {
+                // find the document that's been in flight the longest
+                final long now = System.currentTimeMillis();
+                final Set<Map.Entry<String, Long>> entries = paperId2startTime.entrySet();
+                final Optional<Map.Entry<String, Long>> maxEntry =
+                        entries.stream().max(
+                                new Comparator<Map.Entry<String, Long>>() {
+                                  @Override
+                                  public int compare(
+                                          final Map.Entry<String, Long> left,
+                                          final Map.Entry<String, Long> right
+                                  ) {
+                                    final long l = now - left.getValue();
+                                    final long r = now - right.getValue();
+                                    if (l < r)
+                                      return -1;
+                                    else if (l > r)
+                                      return 1;
+                                    else
+                                      return 0;
+                                  }
+                                });
+
+                final int succeeded = usedPaperIds.size();
+                if (maxEntry.isPresent()) {
+                  logger.info(String.format(
+                          "Tried to label %d papers, succeeded %d times (%.2f%%), %d papers in flight, oldest is %s at %.2f seconds",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double) tried,
+                          entries.size(),
+                          maxEntry.get().getKey(),
+                          (now - maxEntry.get().getValue()) / 1000.0));
+                } else {
+                  logger.info(String.format(
+                          "Tried to label %d papers, succeeded %d times (%.2f%%), 0 papers in flight",
+                          tried,
+                          succeeded,
+                          succeeded * 100.0 / (double) tried));
+                }
+              }
+
+              return result;
+            } catch (final IOException e) {
+              logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
+              return null;
+            } finally {
+              paperId2startTime.remove(p.id);
+            }
+          });
+          workQueue.add(future);
+        }
+
+        // read from the queue
+        val top = workQueue.poll();
+        try {
+          val result = top.get();
+          if(result != null)
+            results.add(result);
+        } catch (final InterruptedException e) {
+          logger.warn("Interrupted while processing paper", e);
+        } catch (final ExecutionException e) {
+          logger.warn("ExecutionException while processing paper", e);
+        }
+      }
+
+      // read the queue empty if we have to
+      while(!workQueue.isEmpty() && (maxFiles <= 0 || results.size() < maxFiles)) {
+        try {
+          val result = workQueue.poll().get();
+          if(result != null)
+            results.add(result);
+        } catch (final InterruptedException e) {
+          logger.warn("Interrupted while processing paper", e);
+        } catch (final ExecutionException e) {
+          logger.warn("ExecutionException while processing paper", e);
+        }
+      }
+    } finally {
+      executor.shutdown();
+      try {
+        logger.info("Done labeling papers. Waiting for threads to shut down.");
+        executor.awaitTermination(10, TimeUnit.MINUTES);
+      } catch(final InterruptedException e) {
+        logger.warn("Interrupted while waiting for the executor to shut down. We may be leaking threads.", e);
+      }
+    }
+
+    logger.info(String.format(
+            "Tried to label %d papers, succeeded %d times (%.2f%%), all done!",
+            triedCount.get(),
+            usedPaperIds.size(),
+            usedPaperIds.size() * 100.0 / triedCount.doubleValue()));
+
+    return new LabelingOutput(results, usedPaperIds.asUnmodifiable());
+  }
+
+  public static List<List<Pair<PaperToken, String>>> bootstrapLabels(
+          List<File> files,
+          int headerMax
+  ) throws IOException {
+    List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
+    PDFExtractor ext = new PDFExtractor();
+
+    for (File f : files) {
+      val labeledPaper = getPaperLabels(f, null, ext, headerMax);
+      if (labeledPaper != null)
+        labeledData.add(labeledPaper);
+    }
+    return labeledData;
+  }
+
+  private static UnifiedSet<String> readSet(String inFile) throws IOException {
+    val out = new UnifiedSet<String>();
+    BufferedReader brIn = new BufferedReader(new FileReader(inFile));
+    String sLine;
+    while ((sLine = brIn.readLine()) != null) {
+      out.add(sLine);
+    }
+    brIn.close();
+    return out;
+  }
+
+  public static void trainBibliographyCRF(
+          final File bibsGroundTruthDirectory,
+          final ParseOpts opts
+  ) throws IOException {
+    final File coraTrainFile = new File(bibsGroundTruthDirectory, "cora-citations.txt");
+    final File umassTrainFile = new File(bibsGroundTruthDirectory, "umass-citations.txt");
+    final File kermitTrainFile = new File(bibsGroundTruthDirectory, "kermit-citations.txt");
+    trainBibliographyCRF(coraTrainFile, umassTrainFile, kermitTrainFile, opts);
+  }
+  
+  public static void trainBibliographyCRF(File coraTrainFile, File umassTrainFile, File kermitTrainFile, ParseOpts opts) throws IOException {
+    List<List<Pair<String, String>>> labeledData;
+    labeledData = CRFBibRecordParser.labelFromCoraFile(coraTrainFile);
+    if(umassTrainFile != null)
+      labeledData.addAll(CRFBibRecordParser.labelFromUMassFile(umassTrainFile));
+    if(kermitTrainFile != null)
+      labeledData.addAll(CRFBibRecordParser.labelFromKermitFile(kermitTrainFile));
+    ReferencesPredicateExtractor predExtractor;
+    
+    GazetteerFeatures gf = null;
+    try {
+    if(opts.gazetteerDir != null)
+      gf = new GazetteerFeatures(opts.gazetteerDir);
+    }
+    catch (IOException e) {
+      logger.error("Error importing gazetteer directory, ignoring.");
+    }
+    ParserLMFeatures plf = null;
+    if(opts.gazetteerFile != null) {
+      ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
+      plf = new ParserLMFeatures(
+          gaz.papers,
+          new UnifiedSet<>(),
+          new File(opts.backgroundDirectory),
+          opts.backgroundSamples);
+      predExtractor = new ReferencesPredicateExtractor(plf);
+    } else {
+      predExtractor = new ReferencesPredicateExtractor();
+    }
+    predExtractor.setGf(gf);
+    
+    // Split train/test data
+    logger.info("CRF training for bibs with {} threads and {} labeled examples", opts.threads, labeledData.size());
+    Pair<List<List<Pair<String, String>>>, List<List<Pair<String, String>>>> trainTestPair =
+      splitData(labeledData, 1.0 - opts.trainFraction);
+    val trainLabeledData = trainTestPair.getOne();
+    val testLabeledData = trainTestPair.getTwo();
+
+    // Set up Train options
+    CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
+    trainOpts.optimizerOpts.maxIters = opts.iterations;
+    trainOpts.numThreads = opts.threads;
+    trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
+
+    // set up evaluation function
+    final Parallel.MROpts evalMrOpts =
+            Parallel.MROpts.withIdAndThreads("mr-crf-bib-train-eval", opts.threads);
+    final ToDoubleFunction<CRFModel<String, String, String>> testEvalFn;
+    {
+      final List<List<Pair<String, String>>> testEvalData =
+              testLabeledData.
+                      stream().
+                      map(x -> x.stream().map(Pair::swap).collect(toList())).
+                      collect(toList());
+      testEvalFn = (model) -> {
+        final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        return eval.tokenAccuracy.accuracy();
+      };
+    }
+
+    // set up early stopping so that we stop training after 50 down-iterations
+    final TrainCriterionEval<CRFModel<String, String, String>> earlyStoppingEvaluator =
+            new TrainCriterionEval<>(testEvalFn);
+    earlyStoppingEvaluator.maxNumDipIters = 100;
+    trainOpts.iterCallback = earlyStoppingEvaluator;
+
+    // training
+    CRFTrainer<String, String, String> trainer =
+      new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
+    trainer.train(trainLabeledData);
+    final CRFModel<String, String, String> crfModel = earlyStoppingEvaluator.bestModel;
+
+    Vector weights = crfModel.weights();
+    Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
+
+    val dos = new DataOutputStream(new FileOutputStream(opts.modelFile));
+    logger.info("Writing model to {}", opts.modelFile);
+    saveModel(dos, crfModel.featureEncoder, weights, plf, gf, ExtractReferences.DATA_VERSION);
+    dos.close();
+  }
+
+  public static void trainParser(
+          final List<File> files,
+          final ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          final ParseOpts opts
+  ) throws IOException {
+    trainParser(files, pgt, paperSource, opts, UnifiedSet.newSet());
+  }
+
+  public static void trainParser(
+          final List<File> files,
+          final ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          final ParseOpts opts,
+          final String excludeIDsFile
+  ) throws IOException {
+    final UnifiedSet<String> excludedIDs;
+    if (excludeIDsFile == null)
+      excludedIDs = new UnifiedSet<>();
+    else
+      excludedIDs = readSet(excludeIDsFile);
+    trainParser(files, pgt, paperSource, opts, excludedIDs);
+  }
+
+  //borrowing heavily from conll.Trainer
+  public static void trainParser(
+          List<File> files,
+          ParserGroundTruth pgt,
+          final PaperSource paperSource,
+          ParseOpts opts,
+          final UnifiedSet<String> excludeIDs
+  ) throws IOException {
+    final LabelingOutput labelingOutput;
+    PDFPredicateExtractor predExtractor;
+    if (files != null) {
+      labelingOutput = new LabelingOutput(
+        bootstrapLabels(files, opts.headerMax),  //don't exclude for pdf meta bootstrap
+        UnifiedSet.newSet());
+    } else {
+      labelingOutput = labelFromGroundTruth(
+              pgt,
+              paperSource,
+              opts.headerMax,
+              opts.documentCount > 0 ? opts.documentCount : pgt.papers.size(),
+              opts.minYear,
+              opts.checkAuthors,
+              excludeIDs);
+    }
+    ParserLMFeatures plf = null;
+    if (opts.gazetteerFile != null) {
+      ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
+      UnifiedSet<String> excludedIds = new UnifiedSet<String>(labelingOutput.usedPaperIds);
+      excludedIds.addAll(excludeIDs);
+      plf = new ParserLMFeatures(
+              gaz.papers,
+              excludedIds,
+              new File(opts.backgroundDirectory),
+              opts.backgroundSamples);
+      predExtractor = new PDFPredicateExtractor(plf);
+    } else {
+      predExtractor = new PDFPredicateExtractor();
+    }
+
+    // Split train/test data
+    logger.info(
+            "CRF training with {} threads and {} labeled examples",
+            opts.threads,
+            labelingOutput.labeledData.size());
+    Pair<List<List<Pair<PaperToken, String>>>, List<List<Pair<PaperToken, String>>>> trainTestPair =
+      splitData(labelingOutput.labeledData, 1.0 - opts.trainFraction);
+    val trainLabeledData = trainTestPair.getOne();
+    val testLabeledData = trainTestPair.getTwo();
+
+    // log test and training data
+    if(labeledDataLogger.isDebugEnabled()) {
+      labeledDataLogger.info("Training data before:");
+      logLabeledData(trainLabeledData);
+
+      labeledDataLogger.info("Test data before:");
+      logLabeledData(testLabeledData);
+    }
+
+    // Set up Train options
+    CRFTrainer.Opts trainOpts = new CRFTrainer.Opts();
+    trainOpts.optimizerOpts.maxIters = opts.iterations;
+    trainOpts.numThreads = opts.threads;
+    trainOpts.minExpectedFeatureCount = opts.minExpectedFeatureCount;
+
+    // set up evaluation function
+    final Parallel.MROpts evalMrOpts =
+            Parallel.MROpts.withIdAndThreads("mr-crf-train-eval", opts.threads);
+    final ToDoubleFunction<CRFModel<String, PaperToken, String>> testEvalFn;
+    {
+      final List<List<Pair<String, PaperToken>>> testEvalData =
+              testLabeledData.
+                      stream().
+                      map(x -> x.stream().map(Pair::swap).collect(toList())).
+                      collect(toList());
+      testEvalFn = (model) -> {
+        final Evaluation<String> eval = Evaluation.compute(model, testEvalData, evalMrOpts);
+        logger.info("Test Label F-measures");
+        eval.stateFMeasures.forEach((label, fMeasure) -> {
+          logger.info(String.format("-- %s: p:%.3f r:%.3f f1:%.3f",
+              label, fMeasure.precision(), fMeasure.recall(), fMeasure.f1()));
+        });
+        logger.info("");
+        return eval.tokenAccuracy.accuracy();
+      };
+    }
+
+    // set up early stopping so that we stop training after 50 down-iterations
+    final TrainCriterionEval<CRFModel<String, PaperToken, String>> earlyStoppingEvaluator =
+            new TrainCriterionEval<>(testEvalFn);
+    earlyStoppingEvaluator.maxNumDipIters = 100;
+    trainOpts.iterCallback = earlyStoppingEvaluator;
+
+    // training
+    final CRFTrainer<String, PaperToken, String> trainer =
+      new CRFTrainer<>(trainLabeledData, predExtractor, trainOpts);
+    trainer.train(trainLabeledData);
+    final CRFModel<String, PaperToken, String> crfModel = earlyStoppingEvaluator.bestModel;
+
+    final Vector weights = crfModel.weights();
+    Parallel.shutdownExecutor(evalMrOpts.executorService, Long.MAX_VALUE);
+
+    try(val dos = new DataOutputStream(new FileOutputStream(opts.modelFile))) {
+      logger.info("Writing model to {}", opts.modelFile);
+      saveModel(dos, crfModel.featureEncoder, weights, plf);
+    }
+
+    // log test and training data
+    if(labeledDataLogger.isDebugEnabled()) {
+      labeledDataLogger.info("Training data after:");
+      logLabeledData(trainLabeledData);
+
+      labeledDataLogger.info("Test data after:");
+      logLabeledData(testLabeledData);
+    }
+  }
+
+  private static void logLabeledData(final List<List<Pair<PaperToken, String>>> data) {
+    for(List<Pair<PaperToken, String>> line : data) {
+      final String logLine = line.stream().map(pair ->
+              String.format(
+                      "%s/%x/%s",
+                      pair.getOne().getPdfToken() == null ?
+                              "null" :
+                              pair.getOne().getPdfToken().getToken(),
+                      pair.getOne().hashCode(),
+                      pair.getTwo())).collect(Collectors.joining(" "));
+      labeledDataLogger.info(logLine);
+    }
+  }
+
+  public static <T> void saveModel(
+    final DataOutputStream dos,
+    final CRFFeatureEncoder<String, T, String> fe,
+    final Vector weights,
+    final ParserLMFeatures plf,
+    final String dataVersion
+  ) throws IOException {
+    saveModel(dos, fe,weights, plf, null, dataVersion);
+  }
+  
+  public static <T> void saveModel(
+    final DataOutputStream dos,
+    final CRFFeatureEncoder<String, T, String> fe,
+    final Vector weights,
+    final ParserLMFeatures plf,
+    final GazetteerFeatures gf,
+    final String dataVersion
+  ) throws IOException {
+    dos.writeUTF(dataVersion);
+    fe.stateSpace.save(dos);
+    fe.nodeFeatures.save(dos);
+    fe.edgeFeatures.save(dos);
+    IOUtils.saveDoubles(dos, weights.toDoubles());
+
+    logger.debug("Saving ParserLMFeatures");
+    try(final FSTObjectOutput out = new FSTObjectOutput(dos)) {
+      out.writeObject(plf);
+      if (plf != null)
+        plf.logState();
+
+      logger.debug("Saving gazetteer features");
+      out.writeObject(gf);
+    }
+  }
+
+  public static <T> void saveModel(
+    final DataOutputStream dos,
+    final CRFFeatureEncoder<String, T, String> fe,
+    final Vector weights,
+    final ParserLMFeatures plf
+  ) throws IOException {
+    saveModel(dos, fe, weights, plf, Parser.DATA_VERSION);
+  }
+
+  @Data
+  public static class ModelComponents {
+    public final PDFPredicateExtractor predExtractor;
+    public final CRFFeatureEncoder<String, PaperToken, String> featureEncoder;
+    public final CRFWeightsEncoder<String> weightsEncoder;
+    public final CRFModel<String, PaperToken, String> model;
+  }
+
+  public static ModelComponents loadModelComponents(
+    final DataInputStream dis,
+    String dataVersion
+  ) throws IOException {
+    IOUtils.ensureVersionMatch(dis, dataVersion);
+    val stateSpace = StateSpace.load(dis);
+    Indexer<String> nodeFeatures = Indexer.load(dis);
+    Indexer<String> edgeFeatures = Indexer.load(dis);
+    Vector weights = DenseVector.of(IOUtils.loadDoubles(dis));
+
+    logger.debug("Loading ParserLMFeatures");
+    final ParserLMFeatures plf;
+    try(final FSTObjectInput in = new FSTObjectInput(dis)) {
+      try {
+        plf = (ParserLMFeatures) in.readObject();
+      } catch (final ClassNotFoundException e) {
+        throw new IOException("Model file contains unknown class.", e);
+      }
+    }
+    if(plf != null && logger.isDebugEnabled())
+      plf.logState();
+
+    val predExtractor = new PDFPredicateExtractor(plf);
+    val featureEncoder = new CRFFeatureEncoder<String, PaperToken, String>
+            (predExtractor, stateSpace, nodeFeatures, edgeFeatures);
+    val weightsEncoder = new CRFWeightsEncoder<String>(stateSpace, nodeFeatures.size(), edgeFeatures.size());
+    val model = new CRFModel<String, PaperToken, String>(featureEncoder, weightsEncoder, weights);
+    return new ModelComponents(predExtractor, featureEncoder, weightsEncoder, model);
+  }
+
+  public static ModelComponents loadModelComponents(
+    final DataInputStream dis
+  ) throws IOException {
+    return loadModelComponents(dis, DATA_VERSION);
+  }
+
+  public static CRFModel<String, PaperToken, String> loadModel(
+    final DataInputStream dis
+  ) throws IOException {
+    return loadModelComponents(dis).model;
+  }
+
+  public static void clean(ExtractedMetadata em) {
+    em.title = cleanTitle(em.title);
+    em.authors = trimAuthors(em.authors);
+  }
+
+  public static String cleanTitle(String t) {
+    if (t == null || t.length() == 0)
+      return t;
+    // strip accents and unicode changes
+    t = Normalizer.normalize(t, Normalizer.Form.NFKD);
+    // kill non-character letters
+    // kill xml
+    t = t.replaceAll("\\&.*?\\;", "");
+    if (t.endsWith("."))
+      t = t.substring(0, t.length() - 1);
+    return t;
+  }
+
+  public static String processTitle(String t) {
+    // case fold and remove lead/trail space
+    if(t==null || t.length()==0)
+      return t;
+    t = t.trim().toLowerCase();
+    t = cleanTitle(t);
+    // kill non-letter chars
+    t = t.replaceAll("\\W", "");
+    return t.replaceAll("\\s+", " ");
+  }
+
+  //changes extraction to remove common failure modes
+  public static String processExtractedTitle(String t) {
+    String out = t.replaceAll("(?<=[a-z])\\- ", ""); //continuation dash
+    if (!out.endsWith("?") && !out.endsWith("\"") && !out.endsWith(")"))
+      out = out.replaceFirst("\\W$", ""); //end of title punctuation if not ?, ", or )
+    return out.trim();
+  }
+
+  //lowercases
+  public static String lastName(String s) {
+    String[] words = s.split(" ");
+    if (words.length > 0)
+      return processTitle(words[words.length - 1]);
+    else
+      return "";
+  }
+
+  public static List<String> lastNames(List<String> ss) {
+    return (ss==null)?null:ss.stream().map(s -> lastName(s)).collect(Collectors.toList());
+  }
+
+  public static int scoreAuthors(String[] expected, List<String> guessed) {
+    List<String> guessLastName = lastNames(guessed);
+    List<String> expectedLastName = lastNames(Arrays.asList(expected));
+    //slow:
+    int truePos = 0;
+    for (String s : expectedLastName) {
+      if (guessLastName.contains(s))
+        truePos++;
+    }
+    return truePos;
+  }
+
+  /** Fixes common author problems. This is applied to the output of both normalized and
+   * unnormalized author names, and it is used in training as well. Experience shows that if you
+   * make changes here, there is a good chance you'll need to retrain, even if you think the change
+   * is fairly trivial. */
+  public static String fixupAuthors(String s) {
+    // delete trailing special characters
+    String sFix = s.replaceAll("([^\\p{javaLowerCase}\\p{javaUpperCase}])+$", "");
+    if (sFix.contains(","))
+      sFix = sFix.substring(0, sFix.indexOf(","));
+    if (sFix.endsWith("Jr"))
+      sFix = sFix + ".";
+    return sFix;
+  }
+
+  private final static int MAX_AUTHOR_LENGTH = 32;
+  private final static int MIN_AUTHOR_LENGTH = 2;
+  public static List<String> trimAuthors(List<String> auth) {
+    return auth.stream().
+            flatMap(s -> Arrays.stream(s.split("(?!,\\s*Jr),|\\band\\b"))).
+            map(String::trim).
+            map(Parser::fixupAuthors).
+            filter(s -> !s.isEmpty()).
+            filter(s -> s.length() <= MAX_AUTHOR_LENGTH).
+            filter(s -> s.length() >= MIN_AUTHOR_LENGTH).
+            distinct().
+            collect(Collectors.toList());
+  }
+
+  public static void main(String[] args) throws Exception {
+    if (!((args.length == 3 && args[0].equalsIgnoreCase("bootstrap")) ||
+      (args.length == 5 && args[0].equalsIgnoreCase("parse")) ||
+      (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
+      (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
+      (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
+      (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
+      ((args.length == 4 || args.length == 6) && args[0].equalsIgnoreCase("learnBibCRF")))) {
+      System.err.println("Usage: bootstrap <input dir> <model output file>");
+      System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
+      System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
+      System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
+      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <bib model file>");
+      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir> [<umass file> <kermit file>]");
+    } else if (args[0].equalsIgnoreCase("bootstrap")) {
+      File inDir = new File(args[1]);
+      List<File> inFiles = Arrays.asList(inDir.listFiles());
+      ParseOpts opts = new ParseOpts();
+      opts.modelFile = args[2];
+      //TODO: use config file
+      opts.headerMax = 100;
+      opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
+      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
+      trainParser(inFiles, null, null, opts);
+
+    } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
+      ParserGroundTruth pgt = new ParserGroundTruth(args[1]); //holds the labeled data to be used for train, test (S2 json bib format)
+      ParseOpts opts = new ParseOpts();
+      opts.modelFile = args[4]; //holds the output file for the model.
+      //TODO: use config file
+      opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
+      opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
+      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
+      opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
+      opts.backgroundDirectory = args[5]; //where to find the background papers
+      opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)
+      opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
+      opts.checkAuthors = true; //exclude from training papers where we don't find authors
+      opts.minYear = 2008; //discard papers from before this date
+      opts.documentCount = args.length > 7 ? Integer.parseInt(args[7]) : -1;
+      final PaperSource paperSource = new DirectoryPaperSource(new File(args[3])); //args[3] holds the papers in which we can find ground truth
+      trainParser(null, pgt, paperSource, opts, args[6]);
+                //args[6] is a list of paper ids (one id per line) that we must exclude from training data and gazetteers 
+                //(because they're used for final tests)
+    } else if (args[0].equalsIgnoreCase("parse")) {
+      final Path modelFile;
+      if(args[2].equals("-"))
+        modelFile = Parser.getDefaultProductionModel();
+      else
+        modelFile = Paths.get(args[2]);
+
+      final Path gazetteerFile;
+      if(args[4].equals("-"))
+        gazetteerFile = Parser.getDefaultGazetteer();
+      else
+        gazetteerFile = Paths.get(args[4]);
+
+      Parser p = new Parser(modelFile, gazetteerFile, getDefaultBibModel());
+      File input = new File(args[1]);
+      File outDir = new File(args[3]);
+      final List<File> inFiles;
+      if(input.isFile())
+        inFiles = Collections.singletonList(input);
+      else
+        inFiles = Arrays.asList(input.listFiles());
+      ObjectMapper mapper = new ObjectMapper();
+
+      for (File f : inFiles) {
+        if (!f.getName().endsWith(".pdf"))
+          continue;
+        val fis = new FileInputStream(f);
+        ExtractedMetadata em = null;
+        try {
+          em = p.doParse(fis, MAXHEADERWORDS);
+        } catch (final Exception e) {
+          logger.info("Parse error: " + f, e);
+        }
+        fis.close();
+        //Object to JSON in file
+        mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
+      }
+
+    } else if (args[0].equalsIgnoreCase("parseAndScore")) {
+      Parser p = new Parser(args[2], args[4], getDefaultBibModel().toString());
+      File inDir = new File(args[1]);
+      List<File> inFiles = Arrays.asList(inDir.listFiles());
+      ParserGroundTruth pgt = new ParserGroundTruth(args[4]);
+      int totalFiles = 0;
+      int totalProcessed = 0;
+      int crfTruePos = 0;
+      int crfFalsePos = 0;
+      int metaTruePos = 0;
+      int metaFalsePos = 0;
+      double crfPrecision = 0;
+      double crfRecall = 0;
+      double crfTotal = 0;
+      double metaPrecision = 0;
+      double metaRecall = 0;
+      double metaTotal = 0;
+
+
+      for (File f : inFiles) {
+        val fis = new FileInputStream(f);
+        String key = f.getName().substring(0, f.getName().length() - 4);
+        Paper pap = pgt.forKey(key);
+        if (pap.year < 2010)
+          continue;
+        totalFiles++;
+        ExtractedMetadata em = null;
+        try {
+          em = p.doParse(fis, MAXHEADERWORDS);
+          totalProcessed++;
+        } catch (final Exception e) {
+          logger.info("Parse error: " + f, e);
+        }
+
+        if (em != null && em.title != null) {
+          String expected = pap.title;
+          String guessed = em.title;
+          String procExpected = processTitle(expected);
+          String procGuessed = processTitle(processExtractedTitle(guessed));
+          String[] authExpected = pap.authors;
+          List<String> authGuessed = trimAuthors(em.authors);
+
+          int tempTP = scoreAuthors(authExpected, authGuessed);
+          double prec = ((double) tempTP) / ((double) authGuessed.size() + 0.000000001);
+          double rec = ((double) tempTP) / ((double) authExpected.length);
+          if (em.source == ExtractedMetadata.Source.CRF) {
+            crfPrecision += prec;
+            crfRecall += rec;
+            crfTotal += 1.0;
+          } else {
+            metaPrecision += prec;
+            metaRecall += rec;
+            metaTotal += 1.0;
+          }
+
+          if (tempTP != authGuessed.size() || tempTP != authExpected.length) {
+            logger.info("auth error: " + tempTP + " right, exp " + Arrays.toString(authExpected) + " got " + authGuessed);
+            logger.info(f.getName());
+          }
+          if (procExpected.equals(procGuessed))
+            if (em.source == ExtractedMetadata.Source.CRF)
+              crfTruePos++;
+            else
+              metaTruePos++;
+          else {
+            if (em.source == ExtractedMetadata.Source.CRF)
+              crfFalsePos++;
+            else
+              metaFalsePos++;
+            logger.info(em.source + " error, expected:\r\n" + procExpected + "\r\ngot\r\n" + procGuessed);
+          }
+        }
+
+        fis.close();
+      }
+      logger.info("total files: " + totalFiles);
+      logger.info("total processed: " + totalProcessed);
+      logger.info("crf correct: " + crfTruePos);
+      logger.info("crf false positive " + crfFalsePos);
+      logger.info("meta correct: " + metaTruePos);
+      logger.info("meta false positive " + metaFalsePos);
+      logger.info("crf micro-average prec: " + crfPrecision);
+      logger.info("crf micro-average rec: " + crfRecall);
+      logger.info("crf total: " + crfTotal);
+      logger.info("meta micro-average prec: " + metaPrecision);
+      logger.info("meta micro-average rec: " + metaRecall);
+      logger.info("meta total: " + metaTotal);
+      logger.info("overall author precision: " + (crfPrecision + metaPrecision) / (crfTotal + metaTotal));
+      logger.info("overall author recall: " + (crfRecall + metaRecall) / ((double) totalFiles));
+      //TODO: write output
+
+    } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
+      Parser p = new Parser(new File(args[2]), new File(Parser.getDefaultGazetteer().toString()), new File(args[4]));
+      File inDir = new File(args[1]);
+      File outDir = new File(args[3]);
+      List<File> inFiles = Arrays.asList(inDir.listFiles());
+      HashSet<String> foundRefs = new HashSet<String>();
+      HashSet<String> unfoundRefs = new HashSet<String>();
+
+      ObjectMapper mapper = new ObjectMapper();
+      int totalRefs = 0;
+      int totalCites = 0;
+      int blankAbstracts = 0;
+      for (File f : inFiles) {
+        if (!f.getName().endsWith(".pdf"))
+          continue;
+        val fis = new FileInputStream(f);
+        ExtractedMetadata em = null;
+        try {
+          logger.info(f.getName());
+          em = p.doParse(fis, MAXHEADERWORDS);
+          if(em.abstractText == null || em.abstractText.length() == 0) {
+            logger.info("abstract blank!");
+            blankAbstracts++;
+          }
+          else {
+            logger.info("abstract: " + em.abstractText);
+          }
+          final List<BibRecord> br = em.references;
+          final List<CitationRecord> cr = em.referenceMentions;
+          if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
+            foundRefs.add(f.getAbsolutePath());
+          } else {
+            unfoundRefs.add(f.getAbsolutePath());
+          }
+          totalRefs += br.size();
+          totalCites += cr.size();
+          mapper.writeValue(
+            new File(outDir, f.getName() + ".dat"), em);
+            //Tuples.pair(em.references, em.referenceMentions));
+        } catch (Exception e) {
+          logger.info("Parse error: " + f);
+          e.printStackTrace();
+        }
+        fis.close();
+
+      }
+
+      //Object to JSON in file
+      mapper.writeValue(new File(outDir, "unfoundReferences.dat"), unfoundRefs);
+      mapper.writeValue(new File(outDir, "foundReferences.dat"), foundRefs);
+      logger.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");
+      logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
+      logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
+      logger.info("blank abstracts: " + blankAbstracts);
+            
+    }
+    else if(args[0].equalsIgnoreCase("learnBibCRF")) {
+      ParseOpts opts = new ParseOpts();
+      opts.modelFile = args[2];
+      opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
+      opts.gazetteerDir = Parser.getDefaultGazetteerDir().toString();
+      opts.backgroundDirectory = args[3];
+      opts.iterations = 20;
+      opts.threads = Runtime.getRuntime().availableProcessors();
+      opts.backgroundSamples = 5;
+      opts.trainFraction = 0.9;
+      if(args.length == 6)
+        trainBibliographyCRF(new File(args[1]), new File(args[4]), new File(args[5]), opts);
+      else
+        trainBibliographyCRF(new File(args[1]), opts);
+    }
+  }
+
+  static void logExceptionShort(final Throwable t, final String errorType, final String filename) {
+    if (t.getStackTrace().length == 0) {
+      logger.warn("Exception without stack trace", t);
+    } else {
+      final StackTraceElement ste = t.getStackTrace()[0];
+      logger.warn(
+        String.format(
+          "%s while processing file %s at %s:%d: %s (%s)",
+          errorType,
+          filename,
+          ste.getFileName(),
+          ste.getLineNumber(),
+          t.getClass().getName(),
+          t.getMessage()));
+    }
+  }
+
+  public static class ParsingTimeout extends RuntimeException { }
+  private final Timer parserKillerTimer = new Timer("Science-parse killer timer", true);
+  private final MutableIntSet parseNumbersInProgress = IntSets.mutable.empty();
+  private final AtomicInteger nextParseNumber = new AtomicInteger();
+  public ExtractedMetadata doParseWithTimeout(final InputStream is, final long timeoutInMs) throws IOException {
+    final int parseNumber = nextParseNumber.getAndIncrement();
+
+    final Thread t = Thread.currentThread();
+    final TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        synchronized (parseNumbersInProgress) {
+          if(parseNumbersInProgress.remove(parseNumber)) {
+            logger.info("Interrupting parsing thread {} because it's taking too long", t.getId());
+            t.interrupt();
+          }
+        }
+      }
+    };
+
+    synchronized (parseNumbersInProgress) {
+      parseNumbersInProgress.add(parseNumber);
+    }
+
+    final ExtractedMetadata result;
+    final boolean wasInterrupted;
+    parserKillerTimer.schedule(task, timeoutInMs);
+    try {
+      result = doParse(is);
+    } finally {
+      synchronized (parseNumbersInProgress) {
+        parseNumbersInProgress.remove(parseNumber);
+      }
+
+      // This clears the interrupted flag, in case it happened after we were already done parsing,
+      // but before we could remove the parse number. We don't want to leave this function with
+      // the interrupted flag set on the thread.
+      // Actually, the window of opportunity is from the last time that doParse() checks the
+      // flag to the time we remove the parse number, which is quite a bit bigger.
+      wasInterrupted = Thread.interrupted();
+    }
+
+    if(wasInterrupted)
+      logger.info("Overriding interruption of parsing thread {} because it finished before we could react", t.getId());
+    assert !Thread.interrupted();
+
+    return result;
+  }
+
+  public ExtractedMetadata doParse(final InputStream is) throws IOException {
+    return doParse(is, MAXHEADERWORDS);
+  }
+
+  /**
+   * Given a body of text (e.g. an entire section of a paper) within which a citation is mentioned, extracts a
+   * single-sentence context from that larger body of text. Used both here for Science Parse extraction and in
+   * GrobidParser for evaluation of Grobid citation mention extraction.
+   */
+  public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
+    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
+    int crSentenceEnd = context.indexOf('.', end);
+    if(crSentenceEnd < 0)
+      crSentenceEnd = context.length();
+    else
+      crSentenceEnd += 1;
+
+    String contextSentenceUntrimmed = context.substring(sentenceStart, crSentenceEnd);
+    String contextSentence = contextSentenceUntrimmed.trim();
+    sentenceStart += contextSentenceUntrimmed.indexOf(contextSentence);
+    return new CitationRecord(referenceID, contextSentence, begin - sentenceStart,
+            end - sentenceStart);
+  }
+
+  public ExtractedMetadata doParse(final InputStream is, int headerMax) throws IOException {
+    final ExtractedMetadata em;
+    final PDDocument pdDoc = PDDocument.load(is);
+
+    //
+    // Run Science-parse
+    //
+    {
+      PDFExtractor ext = new PDFExtractor();
+      PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
+      seq = seq.subList(0, Math.min(seq.size(), headerMax));
+      seq = PDFToCRFInput.padSequence(seq);
+
+      { // get title and authors from the CRF
+        List<String> outSeq = model.bestGuess(seq);
+        //the output tag sequence will not include the start/stop states!
+        outSeq = PDFToCRFInput.padTagSequence(outSeq);
+        em = new ExtractedMetadata(seq, outSeq);
+        em.source = ExtractedMetadata.Source.CRF;
+      }
+
+      // use PDF metadata if it's there
+      if (doc.meta != null) {
+        if (doc.meta.title != null) {
+          em.setTitle(doc.meta.title);
+          em.source = ExtractedMetadata.Source.META;
+        }
+        if (doc.meta.createDate != null)
+          em.setYearFromDate(doc.meta.createDate);
+      }
+
+      clean(em);
+      final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
+
+      em.creator = doc.meta.creator;
+      // extract references
+      try {
+        final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
+        final Pair<List<BibRecord>, List<CitationRecord>> pair =
+            getReferences(lines, rawReferences, referenceExtractor);
+        em.references = pair.getOne();
+        List<CitationRecord> crs = new ArrayList<>();
+        for (CitationRecord cr : pair.getTwo()) {
+          crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+        }
+        em.referenceMentions = crs;
+      } catch (final RegexWithTimeout.RegexTimeout e) {
+        logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
+        if (em.references == null)
+          em.references = Collections.emptyList();
+        if (em.referenceMentions == null)
+          em.referenceMentions = Collections.emptyList();
+      }
+      logger.debug(em.references.size() + " refs for " + em.title);
+
+      try {
+        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
+        if (em.abstractText.isEmpty())
+          em.abstractText = null;
+      } catch (final RegexWithTimeout.RegexTimeout e) {
+        logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
+        em.abstractText = null;
+      }
+    }
+
+    //
+    // Run figure extraction to get sections
+    //
+    try {
+      final FigureExtractor fe = new FigureExtractor(false, true, true, true, true);
+
+      final FigureExtractor.Document doc =
+          fe.getFiguresWithText(pdDoc, scala.Option.apply(null), scala.Option.apply(null));
+
+      em.sections = ScalaStreamSupport.stream(doc.sections()).map(documentSection ->
+          new Section(
+              OptionConverters.toJava(documentSection.titleText()).orElse(null),
+              documentSection.bodyText()
+          )
+      ).filter(documentSection ->
+          // filter out reference sections
+          !(
+              documentSection.getHeading() != null &&
+              PDFDocToPartitionedText.referenceHeaders.contains(
+                documentSection.getHeading().trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+          )
+      ).collect(Collectors.toList());
+    } catch (final Exception e) {
+      logger.warn(
+          "Exception {} while getting sections. Section data will be missing.",
+          e.getMessage());
+      em.sections = null;
+    }
+
+    return em;
+  }
+
+  public static class ParseOpts {
+    public String modelFile;
+    public int iterations;
+    public int threads;
+    public int headerMax;
+    public double trainFraction;
+    public String gazetteerFile; //record of references
+    public String gazetteerDir; //directory of entity lists (universities, person names, etc.)
+    public int backgroundSamples;
+    public String backgroundDirectory;
+    public int minYear; //only process papers this year or later
+    public boolean checkAuthors; //only bootstraps papers if all authors are found
+    public int documentCount = -1; // how many documents to train on. set to -1 to train on all.
+    public int minExpectedFeatureCount = 1;
+  }
+}
