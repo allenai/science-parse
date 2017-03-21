@@ -8,7 +8,8 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3}
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
+import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.allenai.common.{Resource, Logging}
@@ -355,17 +356,23 @@ class SPServer(
     }
 
     // We de-serialize and then re-serialize the posted data to check for errors and validity.
-    var input: LabeledData = formatString match {
-      case "LabeledData" =>
-        import spray.json._
-        import LabeledDataJsonProtocol._
-        inputString.parseJson.convertTo[LabeledData]
-      case "ExtractedMetadata" =>
-        val em = jsonMapper.readValue(inputString, classOf[ExtractedMetadata])
-        LabeledData.fromExtractedMetadata(paperId, em)
-      case _ =>
-        throw SPServerException(400, s"Could not understand input format '$formatString'")
+    var input: LabeledData = try {
+      formatString match {
+        case "LabeledData" =>
+          import spray.json._
+          import LabeledDataJsonProtocol._
+          inputString.parseJson.convertTo[LabeledData]
+        case "ExtractedMetadata" =>
+          val em = jsonMapper.readValue(inputString, classOf[ExtractedMetadata])
+          LabeledData.fromExtractedMetadata(paperId, em)
+        case _ =>
+          throw SPServerException(400, s"Could not understand input format '$formatString'")
+      }
+    } catch {
+      case e @ (_: spray.json.DeserializationException | _: JsonMappingException | _: UnrecognizedPropertyException) =>
+        throw SPServerException(400, s"Error while parsing input: ${e.getMessage}")
     }
+
     if(!input.id.startsWith("feedback:"))
       input = input.copy(id = s"feedback:${input.id}")
 
