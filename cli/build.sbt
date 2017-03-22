@@ -1,6 +1,8 @@
 
 description := "Java CLI to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
 
+name := "science-parse-cli"
+
 organization := "org.allenai.scienceparse"
 
 // We still have to disable these specifically. I'm not sure why.
