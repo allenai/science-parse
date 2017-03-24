@@ -7,6 +7,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.gs.collections.api.map.primitive.DoubleIntMap;
+import com.gs.collections.api.map.primitive.MutableDoubleIntMap;
+import com.gs.collections.api.map.primitive.MutableObjectIntMap;
+import com.gs.collections.api.set.primitive.DoubleSet;
+import com.gs.collections.api.set.primitive.MutableDoubleSet;
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.api.tuple.primitive.DoubleIntPair;
+import com.gs.collections.impl.factory.primitive.DoubleIntMaps;
+import com.gs.collections.impl.factory.primitive.DoubleSets;
+import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
+import com.gs.collections.impl.tuple.Tuples;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFLine;
 import org.allenai.scienceparse.pdfapi.PDFPage;
@@ -225,21 +236,25 @@ public class PDFDocToPartitionedText {
       "references",
       "citations",
       "bibliography",
-      "reference"));
+      "reference",
+      "bibliographie"));
+
+  private static Pattern referenceStartPattern =
+      Pattern.compile("^\\d{1,2}\\.|^\\[\\d{1,2}\\]");
 
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
    */
   public static List<String> getRawReferences(PDFDoc pdf) {
-    List<String> out = new ArrayList<String>();
     PDFLine prevLine = null;
     boolean inRefs = false;
     boolean foundRefs = false;
     double qLineBreak = getReferenceLineBreak(pdf);
-    StringBuffer sb = new StringBuffer();
     boolean lenient = false;
-    
+
+    // Find reference lines in the document
+    final List<Pair<PDFPage, PDFLine>> referenceLines = new ArrayList<>();
     for(int pass=0;pass<2;pass++) {
       if(pass==1)
         if(foundRefs)
@@ -268,54 +283,120 @@ public class PDFDocToPartitionedText {
               }
             }
           }
-          if (inRefs) {
-            double left = PDFToCRFInput.getX(l, true);
-            double right = PDFToCRFInput.getX(l, false);
-            if (farRight >= 0 && right > farRight) { //new column, reset
-              farLeft = Double.MAX_VALUE;
-              farRight = -1.0;
-            }
-            farLeft = Math.min(left, farLeft);
-            farRight = Math.max(right, farRight);
-            boolean br = false;
-            final List<PDFToken> tokens = l.tokens;
-            if (tokens != null && tokens.size() > 0) {
-              String sAdd = lineToString(l);
-              if (left > farLeft + tokens.get(0).fontMetrics.spaceWidth) {
-                br = false;
-              } else {
-                final double prevLineX = PDFToCRFInput.getX(prevLine, false);
-                final double spaceWidth = tokens.get(0).fontMetrics.spaceWidth;
-                if (prevLineX + spaceWidth < farRight) {
-                  br = true;
-                } else {
-                  final double breakSize = breakSize(l, prevLine);
-                  if (breakSize > qLineBreak) {
-                    br = true;
-                  }
-                }
-              }
-              if (br) {
-                out.add(cleanLine(sb.toString()));
-                sb = new StringBuffer(sAdd);
-              } else {
-                sb.append("<lb>");
-                sb.append(sAdd);
-              }
-            }
-          }
+          if (inRefs)
+            referenceLines.add(Tuples.pair(p, l));
           prevLine = l;
-        }
-        //HACK(dcdowney): always break on new page.  Should be safe barring "bad breaks" I think
-        if (sb.length() > 0) {
-          String sAdd = sb.toString();
-          if (sAdd.endsWith("<lb>"))
-            sAdd = sAdd.substring(0, sAdd.length() - 4);
-          out.add(cleanLine(sAdd));
-          sb = new StringBuffer();
         }
       }
     }
+
+    // find most common fonts in references
+    final MutableObjectIntMap<String> font2count = new ObjectIntHashMap<>();
+    int tokenCount = 0;
+    for(final Pair<PDFPage, PDFLine> pageLinePair : referenceLines) {
+      final PDFLine l = pageLinePair.getTwo();
+      tokenCount += l.tokens.size();
+      for(final PDFToken t: l.tokens)
+        font2count.addToValue(t.fontMetrics.stringRepresentation(), 1);
+    }
+
+    // Filter out everything that's in a font that makes up less than 10%
+    final int tc = tokenCount;
+    Set<String> allowedFonts =
+        font2count.reject((font, count) -> count < tc / 10).keySet();
+    if(allowedFonts.isEmpty())
+      allowedFonts = font2count.keySet();
+
+    // split reference lines into columns, and remove all lines containing unallowed fonts
+    final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
+    PDFPage lastPage = null;
+    double currentColumnBottom = Double.MAX_VALUE;
+    for(final Pair<PDFPage, PDFLine> pageLinePair : referenceLines) {
+      final PDFPage p = pageLinePair.getOne();
+      final PDFLine l = pageLinePair.getTwo();
+
+      // remove empty lines
+      if(l.tokens.isEmpty())
+        continue;
+
+      // remove lines with weird fonts
+      final Set<String> af = allowedFonts;
+      if(l.tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.stringRepresentation())))
+        continue;
+
+      // Cut into columns. One column is a set of lines with continuously increasing Y coordinates.
+      final double lineTop = PDFToCRFInput.getY(l, true);
+      final double lineBottom = PDFToCRFInput.getY(l, false);
+      if (p != lastPage || lineTop < currentColumnBottom) {
+        final List<PDFLine> newColumn = new ArrayList<>();
+        newColumn.add(l);
+        referenceLinesInColumns.add(newColumn);
+        currentColumnBottom = lineBottom;
+      } else {
+        referenceLinesInColumns.get(referenceLinesInColumns.size() - 1).add(l);
+        currentColumnBottom = lineBottom;
+      }
+      lastPage = p;
+    }
+
+    // parse each column into output
+    // We assume that the indentation of the first line of every column marks the start of a
+    // reference (unless that indentation happens only once)
+    final List<String> out = new ArrayList<String>();
+    for(final List<PDFLine> column : referenceLinesInColumns) {
+      // Find indentation levels.
+      final MutableDoubleIntMap left2count = DoubleIntMaps.mutable.empty();
+      for(final PDFLine l : column) {
+        final double left = PDFToCRFInput.getX(l, true);
+        left2count.addToValue(left, 1);
+      }
+      final DoubleSet repeatedIndentations =
+          left2count.reject((left, count) -> count <= 1).keySet();
+
+      // find the indentation that starts a reference
+      double startReferenceIndentation = -1.0;
+      for(final PDFLine l : column) {
+        final double left = PDFToCRFInput.getX(l, true);
+        final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
+        if(repeatedIndentations.anySatisfy(indent -> Math.abs(left - indent) < lineSpaceWidth)) {
+          startReferenceIndentation = left;
+          break;
+        }
+      }
+
+      int linesGrouped = 0; // We never group more than six lines together at a time.
+      final StringBuilder builder = new StringBuilder();
+      for(final PDFLine l : column) {
+        final double left = PDFToCRFInput.getX(l, true);
+        final String lineAsString = lineToString(l);
+        final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
+        linesGrouped += 1;
+
+        final boolean br =
+          linesGrouped >= 6 ||
+          Math.abs(left-startReferenceIndentation) < lineSpaceWidth ||
+          referenceStartPattern.matcher(lineAsString).find();
+
+        if(br) {
+          // save old line
+          final String outLine = cleanLine(builder.toString());
+          if(!outLine.isEmpty())
+            out.add(outLine);
+          // start new line
+          builder.setLength(0);
+          builder.append(lineAsString);
+          linesGrouped = 1;
+        } else {
+          builder.append("<lb>");
+          builder.append(lineAsString);
+        }
+      }
+      // save last line
+      final String outLine = cleanLine(builder.toString());
+      if(!outLine.isEmpty())
+        out.add(outLine);
+    }
+
     return out;
   }
   
