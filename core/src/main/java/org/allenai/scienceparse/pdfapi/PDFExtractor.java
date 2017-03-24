@@ -350,9 +350,16 @@ public class PDFExtractor {
       if (curLineTokens.isEmpty()) {
         curLineTokens.add(token);
       } else {
-        double curYBottom = token.bounds.get(3);
-        boolean yOffsetOverlap = curYBottom <= lastToken.bounds.get(3)
-          || curYBottom >= lastToken.bounds.get(1);
+        final double curTop = token.bounds.get(1);
+        final double curBottom = token.bounds.get(3);
+        assert curTop <= curBottom;
+        final double lastTop = lastToken.bounds.get(1);
+        final double lastBottom = lastToken.bounds.get(3);
+        assert lastTop <= lastBottom;
+        final boolean yOffsetOverlap =
+            (curTop >= lastTop && curTop <= lastBottom) ||
+            (curBottom >= lastTop && curBottom <= lastBottom);
+
         float spaceWidth = Math.max(token.getFontMetrics().getSpaceWidth(), token.getFontMetrics().ptSize);
         float observedWidth = token.bounds.get(0) - lastToken.bounds.get(2);
         boolean withinSpace = observedWidth > 0 && observedWidth < 4 * spaceWidth;
