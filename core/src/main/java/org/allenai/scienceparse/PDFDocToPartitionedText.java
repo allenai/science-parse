@@ -290,22 +290,22 @@ public class PDFDocToPartitionedText {
       }
     }
 
-    // find most common fonts in references
-    final MutableObjectIntMap<String> font2count = new ObjectIntHashMap<>();
+    // find most common font sizes in references
+    final MutableDoubleIntMap fontSize2count = DoubleIntMaps.mutable.empty();
     int tokenCount = 0;
     for(final Pair<PDFPage, PDFLine> pageLinePair : referenceLines) {
       final PDFLine l = pageLinePair.getTwo();
       tokenCount += l.tokens.size();
       for(final PDFToken t: l.tokens)
-        font2count.addToValue(t.fontMetrics.stringRepresentation(), 1);
+        fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
     }
 
-    // Filter out everything that's in a font that makes up less than 10%
+    // Filter out everything that's in a font size that makes up less than 10%
     final int tc = tokenCount;
-    Set<String> allowedFonts =
-        font2count.reject((font, count) -> count < tc / 10).keySet();
-    if(allowedFonts.isEmpty())
-      allowedFonts = font2count.keySet();
+    DoubleSet allowedFontSizes =
+        fontSize2count.reject((font, count) -> count < tc / 10).keySet();
+    if(allowedFontSizes.isEmpty())
+      allowedFontSizes = fontSize2count.keySet();
 
     // split reference lines into columns, and remove all lines containing unallowed fonts
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
@@ -319,9 +319,9 @@ public class PDFDocToPartitionedText {
       if(l.tokens.isEmpty())
         continue;
 
-      // remove lines with weird fonts
-      final Set<String> af = allowedFonts;
-      if(l.tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.stringRepresentation())))
+      // remove lines with weird fonts sizes
+      final DoubleSet af = allowedFontSizes;
+      if(l.tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize)))
         continue;
 
       // Cut into columns. One column is a set of lines with continuously increasing Y coordinates.
@@ -350,15 +350,16 @@ public class PDFDocToPartitionedText {
         final double left = PDFToCRFInput.getX(l, true);
         left2count.addToValue(left, 1);
       }
-      final DoubleSet repeatedIndentations =
-          left2count.reject((left, count) -> count <= 1).keySet();
 
       // find the indentation that starts a reference
       double startReferenceIndentation = -1.0;
       for(final PDFLine l : column) {
         final double left = PDFToCRFInput.getX(l, true);
         final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
-        if(repeatedIndentations.anySatisfy(indent -> Math.abs(left - indent) < lineSpaceWidth)) {
+        final long linesWithIndentCloseToThisOne =
+            left2count.select((indent, count) -> Math.abs(left - indent) < lineSpaceWidth).values().sum();
+
+        if(linesWithIndentCloseToThisOne > 1) {
           startReferenceIndentation = left;
           break;
         }
