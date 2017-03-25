@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.gs.collections.api.list.ImmutableList;
 import com.gs.collections.api.map.primitive.DoubleIntMap;
 import com.gs.collections.api.map.primitive.MutableDoubleIntMap;
 import com.gs.collections.api.map.primitive.MutableObjectIntMap;
@@ -334,24 +335,48 @@ public class PDFDocToPartitionedText {
     // reference (unless that indentation happens only once)
     final List<String> out = new ArrayList<String>();
     for(final List<PDFLine> column : referenceLinesInColumns) {
-      // Find indentation levels.
+      // find indentation levels
       final MutableDoubleIntMap left2count = DoubleIntMaps.mutable.empty();
       for(final PDFLine l : column) {
-        final double left = PDFToCRFInput.getX(l, true);
+        double left = PDFToCRFInput.getX(l, true);
+        final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
+
+        // find an indentation level that's close to this one
+        // This is not proper clustering, but I don't think we need it.
+        for(final double indentLevel : left2count.keySet().toArray()) {
+          if(Math.abs(indentLevel - left) < lineSpaceWidth) {
+            left = indentLevel;
+            break;
+          }
+        }
+
         left2count.addToValue(left, 1);
       }
 
       // find the indentation that starts a reference
       double startReferenceIndentation = -1.0;
-      for(final PDFLine l : column) {
-        final double left = PDFToCRFInput.getX(l, true);
-        final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
-        final long linesWithIndentCloseToThisOne =
-            left2count.select((indent, count) -> Math.abs(left - indent) < lineSpaceWidth).values().sum();
-
-        if(linesWithIndentCloseToThisOne > 1) {
-          startReferenceIndentation = left;
-          break;
+      final ImmutableList<DoubleIntPair> startReferenceIndentCandidates =
+          left2count.keyValuesView().toSortedListBy(pair -> -pair.getTwo()).take(2).toImmutable();
+      if(startReferenceIndentCandidates.size() == 1) {
+        startReferenceIndentation = startReferenceIndentCandidates.get(0).getOne();
+      } else {
+        final DoubleIntPair first = startReferenceIndentCandidates.get(0);
+        final DoubleIntPair second = startReferenceIndentCandidates.get(1);
+        if(first.getTwo() == second.getTwo()) { // If the counts for both are the same, we pick the first one we see.
+          for(final PDFLine l : column) {
+            final double left = PDFToCRFInput.getX(l, true);
+            final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
+            if(Math.abs(first.getOne() - left) < lineSpaceWidth) {
+              startReferenceIndentation = first.getOne();
+              break;
+            }
+            if(Math.abs(second.getOne() - left) < lineSpaceWidth) {
+              startReferenceIndentation = second.getOne();
+              break;
+            }
+          }
+        } else {
+          startReferenceIndentation = second.getOne();
         }
       }
 
@@ -390,5 +415,4 @@ public class PDFDocToPartitionedText {
 
     return out;
   }
-  
 }
