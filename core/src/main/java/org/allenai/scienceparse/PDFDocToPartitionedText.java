@@ -302,14 +302,7 @@ public class PDFDocToPartitionedText {
         fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
     }
 
-    // Filter out everything that's in a font size that makes up less than 4%
-    final int tc = tokenCount;
-    DoubleSet allowedFontSizes =
-        fontSize2count.reject((font, count) -> count < tc / 25).keySet();
-    if(allowedFontSizes.isEmpty())
-      allowedFontSizes = fontSize2count.keySet();
-
-    // split reference lines into columns, and remove all lines containing unallowed fonts
+    // split reference lines into columns
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
     PDFPage lastPage = null;
     double currentColumnBottom = Double.MAX_VALUE;
@@ -319,11 +312,6 @@ public class PDFDocToPartitionedText {
 
       // remove empty lines
       if(l.tokens.isEmpty())
-        continue;
-
-      // remove lines with weird fonts sizes
-      final DoubleSet af = allowedFontSizes;
-      if(l.tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize)))
         continue;
 
       // Cut into columns. One column is a set of lines with continuously increasing Y coordinates.
