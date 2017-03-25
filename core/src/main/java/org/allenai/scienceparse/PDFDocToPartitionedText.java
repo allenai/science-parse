@@ -268,7 +268,9 @@ public class PDFDocToPartitionedText {
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
             if (
               l.tokens.get(l.tokens.size() - 1).token != null &&
-              referenceHeaders.contains(l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", ""))
+              referenceHeaders.contains(
+                  l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", "")) &&
+              l.tokens.size() < 5
             ) {
               inRefs = true;
               foundRefs = true;
