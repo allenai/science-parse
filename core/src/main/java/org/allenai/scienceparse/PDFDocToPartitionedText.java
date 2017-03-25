@@ -302,10 +302,10 @@ public class PDFDocToPartitionedText {
         fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
     }
 
-    // Filter out everything that's in a font size that makes up less than 10%
+    // Filter out everything that's in a font size that makes up less than 4%
     final int tc = tokenCount;
     DoubleSet allowedFontSizes =
-        fontSize2count.reject((font, count) -> count < tc / 10).keySet();
+        fontSize2count.reject((font, count) -> count < tc / 25).keySet();
     if(allowedFontSizes.isEmpty())
       allowedFontSizes = fontSize2count.keySet();
 
