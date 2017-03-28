@@ -56,7 +56,7 @@ object SPServer extends Logging {
 
       opt[Unit]("disableFeedback") action { (_, c) =>
         c.copy(enableFeedback = false)
-      } text "Disabled the feedback mechanism"
+      } text "Disables the feedback mechanism"
 
       help("help") text "Prints help text"
     }
