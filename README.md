@@ -15,9 +15,9 @@ Science Parse parses scientific papers (in PDF form) and returns them in structu
 ## Get started
 There are three different ways to get started with SP. Each has its own document:
 
- * Server: This contains the SP server. It's useful for PDF parsing as a service. It's also probably the easiest way to get going.
- * CLI: This contains the command line interface to SP. That's most useful for batch processing.
- * Core: This contains SP as a library. It has all the extraction code, plus training and evaluation. Both server and CLI use this to do the actual work.
+ * [Server](server/README.md): This contains the SP server. It's useful for PDF parsing as a service. It's also probably the easiest way to get going.
+ * [CLI](cli/README.md): This contains the command line interface to SP. That's most useful for batch processing.
+ * [Core](core/README.md): This contains SP as a library. It has all the extraction code, plus training and evaluation. Both server and CLI use this to do the actual work.
 
 ## How to include into your own project
  
