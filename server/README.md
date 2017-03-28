@@ -20,3 +20,9 @@ Note that the content type needs to be `application/pdf`, and the URL needs to n
 You can compile the server into a super-jar with sbt like this `sbt server/assembly`. That will download all dependencies, compile them, and build an executable jar with all dependencies bundled. Then, you can start up the server with `java -jar jarfile.jar`. On first startup, it will download several gigabytes of model files, and then bind to port 8080 on the machine you run it on.
 
 The server takes a few command line arguments. Run it with `java -jar jarfile.jar --help` to see what they are.
+
+## Feedback mechanism
+
+The server supports something called the "Feedback mechanism". This is a fairly basic way to gather corrections to the extractions SP makes, so we can improve the models. The machanism is disabled by default, so you shouldn't have to worry about it most of the time.
+
+We don't support this mechanism publically, but if you want to play with it, it should be easy to point it at a postgres database of your choice, and start gathering feedback.
