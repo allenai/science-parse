@@ -11,7 +11,27 @@ Science Parse parses scientific papers (in PDF form) and returns them in structu
    * Venue
    * Year
  * Mentions, i.e., places in the paper where bibliography entries are mentioned
+ 
+# How to include into your own project
+ 
+The current version is `1.2.5`. If you want to include it in your own project, use this:
 
+For SBT:
+```
+libraryDependencies += "org.allenai" %% "science-parse" % "1.2.5"
+```
+
+For Maven:
+```
+<dependency>
+  <groupId>org.allenai</groupId>
+  <artifactId>science-parse_2.11</artifactId>
+  <version>1.2.5</version>
+  <type>pom</type>
+</dependency>
+```
+
+## Organization
 The project has three parts, each with their own README.md:
  * Core: This contains SP as a library. It has all the extraction code, plus training and evaluation.
  * Server: This contains the SP server. It's useful for PDF parsing as a service.
