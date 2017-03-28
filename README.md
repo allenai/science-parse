@@ -21,7 +21,7 @@ The project has three parts, each with their own README.md:
 
 This project is a hybrid between Java and Scala. The interaction between the languages is fairly seamless, and SP can be used as a library in an JVM-based language.
 
-### Lombok
+## Lombok
 
 This project uses [Lombok](https://projectlombok.org) which requires you to enable annotation processing inside of an IDE.
 [Here](https://plugins.jetbrains.com/plugin/6317) is the IntelliJ plugin and you'll need to enable annotation processing (instructions [here](https://www.jetbrains.com/idea/help/configuring-annotation-processing.html)).
