@@ -12,7 +12,7 @@ Science Parse parses scientific papers (in PDF form) and returns them in structu
    * Year
  * Mentions, i.e., places in the paper where bibliography entries are mentioned
  
-# How to include into your own project
+## How to include into your own project
  
 The current version is `1.2.5`. If you want to include it in your own project, use this:
 
@@ -37,11 +37,11 @@ The project has three parts, each with their own README.md:
  * Server: This contains the SP server. It's useful for PDF parsing as a service.
  * CLI: This contains the command line interface to SP. That's most useful for batch processing.
  
-# Development
+## Development
 
 This project is a hybrid between Java and Scala. The interaction between the languages is fairly seamless, and SP can be used as a library in an JVM-based language.
 
-## Lombok
+### Lombok
 
 This project uses [Lombok](https://projectlombok.org) which requires you to enable annotation processing inside of an IDE.
 [Here](https://plugins.jetbrains.com/plugin/6317) is the IntelliJ plugin and you'll need to enable annotation processing (instructions [here](https://www.jetbrains.com/idea/help/configuring-annotation-processing.html)).
