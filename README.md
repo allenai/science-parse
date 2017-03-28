@@ -1,8 +1,25 @@
-This is a replacement for Grobid. It uses our local build of [pdfbox](http://utility.allenai.org:8081/nexus/content/repositories/thirdparty/org/apache/pdfbox-local/). It also uses sbt to build instead of gradle.
-
 # Science Parse
 
-Parsing PDF meta-data.
+Science Parse parses scientific papers (in PDF form) and returns them in structured form. As of today, it supports these fields:
+ * Title
+ * Authors
+ * Abstract
+ * Sections (each with heading and body text)
+ * Bibliography, each with
+   * Title
+   * Authors
+   * Venue
+   * Year
+ * Mentions, i.e., places in the paper where bibliography entries are mentioned
+
+The project has three parts, each with their own README.md:
+ * Core: This contains SP as a library. It has all the extraction code, plus training and evaluation.
+ * Server: This contains the SP server. It's useful for PDF parsing as a service.
+ * CLI: This contains the command line interface to SP. That's most useful for batch processing.
+ 
+# Development
+
+This project is a hybrid between Java and Scala. The interaction between the languages is fairly seamless, and SP can be used as a library in an JVM-based language.
 
 ### Lombok
 
@@ -13,4 +30,3 @@ Lombok has a lot of useful annotations that give you some of the nice things in 
 
 * `val` is equivalent to `final` and the right-hand-side class. It gives you type-inference via some tricks
 * Check out [`@Data`](https://projectlombok.org/features/Data.html)
-
