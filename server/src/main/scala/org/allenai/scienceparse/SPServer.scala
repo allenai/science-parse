@@ -32,7 +32,8 @@ object SPServer extends Logging {
       bibModelFile: Option[File] = None,
       gazetteerFile: Option[File] = None,
       paperDirectory: Option[File] = None,
-      enableFeedback: Boolean = true
+      enableFeedback: Boolean = true,
+      downloadModelOnly: Boolean = false
     )
 
     val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -58,6 +59,10 @@ object SPServer extends Logging {
         c.copy(enableFeedback = false)
       } text "Disabled the feedback mechanism"
 
+      opt[Unit]("downloadModelOnly") action { (_, c) =>
+        c.copy(downloadModelOnly = true)
+      } text "Just downloads all the model files, and then quits"
+
       help("help") text "Prints help text"
     }
 
@@ -69,6 +74,9 @@ object SPServer extends Logging {
       val scienceParser = new Parser(modelFile, gazetteerFile, bibModelFile)
       val end = System.currentTimeMillis()
       logger.info(s"Loaded science parser in ${end - start}ms")
+
+      if(config.downloadModelOnly)
+        System.exit(0)
 
       val paperSource = {
         val bucketSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
