@@ -39,7 +39,7 @@ The project has three parts, each with their own README.md:
  
 ## Development
 
-This project is a hybrid between Java and Scala. The interaction between the languages is fairly seamless, and SP can be used as a library in an JVM-based language.
+This project is a hybrid between Java and Scala. The interaction between the languages is fairly seamless, and SP can be used as a library in any JVM-based language.
 
 ### Lombok
 
