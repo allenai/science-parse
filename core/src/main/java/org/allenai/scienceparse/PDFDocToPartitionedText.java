@@ -1,11 +1,8 @@
 package org.allenai.scienceparse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.gs.collections.api.list.ImmutableList;
 import com.gs.collections.api.map.primitive.DoubleIntMap;
@@ -186,9 +183,9 @@ public class PDFDocToPartitionedText {
   public static String getAbstract(List<String> raw, PDFDoc pdf) {
     boolean inAbstract = false;
     StringBuilder out = new StringBuilder();
-    for(String s : raw) {
-      if(inAbstract) {
-        if(s.length() < 20)
+    for (String s : raw) {
+      if (inAbstract) {
+        if (s.length() < 20)
           break;
         else {
           out.append(' ');
@@ -196,31 +193,31 @@ public class PDFDocToPartitionedText {
         }
       }
 
-      if(s.toLowerCase().contains("abstract") && s.length() < 10) {
+      if (s.toLowerCase().contains("abstract") && s.length() < 10) {
         inAbstract = true;
-      } else if(s.toLowerCase().contains("a b s t r a c t")) {
+      } else if (s.toLowerCase().contains("a b s t r a c t")) {
         inAbstract = true;
-      } else if(RegexWithTimeout.matcher(inLineAbstractPattern, s).find()) {
+      } else if (RegexWithTimeout.matcher(inLineAbstractPattern, s).find()) {
         out.append(RegexWithTimeout.matcher(inLineAbstractPattern, s).replaceFirst(""));
         inAbstract = true;
       }
     }
     String abs = out.toString().trim();
-    if(abs.length()==0) {
+    if (abs.length() == 0) {
       //we didn't find an abstract.  Pull out the first paragraph-looking thing.
       abs = getFirstTextBlock(pdf);
       abs = RegexWithTimeout.matcher(paragraphAbstractCleaner, abs).replaceFirst("");
     }
-    
+
     // remove keywords, intro from abstract
-    for(Pattern p : generalAbstractCleaners) {
+    for (Pattern p : generalAbstractCleaners) {
       abs = RegexWithTimeout.matcher(p, abs).replaceFirst("");
     }
 
     abs = abs.replaceAll("- ", "");
     return abs;
   }
-  
+
   private static boolean lenientRefStart(PDFLine l, PDFLine prevLine, double qLineBreak) {
     final PDFToken firstToken = l.tokens.get(0);
 
@@ -243,6 +240,67 @@ public class PDFDocToPartitionedText {
   private static Pattern referenceStartPattern =
       Pattern.compile("^\\d{1,2}\\.|^\\[\\d{1,2}\\]");
 
+  private static boolean gapAcrossMiddle(PDFToken t1, PDFToken t2, PDFPage p, float lineSpaceWidth) {
+    double gap = PDFToCRFInput.getXGap(t1, t2);
+    double pageCenter = p.getPageWidth() / 2.0;
+    double gapCenter = (PDFToCRFInput.getX(t1, false) + PDFToCRFInput.getX(t2, true))/2.0;
+    return gap > 5*lineSpaceWidth &&
+            Math.abs(gapCenter - pageCenter) < 50*lineSpaceWidth; //lenient on center since margins might differ
+  }
+
+  /**
+   * The lower-level processing sometimes fails to detect column breaks and/or fails to order
+   * to column lines correctly.  This function attempts to repair that, returning column-broken lines
+   * ordered left-to-right, top-to-bottom.
+   * @param lines
+   * @return
+   */
+  public static List<Pair<PDFPage, PDFLine>> repairColumns(List<Pair<PDFPage, PDFLine>> lines) {
+    List<Pair<PDFPage, PDFLine>> out = new ArrayList<>();
+    List<PDFLine> linesA = new ArrayList<>(); //holds new, broken lines
+    PDFPage prevPage = null;
+    for(final Pair<PDFPage, PDFLine> pageLinePair : lines) {
+      PDFLine line = pageLinePair.getTwo();
+      PDFPage page = pageLinePair.getOne();
+      if(page != prevPage && prevPage != null) {
+        final PDFPage comparePage = prevPage;
+        linesA.sort((line1, line2) -> Double.compare(lineSorter(line1, comparePage), lineSorter(line2, comparePage)));
+        for(PDFLine linea : linesA)
+          out.add(Tuples.pair(prevPage, linea));
+        linesA = new ArrayList<>();
+      }
+      List<PDFToken> lineAcc = new ArrayList<>();
+      PDFToken prevToken = null;
+      for(final PDFToken token : line.tokens) {
+        if(prevToken != null) {
+          if(gapAcrossMiddle(prevToken, token, page, prevToken.fontMetrics.spaceWidth)) {
+            linesA.add(PDFLine.builder().tokens(new ArrayList<>(lineAcc)).build());
+            lineAcc = new ArrayList<>();
+          }
+        }
+        lineAcc.add(token);
+        prevToken = token;
+      }
+      if(lineAcc.size() > 0)
+        linesA.add(PDFLine.builder().tokens(new ArrayList<>(lineAcc)).build());
+      prevPage = page;
+    }
+    final PDFPage comparePage = prevPage;
+    linesA.sort((line1, line2) -> Double.compare(lineSorter(line1, comparePage), lineSorter(line2, comparePage)));
+    for(PDFLine linea : linesA)
+      out.add(Tuples.pair(prevPage, linea));
+    return out;
+  }
+
+  private static double lineSorter(PDFLine line, PDFPage p) {
+    return 1E8*(firstCol(line, p)?0.0:1.0) + PDFToCRFInput.getY(line, true);
+  }
+
+  private static boolean firstCol(PDFLine line, PDFPage p) {
+    double pageThird = p.getPageWidth() / 3.0;
+    return PDFToCRFInput.getX(line, true) < pageThird;
+  }
+
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
@@ -255,31 +313,35 @@ public class PDFDocToPartitionedText {
     boolean lenient = false;
 
     // Find reference lines in the document
-    final List<Pair<PDFPage, PDFLine>> referenceLines = new ArrayList<>();
+    List<Pair<PDFPage, PDFLine>> referenceLines = new ArrayList<>();
+    int totalLines = 0;
     for(int pass=0;pass<2;pass++) {
-      if(pass==1)
-        if(foundRefs)
+      int passLines = 0;
+      if (pass == 1)
+        if (foundRefs)
           break;
         else
-          lenient=true; //try harder this time.
+          lenient = true; //try harder this time.
       for (PDFPage p : pdf.getPages()) {
         double farLeft = Double.MAX_VALUE; //of current column
         double farRight = -1.0; //of current column
         for (PDFLine l : p.getLines()) {
+          if (pass == 0)
+            totalLines++;
+          passLines++;
           if (!inRefs && (l != null && l.tokens != null && l.tokens.size() > 0)) {
             if (
-              l.tokens.get(l.tokens.size() - 1).token != null &&
-              referenceHeaders.contains(
-                  l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", "")) &&
-              l.tokens.size() < 5
-            ) {
+                    l.tokens.get(l.tokens.size() - 1).token != null &&
+                            referenceHeaders.contains(
+                                    l.tokens.get(l.tokens.size() - 1).token.trim().toLowerCase().replaceAll("\\p{Punct}*$", "")) &&
+                            l.tokens.size() < 5
+                    ) {
               inRefs = true;
               foundRefs = true;
               prevLine = l;
               continue; //skip this line
-            }
-            else if(lenient) { //used if we don't find refs on first pass
-              if(lenientRefStart(l, prevLine, qLineBreak)) {
+            } else if (lenient && passLines > totalLines / 4) { //used if we don't find refs on first pass; must not be in first 1/4 of doc
+              if (lenientRefStart(l, prevLine, qLineBreak)) {
                 inRefs = true;
                 foundRefs = true;
                 //DON'T skip this line.
@@ -293,6 +355,8 @@ public class PDFDocToPartitionedText {
       }
     }
 
+    referenceLines = repairColumns(referenceLines);
+
     // find most common font sizes in references
     final MutableDoubleIntMap fontSize2count = DoubleIntMaps.mutable.empty();
     int tokenCount = 0;
@@ -302,6 +366,16 @@ public class PDFDocToPartitionedText {
       for(final PDFToken t: l.tokens)
         fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
     }
+
+
+
+    // Filter out everything that's in a font size that makes up less than 4%
+
+//    final int tc = tokenCount;
+//    DoubleSet allowedFontSizes =
+//            fontSize2count.reject((font, count) -> count < tc / 4).keySet();
+//    if(allowedFontSizes.isEmpty())
+//      allowedFontSizes = fontSize2count.keySet();
 
     // split reference lines into columns
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
@@ -315,6 +389,15 @@ public class PDFDocToPartitionedText {
       if(l.tokens.isEmpty())
         continue;
 
+
+      // remove tokens with weird font sizes
+
+//      final DoubleSet af = allowedFontSizes;
+//      l.tokens = l.tokens.stream().filter(t -> af.contains(t.fontMetrics.ptSize)).collect(Collectors.toList());
+//      if(l.tokens.size() == 0)
+//        continue;
+//      if(l.tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize)))
+//        continue;
 
       // Cut into columns. One column is a set of lines with continuously increasing Y coordinates.
       final double lineTop = PDFToCRFInput.getY(l, true);
@@ -435,3 +518,4 @@ public class PDFDocToPartitionedText {
     return out;
   }
 }
+
