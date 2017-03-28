@@ -303,13 +303,6 @@ public class PDFDocToPartitionedText {
         fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
     }
 
-    // Filter out everything that's in a font size that makes up less than 4%
-    final int tc = tokenCount;
-    DoubleSet allowedFontSizes =
-            fontSize2count.reject((font, count) -> count < tc / 25).keySet();
-    if(allowedFontSizes.isEmpty())
-      allowedFontSizes = fontSize2count.keySet();
-
     // split reference lines into columns
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
     PDFPage lastPage = null;
@@ -337,22 +330,6 @@ public class PDFDocToPartitionedText {
       }
       lastPage = p;
     }
-
-    //      // remove first,last lines with weird fonts sizes
-    final DoubleSet af = allowedFontSizes;
-    for(final List<PDFLine> column : referenceLinesInColumns) {
-      if(column.size() > 0) {
-        if(column.get(0).tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize))) {
-          column.remove(0);
-        }
-      }
-      if(column.size() > 0) {
-        if(column.get(column.size() - 1).tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize))) {
-          column.remove(column.size() - 1);
-        }
-      }
-    }
-
 
     // parse each column into output
     // We assume that the indentation of the first line of every column marks the start of a
@@ -447,7 +424,7 @@ public class PDFDocToPartitionedText {
           builder.append(lineAsString);
         }
 
-        brNext = right < modeRight - 3*lineSpaceWidth;
+        brNext = right < modeRight - 2*lineSpaceWidth;
       }
       // save last line
       final String outLine = cleanLine(builder.toString());
