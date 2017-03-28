@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -182,4 +183,65 @@ public class ParserTest {
 //	  ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/papers-parseBugs.json"));
 //	  Assert.assertEquals(false, true);
   }
+
+  public void dummyTestRefExtraction() throws Exception {
+    Parser p = new Parser();
+    File inDir = new File("e:\\data\\science-parse\\debug2");
+    File outDir = new File("e:\\data\\science-parse\\out");
+    List<File> inFiles = Arrays.asList(inDir.listFiles());
+    HashSet<String> foundRefs = new HashSet<String>();
+    HashSet<String> unfoundRefs = new HashSet<String>();
+
+    ObjectMapper mapper = new ObjectMapper();
+    int totalRefs = 0;
+    int totalCites = 0;
+    int blankAbstracts = 0;
+    for (File f : inFiles) {
+      if (!f.getName().endsWith(".pdf"))
+        continue;
+      val fis = new FileInputStream(f);
+      ExtractedMetadata em = null;
+      try {
+        log.info(f.getName());
+        em = p.doParse(fis, Parser.MAXHEADERWORDS);
+        if(em.abstractText == null || em.abstractText.length() == 0) {
+          log.info("abstract blank!");
+          blankAbstracts++;
+        }
+        else {
+          log.info("abstract: " + em.abstractText);
+        }
+        final List<BibRecord> br = em.references;
+        for(BibRecord b : br)
+          log.info(b.toString());
+        final List<CitationRecord> cr = em.referenceMentions;
+        if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
+          foundRefs.add(f.getAbsolutePath());
+        } else {
+          unfoundRefs.add(f.getAbsolutePath());
+        }
+        totalRefs += br.size();
+        totalCites += cr.size();
+        mapper.writeValue(
+                new File(outDir, f.getName() + ".dat"), em);
+        //Tuples.pair(em.references, em.referenceMentions));
+      } catch (Exception e) {
+        log.info("Parse error: " + f);
+        e.printStackTrace();
+      }
+      fis.close();
+
+    }
+
+    //Object to JSON in file
+    mapper.writeValue(new File(outDir, "unfoundReferences.dat"), unfoundRefs);
+    mapper.writeValue(new File(outDir, "foundReferences.dat"), foundRefs);
+    log.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");
+    log.info("failed to find that many for " + unfoundRefs.size() + " papers.");
+    log.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
+    log.info("blank abstracts: " + blankAbstracts);
+
+
+  }
+
 }

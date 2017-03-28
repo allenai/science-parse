@@ -303,6 +303,13 @@ public class PDFDocToPartitionedText {
         fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
     }
 
+    // Filter out everything that's in a font size that makes up less than 4%
+    final int tc = tokenCount;
+    DoubleSet allowedFontSizes =
+            fontSize2count.reject((font, count) -> count < tc / 25).keySet();
+    if(allowedFontSizes.isEmpty())
+      allowedFontSizes = fontSize2count.keySet();
+
     // split reference lines into columns
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
     PDFPage lastPage = null;
@@ -314,6 +321,7 @@ public class PDFDocToPartitionedText {
       // remove empty lines
       if(l.tokens.isEmpty())
         continue;
+
 
       // Cut into columns. One column is a set of lines with continuously increasing Y coordinates.
       final double lineTop = PDFToCRFInput.getY(l, true);
@@ -330,15 +338,36 @@ public class PDFDocToPartitionedText {
       lastPage = p;
     }
 
+    //      // remove first,last lines with weird fonts sizes
+    final DoubleSet af = allowedFontSizes;
+    for(final List<PDFLine> column : referenceLinesInColumns) {
+      if(column.size() > 0) {
+        if(column.get(0).tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize))) {
+          column.remove(0);
+        }
+      }
+      if(column.size() > 0) {
+        if(column.get(column.size() - 1).tokens.stream().anyMatch(t -> !af.contains(t.fontMetrics.ptSize))) {
+          column.remove(column.size() - 1);
+        }
+      }
+    }
+
+
     // parse each column into output
     // We assume that the indentation of the first line of every column marks the start of a
     // reference (unless that indentation happens only once)
     final List<String> out = new ArrayList<String>();
     for(final List<PDFLine> column : referenceLinesInColumns) {
-      // find indentation levels
+      if(column.size()==0) continue;
+      // find indentation levels and right limits
       final MutableDoubleIntMap left2count = DoubleIntMaps.mutable.empty();
+      final MutableDoubleIntMap right2count = DoubleIntMaps.mutable.empty();
+
       for(final PDFLine l : column) {
+
         double left = PDFToCRFInput.getX(l, true);
+        double right = PDFToCRFInput.getX(l, false);
         final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
 
         // find an indentation level that's close to this one
@@ -349,17 +378,27 @@ public class PDFDocToPartitionedText {
             break;
           }
         }
-
         left2count.addToValue(left, 1);
-      }
+
+        for(final double rightLevel : right2count.keySet().toArray()) {
+          if(Math.abs(rightLevel - right) < lineSpaceWidth) {
+            right = rightLevel;
+            break;
+          }
+        }
+        left2count.addToValue(left, 1);
+        right2count.addToValue(right, 1);  }
+      double modeRight = right2count.keyValuesView().maxBy(pair -> pair.getTwo()).getOne();
 
       // find the indentation that starts a reference
       double startReferenceIndentation = -1.0;
       final ImmutableList<DoubleIntPair> startReferenceIndentCandidates =
           left2count.keyValuesView().toSortedListBy(pair -> -pair.getTwo()).take(2).toImmutable();
+      boolean useIndentation = false;
       if(startReferenceIndentCandidates.size() == 1) {
         startReferenceIndentation = startReferenceIndentCandidates.get(0).getOne();
       } else {
+        useIndentation = true;
         final DoubleIntPair first = startReferenceIndentCandidates.get(0);
         final DoubleIntPair second = startReferenceIndentCandidates.get(1);
         if(first.getTwo() == second.getTwo()) { // If the counts for both are the same, we pick the first one we see.
@@ -382,17 +421,18 @@ public class PDFDocToPartitionedText {
 
       int linesGrouped = 0; // We never group more than six lines together at a time.
       final StringBuilder builder = new StringBuilder();
+      boolean brNext = false;
       for(final PDFLine l : column) {
         final double left = PDFToCRFInput.getX(l, true);
+        final double right = PDFToCRFInput.getX(l, false);
         final String lineAsString = lineToString(l);
         final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
         linesGrouped += 1;
 
-        final boolean br =
+        final boolean br = brNext ||
           linesGrouped >= 6 ||
-          Math.abs(left-startReferenceIndentation) < lineSpaceWidth ||
+                  (useIndentation && Math.abs(left-startReferenceIndentation) < lineSpaceWidth) ||
           referenceStartPattern.matcher(lineAsString).find();
-
         if(br) {
           // save old line
           final String outLine = cleanLine(builder.toString());
@@ -406,6 +446,8 @@ public class PDFDocToPartitionedText {
           builder.append("<lb>");
           builder.append(lineAsString);
         }
+
+        brNext = right < modeRight - 3*lineSpaceWidth;
       }
       // save last line
       final String outLine = cleanLine(builder.toString());
