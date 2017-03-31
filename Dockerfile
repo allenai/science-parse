@@ -10,6 +10,8 @@ RUN apt-get -y install oracle-java8-installer
 
 WORKDIR /app
 
-ADD server/target/scala-2.11/science-parse-science-parse-server-1.2.6-SNAPSHOT.jar /app/science-parse-server-1.2.6-SNAPSHOT.jar
+ADD server/target/scala-2.11/science-parse-science-parse-server-1.2.7-SNAPSHOT.jar /app/science-parse-server-1.2.7-SNAPSHOT.jar
 
-CMD java -jar science-parse-server-1.2.6-SNAPSHOT.jar --disableFeedback
+RUN java -jar /app/science-parse-server-1.2.7-SNAPSHOT.jar --downloadModelOnly
+
+CMD java -jar science-parse-server-1.2.7-SNAPSHOT.jar --disableFeedback
