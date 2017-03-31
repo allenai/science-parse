@@ -246,6 +246,96 @@ public class PDFDocToPartitionedText {
   private static Pattern referenceStartPattern =
       Pattern.compile("^\\d{1,2}\\.|^\\[");
 
+  private static boolean gapAcrossMiddle(PDFToken t1, PDFToken t2, PDFPage p, float lineSpaceWidth) {
+    double gap = PDFToCRFInput.getXGap(t1, t2);
+    double pageCenter = p.getPageWidth() / 2.0;
+    double gapCenter = (PDFToCRFInput.getX(t1, false) + PDFToCRFInput.getX(t2, true))/2.0;
+    return gap > 5*lineSpaceWidth &&
+            Math.abs(gapCenter - pageCenter) < 50*lineSpaceWidth; //lenient on center since margins might differ
+  }
+
+  /**
+   * The lower-level processing sometimes fails to detect column breaks and/or fails to order
+   * to column lines correctly.  This function attempts to repair that, returning column-broken lines
+   * ordered left-to-right, top-to-bottom.
+   * @param lines
+   * @return
+   */
+  public static List<Pair<PDFPage, PDFLine>> repairColumns(List<Pair<PDFPage, PDFLine>> lines) {
+    List<Pair<PDFPage, PDFLine>> out = new ArrayList<>();
+    List<PDFLine> linesA = new ArrayList<>(); //holds new, broken lines
+    PDFPage prevPage = null;
+
+    ArrayList<Double> gaps = new ArrayList<>();
+
+    double meanSpaceWidth = 0.0;
+
+    for(final Pair<PDFPage, PDFLine> pageLinePair : lines) {
+      PDFLine line = pageLinePair.getTwo();
+      PDFPage page = pageLinePair.getOne();
+      if(page != prevPage && prevPage != null) {
+        final PDFPage comparePage = prevPage;
+        linesA.sort((line1, line2) -> Double.compare(lineSorter(line1, comparePage), lineSorter(line2, comparePage)));
+        for(PDFLine linea : linesA)
+          out.add(Tuples.pair(prevPage, linea));
+        linesA = new ArrayList<>();
+      }
+      List<PDFToken> lineAcc = new ArrayList<>();
+      PDFToken prevToken = null;
+      for(final PDFToken token : line.tokens) {
+        if(prevToken != null) {
+          if(gapAcrossMiddle(prevToken, token, page, prevToken.fontMetrics.spaceWidth)) {
+            gaps.add((PDFToCRFInput.getX(prevToken,false) + PDFToCRFInput.getX(token, true))/2.0);
+            meanSpaceWidth += prevToken.fontMetrics.spaceWidth;
+            linesA.add(PDFLine.builder().tokens(new ArrayList<>(lineAcc)).build());
+            lineAcc = new ArrayList<>();
+          }
+        }
+        lineAcc.add(token);
+        prevToken = token;
+      }
+      if(lineAcc.size() > 0)
+        linesA.add(PDFLine.builder().tokens(new ArrayList<>(lineAcc)).build());
+      prevPage = page;
+    }
+    //if gaps are consistent and there are at least ten of them:
+    boolean useReorderedLines = false;
+    if(gaps.size() > 10) {
+      useReorderedLines = true;
+      double mean = 0.0;
+      meanSpaceWidth /= gaps.size();
+      for(double d : gaps) {
+        mean += d;
+      }
+      mean /= gaps.size();
+      for(double d : gaps) {
+        if(Math.abs(d - mean) > 3*meanSpaceWidth) {
+          useReorderedLines = false;
+          break;
+        }
+      }
+    }
+    if(useReorderedLines) {
+      final PDFPage comparePage = prevPage;
+      linesA.sort((line1, line2) -> Double.compare(lineSorter(line1, comparePage), lineSorter(line2, comparePage)));
+      for (PDFLine linea : linesA)
+        out.add(Tuples.pair(prevPage, linea));
+      log.info("using re-ordered lines.");
+      return out;
+    }
+    else
+      return lines;
+  }
+
+  private static double lineSorter(PDFLine line, PDFPage p) {
+    return 1E8*(firstCol(line, p)?0.0:1.0) + PDFToCRFInput.getY(line, true);
+  }
+
+  private static boolean firstCol(PDFLine line, PDFPage p) {
+    double pageThird = p.getPageWidth() / 3.0;
+    return PDFToCRFInput.getX(line, true) < pageThird;
+  }
+
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
@@ -258,8 +348,11 @@ public class PDFDocToPartitionedText {
     boolean lenient = false;
 
     // Find reference lines in the document
-    final List<Pair<PDFPage, PDFLine>> referenceLines = new ArrayList<>();
+    List<Pair<PDFPage, PDFLine>> referenceLines = new ArrayList<>();
+    int totalLines = 0;
+
     for(int pass=0;pass<2;pass++) {
+      int passLines = 0;
       if(pass==1)
         if(foundRefs)
           break;
@@ -281,8 +374,8 @@ public class PDFDocToPartitionedText {
               prevLine = l;
               continue; //skip this line
             }
-            else if(lenient) { //used if we don't find refs on first pass
-              if(lenientRefStart(l, prevLine, qLineBreak)) {
+            else if (lenient && passLines > totalLines / 4) { //used if we don't find refs on first pass; must not be in first 1/4 of doc
+              if (lenientRefStart(l, prevLine, qLineBreak)) {
                 inRefs = true;
                 foundRefs = true;
                 //DON'T skip this line.
@@ -293,8 +386,13 @@ public class PDFDocToPartitionedText {
             referenceLines.add(Tuples.pair(p, l));
           prevLine = l;
         }
+        if(pass==0)
+          totalLines++;
+        passLines++;
       }
     }
+
+    referenceLines = repairColumns(referenceLines);
 
     // split reference lines into columns
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
