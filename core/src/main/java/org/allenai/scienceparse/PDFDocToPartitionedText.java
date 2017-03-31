@@ -10,13 +10,16 @@ import java.util.regex.Pattern;
 import com.gs.collections.api.list.ImmutableList;
 import com.gs.collections.api.map.primitive.DoubleIntMap;
 import com.gs.collections.api.map.primitive.MutableDoubleIntMap;
+import com.gs.collections.api.map.primitive.MutableFloatIntMap;
 import com.gs.collections.api.map.primitive.MutableObjectIntMap;
 import com.gs.collections.api.set.primitive.DoubleSet;
 import com.gs.collections.api.set.primitive.MutableDoubleSet;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.api.tuple.primitive.DoubleIntPair;
+import com.gs.collections.api.tuple.primitive.FloatIntPair;
 import com.gs.collections.impl.factory.primitive.DoubleIntMaps;
 import com.gs.collections.impl.factory.primitive.DoubleSets;
+import com.gs.collections.impl.factory.primitive.FloatIntMaps;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import com.gs.collections.impl.tuple.Tuples;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
@@ -69,9 +72,9 @@ public class PDFDocToPartitionedText {
     return out;
   }
 
-  public static double breakSize(PDFLine l2, PDFLine l1) {
+  public static float breakSize(PDFLine l2, PDFLine l1) {
     if (l2 == null || l1 == null)
-      return 0.0;
+      return 0.0f;
     float h1 = PDFToCRFInput.getH(l1);
     float h2 = PDFToCRFInput.getH(l2);
     return (PDFToCRFInput.getY(l2, true) - PDFToCRFInput.getY(l1, false)) / Math.min(h1, h2);
@@ -241,7 +244,7 @@ public class PDFDocToPartitionedText {
       "bibliographie"));
 
   private static Pattern referenceStartPattern =
-      Pattern.compile("^\\d{1,2}\\.|^\\[\\d{1,2}\\]");
+      Pattern.compile("^\\d{1,2}\\.|^\\[");
 
   /**
    * Returns best guess of list of strings representation of the references of this file,
@@ -293,16 +296,6 @@ public class PDFDocToPartitionedText {
       }
     }
 
-    // find most common font sizes in references
-    final MutableDoubleIntMap fontSize2count = DoubleIntMaps.mutable.empty();
-    int tokenCount = 0;
-    for(final Pair<PDFPage, PDFLine> pageLinePair : referenceLines) {
-      final PDFLine l = pageLinePair.getTwo();
-      tokenCount += l.tokens.size();
-      for(final PDFToken t: l.tokens)
-        fontSize2count.addToValue(t.fontMetrics.ptSize, 1);
-    }
-
     // split reference lines into columns
     final List<List<PDFLine>> referenceLinesInColumns = new ArrayList<>();
     PDFPage lastPage = null;
@@ -336,62 +329,120 @@ public class PDFDocToPartitionedText {
     final List<String> out = new ArrayList<String>();
     for(final List<PDFLine> column : referenceLinesInColumns) {
       // find indentation levels
-      final MutableDoubleIntMap left2count = DoubleIntMaps.mutable.empty();
+      final MutableFloatIntMap left2count = FloatIntMaps.mutable.empty();
       for(final PDFLine l : column) {
-        double left = PDFToCRFInput.getX(l, true);
+        final float left = PDFToCRFInput.getX(l, true);
         final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
 
         // find an indentation level that's close to this one
         // This is not proper clustering, but I don't think we need it.
-        for(final double indentLevel : left2count.keySet().toArray()) {
+        float foundLeft = left;
+        for(final float indentLevel : left2count.keySet().toArray()) {
           if(Math.abs(indentLevel - left) < lineSpaceWidth) {
-            left = indentLevel;
+            foundLeft = indentLevel;
             break;
           }
         }
 
-        left2count.addToValue(left, 1);
+        final int oldCount = left2count.getIfAbsent(foundLeft, 0);
+        left2count.remove(foundLeft);
+        left2count.put(
+            (foundLeft * oldCount + left) / (oldCount + 1),
+            oldCount + 1);
       }
 
       // find the indentation that starts a reference
-      double startReferenceIndentation = -1.0;
-      final ImmutableList<DoubleIntPair> startReferenceIndentCandidates =
+      float startReferenceIndentation = -1000; // default is some number that's definitely more than one space width away from a realistic indent
+      final ImmutableList<FloatIntPair> startReferenceIndentCandidates =
           left2count.keyValuesView().toSortedListBy(pair -> -pair.getTwo()).take(2).toImmutable();
-      if(startReferenceIndentCandidates.size() == 1) {
-        startReferenceIndentation = startReferenceIndentCandidates.get(0).getOne();
-      } else {
-        final DoubleIntPair first = startReferenceIndentCandidates.get(0);
-        final DoubleIntPair second = startReferenceIndentCandidates.get(1);
-        if(first.getTwo() == second.getTwo()) { // If the counts for both are the same, we pick the first one we see.
-          for(final PDFLine l : column) {
-            final double left = PDFToCRFInput.getX(l, true);
-            final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
-            if(Math.abs(first.getOne() - left) < lineSpaceWidth) {
-              startReferenceIndentation = first.getOne();
-              break;
-            }
-            if(Math.abs(second.getOne() - left) < lineSpaceWidth) {
-              startReferenceIndentation = second.getOne();
-              break;
-            }
+      if(startReferenceIndentCandidates.size() > 1) {
+        final FloatIntPair first = startReferenceIndentCandidates.get(0);
+        final FloatIntPair second = startReferenceIndentCandidates.get(1);
+
+        // find lines that look like they start references, and use them to determine which indent
+        // starts a reference
+        float firstIndentSeen = -1;
+        for(final PDFLine l : column) {
+          float left = PDFToCRFInput.getX(l, true);
+          final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
+
+          // snap to candidate indentations
+          if(Math.abs(first.getOne() - left) < lineSpaceWidth)
+            left = first.getOne();
+          else if(Math.abs(second.getOne() - left) < lineSpaceWidth)
+            left = second.getOne();
+          else
+            continue; // only consider candidates
+
+          if(firstIndentSeen < 0)
+            firstIndentSeen = left;
+
+          final String lineAsString = lineToString(l);
+          if(referenceStartPattern.matcher(lineAsString).find()) {
+            startReferenceIndentation = left;
+            break;
           }
-        } else {
-          startReferenceIndentation = second.getOne();
+        }
+
+        if(startReferenceIndentation < 0) {
+          startReferenceIndentation = second.getOne();  // pick the one that's less common
         }
       }
 
+      // find vertical spaces that might separate references
+      final float breakSizeTolerance = 0.1f;
+      MutableFloatIntMap vspace2count = FloatIntMaps.mutable.empty();
+      for(int i = 1; i < column.size(); ++i) {
+        final PDFLine l1 = column.get(i - 1);
+        final PDFLine l2 = column.get(i);
+        final float thisVspace = breakSize(l2, l1); // vspace is measured in line heights
+
+        // if it's close to another break size, we should cluster them
+        float foundVspace = thisVspace;
+        for(final float v : vspace2count.keySet().toArray()) {
+          if(Math.abs(v - thisVspace) <= breakSizeTolerance) {
+            foundVspace = v;
+            break;
+          }
+        }
+
+        final int oldCount = vspace2count.getIfAbsent(foundVspace, 0);
+        vspace2count.remove(foundVspace);
+        vspace2count.put(
+            (foundVspace * oldCount + thisVspace) / (oldCount + 1),
+            oldCount + 1);
+      }
+      // filter down to reasonable vspaces
+      final long numberOfBreaks = vspace2count.sum();
+      vspace2count = vspace2count.select((vspace, count) ->
+          count >= numberOfBreaks / 5 &&  // must account for 20% of breaks
+          count > 1 &&                    // must occur at least once
+          vspace < 3                      // more than 3 lines of gap is crazy
+      );
+
+      float breakReferenceVspace = -1.0f;
+      if(column.size() > 5 && vspace2count.size() >= 2) // only if we have at least 5 lines
+        breakReferenceVspace = vspace2count.keySet().max();
+
       int linesGrouped = 0; // We never group more than six lines together at a time.
       final StringBuilder builder = new StringBuilder();
+      prevLine = null;
       for(final PDFLine l : column) {
-        final double left = PDFToCRFInput.getX(l, true);
+        final float left = PDFToCRFInput.getX(l, true);
         final String lineAsString = lineToString(l);
         final float lineSpaceWidth = l.tokens.get(0).fontMetrics.spaceWidth;
         linesGrouped += 1;
 
         final boolean br =
-          linesGrouped >= 6 ||
-          Math.abs(left-startReferenceIndentation) < lineSpaceWidth ||
-          referenceStartPattern.matcher(lineAsString).find();
+          linesGrouped >= 6 || (
+            breakReferenceVspace < 0 && // if we have vspace, we don't use indent
+            startReferenceIndentation > 0 &&
+            Math.abs(left-startReferenceIndentation) < lineSpaceWidth
+          ) || referenceStartPattern.matcher(lineAsString).find() || (
+            prevLine != null &&
+            breakReferenceVspace > 0 &&
+            breakSize(l, prevLine) >= breakReferenceVspace - breakSizeTolerance
+          );
 
         if(br) {
           // save old line
@@ -406,6 +457,8 @@ public class PDFDocToPartitionedText {
           builder.append("<lb>");
           builder.append(lineAsString);
         }
+
+        prevLine = l;
       }
       // save last line
       final String outLine = cleanLine(builder.toString());
