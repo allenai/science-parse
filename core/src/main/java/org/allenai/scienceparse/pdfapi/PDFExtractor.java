@@ -326,8 +326,17 @@ public class PDFExtractor {
       // Build current token and decide if on the same line as previous token or starts a new line
       List<TextPosition> curPositions = new ArrayList<>();
       List<PDFToken> tokens = new ArrayList<>();
+      double prevX = -1.0;
       for (TextPosition tp : textPositions) {
-        if (tp.getUnicode().trim().isEmpty()) {
+        if(prevX > 0.0 && tp.getX() < prevX) { //catch out-of-phase columns
+          List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
+          if (tokenPositions.size() > 0) {
+            tokens.add(RawChunk.of(tokenPositions).toPDFToken());
+          }
+          curPositions.clear();
+          curPositions.add(tp);
+        }
+        else if (tp.getUnicode().trim().isEmpty()) {
           List<TextPosition> tokenPositions = new ArrayList<>(curPositions);
           if (tokenPositions.size() > 0) {
             tokens.add(RawChunk.of(tokenPositions).toPDFToken());
@@ -336,6 +345,7 @@ public class PDFExtractor {
         } else {
           curPositions.add(tp);
         }
+        prevX = tp.getX();
       }
       if (!curPositions.isEmpty()) {
         tokens.add(RawChunk.of(new ArrayList<>(curPositions)).toPDFToken());
@@ -346,13 +356,21 @@ public class PDFExtractor {
 
     }
 
+
     private void updateFromToken(PDFToken token) {
       if (curLineTokens.isEmpty()) {
         curLineTokens.add(token);
       } else {
-        double curYBottom = token.bounds.get(3);
-        boolean yOffsetOverlap = curYBottom <= lastToken.bounds.get(3)
-          || curYBottom >= lastToken.bounds.get(1);
+        final double curTop = token.bounds.get(1);
+        final double curBottom = token.bounds.get(3);
+        assert curTop <= curBottom;
+        final double lastTop = lastToken.bounds.get(1);
+        final double lastBottom = lastToken.bounds.get(3);
+        assert lastTop <= lastBottom;
+        final boolean yOffsetOverlap =
+            (curTop >= lastTop && curTop <= lastBottom) ||
+            (curBottom >= lastTop && curBottom <= lastBottom);
+
         float spaceWidth = Math.max(token.getFontMetrics().getSpaceWidth(), token.getFontMetrics().ptSize);
         float observedWidth = token.bounds.get(0) - lastToken.bounds.get(2);
         boolean withinSpace = observedWidth > 0 && observedWidth < 4 * spaceWidth;

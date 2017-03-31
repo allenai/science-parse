@@ -45,9 +45,8 @@ public class ParserTest {
     log.info("test bootstrap tokens: " + justTokens.stream().map(t -> (t==null)?"":t.toStringShort()).collect(Collectors.toList()).toString());
     
     List<ObjectDoubleMap<String>> preds = ppe.nodePredicates(justTokens);
-    
 
-    Assert.assertTrue((preds.get(26).containsKey("%fcb")));
+    Assert.assertTrue((preds.get(27).containsKey("%fcb")));
   }
 
   private List<File> resolveKeys(List<String> keys) {
