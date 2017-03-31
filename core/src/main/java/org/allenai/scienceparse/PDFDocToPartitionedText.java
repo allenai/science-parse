@@ -320,7 +320,7 @@ public class PDFDocToPartitionedText {
       linesA.sort((line1, line2) -> Double.compare(lineSorter(line1, comparePage), lineSorter(line2, comparePage)));
       for (PDFLine linea : linesA)
         out.add(Tuples.pair(prevPage, linea));
-      log.info("using re-ordered lines.");
+      log.info("using re-ordered lines: " + out.size());
       return out;
     }
     else
