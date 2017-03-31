@@ -56,13 +56,13 @@ public class PDFToCRFInputTest {
     val labeledData = PDFToCRFInput.labelMetadata("P14-1059", pts, em);
     log.info(PDFToCRFInput.getLabelString(labeledData));
     log.info(pts.stream().map((PaperToken p) -> p.getPdfToken().token).collect(Collectors.toList()).toString());
-    Assert.assertEquals(labeledData.get(24 + 1).getTwo(), "O");
-    Assert.assertEquals(labeledData.get(25 + 1).getTwo(), "B_T");
-    Assert.assertEquals(labeledData.get(32 + 1).getTwo(), "I_T");
-    Assert.assertEquals(labeledData.get(35 + 1).getTwo(), "E_T");
-    Assert.assertEquals(labeledData.get(36 + 1).getTwo(), "B_A");
-    Assert.assertEquals(labeledData.get(45 + 1).getTwo(), "O");
-    Assert.assertEquals(labeledData.get(45 + 1).getOne(), pts.get(45)); //off by one due to start/stop
+    Assert.assertEquals(labeledData.get(26).getTwo(), "O");
+    Assert.assertEquals(labeledData.get(27).getTwo(), "B_T");
+    Assert.assertEquals(labeledData.get(34).getTwo(), "I_T");
+    Assert.assertEquals(labeledData.get(37).getTwo(), "E_T");
+    Assert.assertEquals(labeledData.get(38).getTwo(), "B_A");
+    Assert.assertEquals(labeledData.get(47).getTwo(), "O");
+    Assert.assertEquals(labeledData.get(47).getOne(), pts.get(46)); //off by one due to start/stop
     Assert.assertEquals(labeledData.get(0).getTwo(), "<S>");
     Assert.assertEquals(labeledData.get(labeledData.size() - 1).getTwo(), "</S>");
   }
@@ -98,10 +98,9 @@ public class PDFToCRFInputTest {
     ExtractedMetadata em = new ExtractedMetadata("How to make words with vectors: Phrase generation in distributional semantics",
       Arrays.asList("Georgiana Dinu", "Marco C. Baroni"), new Date(1388556000000L));
     val labeledData = PDFToCRFInput.labelMetadata("P14-1059", pts, em);
-    Assert.assertEquals(labeledData.get(36 + 1).getTwo(), "B_A");
-    Assert.assertEquals(labeledData.get(37 + 1).getTwo(), "E_A");
-    Assert.assertEquals(labeledData.get(39 + 1).getTwo(), "B_A");
-    Assert.assertEquals(labeledData.get(40 + 1).getTwo(), "E_A");
+    Assert.assertEquals(labeledData.get(38).getTwo(), "B_A");
+    Assert.assertEquals(labeledData.get(39).getTwo(), "E_A");
+    Assert.assertEquals(labeledData.get(41).getTwo(), "B_A");
+    Assert.assertEquals(labeledData.get(42).getTwo(), "E_A");
   }
-
 }
