@@ -480,8 +480,8 @@ public class ExtractReferences {
       if(
           !newTitle.isEmpty() &&      // delete empty titles
           newTitle.length() < 512 &&  // delete absurdly long bib entries
-          b.venue.length() < 512 &&
-          b.author.stream().allMatch(a -> a.length() < 512)
+          (b.venue == null || b.venue.length() < 512) &&
+          (b.author == null || b.author.stream().allMatch(a -> a.length() < 512))
       ) {
         result.add(b.withTitle(newTitle));
       }
