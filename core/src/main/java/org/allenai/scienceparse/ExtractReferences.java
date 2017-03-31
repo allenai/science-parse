@@ -474,14 +474,19 @@ public class ExtractReferences {
     val result = new ArrayList<BibRecord>(brs.size());
 
     // remove punctuation at the beginning and end of the title
-    for(BibRecord b : brs) {
+    for(final BibRecord b : brs) {
       final String newTitle =
           b.title.trim().replaceAll("^\\p{P}", "").replaceAll("[\\p{P}&&[^)]]$", "");
-      if(!newTitle.isEmpty())
+      if(
+          !newTitle.isEmpty() &&      // delete empty titles
+          newTitle.length() < 512 &&  // delete absurdly long bib entries
+          b.venue.length() < 512 &&
+          b.author.stream().allMatch(a -> a.length() < 512)
+      ) {
         result.add(b.withTitle(newTitle));
+      }
     }
 
-    // remove bib records with no title
     return result;
   }
   
