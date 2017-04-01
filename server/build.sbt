@@ -1,7 +1,7 @@
 
 description := "Java server to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
 
-name := "science-parse-server"
+name := "server"
 
 organization := "org.allenai.scienceparse"
 
