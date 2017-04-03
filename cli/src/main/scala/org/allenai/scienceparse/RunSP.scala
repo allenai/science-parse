@@ -66,7 +66,7 @@ object RunSP extends Logging {
 
       opt[File]('p', "paperDirectory") action { (p, c) =>
         c.copy(paperDirectory = Some(p))
-      } text "Specifies a directory with papers in them. If this is not specified, or a paper can't be found in the directory, we fall back to getting the paper from the bucket."
+      } text "Specifies a directory with papers in them. If this is not specified, or a paper can't be found in the directory, we fall back to getting the paper from Semantic Scholar."
 
       arg[String]("<pdf|directory|sha|textfile>...") unbounded () action {
         (f, c) => c.copy(pdfInputs = c.pdfInputs :+ f)
