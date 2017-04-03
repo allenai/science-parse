@@ -32,7 +32,7 @@ object SPServer extends Logging {
       bibModelFile: Option[File] = None,
       gazetteerFile: Option[File] = None,
       paperDirectory: Option[File] = None,
-      enableFeedback: Boolean = true,
+      enableFeedback: Boolean = false,
       downloadModelOnly: Boolean = false
     )
 
@@ -55,9 +55,9 @@ object SPServer extends Logging {
         c.copy(paperDirectory = Some(p))
       } text "Specifies a directory with papers in them. If this is not specified, or a paper can't be found in the directory, we fall back to getting the paper from the bucket."
 
-      opt[Unit]("disableFeedback") action { (_, c) =>
-        c.copy(enableFeedback = false)
-      } text "Disables the feedback mechanism"
+      opt[Unit]("enableFeedback") action { (_, c) =>
+        c.copy(enableFeedback = true)
+      } text "Enables the feedback mechanism"
 
       opt[Unit]("downloadModelOnly") action { (_, c) =>
         c.copy(downloadModelOnly = true)
