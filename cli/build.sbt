@@ -1,7 +1,7 @@
 
 description := "Java CLI to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
 
-name := "science-parse-cli"
+name := "cli"
 
 organization := "org.allenai.scienceparse"
 
