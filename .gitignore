@@ -20,3 +20,8 @@ project/target/**
 project/project/**
 
 EvalErrors.log
+
+!/cli/
+!/core/
+!/server/
+!/project/

@@ -31,4 +31,8 @@ public class PDFFontMetrics {
     val curValue = canonical.putIfAbsent(name, fontMetrics);
     return curValue != null ? curValue : fontMetrics;
   }
+
+  public String stringRepresentation() {
+    return String.format("%s-%f", name, ptSize);
+  }
 }

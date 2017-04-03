@@ -208,6 +208,10 @@ public class PDFToCRFInput {
       return l.bounds().get(3);
   }
 
+  public static float getXGap(PDFToken t1, PDFToken t2) {
+    return getX(t2, true) - getX(t1, false);
+  }
+
   public static float getX(PDFLine l, boolean left) {
     if (left)
       return l.bounds().get(0);
