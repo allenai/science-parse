@@ -11,6 +11,7 @@ RUN apt-get -y install oracle-java8-installer
 WORKDIR /app
 
 ARG SP_VERSION
+ENV SP_VERSION $SP_VERSION
 
 ADD server/target/scala-2.11/science-parse-server-$SP_VERSION.jar /app/science-parse-server-$SP_VERSION.jar
 
