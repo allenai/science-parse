@@ -37,7 +37,7 @@ public class ExtractedMetadata {
 }
 ```
 
-For more detail, we recommend diving into the code, or asking a question (as an issue).
+For more detail, we recommend diving into the code, or asking a question (create an issue).
 
 ## Training models
 
