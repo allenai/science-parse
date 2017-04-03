@@ -17,7 +17,7 @@ Note that the content type needs to be `application/pdf`, and the URL needs to n
 
 ## Running the server yourself
 
-You can compile the server into a super-jar with sbt with `sbt server/assembly`. That will download all dependencies, compile them, and build an executable jar with all dependencies bundled. Then, you can start up the server with `java -Xmx8g -jar jarfile.jar`. On first startup, it will download several gigabytes of model files, and then bind to port 8080 on the machine you run it on.
+You can compile the server into a super-jar with sbt with `sbt server/assembly`. That will download all dependencies, compile them, and build an executable jar with all dependencies bundled. Then, you can start up the server with `java -Xmx6g -jar jarfile.jar`. On first startup, it will download several gigabytes of model files, and then bind to port 8080 on the machine you run it on.
 
 The server takes a few command line arguments. Run it with `java -jar jarfile.jar --help` to see what they are.
 

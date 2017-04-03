@@ -21,11 +21,11 @@ There are three different ways to get started with SP. Each has its own document
 
 ## How to include into your own project
  
-The current version is `1.2.5`. If you want to include it in your own project, use this:
+The current version is `1.2.6`. If you want to include it in your own project, use this:
 
 For SBT:
 ```
-libraryDependencies += "org.allenai" %% "science-parse" % "1.2.5"
+libraryDependencies += "org.allenai" %% "science-parse" % "1.2.6"
 ```
 
 For Maven:
@@ -33,7 +33,7 @@ For Maven:
 <dependency>
   <groupId>org.allenai</groupId>
   <artifactId>science-parse_2.11</artifactId>
-  <version>1.2.5</version>
+  <version>1.2.6</version>
   <type>pom</type>
 </dependency>
 ```
