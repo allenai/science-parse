@@ -119,7 +119,7 @@ class SPServer(
   // Request / response stuff
   //
 
-  private case class SPServerException(val status: Int, message: String) extends Exception(message) {
+  private case class SPServerException(status: Int, message: String) extends Exception(message) {
     def getStatus = status // because all the other methods are named get*
   }
 
