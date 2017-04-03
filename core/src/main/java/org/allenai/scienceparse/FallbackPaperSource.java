@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * A paper source that uses other paper sources, one after the other, to try to locate a paper.
  */
-public class FallbackPaperSource implements PaperSource {
+public class FallbackPaperSource extends PaperSource {
   private final static Logger logger =
       LoggerFactory.getLogger(FallbackPaperSource.class);
 

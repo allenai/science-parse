@@ -9,7 +9,7 @@ import java.io.InputStream;
 /**
  * A paper source that gets papers from a directory in the file system
  */
-public class DirectoryPaperSource implements PaperSource {
+public class DirectoryPaperSource extends PaperSource {
     private final File dir;
 
     public DirectoryPaperSource(final File dir) {

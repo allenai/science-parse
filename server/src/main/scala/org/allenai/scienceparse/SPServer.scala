@@ -79,13 +79,13 @@ object SPServer extends Logging {
         System.exit(0)
 
       val paperSource = {
-        val bucketSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
+        val defaultSource = PaperSource.getDefault
         config.paperDirectory match {
-          case None => bucketSource
+          case None => defaultSource
           case Some(dir) =>
             new FallbackPaperSource(
               new DirectoryPaperSource(dir),
-              bucketSource
+              defaultSource
             )
         }
       }

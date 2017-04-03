@@ -17,7 +17,7 @@ import java.nio.file.StandardCopyOption;
 /**
  * Gets papers from the ai2-s2-pdfs bucket
  */
-public class ScholarBucketPaperSource implements PaperSource {
+public class ScholarBucketPaperSource extends PaperSource {
     // make this a singleton
     private static ScholarBucketPaperSource instance = new ScholarBucketPaperSource();
     protected ScholarBucketPaperSource() { }

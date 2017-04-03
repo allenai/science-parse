@@ -9,7 +9,7 @@ import java.io.InputStream;
  * An instance of PaperSource that wraps another, and retries a bunch of times to get the paper
  */
 @Slf4j
-public class RetryPaperSource implements PaperSource {
+public class RetryPaperSource extends PaperSource {
     private final PaperSource inner;
     private final int tries;
 

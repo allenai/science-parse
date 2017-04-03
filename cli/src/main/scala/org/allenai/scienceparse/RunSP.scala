@@ -8,7 +8,7 @@ import ch.qos.logback.classic.Level
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.allenai.common.{Resource, Logging}
+import org.allenai.common.{Logging, Resource}
 import org.allenai.common.ParIterator._
 import org.slf4j.Logger
 import scopt.OptionParser
@@ -96,7 +96,7 @@ object RunSP extends Logging {
       }
 
       val paperSource = {
-        val bucketSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
+        val bucketSource = PaperSource.getDefault
         config.paperDirectory match {
           case None => bucketSource
           case Some(dir) =>

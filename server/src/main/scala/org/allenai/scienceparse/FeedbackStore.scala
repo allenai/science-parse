@@ -96,7 +96,7 @@ object FeedbackStore extends Logging {
     }
   }
 
-  private val paperSource = new RetryPaperSource(ScholarBucketPaperSource.getInstance())
+  private val paperSource = PaperSource.getDefault
 
   def getFeedback(paperId: String): Option[LabeledData] = {
     import spray.json._
