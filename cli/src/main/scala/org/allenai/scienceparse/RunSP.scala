@@ -187,11 +187,16 @@ object RunSP extends Logging {
 
         val startTime = System.currentTimeMillis()
         val finishedCount = new AtomicInteger()
+        val timeout = 60000 // ms
         inputStreams.parForeach { case (name, is) =>
           logger.info(s"Starting $name")
           try {
-            val metadata = parser.doParseWithTimeout(is, 60000)
+            val thisDocStartTime = System.currentTimeMillis()
+            val metadata = parser.doParseWithTimeout(is, timeout)
             val wrapper = MetadataWrapper(name, metadata)
+            val thisDocEndTime = System.currentTimeMillis()
+            if(thisDocEndTime - thisDocStartTime > timeout)
+              logger.warn(s"Document $name took ${thisDocEndTime - thisDocStartTime} ms")
 
             // write to output directory
             config.outputDir.foreach { dir =>
