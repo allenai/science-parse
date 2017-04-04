@@ -407,6 +407,8 @@ public class ExtractReferences {
               int st = Integer.parseInt(mRange.group(1));
               int end = Integer.parseInt(mRange.group(2));
               for(int j=st;j<=end;j++) {
+                if(Thread.interrupted())
+                  throw new Parser.ParsingTimeout();
                 int idx = getIdxOf(bib, j + "");
                 if (idx >= 0) {
                   out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
