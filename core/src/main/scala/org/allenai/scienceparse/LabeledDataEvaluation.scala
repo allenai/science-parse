@@ -1,14 +1,15 @@
 package org.allenai.scienceparse
 
 import java.io.File
-import java.util.concurrent.{TimeUnit, Executors}
+import java.util.concurrent.{Executors, TimeUnit}
 
 import org.allenai.common.Logging
 import org.allenai.common.ParIterator._
 import java.net.URL
-import org.allenai.nlpstack.tokenize.defaultTokenizer
+
+import opennlp.tools.tokenize.{TokenizerME, TokenizerModel}
 import org.allenai.scienceparse.LabeledData.Reference
-import org.allenai.scienceparse.pipeline.{Normalizers => PipelineNormalizers, Bucketizers => PipelineBucketizers, SimilarityMeasures, TitleAuthors}
+import org.allenai.scienceparse.pipeline.{SimilarityMeasures, TitleAuthors, Bucketizers => PipelineBucketizers, Normalizers => PipelineNormalizers}
 import org.slf4j.LoggerFactory
 import scopt.OptionParser
 
@@ -18,6 +19,9 @@ import scala.concurrent.ExecutionContext
 
 object LabeledDataEvaluation extends Logging {
   import StringUtils._
+
+  val tokenizerModel =
+    new TokenizerModel(this.getClass.getResourceAsStream("/opennlp/tools/tokenize/en-token.bin"))
 
   case class PR(precision: Double, recall: Double) {
     def p = precision
@@ -544,11 +548,12 @@ object LabeledDataEvaluation extends Logging {
 
         {
           logger.info("Calculating sectionTokensNormalized ...")
+          val tokenizer = new TokenizerME(tokenizerModel)
           val (sp, grobid, count) = evaluateMetric("sectionsTokensNormalized") { labeledData =>
             labeledData.sections.map(_.flatMap { s =>
               val heading = s.heading.map(h => normalize(h) + " : ").getOrElse("")
               val body = normalize(s.text)
-              defaultTokenizer(heading + body).map(_.string)
+              tokenizer.tokenize(heading + body)
             })
           }
 
