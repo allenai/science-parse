@@ -19,4 +19,4 @@ RUN java -Xmx8g -jar /app/science-parse-server-$SP_VERSION.jar --downloadModelOn
 
 EXPOSE 8080
 
-CMD java -Xmx8g -jar science-parse-server-$SP_VERSION.jar --disableFeedback
+CMD java -Xmx8g -jar science-parse-server-$SP_VERSION.jar
