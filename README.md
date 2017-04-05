@@ -55,3 +55,7 @@ Lombok has a lot of useful annotations that give you some of the nice things in 
 
 * `val` is equivalent to `final` and the right-hand-side class. It gives you type-inference via some tricks
 * Check out [`@Data`](https://projectlombok.org/features/Data.html)
+
+## Thanks
+
+Special thanks goes to @kermitt2, whose work on [kermitt2/grobid](https://github.com/kermitt2/grobid) inspired Science Parse, and helped us get started with some labeled data.
