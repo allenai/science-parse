@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
-  "org.allenai.datastore" %% "datastore" % "1.0.8" excludeAll(
+  "org.allenai.datastore" %% "datastore" % "1.0.9" excludeAll(
     ExclusionRule(organization = "com.amazonaws")
   ),
   "org.bouncycastle" % "bcprov-jdk15on" % "1.54",
