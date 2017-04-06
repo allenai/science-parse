@@ -42,7 +42,8 @@ For Maven:
 
 The first time you run it, SP will download some rather large model files. Don't be alarmed! The model files are cached, and startup is much faster the second time.
 
-For licensing reasons, SP does not include libraries for some image formats. If you have no
+For licensing reasons, SP does not include libraries for some image formats. Without these
+libraries, SP cannot process PDFs that contain images in these formats. If you have no
 licensing restrictions in your project, we recommend you add these additional dependencies to your
 project as well:
 ```
