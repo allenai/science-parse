@@ -34,7 +34,7 @@ object PrintFeaturizedCRFInput extends App {
 
   parser.parse(args, Config()).foreach { config =>
     val paperSource = config.paperDir.map(new DirectoryPaperSource(_)).getOrElse {
-      new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
+      PaperSource.getDefault
     }
 
     val predExtractor = {

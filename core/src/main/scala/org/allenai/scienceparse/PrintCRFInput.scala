@@ -27,7 +27,7 @@ object PrintCRFInput extends App {
 
   parser.parse(args, Config()).foreach { config =>
     val paperSource = config.paperDir.map(new DirectoryPaperSource(_)).getOrElse {
-      new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5)
+      PaperSource.getDefault
     }
 
     val seq = Resource.using(paperSource.getPdf(config.paperId)) { is =>

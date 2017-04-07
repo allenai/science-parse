@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 @Test(groups = {"integration"})
 @Slf4j
 public class HeaderIntegrationTest {
-    private final static PaperSource paperSource =
-            new RetryPaperSource(ScholarBucketPaperSource.getInstance(), 5);
+    private final static PaperSource paperSource = PaperSource.getDefault();
 
     static final int kSampledPapers = 100;
 

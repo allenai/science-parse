@@ -1337,8 +1337,8 @@ public class Parser {
           crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
         }
         em.referenceMentions = crs;
-      } catch (final RegexWithTimeout.RegexTimeout e) {
-        logger.warn("Regex timeout while extracting references. References may be incomplete or missing.");
+      } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
+        logger.warn("Timeout while extracting references. References may be incomplete or missing.");
         if (em.references == null)
           em.references = Collections.emptyList();
         if (em.referenceMentions == null)
@@ -1350,8 +1350,8 @@ public class Parser {
         em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
         if (em.abstractText.isEmpty())
           em.abstractText = null;
-      } catch (final RegexWithTimeout.RegexTimeout e) {
-        logger.warn("Regex timeout while extracting abstract. Abstract will be missing.");
+      } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
+        logger.warn("Timeout while extracting abstract. Abstract will be missing.");
         em.abstractText = null;
       }
     }
