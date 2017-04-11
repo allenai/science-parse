@@ -6,7 +6,6 @@ lazy val commonSettings = Seq(
   organization := "org.allenai",
   resolvers ++= Seq(
     "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
-    "AllenAI Bintray Private" at "http://dl.bintray.com/allenai/private",
     Resolver.jcenterRepo
   ),
   // assembly settings
