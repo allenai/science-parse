@@ -21,15 +21,15 @@ There are three different ways to get started with SP. Each has its own document
  * [CLI](cli/README.md): This contains the command line interface to SP. That's most useful for batch processing.
  * [Core](core/README.md): This contains SP as a library. It has all the extraction code, plus training and evaluation. Both server and CLI use this to do the actual work.
 
-Alternatively, you can run the **docker image**: `docker run -p 8080:8080 --rm allenai-docker-public-docker.bintray.io/s2/scienceparse:1.2.7-SNAPSHOT`
+Alternatively, you can run the **docker image**: `docker run -p 8080:8080 --rm allenai-docker-public-docker.bintray.io/s2/scienceparse:1.2.8-SNAPSHOT`
 
 ## How to include into your own project
  
-The current version is `1.2.6`. If you want to include it in your own project, use this:
+The current version is `1.2.7`. If you want to include it in your own project, use this:
 
 For SBT:
 ```
-libraryDependencies += "org.allenai" %% "science-parse" % "1.2.6"
+libraryDependencies += "org.allenai" %% "science-parse" % "1.2.7"
 ```
 
 For Maven:
@@ -37,7 +37,7 @@ For Maven:
 <dependency>
   <groupId>org.allenai</groupId>
   <artifactId>science-parse_2.11</artifactId>
-  <version>1.2.6</version>
+  <version>1.2.7</version>
   <type>pom</type>
 </dependency>
 ```
