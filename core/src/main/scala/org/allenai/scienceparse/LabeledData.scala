@@ -402,7 +402,7 @@ object LabeledPapersFromPMC extends Datastores with Logging {
 object LabeledDataFromDBLP extends Datastores {
   def apply = get
 
-  def get: Iterator[LabeledPaper] = getFromGroundTruth(publicFile("productionGroundTruth.json", 1))
+  def get: Iterator[LabeledPaper] = getFromGroundTruth(publicFile("productionGroundTruth.json", 2))
 
   def getFromGroundTruth(groundTruthFile: Path) = {
     val jsonLines = StreamClosingIterator {
