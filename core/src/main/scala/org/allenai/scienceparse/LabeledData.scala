@@ -427,7 +427,9 @@ object LabeledDataFromDBLP extends Datastores {
         LabeledData.empty.copy(
           id = s"DBLP:$id",
           title = Some(title),
-          authors = Some(authors.map(LabeledData.Author(_))),
+          authors = Some(authors.map { a =>
+            LabeledData.Author(ParserGroundTruth.invertAroundComma(a))
+          }),
           year = Some(year)
         ),
         Some(id)
