@@ -62,6 +62,7 @@ import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -276,25 +277,13 @@ public class Parser {
   }
 
   public static List<Pair<PaperToken, String>> getPaperLabels(
-          File pdf,
-          Paper p,
-          PDFExtractor ext,
-          int headerMax
+      final String paperId,
+      final InputStream is,
+      final LabeledData labeledData,
+      PDFExtractor ext,
+      int headerMax,
+      boolean checkAuthors
   ) throws IOException {
-    try(final InputStream is = new BufferedInputStream(new FileInputStream(pdf))) {
-      return getPaperLabels(is, p, ext, headerMax, false);
-    }
-  }
-
-  public static List<Pair<PaperToken, String>> getPaperLabels(
-          final InputStream is,
-          final Paper p,
-          PDFExtractor ext,
-          int headerMax,
-          boolean checkAuthors
-  ) throws IOException {
-    final String paperId = p == null ? null : p.getId();
-    if(paperId != null)
     logger.debug("{}: starting", paperId);
 
     final PDFDoc doc;
@@ -312,25 +301,21 @@ public class Parser {
     if (seq.size() == 0)
       return null;
     seq = seq.subList(0, Math.min(seq.size(), headerMax));
-    ExtractedMetadata em = null;
-    if (p == null) { //bootstrap:
-      em = new ExtractedMetadata(
-              doc.getMeta().getTitle(),
-              doc.getMeta().getAuthors(),
-        doc.getMeta().getCreateDate());
-      if (em.title == null)
-        return null;
-    } else {
-      em = new ExtractedMetadata(p);
-    }
-    List<Pair<PaperToken, String>> labeledPaper = PDFToCRFInput.labelMetadata(paperId, seq, em);
+    List<Pair<PaperToken, String>> labeledPaper =
+        PDFToCRFInput.labelMetadata(paperId, seq, labeledData);
     if (labeledPaper != null && checkAuthors) {
-      ExtractedMetadata checkEM =
+      final ExtractedMetadata checkEM =
               new ExtractedMetadata(
                       labeledPaper.stream().map(Pair::getOne).collect(Collectors.toList()),
                       labeledPaper.stream().map(Pair::getTwo).collect(Collectors.toList()));
-      if (checkEM.authors.size() != em.authors.size()) {
-        logger.debug("{}: author mismatch, discarding. Expected {}, got {}.", paperId, em.authors, checkEM.authors);
+      final Collection<String> expectedAuthorNames =
+          labeledData.javaAuthorNames().orElse(Collections.emptyList());
+      if(checkEM.authors.size() != expectedAuthorNames.size()) {
+        logger.debug(
+            "{}: author mismatch, discarding. Expected {}, got {}.",
+            paperId,
+            expectedAuthorNames,
+            checkEM.authors);
         labeledPaper = null;
       }
     }
@@ -345,8 +330,7 @@ public class Parser {
   }
 
   private static LabelingOutput labelFromGroundTruth(
-    final ParserGroundTruth pgt,
-    final PaperSource paperSource,
+    final Iterator<LabeledPaper> labeledPapers,
     final int headerMax,
     final int maxFiles,
     final int minYear,
@@ -359,7 +343,6 @@ public class Parser {
     final int parallelism = Runtime.getRuntime().availableProcessors() * 2;
     final int queueSize = parallelism * 4;
     final Queue<Future<List<Pair<PaperToken, String>>>> workQueue = new ArrayDeque<>(queueSize);
-    final Iterator<Paper> papers = pgt.papers.iterator();
 
     // stuff we need while processing
     final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
@@ -368,7 +351,7 @@ public class Parser {
 
     // capturing results
     final ArrayList<List<Pair<PaperToken, String>>> results =
-            new ArrayList<>(maxFiles > 0 ? maxFiles : pgt.papers.size() / 2);
+        new ArrayList<>(maxFiles > 0 ? maxFiles : 1024);
     final MutableSet<String> usedPaperIds = new UnifiedSet<String>().asSynchronized();
 
     try {
@@ -377,31 +360,41 @@ public class Parser {
       else
         logger.info("Will be labeling all papers in {} threads.", parallelism);
 
-      while (papers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
+      while (labeledPapers.hasNext() && (maxFiles <= 0 || results.size() < maxFiles)) {
         // fill up the queue
-        while (papers.hasNext() && workQueue.size() < queueSize) {
-          val p = papers.next();
-        if (minYear > 0 && p.year < minYear)
-          continue;
-        if (excludeIDs.contains(p.id))
-          continue;
+        while (labeledPapers.hasNext() && workQueue.size() < queueSize) {
+          final LabeledPaper paper = labeledPapers.next();
+          final LabeledData labels = paper.labels();
+
+          val title = labels.javaTitle();
+          val authors = labels.javaAuthors();
+
+          if (excludeIDs.contains(paper.paperId()))
+            continue;
+
+          if(minYear > 0) {
+            val year = labels.javaYear();
+            if(!year.isPresent() || year.getAsInt() < minYear)
+              continue;
+          }
 
           final Future<List<Pair<PaperToken, String>>> future = executor.submit(() -> {
             try {
-              paperId2startTime.put(p.id, System.currentTimeMillis());
+              paperId2startTime.put(paper.paperId(), System.currentTimeMillis());
               final List<Pair<PaperToken, String>> result;
-              try(final InputStream is = paperSource.getPdf(p.id)) {
+              try(final InputStream is = paper.inputStream()) {
                 result = getPaperLabels(
-                        is,
-                        p,
-                        ext,
-                        headerMax,
-                        checkAuthors);
+                    paper.paperId(),
+                    is,
+                    labels,
+                    ext,
+                    headerMax,
+                    checkAuthors);
               }
 
               int tried = triedCount.incrementAndGet();
               if (result != null)
-                usedPaperIds.add(p.id);
+                usedPaperIds.add(paper.paperId());
               if (tried % 100 == 0) {
                 // find the document that's been in flight the longest
                 final long now = System.currentTimeMillis();
@@ -446,10 +439,13 @@ public class Parser {
 
               return result;
             } catch (final IOException e) {
-              logger.warn("IOException {} while processing paper {}", e.getMessage(), p.id);
+              logger.warn(
+                  "IOException {} while processing paper {}",
+                  e.getMessage(),
+                  paper.paperId());
               return null;
             } finally {
-              paperId2startTime.remove(p.id);
+              paperId2startTime.remove(paper.paperId());
             }
           });
           workQueue.add(future);
@@ -497,21 +493,6 @@ public class Parser {
             usedPaperIds.size() * 100.0 / triedCount.doubleValue()));
 
     return new LabelingOutput(results, usedPaperIds.asUnmodifiable());
-  }
-
-  public static List<List<Pair<PaperToken, String>>> bootstrapLabels(
-          List<File> files,
-          int headerMax
-  ) throws IOException {
-    List<List<Pair<PaperToken, String>>> labeledData = new ArrayList<>();
-    PDFExtractor ext = new PDFExtractor();
-
-    for (File f : files) {
-      val labeledPaper = getPaperLabels(f, null, ext, headerMax);
-      if (labeledPaper != null)
-        labeledData.add(labeledPaper);
-    }
-    return labeledData;
   }
 
   private static UnifiedSet<String> readSet(String inFile) throws IOException {
@@ -617,54 +598,39 @@ public class Parser {
   }
 
   public static void trainParser(
-          final List<File> files,
-          final ParserGroundTruth pgt,
-          final PaperSource paperSource,
-          final ParseOpts opts
+      final Iterator<LabeledPaper> labeledTrainingData,
+      final ParseOpts opts
   ) throws IOException {
-    trainParser(files, pgt, paperSource, opts, UnifiedSet.newSet());
+    trainParser(labeledTrainingData, opts, UnifiedSet.newSet());
   }
 
   public static void trainParser(
-          final List<File> files,
-          final ParserGroundTruth pgt,
-          final PaperSource paperSource,
-          final ParseOpts opts,
-          final String excludeIDsFile
+      final Iterator<LabeledPaper> labeledTrainingData,
+      final ParseOpts opts,
+      final String excludeIDsFile
   ) throws IOException {
     final UnifiedSet<String> excludedIDs;
     if (excludeIDsFile == null)
       excludedIDs = new UnifiedSet<>();
     else
       excludedIDs = readSet(excludeIDsFile);
-    trainParser(files, pgt, paperSource, opts, excludedIDs);
+    trainParser(labeledTrainingData, opts, excludedIDs);
   }
 
-  //borrowing heavily from conll.Trainer
   public static void trainParser(
-          List<File> files,
-          ParserGroundTruth pgt,
-          final PaperSource paperSource,
-          ParseOpts opts,
-          final UnifiedSet<String> excludeIDs
+      Iterator<LabeledPaper> labeledTrainingData,
+      ParseOpts opts,
+      final UnifiedSet<String> excludeIDs
   ) throws IOException {
-    final LabelingOutput labelingOutput;
-    PDFPredicateExtractor predExtractor;
-    if (files != null) {
-      labelingOutput = new LabelingOutput(
-        bootstrapLabels(files, opts.headerMax),  //don't exclude for pdf meta bootstrap
-        UnifiedSet.newSet());
-    } else {
-      labelingOutput = labelFromGroundTruth(
-              pgt,
-              paperSource,
-              opts.headerMax,
-              opts.documentCount > 0 ? opts.documentCount : pgt.papers.size(),
-              opts.minYear,
-              opts.checkAuthors,
-              excludeIDs);
-    }
+    final LabelingOutput labelingOutput = labelFromGroundTruth(
+        labeledTrainingData,
+        opts.headerMax,
+        opts.documentCount,
+        opts.minYear,
+        opts.checkAuthors,
+        excludeIDs);
     ParserLMFeatures plf = null;
+    final PDFPredicateExtractor predExtractor;
     if (opts.gazetteerFile != null) {
       ParserGroundTruth gaz = new ParserGroundTruth(opts.gazetteerFile);
       UnifiedSet<String> excludedIds = new UnifiedSet<String>(labelingOutput.usedPaperIds);
@@ -952,269 +918,6 @@ public class Parser {
             filter(s -> s.length() >= MIN_AUTHOR_LENGTH).
             distinct().
             collect(Collectors.toList());
-  }
-
-  public static void main(String[] args) throws Exception {
-    if (!((args.length == 3 && args[0].equalsIgnoreCase("bootstrap")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("parse")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("metaEval")) ||
-      (args.length == 7 || args.length == 8 && args[0].equalsIgnoreCase("learn")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("parseAndScore")) ||
-      (args.length == 5 && args[0].equalsIgnoreCase("scoreRefExtraction")) ||
-      ((args.length == 4 || args.length == 6) && args[0].equalsIgnoreCase("learnBibCRF")))) {
-      System.err.println("Usage: bootstrap <input dir> <model output file>");
-      System.err.println("OR:    learn <ground truth file> <gazetteer file> <input dir> <model output file> <background dir> <exclude ids file>");
-      System.err.println("OR:    parse <input dir> <model input file> <output dir> <gazetteer file>");
-      System.err.println("OR:    parseAndScore <input dir> <model input file> <output dir> <ground truth file>");
-      System.err.println("OR:    scoreRefExtraction <input dir> <model input file> <output file> <bib model file>");
-      System.err.println("OR:    learnBibCRF <cora file> <output file> <background dir> [<umass file> <kermit file>]");
-    } else if (args[0].equalsIgnoreCase("bootstrap")) {
-      File inDir = new File(args[1]);
-      List<File> inFiles = Arrays.asList(inDir.listFiles());
-      ParseOpts opts = new ParseOpts();
-      opts.modelFile = args[2];
-      //TODO: use config file
-      opts.headerMax = 100;
-      opts.iterations = inFiles.size() / 10; //HACK because training throws exceptions if you iterate too much
-      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
-      trainParser(inFiles, null, null, opts);
-
-    } else if (args[0].equalsIgnoreCase("learn")) { //learn from ground truth
-      ParserGroundTruth pgt = new ParserGroundTruth(args[1]); //holds the labeled data to be used for train, test (S2 json bib format)
-      ParseOpts opts = new ParseOpts();
-      opts.modelFile = args[4]; //holds the output file for the model.
-      //TODO: use config file
-      opts.headerMax = MAXHEADERWORDS; //a limit for the length of the header to process, in words.
-      opts.iterations = Math.min(1000, pgt.papers.size()); //HACK because training throws exceptions if you iterate too much
-      opts.threads = Runtime.getRuntime().availableProcessors() * 2;
-      opts.backgroundSamples = 400; //use up to this many papers from background dir to estimate background language model
-      opts.backgroundDirectory = args[5]; //where to find the background papers
-      opts.gazetteerFile = args[2]; //a gazetteer of true bib records  (S2 json bib format)
-      opts.trainFraction = 0.9; //what fraction of data to use for training, the rest is test
-      opts.checkAuthors = true; //exclude from training papers where we don't find authors
-      opts.minYear = 2008; //discard papers from before this date
-      opts.documentCount = args.length > 7 ? Integer.parseInt(args[7]) : -1;
-      final PaperSource paperSource = new DirectoryPaperSource(new File(args[3])); //args[3] holds the papers in which we can find ground truth
-      trainParser(null, pgt, paperSource, opts, args[6]);
-                //args[6] is a list of paper ids (one id per line) that we must exclude from training data and gazetteers 
-                //(because they're used for final tests)
-    } else if (args[0].equalsIgnoreCase("parse")) {
-      final Path modelFile;
-      if(args[2].equals("-"))
-        modelFile = Parser.getDefaultProductionModel();
-      else
-        modelFile = Paths.get(args[2]);
-
-      final Path gazetteerFile;
-      if(args[4].equals("-"))
-        gazetteerFile = Parser.getDefaultGazetteer();
-      else
-        gazetteerFile = Paths.get(args[4]);
-
-      Parser p = new Parser(modelFile, gazetteerFile, getDefaultBibModel());
-      File input = new File(args[1]);
-      File outDir = new File(args[3]);
-      final List<File> inFiles;
-      if(input.isFile())
-        inFiles = Collections.singletonList(input);
-      else
-        inFiles = Arrays.asList(input.listFiles());
-      ObjectMapper mapper = new ObjectMapper();
-
-      for (File f : inFiles) {
-        if (!f.getName().endsWith(".pdf"))
-          continue;
-        val fis = new FileInputStream(f);
-        ExtractedMetadata em = null;
-        try {
-          em = p.doParse(fis, MAXHEADERWORDS);
-        } catch (final Exception e) {
-          logger.info("Parse error: " + f, e);
-        }
-        fis.close();
-        //Object to JSON in file
-        mapper.writeValue(new File(outDir, f.getName() + ".dat"), em);
-      }
-
-    } else if (args[0].equalsIgnoreCase("parseAndScore")) {
-      Parser p = new Parser(args[2], args[4], getDefaultBibModel().toString());
-      File inDir = new File(args[1]);
-      List<File> inFiles = Arrays.asList(inDir.listFiles());
-      ParserGroundTruth pgt = new ParserGroundTruth(args[4]);
-      int totalFiles = 0;
-      int totalProcessed = 0;
-      int crfTruePos = 0;
-      int crfFalsePos = 0;
-      int metaTruePos = 0;
-      int metaFalsePos = 0;
-      double crfPrecision = 0;
-      double crfRecall = 0;
-      double crfTotal = 0;
-      double metaPrecision = 0;
-      double metaRecall = 0;
-      double metaTotal = 0;
-
-
-      for (File f : inFiles) {
-        val fis = new FileInputStream(f);
-        String key = f.getName().substring(0, f.getName().length() - 4);
-        Paper pap = pgt.forKey(key);
-        if (pap.year < 2010)
-          continue;
-        totalFiles++;
-        ExtractedMetadata em = null;
-        try {
-          em = p.doParse(fis, MAXHEADERWORDS);
-          totalProcessed++;
-        } catch (final Exception e) {
-          logger.info("Parse error: " + f, e);
-        }
-
-        if (em != null && em.title != null) {
-          String expected = pap.title;
-          String guessed = em.title;
-          String procExpected = processTitle(expected);
-          String procGuessed = processTitle(processExtractedTitle(guessed));
-          String[] authExpected = pap.authors;
-          List<String> authGuessed = trimAuthors(em.authors);
-
-          int tempTP = scoreAuthors(authExpected, authGuessed);
-          double prec = ((double) tempTP) / ((double) authGuessed.size() + 0.000000001);
-          double rec = ((double) tempTP) / ((double) authExpected.length);
-          if (em.source == ExtractedMetadata.Source.CRF) {
-            crfPrecision += prec;
-            crfRecall += rec;
-            crfTotal += 1.0;
-          } else {
-            metaPrecision += prec;
-            metaRecall += rec;
-            metaTotal += 1.0;
-          }
-
-          if (tempTP != authGuessed.size() || tempTP != authExpected.length) {
-            logger.info("auth error: " + tempTP + " right, exp " + Arrays.toString(authExpected) + " got " + authGuessed);
-            logger.info(f.getName());
-          }
-          if (procExpected.equals(procGuessed))
-            if (em.source == ExtractedMetadata.Source.CRF)
-              crfTruePos++;
-            else
-              metaTruePos++;
-          else {
-            if (em.source == ExtractedMetadata.Source.CRF)
-              crfFalsePos++;
-            else
-              metaFalsePos++;
-            logger.info(em.source + " error, expected:\r\n" + procExpected + "\r\ngot\r\n" + procGuessed);
-          }
-        }
-
-        fis.close();
-      }
-      logger.info("total files: " + totalFiles);
-      logger.info("total processed: " + totalProcessed);
-      logger.info("crf correct: " + crfTruePos);
-      logger.info("crf false positive " + crfFalsePos);
-      logger.info("meta correct: " + metaTruePos);
-      logger.info("meta false positive " + metaFalsePos);
-      logger.info("crf micro-average prec: " + crfPrecision);
-      logger.info("crf micro-average rec: " + crfRecall);
-      logger.info("crf total: " + crfTotal);
-      logger.info("meta micro-average prec: " + metaPrecision);
-      logger.info("meta micro-average rec: " + metaRecall);
-      logger.info("meta total: " + metaTotal);
-      logger.info("overall author precision: " + (crfPrecision + metaPrecision) / (crfTotal + metaTotal));
-      logger.info("overall author recall: " + (crfRecall + metaRecall) / ((double) totalFiles));
-      //TODO: write output
-
-    } else if (args[0].equalsIgnoreCase("scoreRefExtraction")) {
-      Parser p = new Parser(new File(args[2]), new File(Parser.getDefaultGazetteer().toString()), new File(args[4]));
-      File inDir = new File(args[1]);
-      File outDir = new File(args[3]);
-      List<File> inFiles = Arrays.asList(inDir.listFiles());
-      HashSet<String> foundRefs = new HashSet<String>();
-      HashSet<String> unfoundRefs = new HashSet<String>();
-
-      ObjectMapper mapper = new ObjectMapper();
-      int totalRefs = 0;
-      int totalCites = 0;
-      int blankAbstracts = 0;
-      for (File f : inFiles) {
-        if (!f.getName().endsWith(".pdf"))
-          continue;
-        val fis = new FileInputStream(f);
-        ExtractedMetadata em = null;
-        try {
-          logger.info(f.getName());
-          em = p.doParse(fis, MAXHEADERWORDS);
-          if(em.abstractText == null || em.abstractText.length() == 0) {
-            logger.info("abstract blank!");
-            blankAbstracts++;
-          }
-          else {
-            logger.info("abstract: " + em.abstractText);
-          }
-          final List<BibRecord> br = em.references;
-          final List<CitationRecord> cr = em.referenceMentions;
-          if (br.size() > 3 && cr.size() > 3) {  //HACK: assume > 3 refs means valid ref list
-            foundRefs.add(f.getAbsolutePath());
-          } else {
-            unfoundRefs.add(f.getAbsolutePath());
-          }
-          totalRefs += br.size();
-          totalCites += cr.size();
-          mapper.writeValue(
-            new File(outDir, f.getName() + ".dat"), em);
-            //Tuples.pair(em.references, em.referenceMentions));
-        } catch (Exception e) {
-          logger.info("Parse error: " + f);
-          e.printStackTrace();
-        }
-        fis.close();
-
-      }
-
-      //Object to JSON in file
-      mapper.writeValue(new File(outDir, "unfoundReferences.dat"), unfoundRefs);
-      mapper.writeValue(new File(outDir, "foundReferences.dat"), foundRefs);
-      logger.info("found 3+ refs and 3+ citations for " + foundRefs.size() + " papers.");
-      logger.info("failed to find that many for " + unfoundRefs.size() + " papers.");
-      logger.info("total references: " + totalRefs + "\ntotal citations: " + totalCites);
-      logger.info("blank abstracts: " + blankAbstracts);
-            
-    }
-    else if(args[0].equalsIgnoreCase("learnBibCRF")) {
-      ParseOpts opts = new ParseOpts();
-      opts.modelFile = args[2];
-      opts.gazetteerFile = Parser.getDefaultGazetteer().toString();
-      opts.gazetteerDir = Parser.getDefaultGazetteerDir().toString();
-      opts.backgroundDirectory = args[3];
-      opts.iterations = 20;
-      opts.threads = Runtime.getRuntime().availableProcessors();
-      opts.backgroundSamples = 5;
-      opts.trainFraction = 0.9;
-      if(args.length == 6)
-        trainBibliographyCRF(new File(args[1]), new File(args[4]), new File(args[5]), opts);
-      else
-        trainBibliographyCRF(new File(args[1]), opts);
-    }
-  }
-
-  static void logExceptionShort(final Throwable t, final String errorType, final String filename) {
-    if (t.getStackTrace().length == 0) {
-      logger.warn("Exception without stack trace", t);
-    } else {
-      final StackTraceElement ste = t.getStackTrace()[0];
-      logger.warn(
-        String.format(
-          "%s while processing file %s at %s:%d: %s (%s)",
-          errorType,
-          filename,
-          ste.getFileName(),
-          ste.getLineNumber(),
-          t.getClass().getName(),
-          t.getMessage()));
-    }
   }
 
   public static class ParsingTimeout extends RuntimeException { }

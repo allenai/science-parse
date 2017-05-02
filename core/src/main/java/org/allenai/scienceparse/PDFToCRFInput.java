@@ -329,16 +329,27 @@ public class PDFToCRFInput {
    * @return
    */
   public static List<Pair<PaperToken, String>> labelMetadata(
-          final String paperId,
-          final List<PaperToken> toks,
-          final ExtractedMetadata truth
+    final String paperId,
+    final List<PaperToken> toks,
+    final LabeledData truth
   ) {
+    val truthAuthorNamesOption = truth.javaAuthorNames();
+    if(!truthAuthorNamesOption.isPresent())
+      return null;
+    val truthAuthorNames = truthAuthorNamesOption.get();
+
+    val truthTitleOption = truth.javaTitle();
+    if(!truthTitleOption.isPresent())
+      return null;
+    val truthTitle = truthTitleOption.get();
+
     val outTmp = new ArrayList<Pair<PaperToken, String>>();
     for (PaperToken t : toks) {
       outTmp.add(Tuples.pair(t, "O"));
     }
-    truth.authors.forEach((String s) -> findAndLabelWith(paperId, toks, outTmp, s, ExtractedMetadata.authorTag, true));
-    if (!findAndLabelWith(paperId, toks, outTmp, truth.title, ExtractedMetadata.titleTag, false)) //must have title to be valid
+
+    truthAuthorNames.forEach((String s) -> findAndLabelWith(paperId, toks, outTmp, s, ExtractedMetadata.authorTag, true));
+    if (!findAndLabelWith(paperId, toks, outTmp, truthTitle, ExtractedMetadata.titleTag, false)) //must have title to be valid
       return null;
     val out = new ArrayList<Pair<PaperToken, String>>();
     out.add(Tuples.pair(PaperToken.generateStartStopToken(), "<S>"));

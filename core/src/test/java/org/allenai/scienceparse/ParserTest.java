@@ -8,13 +8,16 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import scala.collection.JavaConverters;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,20 +36,6 @@ public class ParserTest {
 
   public static String resourceDirectory(String path) {
     return (new File(ParserTest.class.getResource(path).getFile())).getParent();
-  }
-
-  public void testBootstrap() throws IOException {
-    List<List<Pair<PaperToken, String>>> labeledData = Parser.bootstrapLabels(resolveKeys(pdfKeys), 100);
-    PDFPredicateExtractor ppe = new PDFPredicateExtractor();
-    //NOTE 6 should be index of P14-1059, because only mooney gets skipped
-    List<PaperToken> justTokens = labeledData.get(6).stream().map(p ->
-      p.getOne()).collect(Collectors.toList());
-
-    log.info("test bootstrap tokens: " + justTokens.stream().map(t -> (t==null)?"":t.toStringShort()).collect(Collectors.toList()).toString());
-    
-    List<ObjectDoubleMap<String>> preds = ppe.nodePredicates(justTokens);
-
-    Assert.assertTrue((preds.get(27).containsKey("%fcb")));
   }
 
   private List<File> resolveKeys(List<String> keys) {
@@ -93,40 +82,6 @@ public class ParserTest {
     return Tuples.pair((titleTP / (titleTP + titleFP + 0.000001)), authorTP / (authorTP + authorFN + 0.000001));
   }
 
-  public void testParser() throws Exception {
-    final File testModelFile = File.createTempFile("science-parse-test-model.", ".dat");
-    testModelFile.deleteOnExit();
-
-    Parser.ParseOpts opts = new Parser.ParseOpts();
-    opts.iterations = 10;
-    opts.threads = 4;
-    opts.modelFile = testModelFile.getPath();
-    opts.headerMax = 100;
-    opts.trainFraction = 0.9;
-    File f = new File(opts.modelFile);
-    f.deleteOnExit();
-    Parser.trainParser(resolveKeys(pdfKeys), null, null, opts);
-    final Parser p = new Parser(
-            testModelFile,
-            Parser.getDefaultGazetteer().toFile(),
-            Parser.getDefaultBibModel().toFile());
-    double avgTitlePrec = 0.0;
-    double avgAuthorRec = 0.0;
-    double cases = 0.0;
-    for (String s : pdfKeys) {
-      val res = testModel(s, p);
-      cases++;
-      avgTitlePrec += res.getOne();
-      avgAuthorRec += res.getTwo();
-    }
-    avgTitlePrec /= cases;
-    avgAuthorRec /= cases;
-    log.info("Title precision = recall = " + avgTitlePrec);
-    log.info("Author recall = " + avgAuthorRec);
-
-    testModelFile.delete();
-  }
-
   public void testParserWithGroundTruth() throws Exception {
     final File testModelFile = File.createTempFile("science-parse-test-model.", ".dat");
     testModelFile.deleteOnExit();
@@ -145,12 +100,13 @@ public class ParserTest {
 
     File f = new File(opts.modelFile);
     f.deleteOnExit();
+    final Iterator<LabeledPaper> labeledTrainingData =
+      JavaConverters.asJavaIteratorConverter(
+          LabeledDataFromDBLP.getFromGroundTruth(
+              Paths.get(filePathOfResource("/groundTruth.json")))).asJava();
+
     ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
-    Parser.trainParser(
-            null,
-            pgt,
-            new DirectoryPaperSource(new File(resourceDirectory("/groundTruth.json"))),
-            opts); //assumes pdfs in same dir as groundTruth
+    Parser.trainParser(labeledTrainingData, opts);
     final Parser p = new Parser(
             testModelFile,
             Parser.getDefaultGazetteer().toFile(),
