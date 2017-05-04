@@ -399,7 +399,7 @@ object LabeledPapersFromPMC extends Datastores with Logging {
     LabeledData.dump(LabeledPapersFromPMC.get.take(100).toSeq.sortBy(_.paperId).map(_.labels).iterator)
 }
 
-object LabeledDataFromDBLP extends Datastores {
+object LabeledPapersFromDBLP extends Datastores {
   def apply = get
 
   def get: Iterator[LabeledPaper] = getFromGroundTruth(publicFile("productionGroundTruth.json", 2))

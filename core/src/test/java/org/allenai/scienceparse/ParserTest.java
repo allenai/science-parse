@@ -1,7 +1,6 @@
 package org.allenai.scienceparse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.tuple.Tuples;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +10,7 @@ import org.testng.annotations.Test;
 import scala.collection.JavaConverters;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -102,7 +98,7 @@ public class ParserTest {
     f.deleteOnExit();
     final Iterator<LabeledPaper> labeledTrainingData =
       JavaConverters.asJavaIteratorConverter(
-          LabeledDataFromDBLP.getFromGroundTruth(
+          LabeledPapersFromDBLP.getFromGroundTruth(
               Paths.get(filePathOfResource("/groundTruth.json")))).asJava();
 
     ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));

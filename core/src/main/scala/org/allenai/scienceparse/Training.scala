@@ -26,7 +26,8 @@ object Training extends App with Datastores with Logging {
     minYear: Int = 2008,
     maxPaperCount: Int = 34000,
     excludeIdsFile: Option[File] = None,
-    minExpectedFeatureCount: Int = 13
+    minExpectedFeatureCount: Int = 13,
+    trainingData: Iterator[LabeledPaper] = LabeledPapersFromDBLP.get
   )
 
   val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -76,6 +77,14 @@ object Training extends App with Datastores with Logging {
       c.copy(minExpectedFeatureCount = n)
     } text "The minimum number of times we should see a feature before accepting it."
 
+    opt[Unit]("trainOnDBLP") action { (_, c) =>
+      c.copy(trainingData = LabeledPapersFromDBLP.get)
+    } text "Train with data from DBLP"
+
+    opt[Unit]("trainOnPMC") action { (_, c) =>
+      c.copy(trainingData = LabeledPapersFromPMC.get)
+    } text "Train with data from PMC"
+
     help("help") text "Prints help text"
   }
 
@@ -106,7 +115,7 @@ object Training extends App with Datastores with Logging {
       }.toSet
     }.getOrElse(Set.empty)
 
-    val labeledData = LabeledDataFromDBLP.get.asJava
+    val labeledData = LabeledPapersFromDBLP.get.asJava
 
     Parser.trainParser(
       labeledData,
