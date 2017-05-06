@@ -115,7 +115,7 @@ object Training extends App with Datastores with Logging {
       }.toSet
     }.getOrElse(Set.empty)
 
-    val labeledData = LabeledPapersFromDBLP.get.asJava
+    val labeledData = config.trainingData.asJava
 
     Parser.trainParser(
       labeledData,
