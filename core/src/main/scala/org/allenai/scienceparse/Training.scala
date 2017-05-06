@@ -82,7 +82,7 @@ object Training extends App with Datastores with Logging {
     } text "Train with data from DBLP"
 
     opt[Unit]("trainOnPMC") action { (_, c) =>
-      c.copy(trainingData = LabeledPapersFromPMC.get)
+      c.copy(trainingData = LabeledPapersFromPMC.getCleaned)
     } text "Train with data from PMC"
 
     help("help") text "Prints help text"
