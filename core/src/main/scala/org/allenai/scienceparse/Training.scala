@@ -85,6 +85,10 @@ object Training extends App with Datastores with Logging {
       c.copy(trainingData = LabeledPapersFromPMC.getCleaned)
     } text "Train with data from PMC"
 
+    opt[Unit]("trainOnBoth") action { (_, c) =>
+      c.copy(trainingData = new InterleavingIterator(LabeledPapersFromPMC.getCleaned, LabeledPapersFromDBLP.get))
+    } text "Train with data from DBLP and PMC"
+
     help("help") text "Prints help text"
   }
 
