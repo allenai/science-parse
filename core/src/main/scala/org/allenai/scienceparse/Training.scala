@@ -82,7 +82,8 @@ object Training extends App with Datastores with Logging {
     } text "Train with data from DBLP"
 
     opt[Unit]("trainOnPMC") action { (_, c) =>
-      c.copy(trainingData = LabeledPapersFromPMC.getCleaned)
+      c.copy(trainingData = LabeledPapersFromPMC.getCleaned.drop(10000))
+      // Drop 10000 because we test on those.
     } text "Train with data from PMC"
 
     opt[Unit]("trainOnBoth") action { (_, c) =>
