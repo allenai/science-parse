@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,18 +32,24 @@ public class ParserGroundTruth {
     buildLookup();
   }
 
-  public ParserGroundTruth(InputStream is) throws IOException {
-    InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-    ObjectMapper om = new ObjectMapper();
-    ObjectReader r = om.reader(new TypeReference<List<Paper>>() {});
+  public ParserGroundTruth(final InputStream is) throws IOException {
+    try(final BufferedReader reader =
+          new BufferedReader(
+              new InputStreamReader(is, "UTF-8"))) {
 
-//    int c = isr.read();
-//    if(c != 0xfeff) {
-//      isr.reset();
-//    }
-    papers = r.readValue(isr);
+      ObjectMapper om = new ObjectMapper();
+      ObjectReader r = om.reader().forType(new TypeReference<Paper>() {});
+
+      papers = new ArrayList<Paper>();
+      while (true) {
+        final String line = reader.readLine();
+        if (line == null)
+          break;
+        papers.add(r.readValue(line));
+      }
+    }
+
     log.info("Read " + papers.size() + " papers.");
-    isr.close();
 
     buildLookup();
     papers.forEach((Paper p) -> {

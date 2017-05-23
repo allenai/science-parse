@@ -107,7 +107,7 @@ public class Parser {
     return datastore.filePath("org.allenai.scienceparse", "productionModel.dat", 9);
   }
   public static Path getDefaultGazetteer() {
-    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 4);
+    return datastore.filePath("org.allenai.scienceparse", "gazetteer.json", 5);
   }
   public static Path getDefaultGazetteerDir() {
     return datastore.directoryPath("org.allenai.scienceparse", "kermit-gazetteers", 1);
