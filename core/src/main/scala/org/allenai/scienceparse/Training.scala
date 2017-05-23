@@ -17,7 +17,6 @@ object Training extends App with Datastores with Logging {
   // of files during startup, even if they are unused later.
   case class Config(
     output: File = null,
-    groundTruth: Option[File] = None,
     maxHeaderWords: Int = Parser.MAXHEADERWORDS,
     maxIterations: Int = 1000,
     backgroundSampleDocs: Int = 40000,
@@ -26,9 +25,9 @@ object Training extends App with Datastores with Logging {
     trainFraction: Double = 0.9,
     minYear: Int = 2008,
     maxPaperCount: Int = 34000,
-    paperDir: Option[File] = None,
     excludeIdsFile: Option[File] = None,
-    minExpectedFeatureCount: Int = 13
+    minExpectedFeatureCount: Int = 13,
+    trainingData: Iterator[LabeledPaper] = LabeledPapersFromDBLP.get
   )
 
   val parser = new OptionParser[Config](this.getClass.getSimpleName) {
@@ -37,10 +36,6 @@ object Training extends App with Datastores with Logging {
     opt[File]('o', "output") required () action { (o, c) =>
       c.copy(output = o)
     } text "The output file"
-
-    opt[File]('t', "groundTruth") action { (t, c) =>
-      c.copy(groundTruth = Some(t))
-    } text "The ground truth file"
 
     opt[Int]("maxHeaderWords") action { (m, c) =>
       c.copy(maxHeaderWords = m)
@@ -74,10 +69,6 @@ object Training extends App with Datastores with Logging {
       c.copy(maxPaperCount = p)
     } text "The maximum number of labeled documents to consider"
 
-    opt[File]('d', "paperDir") action { (d, c) =>
-      c.copy(paperDir = Some(d))
-    } text "The directory that contains the papers for which we have labeling information"
-
     opt[File]("excludeIdsFile") action { (e, c) =>
       c.copy(excludeIdsFile = Some(e))
     } text "A file with paper IDs to exclude, one per line. We always exclude the papers from the evaluation set."
@@ -86,16 +77,23 @@ object Training extends App with Datastores with Logging {
       c.copy(minExpectedFeatureCount = n)
     } text "The minimum number of times we should see a feature before accepting it."
 
+    opt[Unit]("trainOnDBLP") action { (_, c) =>
+      c.copy(trainingData = LabeledPapersFromDBLP.get)
+    } text "Train with data from DBLP"
+
+    opt[Unit]("trainOnPMC") action { (_, c) =>
+      c.copy(trainingData = LabeledPapersFromPMC.getCleaned.drop(10000))
+      // Drop 10000 because we test on those.
+    } text "Train with data from PMC"
+
+    opt[Unit]("trainOnBoth") action { (_, c) =>
+      c.copy(trainingData = new InterleavingIterator(LabeledPapersFromPMC.getCleaned, LabeledPapersFromDBLP.get))
+    } text "Train with data from DBLP and PMC"
+
     help("help") text "Prints help text"
   }
 
   parser.parse(args, Config()).foreach { config =>
-    val groundTruthFile =
-      config.groundTruth.getOrElse(publicFile("productionGroundTruth.json", 1).toFile)
-    val pgt = Resource.using(new FileInputStream(groundTruthFile)) { is =>
-      new ParserGroundTruth(is)
-    }
-
     val opts = new ParseOpts
     opts.modelFile = config.output.toString
     opts.headerMax = config.maxHeaderWords
@@ -116,20 +114,16 @@ object Training extends App with Datastores with Logging {
     opts.documentCount = config.maxPaperCount
     opts.minExpectedFeatureCount = config.minExpectedFeatureCount
 
-    val paperSource = config.paperDir.map(new DirectoryPaperSource(_)).getOrElse {
-      PaperSource.getDefault
-    }
-
     val excludedIds = Evaluation.goldDocIds ++ config.excludeIdsFile.map { excludedIdsFile =>
       Resource.using(Source.fromFile(excludedIdsFile)) { source =>
         source.getLines().map(_.trim)
       }.toSet
     }.getOrElse(Set.empty)
 
+    val labeledData = config.trainingData.asJava
+
     Parser.trainParser(
-      null,
-      pgt,
-      paperSource,
+      labeledData,
       opts,
       UnifiedSet.newSet(excludedIds.toIterable.asJava)
     )

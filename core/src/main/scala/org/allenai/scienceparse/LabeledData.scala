@@ -2,17 +2,17 @@ package org.allenai.scienceparse
 
 import java.io._
 import java.net.URL
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import java.security.{DigestInputStream, MessageDigest}
 import java.util.zip.ZipFile
 
-import org.allenai.common.{Logging, Resource}
+import org.allenai.common.{Logging, Resource, StreamClosingIterator}
 import org.allenai.common.ParIterator._
 import org.allenai.datastore.Datastores
-import spray.json.{JsNull, JsValue, JsObject, DefaultJsonProtocol}
-
+import spray.json.{DefaultJsonProtocol, JsNull, JsObject, JsValue}
 import org.apache.commons.io.{FilenameUtils, IOUtils}
 import org.apache.pdfbox.pdmodel.PDDocument
+
 import scala.collection.immutable.SortedMap
 import scala.io.{Codec, Source}
 import scala.util.control.NonFatal
@@ -20,7 +20,6 @@ import scala.xml.factory.XMLLoader
 import scala.xml.{Elem, Node, XML}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
-
 import scala.collection.JavaConverters._
 
 object LabeledDataJsonProtocol extends DefaultJsonProtocol {
@@ -103,19 +102,27 @@ class LabeledPaper(
 
 case class LabeledData(
   /** ID to identify this labeled document. Must be unique. */
-  val id: String,
+  id: String,
 
   // expected output
   // These are all Options. If they are not set, we don't have that field labeled for this paper.
-  val title: Option[String],
-  val authors: Option[Seq[LabeledData.Author]],
-  val venue: Option[String],
-  val year: Option[Int],
-  val abstractText: Option[String],
-  val sections: Option[Seq[LabeledData.Section]],
-  val references: Option[Seq[LabeledData.Reference]],
-  val mentions: Option[Seq[LabeledData.Mention]]
-)
+  title: Option[String],
+  authors: Option[Seq[LabeledData.Author]],
+  venue: Option[String] = None,
+  year: Option[Int] = None,
+  abstractText: Option[String] = None,
+  sections: Option[Seq[LabeledData.Section]] = None,
+  references: Option[Seq[LabeledData.Reference]] = None,
+  mentions: Option[Seq[LabeledData.Mention]] = None
+) {
+  import scala.compat.java8.OptionConverters._
+  def javaYear = year.asPrimitive
+  def javaTitle = title.asJava
+  def javaAuthors = authors.map(_.asJavaCollection).asJava
+  def javaAuthorNames = authors.map { as =>
+    as.map(_.name).asJavaCollection
+  }.asJava
+}
 
 object LabeledData {
   case class Author(
@@ -390,6 +397,45 @@ object LabeledPapersFromPMC extends Datastores with Logging {
 
   def main(args: Array[String]): Unit =
     LabeledData.dump(LabeledPapersFromPMC.get.take(100).toSeq.sortBy(_.paperId).map(_.labels).iterator)
+}
+
+object LabeledPapersFromDBLP extends Datastores {
+  def apply = get
+
+  def get: Iterator[LabeledPaper] = getFromGroundTruth(publicFile("productionGroundTruth.json", 2))
+
+  def getFromGroundTruth(groundTruthFile: Path) = {
+    val jsonLines = StreamClosingIterator {
+      Files.newInputStream(groundTruthFile)
+    } {
+      import spray.json._
+      Source.fromInputStream(_, "UTF-8").getLines().map(_.parseJson.asJsObject)
+    }
+
+    jsonLines.map { js =>
+      import DefaultJsonProtocol._
+
+      val Seq(jsId, jsTitle, jsAuthors, jsYear) = js.getFields("id", "title", "authors", "year")
+
+      val id = jsId.convertTo[String]
+      val title = jsTitle.convertTo[String]
+      val authors = jsAuthors.convertTo[Seq[String]]
+      val year = jsYear.convertTo[Int]
+
+      new LabeledPaper(
+        PaperSource.getDefault.getPdf(id),
+        LabeledData.empty.copy(
+          id = s"DBLP:$id",
+          title = Some(title),
+          authors = Some(authors.map { a =>
+            LabeledData.Author(ParserGroundTruth.invertAroundComma(a))
+          }),
+          year = Some(year)
+        ),
+        Some(id)
+      )
+    }
+  }
 }
 
 object LabeledPapersFromResources extends Datastores {
