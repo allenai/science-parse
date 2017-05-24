@@ -15,7 +15,7 @@ sources in (Compile,doc) := Seq.empty
 
 fork := true
 
-fork in test := false
+fork in test := false // There is some bug in sbt IPC that makes things fail if we fork for tests.
 
 assemblyJarName in assembly := s"science-parse-${version.value}.jar"
 
