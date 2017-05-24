@@ -15,6 +15,8 @@ sources in (Compile,doc) := Seq.empty
 
 fork := true
 
+fork in test := false
+
 assemblyJarName in assembly := s"science-parse-${version.value}.jar"
 
 libraryDependencies ++= Seq(
