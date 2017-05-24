@@ -25,7 +25,7 @@ object CoreSettingsPluginLight extends AutoPlugin {
       // Use a sensible default for the logback appname.
       javaOptions += s"-Dlogback.appname=${name.value}",
       scalaVersion := CoreDependencies.defaultScalaVersion,
-      scalacOptions ++= Seq("-target:jvm-1.7", "-Xlint", "-deprecation", "-feature"),
+      scalacOptions ++= Seq("-target:jvm-1.8", "-Xlint", "-deprecation", "-feature"),
       javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
       resolvers ++= CoreRepositories.Resolvers.defaults,
       dependencyOverrides ++= CoreDependencies.loggingDependencyOverrides,
