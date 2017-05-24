@@ -8,8 +8,6 @@ lazy val commonSettings = Seq(
     "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
     Resolver.jcenterRepo
   ),
-  // assembly settings
-  assemblyJarName in assembly := s"science-parse-${name.value}-${version.value}.jar",
   // release settings
   releaseProcess := Seq(
     checkSnapshotDependencies,
