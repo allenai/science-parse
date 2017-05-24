@@ -17,12 +17,6 @@ object CoreSettingsPluginLight extends AutoPlugin {
 
   import autoImport._
 
-  // Add the IntegrationTest config to the project. The `extend(Test)` part makes it so
-  // classes in src/it have a classpath dependency on classes in src/test. This makes
-  // it simple to share common test helper code.
-  // See http://www.scala-sbt.org/release/docs/Testing.html#Custom+test+configuration
-  override val projectConfigurations = Seq(Configurations.IntegrationTest extend Test)
-
   // These settings will be automatically applied to projects
   override def projectSettings: Seq[Setting[_]] = {
     Defaults.itSettings ++

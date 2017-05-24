@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Test(groups = {"integration"})
 @Slf4j
 public class HeaderIntegrationTest {
     private final static PaperSource paperSource = PaperSource.getDefault();
