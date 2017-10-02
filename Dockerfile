@@ -14,10 +14,10 @@ WORKDIR /app
 ARG SP_VERSION
 ENV SP_VERSION $SP_VERSION
 
-ADD server/target/scala-2.11/science-parse-server-$SP_VERSION.jar /app/science-parse-server-$SP_VERSION.jar
+ADD server/target/scala-2.11/science-parse-server-assembly-$SP_VERSION.jar /app/science-parse-server-assembly-$SP_VERSION.jar
 
-RUN java -Xmx8g -jar /app/science-parse-server-$SP_VERSION.jar --downloadModelOnly
+RUN java -Xmx8g -jar /app/science-parse-server-assembly-$SP_VERSION.jar --downloadModelOnly
 
 EXPOSE 8080
 
-CMD java -Xmx8g -jar science-parse-server-$SP_VERSION.jar
+CMD java -Xmx8g -jar science-parse-server-assembly-$SP_VERSION.jar
