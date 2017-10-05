@@ -949,7 +949,6 @@ public class Parser {
           if(parseNumbersInProgress.contains(parseNumber)) {
             logger.info("Interrupting parsing thread {} because it's taking too long", t.getId());
             t.interrupt();
-            parserKillerTimer.schedule(killTaskHard, 2*timeoutInMs);
           }
         }
       }
@@ -962,6 +961,7 @@ public class Parser {
     final ExtractedMetadata result;
     final boolean wasInterrupted;
     parserKillerTimer.schedule(killTaskSoftly, timeoutInMs);
+    parserKillerTimer.schedule(killTaskHard, 3*timeoutInMs);
     try {
       try {
         result = doParse(is);
