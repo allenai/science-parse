@@ -928,11 +928,25 @@ public class Parser {
     final int parseNumber = nextParseNumber.getAndIncrement();
 
     final Thread t = Thread.currentThread();
-    final TimerTask task = new TimerTask() {
+
+    final TimerTask killTaskHard = new TimerTask() {
       @Override
       public void run() {
         synchronized (parseNumbersInProgress) {
-          if(parseNumbersInProgress.remove(parseNumber)) {
+          if(parseNumbersInProgress.contains(parseNumber)) {
+            logger.info("Killing parsing thread {} because it's taking too long", t.getId());
+            t.stop();
+            // I know this is dangerous. This is a last resort.
+          }
+        }
+      }
+    };
+
+    final TimerTask killTaskSoftly = new TimerTask() {
+      @Override
+      public void run() {
+        synchronized (parseNumbersInProgress) {
+          if(parseNumbersInProgress.contains(parseNumber)) {
             logger.info("Interrupting parsing thread {} because it's taking too long", t.getId());
             t.interrupt();
           }
@@ -946,9 +960,14 @@ public class Parser {
 
     final ExtractedMetadata result;
     final boolean wasInterrupted;
-    parserKillerTimer.schedule(task, timeoutInMs);
+    parserKillerTimer.schedule(killTaskSoftly, timeoutInMs);
+    parserKillerTimer.schedule(killTaskHard, 3*timeoutInMs);
     try {
-      result = doParse(is);
+      try {
+        result = doParse(is);
+      } catch(final ThreadDeath e) {
+        throw new RuntimeException("Science-parse killer got impatient", e);
+      }
     } finally {
       synchronized (parseNumbersInProgress) {
         parseNumbersInProgress.remove(parseNumber);
