@@ -1,27 +1,23 @@
 package org.allenai.scienceparse
 
-import java.awt.print.Book
-import java.io.{File, StringWriter, InputStream, ByteArrayInputStream}
-import java.security.{DigestInputStream, MessageDigest}
-import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
+import java.io.{ ByteArrayInputStream, File, InputStream }
+import java.security.{ DigestInputStream, MessageDigest }
+import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
 
-import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.s3.model.ObjectMetadata
-import com.amazonaws.services.s3.{AmazonS3Client, AmazonS3}
+import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
-import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
+import com.fasterxml.jackson.databind.{ JsonMappingException, ObjectMapper }
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.allenai.common.{Resource, Logging}
+import org.allenai.common.{ Logging, Resource }
 import org.apache.commons.io.IOUtils
-import org.eclipse.jetty.server.{Request, Server}
+import org.eclipse.jetty.server.{ Request, Server }
 import org.eclipse.jetty.server.handler.AbstractHandler
 import scopt.OptionParser
 
 import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.collection.JavaConverters._
-
 import spray.json._
 import LabeledDataJsonProtocol._
 
