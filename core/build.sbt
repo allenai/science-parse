@@ -30,16 +30,14 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % Test,
   "org.testng" % "testng" % "6.8.1" % Test,
   "org.allenai.common" %% "common-testkit" % "1.0.20" % Test,
-  "org.allenai.datastore" %% "datastore" % "1.0.9" excludeAll(
-    ExclusionRule(organization = "com.amazonaws")
-  ),
+  "org.allenai.datastore" %% "datastore" % "1.0.9",
   "org.bouncycastle" % "bcprov-jdk15on" % "1.54",
   "org.bouncycastle" % "bcmail-jdk15on" % "1.54",
   "org.bouncycastle" % "bcpkix-jdk15on" % "1.54",
   "org.jsoup" % "jsoup" % "1.8.1",
   "org.apache.commons" % "commons-lang3" % "3.4",
   "commons-io" % "commons-io" % "2.4",
-  "com.amazonaws" % "aws-java-sdk" % "1.7.4" exclude ("commons-logging", "commons-logging"),
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.11.213" exclude ("commons-logging", "commons-logging"),
   "com.medallia.word2vec" %% "word2vecjava" % "1.0-ALLENAI-4"
     exclude ("log4j", "log4j")
     exclude ("commons-logging", "commons-logging"),

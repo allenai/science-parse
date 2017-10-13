@@ -112,7 +112,7 @@ class SPServer(
   private val prettyJsonWriter = jsonMapper.writerWithDefaultPrettyPrinter()
 
   private val bucket: String = "ai2-s2-pdfs"
-  private val s3: AmazonS3 = new AmazonS3Client
+  private val s3: AmazonS3 = AmazonS3ClientBuilder.defaultClient
 
 
   //
