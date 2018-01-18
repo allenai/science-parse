@@ -30,12 +30,12 @@ object FeedbackStore extends Logging {
     ConnectionPool.singleton(dbUrl, dbUser, dbPassword)
 
     // upgrade the schema if necessary
-    val dbRootConfig: Config = config[Config]("org.allenai.scienceparse.Server.db-as-root")
-    if (dbRootConfig[Boolean]("upgradeSchema")){
-      val dbUrl = dbRootConfig.getString("url")
+    {
+      val dbConfig: Config = config[Config]("org.allenai.scienceparse.Server.db-as-root")
+      val dbUrl = dbConfig.getString("url")
       logger.info(s"Connecting to $dbUrl")
-      val dbUser = dbRootConfig.getString("user")
-      val dbPassword = dbRootConfig.get[String]("password").getOrElse(
+      val dbUser = dbConfig.getString("user")
+      val dbPassword = dbConfig.get[String]("password").getOrElse(
         throw new IllegalArgumentException("Root password for DB not set. Please set org.allenai.scienceparse.Server.db-as-root.password."))
 
       val rootConnectionPoolName = "rootConnectionPool"
