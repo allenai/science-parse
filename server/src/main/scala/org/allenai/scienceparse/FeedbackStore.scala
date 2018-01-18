@@ -1,7 +1,7 @@
 package org.allenai.scienceparse
 
-import com.typesafe.config.{Config, ConfigFactory}
-import org.allenai.common.{Logging, Resource}
+import com.typesafe.config.{ConfigFactory, Config}
+import org.allenai.common.{Resource, Logging}
 import org.allenai.common.Config._
 
 import scalikejdbc._
