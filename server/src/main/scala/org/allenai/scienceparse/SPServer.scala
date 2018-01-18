@@ -386,7 +386,7 @@ class SPServer(
   }.getOrElse(throw feedbackUnavailableException)
 
   private def correctionsGetAll(request: SPRequest) = feedbackStore.map { store =>
-    val result = store.getAllFeedback
+    val result = store.getAllFeedback()
     // This keeps the whole result set in memory, which is bad. It should be streamed.
     // ScalikeJDBC already insists on keeping it in memory, so I didn't take the time to optimize
     // it here.

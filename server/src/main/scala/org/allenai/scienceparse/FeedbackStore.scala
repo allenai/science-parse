@@ -1,10 +1,12 @@
 package org.allenai.scienceparse
 
-import com.typesafe.config.{ConfigFactory, Config}
-import org.allenai.common.{Resource, Logging}
+import com.typesafe.config.{Config, ConfigFactory}
+import org.allenai.common.{Logging, Resource}
 import org.allenai.common.Config._
 
 import scalikejdbc._
+
+import java.time.Instant
 
 object FeedbackStore extends Logging {
   { // Set up the DB
@@ -28,12 +30,12 @@ object FeedbackStore extends Logging {
     ConnectionPool.singleton(dbUrl, dbUser, dbPassword)
 
     // upgrade the schema if necessary
-    {
-      val dbConfig: Config = config[Config]("org.allenai.scienceparse.Server.db-as-root")
-      val dbUrl = dbConfig.getString("url")
+    val dbRootConfig: Config = config[Config]("org.allenai.scienceparse.Server.db-as-root")
+    if (dbRootConfig[Boolean]("upgradeSchema")){
+      val dbUrl = dbRootConfig.getString("url")
       logger.info(s"Connecting to $dbUrl")
-      val dbUser = dbConfig.getString("user")
-      val dbPassword = dbConfig.get[String]("password").getOrElse(
+      val dbUser = dbRootConfig.getString("user")
+      val dbPassword = dbRootConfig.get[String]("password").getOrElse(
         throw new IllegalArgumentException("Root password for DB not set. Please set org.allenai.scienceparse.Server.db-as-root.password."))
 
       val rootConnectionPoolName = "rootConnectionPool"
@@ -112,15 +114,26 @@ object FeedbackStore extends Logging {
     }
   }
 
-  def getAllFeedback: Traversable[(String, LabeledData)] = {
+  /**
+    * @param onOrAfter If given, constrains returned feedback to those added on or after this timestamp.
+    * @param before If given, constrains returned feedback to those added before this timestamp.
+    */
+  def getAllFeedback(
+    onOrAfter: Option[Instant] = None,
+    before: Option[Instant] = None
+  ): Traversable[(String, LabeledData)] = {
     import spray.json._
     import LabeledDataJsonProtocol._
+
+    val onOrAfterClause = onOrAfter.map(ts => sqls" AND a.timeadded >= $ts").getOrElse(sqls"")
+    val beforeClause = before.map(ts => sqls" AND a.timeadded < $ts").getOrElse(sqls"")
 
     DB.readOnly { implicit t =>
       sql"""
         SELECT a.paperId AS paperId, a.value AS value FROM feedback AS a JOIN (
           SELECT paperId, MAX(timeAdded) AS timeAdded FROM feedback GROUP BY paperId
         ) AS b ON a.paperId = b.paperId AND a.timeAdded = b.timeAdded
+        $onOrAfterClause $beforeClause
       """.map { result =>
         val paperId = result.string("paperId")
         val jsonString = result.string("value")
