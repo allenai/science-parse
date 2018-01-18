@@ -1,17 +1,17 @@
 package org.allenai.scienceparse
 
-import java.io.{ ByteArrayInputStream, File, InputStream }
-import java.security.{ DigestInputStream, MessageDigest }
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
-
-import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
+import java.io.{ByteArrayInputStream, File, InputStream}
+import java.security.{DigestInputStream, MessageDigest}
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
-import com.fasterxml.jackson.databind.{ JsonMappingException, ObjectMapper }
+import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.allenai.common.{ Logging, Resource }
+import org.allenai.common.{Logging, Resource}
+
 import org.apache.commons.io.IOUtils
-import org.eclipse.jetty.server.{ Request, Server }
+import org.eclipse.jetty.server.{Request, Server}
 import org.eclipse.jetty.server.handler.AbstractHandler
 import scopt.OptionParser
 
@@ -20,6 +20,8 @@ import scala.util.matching.Regex
 import scala.collection.JavaConverters._
 import spray.json._
 import LabeledDataJsonProtocol._
+
+import java.time.Instant
 
 object SPServer extends Logging {
   def main(args: Array[String]): Unit = {
@@ -386,7 +388,11 @@ class SPServer(
   }.getOrElse(throw feedbackUnavailableException)
 
   private def correctionsGetAll(request: SPRequest) = feedbackStore.map { store =>
-    val result = store.getAllFeedback
+
+    val onOrAfterOpt = request.queryParams.get("onOrAfter").map(s => Instant.ofEpochMilli(s.toLong))
+    val beforeOpt = request.queryParams.get("before").map(s => Instant.ofEpochMilli(s.toLong))
+
+    val result = store.getAllFeedback(onOrAfterOpt, beforeOpt)
     // This keeps the whole result set in memory, which is bad. It should be streamed.
     // ScalikeJDBC already insists on keeping it in memory, so I didn't take the time to optimize
     // it here.

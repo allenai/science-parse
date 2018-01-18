@@ -6,6 +6,8 @@ import org.allenai.common.Config._
 
 import scalikejdbc._
 
+import java.time.Instant
+
 object FeedbackStore extends Logging {
   { // Set up the DB
     Class.forName("org.postgresql.Driver")
@@ -112,15 +114,26 @@ object FeedbackStore extends Logging {
     }
   }
 
-  def getAllFeedback: Traversable[(String, LabeledData)] = {
+  /**
+    * @param onOrAfter If given, constrains returned feedback to those added on or after this timestamp.
+    * @param before If given, constrains returned feedback to those added before this timestamp.
+    */
+  def getAllFeedback(
+    onOrAfter: Option[Instant] = None,
+    before: Option[Instant] = None
+  ): Traversable[(String, LabeledData)] = {
     import spray.json._
     import LabeledDataJsonProtocol._
+
+    val onOrAfterClause = onOrAfter.map(ts => sqls" AND a.timeadded >= $ts").getOrElse(sqls"")
+    val beforeClause = before.map(ts => sqls" AND a.timeadded < $ts").getOrElse(sqls"")
 
     DB.readOnly { implicit t =>
       sql"""
         SELECT a.paperId AS paperId, a.value AS value FROM feedback AS a JOIN (
           SELECT paperId, MAX(timeAdded) AS timeAdded FROM feedback GROUP BY paperId
         ) AS b ON a.paperId = b.paperId AND a.timeAdded = b.timeAdded
+        $onOrAfterClause $beforeClause
       """.map { result =>
         val paperId = result.string("paperId")
         val jsonString = result.string("value")
