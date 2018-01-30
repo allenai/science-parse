@@ -31,6 +31,7 @@ object SPServer extends Logging {
       gazetteerFile: Option[File] = None,
       paperDirectory: Option[File] = None,
       enableFeedback: Boolean = false,
+      useS2Bucket: Boolean = false,
       downloadModelOnly: Boolean = false
     )
 
@@ -57,6 +58,10 @@ object SPServer extends Logging {
         c.copy(enableFeedback = true)
       } text "Enables the feedback mechanism"
 
+      opt[Unit]("useS2Bucket") action { (_, c) =>
+        c.copy(useS2Bucket = true)
+      } text "Use the internal Semantic Scholar S3 bucket to retrieve papers"
+
       opt[Unit]("downloadModelOnly") action { (_, c) =>
         c.copy(downloadModelOnly = true)
       } text "Just downloads all the model files, and then quits"
@@ -77,7 +82,11 @@ object SPServer extends Logging {
         System.exit(0)
 
       val paperSource = {
-        val defaultSource = PaperSource.getDefault
+        val defaultSource = if(config.useS2Bucket)
+          ScholarBucketPaperSource.getInstance()
+        else
+          PaperSource.getDefault
+
         config.paperDirectory match {
           case None => defaultSource
           case Some(dir) =>
