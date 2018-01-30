@@ -524,7 +524,7 @@ object LabeledPapersFromScienceParse extends Logging {
       LabeledData.fromExtractedMetadata(labeledPaperId, output)
     } catch {
       case NonFatal(e) =>
-        logger.warn(s"Error while science-parsing: $e")
+        logger.warn(s"Error while science-parsing", e)
         LabeledData.empty
     }
 
