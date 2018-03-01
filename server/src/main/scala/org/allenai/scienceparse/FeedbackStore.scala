@@ -117,7 +117,7 @@ object FeedbackStore extends Logging {
   /**
     * @param onOrAfter If given, constrains returned feedback to those added on or after this timestamp.
     * @param before If given, constrains returned feedback to those added before this timestamp.
-    * @return (paper id, time added, labeled data json)
+    * @return (paper id, time added, labeled data)
     */
   def getAllFeedback(
     onOrAfter: Option[Instant] = None,
