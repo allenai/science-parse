@@ -117,11 +117,12 @@ object FeedbackStore extends Logging {
   /**
     * @param onOrAfter If given, constrains returned feedback to those added on or after this timestamp.
     * @param before If given, constrains returned feedback to those added before this timestamp.
+    * @return (paper id, time added, labeled data)
     */
   def getAllFeedback(
     onOrAfter: Option[Instant] = None,
     before: Option[Instant] = None
-  ): Traversable[(String, LabeledData)] = {
+  ): Traversable[(String, String, LabeledData)] = {
     import spray.json._
     import LabeledDataJsonProtocol._
 
@@ -130,14 +131,15 @@ object FeedbackStore extends Logging {
 
     DB.readOnly { implicit t =>
       sql"""
-        SELECT a.paperId AS paperId, a.value AS value FROM feedback AS a JOIN (
+        SELECT a.paperId, a.timeAdded, a.value FROM feedback AS a JOIN (
           SELECT paperId, MAX(timeAdded) AS timeAdded FROM feedback GROUP BY paperId
         ) AS b ON a.paperId = b.paperId AND a.timeAdded = b.timeAdded
         $onOrAfterClause $beforeClause
       """.map { result =>
         val paperId = result.string("paperId")
+        val timeAdded = result.timestamp("timeAdded").toInstant
         val jsonString = result.string("value")
-        (paperId, jsonString.parseJson.convertTo[LabeledData])
+        (paperId, timeAdded.toString, jsonString.parseJson.convertTo[LabeledData])
       }.traversable.apply()
     }
   }
