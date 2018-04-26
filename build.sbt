@@ -28,7 +28,7 @@ lazy val commonSettings = Seq(
   scmInfo := Some(ScmInfo(
     url("https://github.com/allenai/science-parse"),
     "https://github.com/allenai/science-parse.git")),
-  bintrayRepository := "private",
+  bintrayRepository := "maven",
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
