@@ -36,6 +36,7 @@ object RunSP extends Logging {
       pdfInputs: Seq[String] = Seq(),
       outputDir: Option[File] = None,
       outputFile: Option[File] = None,
+      useS2Bucket: Boolean = false,
       quiet: Boolean = false
     )
 
@@ -68,6 +69,10 @@ object RunSP extends Logging {
         c.copy(paperDirectory = Some(p))
       } text "Specifies a directory with papers in them. If this is not specified, or a paper can't be found in the directory, we fall back to getting the paper from Semantic Scholar."
 
+      opt[Unit]("useS2Bucket") action { (_, c) =>
+        c.copy(useS2Bucket = true)
+      } text "Use the internal Semantic Scholar S3 bucket to retrieve papers"
+
       arg[String]("<pdf|directory|sha|textfile>...") unbounded () action {
         (f, c) => c.copy(pdfInputs = c.pdfInputs :+ f)
       } text "PDFs you'd like to process"
@@ -96,13 +101,17 @@ object RunSP extends Logging {
       }
 
       val paperSource = {
-        val bucketSource = PaperSource.getDefault
+        val defaultSource = if(config.useS2Bucket)
+          ScholarBucketPaperSource.getInstance()
+        else
+          PaperSource.getDefault
+
         config.paperDirectory match {
-          case None => bucketSource
+          case None => defaultSource
           case Some(dir) =>
             new FallbackPaperSource(
               new DirectoryPaperSource(dir),
-              bucketSource
+              defaultSource
             )
         }
       }
