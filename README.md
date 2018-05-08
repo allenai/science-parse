@@ -25,11 +25,11 @@ Alternatively, you can run the **docker image**: `docker run -p 8080:8080 --rm a
 
 ## How to include into your own project
  
-The current version is `1.3.1`. If you want to include it in your own project, use this:
+The current version is `1.3.2`. If you want to include it in your own project, use this:
 
 For SBT:
 ```
-libraryDependencies += "org.allenai" %% "science-parse" % "1.3.1"
+libraryDependencies += "org.allenai" %% "science-parse" % "1.3.2"
 ```
 
 For Maven:
@@ -37,8 +37,7 @@ For Maven:
 <dependency>
   <groupId>org.allenai</groupId>
   <artifactId>science-parse_2.11</artifactId>
-  <version>1.3.1</version>
-  <type>pom</type>
+  <version>1.3.2</version>
 </dependency>
 ```
 
