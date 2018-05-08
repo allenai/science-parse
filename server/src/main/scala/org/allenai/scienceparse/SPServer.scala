@@ -3,7 +3,6 @@ package org.allenai.scienceparse
 import java.io.{ByteArrayInputStream, File, InputStream}
 import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -117,9 +116,6 @@ class SPServer(
   private val jsonMapper = new ObjectMapper() with ScalaObjectMapper
   jsonMapper.registerModule(DefaultScalaModule)
   private val prettyJsonWriter = jsonMapper.writerWithDefaultPrettyPrinter()
-
-  private val bucket: String = "ai2-s2-pdfs"
-  private val s3: AmazonS3 = AmazonS3ClientBuilder.defaultClient
 
 
   //
