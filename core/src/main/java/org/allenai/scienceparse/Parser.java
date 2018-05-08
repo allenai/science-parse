@@ -189,19 +189,11 @@ public class Parser {
       ) {
         if (gazCacheChannel.size() == 0) {
           logger.info("Creating gazetteer cache at {}", gazCachePath);
-
-          // We create it to a temp file first, and then move it over, so that aborting doesn't mean
-          // we end up with a half-written file.
-          val tempFilePath =
-              Paths.get(System.getProperty("java.io.tmpdir"), gazCacheFilename + ".tmp");
-          try(final OutputStream tempFileStream = Files.newOutputStream(tempFilePath)) {
-            referenceExtractor =
-                ExtractReferences.createAndWriteGazCache(
-                    gazetteerIs,
-                    bibModelIs,
-                    tempFileStream);
-          }
-          Files.move(tempFilePath, gazCachePath, StandardCopyOption.REPLACE_EXISTING);
+          referenceExtractor =
+              ExtractReferences.createAndWriteGazCache(
+                  gazetteerIs,
+                  bibModelIs,
+                  Channels.newOutputStream(gazCacheChannel));
         } else {
           logger.info("Reading from gazetteer cache at {}", gazCachePath);
           referenceExtractor = new ExtractReferences(

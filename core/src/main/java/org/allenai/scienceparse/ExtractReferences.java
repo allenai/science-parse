@@ -148,9 +148,8 @@ public class ExtractReferences {
   ) throws IOException {
     val result = new ExtractReferences(is, bibCRFModel);
 
-    try(final FSTObjectOutput out = new FSTObjectOutput(gazCacheFileOutputStream)) {
-      out.writeObject(result.cr);
-    }
+    final FSTObjectOutput out = new FSTObjectOutput(gazCacheFileOutputStream);
+    out.writeObject(result.cr);
 
     return result;
   }
