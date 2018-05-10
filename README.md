@@ -21,7 +21,7 @@ There are three different ways to get started with SP. Each has its own document
  * [CLI](cli/README.md): This contains the command line interface to SP. That's most useful for batch processing.
  * [Core](core/README.md): This contains SP as a library. It has all the extraction code, plus training and evaluation. Both server and CLI use this to do the actual work.
 
-Alternatively, you can run the **docker image**: `docker run -p 8080:8080 --rm allenai-docker-public-docker.bintray.io/s2/scienceparse:1.2.8-SNAPSHOT`
+Alternatively, you can run the **docker image**: `docker run -p 8080:8080 --rm allenai-docker-public-docker.bintray.io/s2/scienceparse:1.3.2`
 
 ## How to include into your own project
  
