@@ -98,6 +98,9 @@ public class ExtractReferences {
       final CRFModel<String, String, String> bibCRF = loadModel(bibCRFModel);
       bibCRFRecordParser = new CRFBibRecordParser(bibCRF);
       extractors.addAll(Arrays.asList(
+          new NumberCloseParen(new Class [] {
+              NumberCloseParenBibRecordParser.class,
+              CRFBibRecordParser.class}),
           new BracketNumber(new Class [] {
               BracketNumberInitialsQuotedBibRecordParser.class,
               CRFBibRecordParser.class}),
@@ -618,6 +621,49 @@ public class ExtractReferences {
     }
   }
 
+  // Example:
+  // 6) Farrell GC, Larter CZ. Nonalcoholic fatty liver disease: from steatosis to cirrhosis.
+  //    Hepatology 2006;43(Suppl. 1):S99-S112.
+  private static class NumberCloseParenBibRecordParser implements BibRecordParser {
+    private static final String uppercaseNameUnit = authUnit;
+    private static final String anycaseNameUnit = "[\\p{L}'`\\-]+";
+    private static final String multipleNameUnits = "(?:" + anycaseNameUnit + " +)*" + uppercaseNameUnit;
+    private static final String initialsLastAuthor = multipleNameUnits + " +\\p{Lu}+";
+    private static final String multipleInitialsLastAuthors =
+        initialsLastAuthor + "(?:" + authConnect + initialsLastAuthor + ")*";
+
+    private static final String regEx = (
+        "([0-9]+)\\)" +                       // "6)"
+        " +" +
+        "(" + multipleInitialsLastAuthors + ")(?:, et al)?\\." + // "Farrell GC, Larter CZ."
+        " +" +
+        "([^\\.]+[\\.\\?])" +                 // "Nonalcoholic fatty liver disease: from steatosis to cirrhosis."
+        " +" +
+        "(.*) +([1-2][0-9]{3});" +            // "Hepatology 2006;"
+        ".*");                                // "43(Suppl. 1):S99-S112."
+    private static final Pattern pattern = Pattern.compile(regEx);
+
+    public NumberCloseParenBibRecordParser() {
+    }
+
+    public BibRecord parseRecord(final String line) {
+      Matcher m = RegexWithTimeout.matcher(pattern, line.trim());
+      if (m.matches()) {
+        String title = m.group(3);
+        if(title.endsWith("."))
+          title = title.substring(0, title.length() - 1);
+        return new BibRecord(
+            title,
+            authorStringToList(m.group(2)),
+            m.group(4),
+            Pattern.compile(m.group(1)), null,
+            extractRefYear(m.group(5)));
+      } else {
+        return null;
+      }
+    }
+  }
+
   static class NumberDotAuthorNoTitleBibRecordParser implements BibRecordParser {
     private static final String regEx =
       "([0-9]+)\\. +(" + authLastCommaInitial + "(?:; " + authLastCommaInitial + ")*)" + " ([^0-9]*) ([1-2][0-9]{3})(?:\\.|,[0-9, ]*)(?:.*)";
@@ -978,6 +1024,54 @@ public class ExtractReferences {
       int st = line.indexOf(tag);
       while (st >= 0) {
         tag = "<lb>[" + (++i) + "]";
+        int end = line.indexOf(tag, st);
+        if (end > 0) {
+          cites.add(line.substring(st, end));
+        } else {
+          cites.add(line.substring(st));
+        }
+        st = end;
+      }
+      List<BibRecord> out = new ArrayList<BibRecord>();
+      boolean first = true;
+      for (String s : cites) {
+        s = s.replaceAll("-<lb>(\\p{Ll})", "$1").replaceAll("<lb>", " ").trim();
+        for(int j=0; j<recParser.length;j++) {
+          BibRecord br = this.recParser[j].parseRecord(s);
+          if(br!=null) {
+            out.add(br);
+            break;
+          }
+        }
+      }
+      out = removeNulls(out);
+      return out;
+    }
+  }
+
+  private class NumberCloseParen extends BibStractor {
+    NumberCloseParen(Class[] c) {
+      super(c);
+    }
+
+    private final String citeRegex = "\\(([0-9, \\p{Pd}]+)\\)";
+    public String getCiteRegex() {
+      return citeRegex;
+    }
+
+    private final String citeDelimiter = "(,| |;)+";
+    public String getCiteDelimiter() {
+      return citeDelimiter;
+    }
+
+    public List<BibRecord> parse(String line) {
+      line = line.replaceAll("<bb>", "<lb>");
+      int i = 0;
+      String tag = (++i) + ")";
+      List<String> cites = new ArrayList<String>();
+      int st = line.indexOf(tag);
+      while (st >= 0) {
+        tag = "<lb>" + (++i) + ")";
         int end = line.indexOf(tag, st);
         if (end > 0) {
           cites.add(line.substring(st, end));
