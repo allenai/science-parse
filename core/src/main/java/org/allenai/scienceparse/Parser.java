@@ -230,7 +230,7 @@ public class Parser {
     final List<String> raw,
     final List<String> rawReferences,
     final ExtractReferences er
-  ) throws IOException {
+  ) {
     final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
     final List<BibRecord> brs =
             fnd.getOne().stream().map(BibRecord::withNormalizedAuthors).collect(Collectors.toList());
