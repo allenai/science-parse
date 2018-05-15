@@ -124,7 +124,8 @@ public class ExtractReferences {
               CRFBibRecordParser.class}),
           new BracketName(new Class [] {
               BracketNameBibRecordParser.class,
-              CRFBibRecordParser.class})));
+              CRFBibRecordParser.class})
+      ));
       extractors.addAll(Arrays.asList(
         new BracketNumber(new Class [] {CRFBibRecordParser.class}),
         new NumberDot(new Class [] {CRFBibRecordParser.class}),
@@ -416,7 +417,7 @@ public class ExtractReferences {
                 int idx = getIdxOf(bib, j + "");
                 if (idx >= 0) {
                   out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
-                }                
+                }
               }
           }
           else {
@@ -957,7 +958,7 @@ public class ExtractReferences {
     protected final String citeRegex = "\\[([0-9, \\p{Pd}]+)\\]";
     protected final String citeDelimiter = "(,| |;)+";
 
-    BracketNumber(Class [] c) {
+    BracketNumber(Class[] c) {
       super(c);
     }
 
