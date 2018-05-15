@@ -253,7 +253,7 @@ class SPServer(
       }.getOrElse {
         val allowedMethods = routes.filter(_.canHandleTarget(target)).map(_.method).toSet
         if (allowedMethods.isEmpty) {
-          throw SPServerException(404, "When someone is searching, said Siddhartha, then it might easily happen that the only thing his eyes still see is that what he searches for, that he is unable to find anything, to let anything enter his mind, because he always thinks of nothing but the object of his search, because he has a goal, because he is obsessed by the goal. Searching means: having a goal. But finding means: being free, being open, having no goal. You, oh venerable one, are perhaps indeed a searcher, because, striving for your goal, there are many things you don't see, which are directly in front of your eyes.")
+          throw SPServerException(404, "Quoth the server, 404")
         } else {
           SPResponse(
             405,
