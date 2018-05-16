@@ -982,7 +982,21 @@ public class Parser {
    * GrobidParser for evaluation of Grobid citation mention extraction.
    */
   public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
-    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
+    int sentenceStart = begin;
+    // Some citation have the form "This is my sentence.(1,2)". So if we just search backwards from
+    // `begin`, we find the end of the sentence we want, rather than the beginning. Thus, we rewind
+    // `sentenceStart` a little if necessary.
+    while(
+        sentenceStart > 0 && (
+            context.charAt(sentenceStart) == '(' ||
+            context.charAt(sentenceStart) == '[' ||
+            context.charAt(sentenceStart) == '.' ||
+            context.charAt(sentenceStart) == '⍐'
+        )
+    ) {
+      sentenceStart -= 1;
+    }
+    sentenceStart = context.substring(0, sentenceStart).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
 
     // Trim away superscripts at the beginning of sentences.
     if(context.charAt(sentenceStart) == '⍐') {
