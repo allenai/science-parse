@@ -1048,7 +1048,8 @@ public class Parser {
       clean(em);
       final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
 
-      em.creator = doc.meta.creator;
+      if(doc.meta != null)
+        em.creator = doc.meta.creator;
       // extract references
       try {
         final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
