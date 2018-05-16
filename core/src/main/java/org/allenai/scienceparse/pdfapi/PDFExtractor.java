@@ -353,9 +353,7 @@ public class PDFExtractor {
       for (PDFToken token : tokens) {
         updateFromToken(token);
       }
-
     }
-
 
     private void updateFromToken(PDFToken token) {
       if (curLineTokens.isEmpty()) {

@@ -319,7 +319,6 @@ class SPServer(
     val digest = MessageDigest.getInstance("SHA-1")
     digest.reset()
     val bytes = Resource.using(new DigestInputStream(request.inputStream(), digest))(IOUtils.toByteArray)
-    val paperId = Utilities.toHex(digest.digest())
 
     // parse paper
     val formatString = request.queryParams.getOrElse("format", "LabeledData")

@@ -37,11 +37,6 @@ public class ExtractReferences {
   public static final String authLastCommaInitial = authOneName + ", (?:\\p{Lu}\\.-? ?)+";
   public static final String authConnect = "(?:; |, |, and |; and | and )";
 
-  //279
-  //378
-  //480
-  //492
-  //606
   public static final String authInitialsLast = "(?:\\p{Lu}\\.?(?:-| )?)+ " + authOneName;
   public static final String authInitialsLastList = authInitialsLast + "(?:" + authConnect + authInitialsLast + ")*";
   public static final String authPlain = authOneName + "(?:\\p{Lu}\\. )?" + authOneName;
@@ -338,12 +333,6 @@ public class ExtractReferences {
 
   private static <T> List<T> removeNulls(List<T> in) {
     return in.stream().filter(a -> (a != null)).collect(Collectors.toList());
-//    List<T> out = new ArrayList<T>();
-//    for (T a : in) {
-//      if (a != null)
-//        out.add(a);
-//    }
-//    return out;
   }
 
   private static String getAuthorLastName(String authName) {
