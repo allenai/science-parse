@@ -1072,7 +1072,7 @@ public class Parser {
           final int contextLength =
               crWithContext.context.length() -
               (crWithContext.endOffset - crWithContext.startOffset);
-          if(contextLength >= 10) // Heuristic number
+          if(contextLength >= 35) // Heuristic number
             crs.add(crWithContext);
         }
 
