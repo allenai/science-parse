@@ -397,7 +397,7 @@ public class ExtractReferences {
   public static List<CitationRecord> findCitations(List<String> paper, List<BibRecord> bib, BibStractor bs) {
     ArrayList<CitationRecord> out = new ArrayList<>();
     Pattern p = Pattern.compile(bs.getCiteRegex());
-    Pattern pRange = Pattern.compile("([0-9]+)\\p{Pd}([0-9]+)");
+    Pattern pRange = Pattern.compile("([1-9][0-9]*)\\p{Pd}([1-9][0-9]*)");
     
     int stop = refStart(paper); //stop at start of refs
     if (stop < 0)
