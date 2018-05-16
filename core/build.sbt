@@ -22,7 +22,7 @@ libraryDependencies ++= Seq(
     ExclusionRule(organization = "args4j"),
     ExclusionRule(organization = "org.slf4j", name="slf4j-simple")
   ),
-  "org.projectlombok" % "lombok" % "1.16.6",
+  "org.projectlombok" % "lombok" % "1.16.20",
   "com.goldmansachs" % "gs-collections" % "6.1.0",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",
