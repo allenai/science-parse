@@ -45,6 +45,17 @@ public class ExtractReferences {
   //pattern for matching single author name, format as in Jones, C. M.
   public static final String authGeneral = "\\p{Lu}[\\p{L}\\.'`\\- ]+";
   public static final String authGeneralList = authGeneral + "(?:(?:; |, |, and |; and | and )" + authGeneral + ")*";
+
+  // patterns for mentions
+  private static final String numberOrRangeRe = "(?:[1-9][0-9]*(?: *- *[1-9][0-9]*)?)";
+  private static final String separatorRe = "(?: *[,;|] *)";
+  private static final String citeCharactersRe = numberOrRangeRe + "(?:" + separatorRe + numberOrRangeRe + ")*";
+  public static final Pattern mentions = Pattern.compile(
+      "(?:" + citeCharactersRe + ")|" +
+      "(?:\\[" + citeCharactersRe + "\\])|" +
+      "(?:\\(" + citeCharactersRe + "\\))"
+  );
+
   private ArrayList<BibStractor> extractors = null;
 
   public static Pattern pBracket = Pattern.compile("\\[([0-9]+)\\](.*)");
@@ -397,7 +408,10 @@ public class ExtractReferences {
       paper.set(i, s);
       Matcher m = RegexWithTimeout.matcher(p, s);
       while (m.find()) {
-        String[] citations = m.group(1).split(bs.getCiteDelimiter());
+        String citationMeat = m.group(1);
+        if(citationMeat == null)
+          citationMeat = m.group(2);
+        String[] citations = citationMeat.split(bs.getCiteDelimiter());
         for (final String citation : citations) {
           Matcher mRange = RegexWithTimeout.matcher(pRange, citation);
           if(mRange.matches()) { //special case for ranges
@@ -990,8 +1004,17 @@ public class ExtractReferences {
   }
 
   private class BracketNumber extends BibStractor {
-    protected final String citeRegex = "\\[([0-9, \\p{Pd}]+)\\]";
-    protected final String citeDelimiter = "(,| |;)+";
+    protected final String citeRegex =
+        "(?:" +
+          "[\\[\\(]" +                   // open bracket/paren
+          "(" + citeCharactersRe + ")" + // the meat
+          "[\\]\\)]" +                   // close bracket/paren
+        ")|(?:" +                        // or
+          "\\.⍐" +                       // period, followed by superscript
+          "(" + citeCharactersRe + ")" + // the meat
+          "⍗" +                          // end of superscript
+        ")";
+    protected final String citeDelimiter = separatorRe;
 
     BracketNumber(Class[] c) {
       super(c);

@@ -991,6 +991,14 @@ public class Parser {
    */
   public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
     int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
+
+    // Trim away superscripts at the beginning of sentences.
+    if(context.charAt(sentenceStart) == '⍐') {
+      final int newSentenceStart = context.indexOf('⍗', sentenceStart);
+      if(newSentenceStart > 0 && newSentenceStart < begin)
+        sentenceStart = newSentenceStart + 1;
+    }
+
     int crSentenceEnd = context.indexOf('.', end);
     if(crSentenceEnd < 0)
       crSentenceEnd = context.length();

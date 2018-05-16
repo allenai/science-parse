@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.allenai.scienceparse.ExtractReferences;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -26,9 +27,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.ToDoubleFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -246,22 +247,8 @@ public class PDFExtractor {
     // The PDFBox class doesn't get exposed outside of this class
     public final List<TextPosition> textPositions;
     
-    public String discardSuperscripts(String token, FloatList bounds) {
-      double yThresh = (bounds.get(3) + bounds.get(1))/2.0;
-      double yGap = (bounds.get(3) - bounds.get(1));
-      StringBuilder sb = new StringBuilder();
-      int i=0;
-      for (TextPosition tp : textPositions) {
-       if(tp.getY() > yThresh || (yThresh - tp.getY() > yGap / 6.0)) //latter case suggests a height bug (?) so ignore
-         sb.append(tp.getUnicode());
-       i++;
-      }
-      return sb.toString();
-    }
-
     public PDFToken toPDFToken() {
       val builder = PDFToken.builder();
-      String tokenText = textPositions.stream().map(TextPosition::getUnicode).collect(Collectors.joining(""));
       // HACK(aria42) assumes left-to-right text
       TextPosition firstTP = textPositions.get(0);
       PDFont pdFont = firstTP.getFont();
@@ -301,7 +288,45 @@ public class PDFExtractor {
       }
       FloatList bounds = FloatArrayList.newListWith(minX, minY, maxX, maxY);
       builder.bounds(bounds);
-      tokenText = discardSuperscripts(tokenText, bounds);
+
+      // put together text from the textPositions, handling superscripts appropriately
+      // Since we have to map superscripts into flat strings, we encode superscripts by enclosing
+      // them in ⍐ and ⍗ characters.
+      String tokenText;
+      {
+        final double yThresh = (bounds.get(3) + bounds.get(1)) / 2.0;
+        final double yGap = (bounds.get(3) - bounds.get(1));
+        final StringBuilder sb = new StringBuilder();
+
+        final StringBuilder superscriptSb = new StringBuilder();
+
+        for (TextPosition tp : textPositions) {
+          if (tp.getY() > yThresh || (yThresh - tp.getY() > yGap / 6.0)) { // latter case suggests a height bug (?) so ignore
+            // normal character
+            if(ExtractReferences.mentions.matcher(superscriptSb).matches()) {
+              assert superscriptSb.length() > 0;
+              sb.append('⍐');
+              sb.append(superscriptSb);
+              sb.append('⍗');
+            }
+            superscriptSb.setLength(0);
+            sb.append(tp.getUnicode());
+          } else {
+            // superscript character
+            superscriptSb.append(tp.getUnicode());
+          }
+        }
+        // pick up leftover superscripts
+        if(ExtractReferences.mentions.matcher(superscriptSb).matches()) {
+          assert superscriptSb.length() > 0;
+          sb.append('⍐');
+          sb.append(superscriptSb);
+          sb.append('⍗');
+        }
+
+        tokenText = sb.toString();
+      }
+
       // separate ligands
       tokenText = Normalizer.normalize(tokenText, Normalizer.Form.NFKC);
       builder.token(tokenText);
