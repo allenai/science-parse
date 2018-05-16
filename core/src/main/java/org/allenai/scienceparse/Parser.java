@@ -1,9 +1,10 @@
 package org.allenai.scienceparse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gs.collections.api.map.primitive.MutableCharIntMap;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.set.primitive.MutableIntSet;
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.factory.primitive.CharIntMaps;
 import com.gs.collections.impl.factory.primitive.IntSets;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
@@ -25,7 +26,6 @@ import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.pdffigures2.FigureExtractor;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
-import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import scala.compat.java8.ScalaStreamSupport;
 import scala.compat.java8.OptionConverters;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -46,18 +45,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -65,7 +58,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +67,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
@@ -85,6 +76,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -1050,14 +1042,17 @@ public class Parser {
 
       if(doc.meta != null)
         em.creator = doc.meta.creator;
+
       // extract references
       try {
         final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
         final Pair<List<BibRecord>, List<CitationRecord>> pair =
             getReferences(lines, rawReferences, referenceExtractor);
         em.references = pair.getOne();
+
+        // add contexts to the mentions
         List<CitationRecord> crs = new ArrayList<>();
-        for (CitationRecord cr : pair.getTwo()) {
+        for(final CitationRecord cr : pair.getTwo()) {
           final CitationRecord crWithContext =
               extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset);
           final int contextLength =
@@ -1066,7 +1061,41 @@ public class Parser {
           if(contextLength >= 10) // Heuristic number
             crs.add(crWithContext);
         }
-        em.referenceMentions = crs;
+
+        // find the predominant mention style, and assign it to em.referenceMentions
+        final Function<CitationRecord, Character> getMentionStyle = (final CitationRecord cr) -> {
+          char firstChar = cr.context.charAt(cr.startOffset);
+          if(firstChar == '(' || firstChar == '[' || firstChar == '⍐')
+            return firstChar;
+          else
+            return '\0';
+        };
+        final MutableCharIntMap styleToCount = CharIntMaps.mutable.empty();
+        int maxStyleCount = 0;
+        char predominantStyle = '\0';
+        for(final CitationRecord cr : crs) {
+          final char style = getMentionStyle.apply(cr);
+          final int newStyleCount = styleToCount.addToValue(style, 1);
+          if(newStyleCount > maxStyleCount) {
+            maxStyleCount = newStyleCount;
+            predominantStyle = style;
+          }
+        }
+
+        // Override this in a special case: If we have more than 4 in the [] style, let's take that
+        // as the style. That style is unlikely to happen by accident, while the () style happens
+        // all the time in other contexts.
+        if(predominantStyle == '(' && styleToCount.getIfAbsent('[', 0) > 4)
+          predominantStyle = '[';
+
+        if(predominantStyle == '\0') {
+          em.referenceMentions = crs;
+        } else {
+          em.referenceMentions = new ArrayList<>(crs.size());
+          for(final CitationRecord cr : crs)
+            if(getMentionStyle.apply(cr) == predominantStyle)
+              em.referenceMentions.add(cr);
+        }
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
         logger.warn("Timeout while extracting references. References may be incomplete or missing.");
         if (em.references == null)
