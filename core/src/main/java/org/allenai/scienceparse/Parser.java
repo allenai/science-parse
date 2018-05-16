@@ -1057,7 +1057,13 @@ public class Parser {
         em.references = pair.getOne();
         List<CitationRecord> crs = new ArrayList<>();
         for (CitationRecord cr : pair.getTwo()) {
-          crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+          final CitationRecord crWithContext =
+              extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset);
+          final int contextLength =
+              crWithContext.context.length() -
+              (crWithContext.endOffset - crWithContext.startOffset);
+          if(contextLength >= 10) // Heuristic number
+            crs.add(crWithContext);
         }
         em.referenceMentions = crs;
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
