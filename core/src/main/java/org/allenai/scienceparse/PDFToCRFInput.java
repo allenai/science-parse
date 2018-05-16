@@ -249,10 +249,8 @@ public class PDFToCRFInput {
    *
    * @param pdf             The PDF Document to convert into instances
    * @return The data sequence
-   * @throws IOException
    */
-  public static List<PaperToken> getSequence(PDFDoc pdf) throws IOException {
-
+  public static List<PaperToken> getSequence(PDFDoc pdf) {
     ArrayList<PaperToken> out = new ArrayList<>();
     List<PDFPage> pages = pdf.getPages();
     for (int pageNum = 0; pageNum < pages.size(); pageNum++) {
