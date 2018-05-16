@@ -1022,7 +1022,8 @@ public class Parser {
     {
       PDFExtractor ext = new PDFExtractor();
       PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
+
+      List<PaperToken> seq = PDFToCRFInput.getSequence(doc.withoutSuperscripts());
       seq = seq.subList(0, Math.min(seq.size(), headerMax));
       seq = PDFToCRFInput.padSequence(seq);
 
