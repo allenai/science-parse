@@ -1027,9 +1027,10 @@ public class Parser {
     //
     {
       PDFExtractor ext = new PDFExtractor();
-      PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
+      final PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
+      final PDFDoc docWithoutSuperscripts = doc.withoutSuperscripts();
 
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc.withoutSuperscripts());
+      List<PaperToken> seq = PDFToCRFInput.getSequence(docWithoutSuperscripts);
       seq = seq.subList(0, Math.min(seq.size(), headerMax));
       seq = PDFToCRFInput.padSequence(seq);
 
@@ -1052,17 +1053,19 @@ public class Parser {
       }
 
       clean(em);
-      final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
 
       if(doc.meta != null)
         em.creator = doc.meta.creator;
 
       // extract references
       try {
+        final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
         final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
         final Pair<List<BibRecord>, List<CitationRecord>> pair =
             getReferences(lines, rawReferences, referenceExtractor);
-        em.references = pair.getOne();
+        em.references = new ArrayList<>(pair.getOne().size());
+        for(final BibRecord record : pair.getOne())
+          em.references.add(record.withoutSuperscripts());
 
         // add contexts to the mentions
         List<CitationRecord> crs = new ArrayList<>();
@@ -1102,14 +1105,10 @@ public class Parser {
         if(predominantStyle == '(' && styleToCount.getIfAbsent('[', 0) > 4)
           predominantStyle = '[';
 
-        if(predominantStyle == '\0') {
-          em.referenceMentions = crs;
-        } else {
-          em.referenceMentions = new ArrayList<>(crs.size());
-          for(final CitationRecord cr : crs)
-            if(getMentionStyle.apply(cr) == predominantStyle)
-              em.referenceMentions.add(cr);
-        }
+        em.referenceMentions = new ArrayList<>(crs.size());
+        for(final CitationRecord cr : crs)
+          if(predominantStyle == '\0' || getMentionStyle.apply(cr) == predominantStyle)
+            em.referenceMentions.add(cr.withConvertedSuperscriptTags());
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
         logger.warn("Timeout while extracting references. References may be incomplete or missing.");
         if (em.references == null)
@@ -1120,7 +1119,9 @@ public class Parser {
       logger.debug(em.references.size() + " refs for " + em.title);
 
       try {
-        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
+        em.abstractText = PDFDocToPartitionedText.getAbstract(
+            PDFDocToPartitionedText.getRaw(docWithoutSuperscripts),
+            docWithoutSuperscripts).trim();
         if (em.abstractText.isEmpty())
           em.abstractText = null;
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {

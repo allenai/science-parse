@@ -16,12 +16,12 @@ public class BibRecord {
   // Something is wrong with sbt, lombok, and Scala/Java interop, making this unconstructable from
   // Scala if you don't write this custom constructor.
   public BibRecord(
-          final String title,
-          final List<String> author,
-          final String venue,
-          final Pattern citeRegEx,
-          final Pattern shortCiteRegEx,
-          final int year
+    final String title,
+    final List<String> author,
+    final String venue,
+    final Pattern citeRegEx,
+    final Pattern shortCiteRegEx,
+    final int year
   ) {
     this.title = title;
     this.author = author;
@@ -56,6 +56,20 @@ public class BibRecord {
         newTitle,
         author,
         venue,
+        citeRegEx,
+        shortCiteRegEx,
+        year);
+  }
+
+  private static String stripSuperscriptTags(final String s) {
+    return s.replaceAll("[⍗⍐]", "");
+  }
+
+  public BibRecord withoutSuperscripts() {
+    return new BibRecord(
+        stripSuperscriptTags(title),
+        author.stream().map(BibRecord::stripSuperscriptTags).collect(Collectors.toList()),
+        stripSuperscriptTags(venue),
         citeRegEx,
         shortCiteRegEx,
         year);
