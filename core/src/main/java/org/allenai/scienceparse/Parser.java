@@ -1058,8 +1058,8 @@ public class Parser {
         em.creator = doc.meta.creator;
 
       // extract references
+      final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
       try {
-        final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
         final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
         final Pair<List<BibRecord>, List<CitationRecord>> pair =
             getReferences(lines, rawReferences, referenceExtractor);
@@ -1119,9 +1119,10 @@ public class Parser {
       logger.debug(em.references.size() + " refs for " + em.title);
 
       try {
-        em.abstractText = PDFDocToPartitionedText.getAbstract(
-            PDFDocToPartitionedText.getRaw(docWithoutSuperscripts),
-            docWithoutSuperscripts).trim();
+        em.abstractText =
+            PDFDocToPartitionedText.getAbstract(lines, doc).trim();
+        em.abstractText = em.abstractText.replaceAll("<lb>", " ");
+        em.abstractText = em.abstractText.replaceAll("⍐[^⍗]⍗", "");
         if (em.abstractText.isEmpty())
           em.abstractText = null;
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
