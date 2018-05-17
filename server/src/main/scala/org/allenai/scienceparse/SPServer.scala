@@ -294,7 +294,7 @@ class SPServer(
   private def handlePaperId(request: SPRequest, regexGroups: Map[String, String]) = {
     val paperId = regexGroups("paperId")
     val formatString = request.queryParams.getOrElse("format", "LabeledData")
-    val skipFields = request.queryParams.getOrElse("skipFields", "").split(",").map(_.trim).toSet
+    val skipFields = request.queryParams.getOrElse("skipFields", "").split(",").map(_.trim).filter(_.nonEmpty).toSet
     val content = formatString match {
       case "LabeledData" =>
         val labeledDataJson =
