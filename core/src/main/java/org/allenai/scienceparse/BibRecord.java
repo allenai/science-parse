@@ -62,7 +62,10 @@ public class BibRecord {
   }
 
   private static String stripSuperscriptTags(final String s) {
-    return s.replaceAll("[⍗⍐]", "");
+    if(s == null)
+      return null;
+    else
+      return s.replaceAll("[⍗⍐]", "");
   }
 
   public BibRecord withoutSuperscripts() {
