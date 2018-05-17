@@ -129,7 +129,10 @@ public class PDFDocToPartitionedText {
 
   private static String lineToString(PDFLine l) {
     StringBuilder sb = new StringBuilder();
-    l.tokens.forEach(t -> { sb.append(t.token); sb.append(' '); } );
+    for(PDFToken token : l.tokens) {
+      sb.append(token.token);
+      sb.append(' ');
+    }
     return sb.toString().trim();
   }
 

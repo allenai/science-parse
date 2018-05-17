@@ -2,7 +2,9 @@ package org.allenai.scienceparse.pdfapi;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Wither;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,6 +16,13 @@ public class PDFDoc {
    * <p>
    * This is < 0 if we can't find an appropriate header/main cut.
    */
-  public List<PDFPage> pages;
-  public PDFMetadata meta;
+  @Wither public final List<PDFPage> pages;
+  public final PDFMetadata meta;
+
+  public PDFDoc withoutSuperscripts() {
+    final List<PDFPage> newPages = new ArrayList<>(pages.size());
+    for(PDFPage page : pages)
+      newPages.add(page.withoutSuperscripts());
+    return this.withPages(newPages);
+  }
 }

@@ -15,14 +15,14 @@ libraryDependencies ++= Seq(
   "org.allenai.common" %% "common-core" % "1.4.9" excludeAll (
     ExclusionRule(organization = "org.apache.common", name = "commons-math3")
   ),
-  "org.apache.pdfbox" % "pdfbox" % "2.0.5" exclude ("commons-logging", "commons-logging"),
-  "org.apache.pdfbox" % "fontbox" % "2.0.5" exclude ("commons-logging", "commons-logging"),
+  "org.apache.pdfbox" % "pdfbox" % "2.0.9" exclude ("commons-logging", "commons-logging"),
+  "org.apache.pdfbox" % "fontbox" % "2.0.9" exclude ("commons-logging", "commons-logging"),
   "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
   "org.allenai" % "ml" % "0.16" excludeAll (
     ExclusionRule(organization = "args4j"),
     ExclusionRule(organization = "org.slf4j", name="slf4j-simple")
   ),
-  "org.projectlombok" % "lombok" % "1.16.6",
+  "org.projectlombok" % "lombok" % "1.16.20",
   "com.goldmansachs" % "gs-collections" % "6.1.0",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.7.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.2",

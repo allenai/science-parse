@@ -4,9 +4,12 @@ import com.gs.collections.api.list.primitive.FloatList;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Wither;
 import lombok.val;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
@@ -18,7 +21,7 @@ import java.util.stream.DoubleStream;
 @Builder
 @Data
 public class PDFLine {
-  public List<PDFToken> tokens;
+  @Wither public final List<PDFToken> tokens;
 
   private DoubleStream projectCoord(int dim) {
     return tokens.stream().mapToDouble(t -> t.bounds.get(dim));
@@ -47,5 +50,15 @@ public class PDFLine {
 
   public double avgFontSize() {
     return tokens.stream().mapToDouble(t -> t.getFontMetrics().getPtSize()).average().orElse(0.0);
+  }
+
+  public PDFLine withoutSuperscripts() {
+    final List<PDFToken> newTokens = new ArrayList<>(tokens.size());
+    for(PDFToken token : tokens) {
+      final String newTokenText = token.token.replaceAll("⍐[^⍗]*⍗", "");
+      if(!newTokenText.isEmpty())
+        newTokens.add(token.withToken(newTokenText));
+    }
+    return this.withTokens(newTokens);
   }
 }

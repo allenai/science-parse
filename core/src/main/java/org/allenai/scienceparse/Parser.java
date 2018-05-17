@@ -1,9 +1,10 @@
 package org.allenai.scienceparse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gs.collections.api.map.primitive.MutableCharIntMap;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.api.set.primitive.MutableIntSet;
 import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.factory.primitive.CharIntMaps;
 import com.gs.collections.impl.factory.primitive.IntSets;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import com.gs.collections.impl.tuple.Tuples;
@@ -25,7 +26,6 @@ import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.pdffigures2.FigureExtractor;
 import org.allenai.scienceparse.ExtractReferences.BibStractor;
-import org.allenai.scienceparse.ParserGroundTruth.Paper;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import scala.compat.java8.ScalaStreamSupport;
 import scala.compat.java8.OptionConverters;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -46,18 +45,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -65,7 +58,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +67,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ExecutionException;
@@ -85,6 +76,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -230,7 +222,7 @@ public class Parser {
     final List<String> raw,
     final List<String> rawReferences,
     final ExtractReferences er
-  ) throws IOException {
+  ) {
     final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
     final List<BibRecord> brs =
             fnd.getOne().stream().map(BibRecord::withNormalizedAuthors).collect(Collectors.toList());
@@ -990,7 +982,29 @@ public class Parser {
    * GrobidParser for evaluation of Grobid citation mention extraction.
    */
   public static CitationRecord extractContext(int referenceID, String context, int begin, int end) {
-    int sentenceStart = context.substring(0, begin).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
+    int sentenceStart = begin;
+    // Some citation have the form "This is my sentence.(1,2)". So if we just search backwards from
+    // `begin`, we find the end of the sentence we want, rather than the beginning. Thus, we rewind
+    // `sentenceStart` a little if necessary.
+    while(
+        sentenceStart > 0 && (
+            context.charAt(sentenceStart) == '(' ||
+            context.charAt(sentenceStart) == '[' ||
+            context.charAt(sentenceStart) == '.' ||
+            context.charAt(sentenceStart) == '⍐'
+        )
+    ) {
+      sentenceStart -= 1;
+    }
+    sentenceStart = context.substring(0, sentenceStart).lastIndexOf('.') + 1; // this evaluates to 0 if '.' is not found
+
+    // Trim away superscripts at the beginning of sentences.
+    if(context.charAt(sentenceStart) == '⍐') {
+      final int newSentenceStart = context.indexOf('⍗', sentenceStart);
+      if(newSentenceStart > 0 && newSentenceStart < begin)
+        sentenceStart = newSentenceStart + 1;
+    }
+
     int crSentenceEnd = context.indexOf('.', end);
     if(crSentenceEnd < 0)
       crSentenceEnd = context.length();
@@ -1013,8 +1027,10 @@ public class Parser {
     //
     {
       PDFExtractor ext = new PDFExtractor();
-      PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
-      List<PaperToken> seq = PDFToCRFInput.getSequence(doc);
+      final PDFDoc doc = ext.extractResultFromPDDocument(pdDoc).document;
+      final PDFDoc docWithoutSuperscripts = doc.withoutSuperscripts();
+
+      List<PaperToken> seq = PDFToCRFInput.getSequence(docWithoutSuperscripts);
       seq = seq.subList(0, Math.min(seq.size(), headerMax));
       seq = PDFToCRFInput.padSequence(seq);
 
@@ -1037,20 +1053,62 @@ public class Parser {
       }
 
       clean(em);
-      final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
 
-      em.creator = doc.meta.creator;
+      if(doc.meta != null)
+        em.creator = doc.meta.creator;
+
       // extract references
       try {
+        final List<String> lines = PDFDocToPartitionedText.getRaw(doc);
         final List<String> rawReferences = PDFDocToPartitionedText.getRawReferences(doc);
         final Pair<List<BibRecord>, List<CitationRecord>> pair =
             getReferences(lines, rawReferences, referenceExtractor);
-        em.references = pair.getOne();
+        em.references = new ArrayList<>(pair.getOne().size());
+        for(final BibRecord record : pair.getOne())
+          em.references.add(record.withoutSuperscripts());
+
+        // add contexts to the mentions
         List<CitationRecord> crs = new ArrayList<>();
-        for (CitationRecord cr : pair.getTwo()) {
-          crs.add(extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset));
+        for(final CitationRecord cr : pair.getTwo()) {
+          final CitationRecord crWithContext =
+              extractContext(cr.referenceID, cr.context, cr.startOffset, cr.endOffset);
+          final int contextLength =
+              crWithContext.context.length() -
+              (crWithContext.endOffset - crWithContext.startOffset);
+          if(contextLength >= 35) // Heuristic number
+            crs.add(crWithContext);
         }
-        em.referenceMentions = crs;
+
+        // find the predominant mention style, and assign it to em.referenceMentions
+        final Function<CitationRecord, Character> getMentionStyle = (final CitationRecord cr) -> {
+          char firstChar = cr.context.charAt(cr.startOffset);
+          if(firstChar == '(' || firstChar == '[' || firstChar == '⍐')
+            return firstChar;
+          else
+            return '\0';
+        };
+        final MutableCharIntMap styleToCount = CharIntMaps.mutable.empty();
+        int maxStyleCount = 0;
+        char predominantStyle = '\0';
+        for(final CitationRecord cr : crs) {
+          final char style = getMentionStyle.apply(cr);
+          final int newStyleCount = styleToCount.addToValue(style, 1);
+          if(newStyleCount > maxStyleCount) {
+            maxStyleCount = newStyleCount;
+            predominantStyle = style;
+          }
+        }
+
+        // Override this in a special case: If we have more than 4 in the [] style, let's take that
+        // as the style. That style is unlikely to happen by accident, while the () style happens
+        // all the time in other contexts.
+        if(predominantStyle == '(' && styleToCount.getIfAbsent('[', 0) > 4)
+          predominantStyle = '[';
+
+        em.referenceMentions = new ArrayList<>(crs.size());
+        for(final CitationRecord cr : crs)
+          if(predominantStyle == '\0' || getMentionStyle.apply(cr) == predominantStyle)
+            em.referenceMentions.add(cr.withConvertedSuperscriptTags());
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
         logger.warn("Timeout while extracting references. References may be incomplete or missing.");
         if (em.references == null)
@@ -1061,7 +1119,16 @@ public class Parser {
       logger.debug(em.references.size() + " refs for " + em.title);
 
       try {
-        em.abstractText = PDFDocToPartitionedText.getAbstract(lines, doc).trim();
+        final List<String> lines = PDFDocToPartitionedText.getRaw(docWithoutSuperscripts);
+        // Fix-up of lines that should not be necessary, but is
+        for(int i = 0; i < lines.size(); ++i) {
+          final String s = lines.get(i).replaceAll("-<lb>", "").replaceAll("<lb>", " ");
+          lines.set(i, s);
+        }
+
+        em.abstractText =
+            PDFDocToPartitionedText.getAbstract(lines, docWithoutSuperscripts).trim();
+        em.abstractText = em.abstractText.replaceAll("⍐[^⍗]⍗", "");
         if (em.abstractText.isEmpty())
           em.abstractText = null;
       } catch (final RegexWithTimeout.RegexTimeout|Parser.ParsingTimeout e) {
