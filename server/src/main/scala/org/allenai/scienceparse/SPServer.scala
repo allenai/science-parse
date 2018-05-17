@@ -346,7 +346,7 @@ class SPServer(
     val paperId = regexGroups("paperId")
     val formatString = request.queryParams.getOrElse("format", "LabeledData")
     val feedback = store.getFeedback(paperId).getOrElse(
-      throw new SPServerException(404, s"No feedback collected for $paperId"))
+      throw SPServerException(404, s"No feedback collected for $paperId"))
     formatString match {
       case "LabeledData" =>
         SPResponse(200, "application/json", feedback.toJson.prettyPrint.getBytes("UTF-8"))
