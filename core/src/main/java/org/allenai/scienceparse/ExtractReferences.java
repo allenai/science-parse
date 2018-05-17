@@ -429,7 +429,14 @@ public class ExtractReferences {
           else {
             int idx = getIdxOf(bib, citation.trim());
             if (idx >= 0) {
-              out.add(new CitationRecord(idx, paper.get(i), m.start(), m.end()));
+              int start = m.start();
+              // Some citeRegexes depend on context, specifically, they only work at the end of a
+              // sentence. That means they have to include the preceding period in the citeRegex,
+              // which makes m.start() point to the period. To avoid this, we go to the next
+              // character.
+              if(paper.get(i).charAt(m.start()) == '.')
+                start += 1;
+              out.add(new CitationRecord(idx, paper.get(i), start, m.end()));
             }
           }
         }
