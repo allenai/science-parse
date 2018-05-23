@@ -167,6 +167,7 @@ public class
     InputStream pdfInputStream = getClass().getResourceAsStream(pdfPath);
     PDFExtractor.Options opts = PDFExtractor.Options.builder().useHeuristicTitle(true).build();
     PDFDoc doc = new PDFExtractor(opts).extractFromInputStream(pdfInputStream);
+    doc = doc.withoutSuperscripts();
     
     for(PDFPage p : doc.pages) {
       for(PDFLine l : p.lines) {
