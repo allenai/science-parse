@@ -125,7 +125,7 @@ object JsonProtocol extends DefaultJsonProtocol {
   implicit object ExtractedMetadataJsonFormat extends RootJsonFormat[ExtractedMetadata] {
     override def write(em: ExtractedMetadata): JsValue = JsObject(
       "source" -> Option(em.source).toJson,
-      "title" -> em.title.toJson,
+      "title" -> Option(em.title).toJson,
       "authors" -> em.authors.toJson,
       "emails" -> em.emails.toJson,
       "sections" -> Option(em.sections).toJson,
@@ -150,7 +150,7 @@ object JsonProtocol extends DefaultJsonProtocol {
     ) match {
       case Seq(
         source,
-        JsString(title),
+        title,
         authors,
         emails,
         sections,
@@ -160,7 +160,10 @@ object JsonProtocol extends DefaultJsonProtocol {
         abstractText,
         creator
       ) =>
-        val em = new ExtractedMetadata(title, authors.convertTo[JavaList[String]], null)
+        val em = new ExtractedMetadata(
+          optional[String](title),
+          authors.convertTo[JavaList[String]],
+          null)
         em.source = optional[ExtractedMetadata.Source](source)
         em.emails = emails.convertTo[JavaList[String]]
         em.sections = optional[JavaList[Section]](sections)

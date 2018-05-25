@@ -47,7 +47,7 @@ class JsonProtocolSpec extends UnitSpec {
   it should "round trip empty content" in {
     // Empty content
     val em = new ExtractedMetadata(
-      "",
+      null,
       util.Arrays.asList(),
       null)
     em.sections = util.Arrays.asList(
