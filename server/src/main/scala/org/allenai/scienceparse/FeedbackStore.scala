@@ -87,7 +87,7 @@ object FeedbackStore extends Logging {
 
   def addFeedback(paperId: String, data: LabeledData): Unit = {
     import spray.json._
-    import LabeledDataJsonProtocol._
+    import JsonProtocol._
 
     val jsonString = data.toJson.compactPrint
     DB.localTx { implicit t =>
@@ -102,7 +102,7 @@ object FeedbackStore extends Logging {
 
   def getFeedback(paperId: String): Option[LabeledData] = {
     import spray.json._
-    import LabeledDataJsonProtocol._
+    import JsonProtocol._
 
     DB.readOnly { implicit t =>
       sql"""
@@ -124,7 +124,7 @@ object FeedbackStore extends Logging {
     before: Option[Instant] = None
   ): Traversable[(String, String, LabeledData)] = {
     import spray.json._
-    import LabeledDataJsonProtocol._
+    import JsonProtocol._
 
     val onOrAfterClause = onOrAfter.map(ts => sqls" AND a.timeadded >= $ts").getOrElse(sqls"")
     val beforeClause = before.map(ts => sqls" AND a.timeadded < $ts").getOrElse(sqls"")

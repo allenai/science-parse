@@ -5,8 +5,6 @@ import java.security.{DigestInputStream, MessageDigest}
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.databind.{JsonMappingException, ObjectMapper}
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.allenai.common.{Logging, Resource}
 
 import org.apache.commons.io.IOUtils
@@ -18,7 +16,7 @@ import scala.util.control.NonFatal
 import scala.util.matching.Regex
 import scala.collection.JavaConverters._
 import spray.json._
-import LabeledDataJsonProtocol._
+import JsonProtocol._
 
 import java.time.Instant
 
@@ -103,8 +101,6 @@ object SPServer extends Logging {
       server.join()
     }
   }
-
-  val paperIdRegex = "^/v1/([a-f0-9]{40})$".r
 }
 
 class SPServer(
@@ -112,11 +108,6 @@ class SPServer(
   private val scienceParser: Parser,
   enableFeedback: Boolean = true
 ) extends AbstractHandler with Logging {
-
-  private val jsonMapper = new ObjectMapper() with ScalaObjectMapper
-  jsonMapper.registerModule(DefaultScalaModule)
-  private val prettyJsonWriter = jsonMapper.writerWithDefaultPrettyPrinter()
-
 
   //
   // Request / response stuff
@@ -303,15 +294,15 @@ class SPServer(
           case (fields, skipField) =>
             fields - skipField
           }
-        JsObject(strippedFields).prettyPrint.getBytes("UTF-8")
+        JsObject(strippedFields)
       case "ExtractedMetadata" if skipFields.isEmpty =>
-        prettyJsonWriter.writeValueAsBytes(scienceParser.doParse(paperSource.getPdf(paperId)))
+        scienceParser.doParse(paperSource.getPdf(paperId)).toJson
       case "ExtractedMetadata" if skipFields.nonEmpty =>
         throw SPServerException(400, s"'skipFields' only works with output format 'LabeledData'.")
       case _ =>
         throw SPServerException(400, s"Could not understand output format '$formatString'.")
     }
-    SPResponse(200, "application/json", content)
+    SPResponse(200, "application/json", content.prettyPrint.getBytes("UTF-8"))
   }
 
   private def handlePost(request: SPRequest) = {
@@ -324,19 +315,15 @@ class SPServer(
     val formatString = request.queryParams.getOrElse("format", "LabeledData")
     val content = formatString match {
       case "LabeledData" =>
-        val labeledData =
-          LabeledPapersFromScienceParse.get(
-            new ByteArrayInputStream(bytes), scienceParser).labels.toJson.prettyPrint
-        labeledData.getBytes("UTF-8")
+        LabeledPapersFromScienceParse.get(
+          new ByteArrayInputStream(bytes), scienceParser).labels.toJson
       case "ExtractedMetadata" =>
-        prettyJsonWriter.writeValueAsBytes(
-          scienceParser.doParse(
-            new ByteArrayInputStream(bytes)))
+        scienceParser.doParse(new ByteArrayInputStream(bytes)).toJson
       case _ =>
         throw SPServerException(400, s"Could not understand output format '$formatString'.")
     }
 
-    SPResponse(200, "application/json", content)
+    SPResponse(200, "application/json", content.prettyPrint.getBytes("UTF-8"))
   }
 
   private val feedbackUnavailableException =
@@ -369,11 +356,9 @@ class SPServer(
     var input: LabeledData = try {
       formatString match {
         case "LabeledData" =>
-          import spray.json._
-          import LabeledDataJsonProtocol._
           inputString.parseJson.convertTo[LabeledData]
         case "ExtractedMetadata" =>
-          val em = jsonMapper.readValue(inputString, classOf[ExtractedMetadata])
+          val em = inputString.parseJson.convertTo[ExtractedMetadata]
           LabeledData.fromExtractedMetadata(paperId, em)
         case _ =>
           throw SPServerException(400, s"Could not understand input format '$formatString'")

@@ -22,15 +22,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.collection.JavaConverters._
 
-object LabeledDataJsonProtocol extends DefaultJsonProtocol {
-  implicit val authorFormat = jsonFormat3(LabeledData.Author)
-  implicit val sectionFormat = jsonFormat2(LabeledData.Section)
-  implicit val referenceFormat = jsonFormat7(LabeledData.Reference)
-  implicit val rangeFormat = jsonFormat2(LabeledData.Range)
-  implicit val mentionFormat = jsonFormat3(LabeledData.Mention)
-  implicit val labeledDataFormat = jsonFormat9(LabeledData.apply)
-}
-
 class LabeledPaper(
   inputStreamFn: => InputStream,
   val labels: LabeledData,
@@ -188,7 +179,7 @@ object LabeledData {
 
   def dump(labeledData: Iterator[LabeledData]): Unit = {
     import spray.json._
-    import LabeledDataJsonProtocol._
+    import JsonProtocol._
 
     // We don't time the first one, because it might load models.
     println(labeledData.next().toJson.prettyPrint)
