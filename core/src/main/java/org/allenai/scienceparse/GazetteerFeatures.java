@@ -15,7 +15,6 @@ import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import com.gs.collections.impl.tuple.Tuples;
-import com.sun.media.jfxmedia.logging.Logger;
 
 import lombok.extern.slf4j.Slf4j;
 
