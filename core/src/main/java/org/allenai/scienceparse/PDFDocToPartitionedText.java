@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gs.collections.api.list.ImmutableList;
@@ -247,7 +248,7 @@ public class PDFDocToPartitionedText {
       "bibliographie"));
 
   private static Pattern referenceStartPattern =
-      Pattern.compile("^\\d{1,2}\\.|^\\[");
+      Pattern.compile("^\\d{1,2}(\\.|\\s|$)|^\\[.+?\\]");
 
   private static boolean gapAcrossMiddle(PDFToken t1, PDFToken t2, PDFPage p, float lineSpaceWidth) {
     double gap = PDFToCRFInput.getXGap(t1, t2);
@@ -555,7 +556,8 @@ public class PDFDocToPartitionedText {
           builder.append(lineAsString);
           linesGrouped = 1;
         } else {
-          builder.append("<lb>");
+          if (!builder.toString().isEmpty())
+            builder.append("<lb>");
           builder.append(lineAsString);
         }
 
@@ -567,6 +569,31 @@ public class PDFDocToPartitionedText {
         out.add(outLine);
     }
 
-    return out;
+    // If two columns were found incorrectly, the out array may consist of alternating
+    // reference numbers and reference information. In this case, combine numbers with
+    // the content that follows.
+    int i=0;
+    while(i<out.size()-1) {
+      String lineOne = out.get(i);
+      String lineTwo = out.get(i+1);
+      Matcher lineOneMatcher = referenceStartPattern.matcher(lineOne);
+      if (lineOneMatcher.find() &&
+          lineOneMatcher.end() == lineOne.length() &&
+          !referenceStartPattern.matcher(lineTwo).find()) {
+        out.set(i, "");
+        out.set(i+1, String.join(" ", lineOne, lineTwo));
+        i += 2;
+      } else
+        i += 1;
+    }
+
+    // Filter out empty lines.
+    ArrayList<String> filteredOut = new ArrayList<>();
+    for (String outLine: out) {
+      if (!outLine.isEmpty())
+        filteredOut.add(outLine);
+    }
+
+    return filteredOut;
   }
 }
