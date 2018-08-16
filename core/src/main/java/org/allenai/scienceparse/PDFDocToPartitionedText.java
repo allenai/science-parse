@@ -340,6 +340,13 @@ public class PDFDocToPartitionedText {
     return PDFToCRFInput.getX(line, true) < pageThird;
   }
 
+  private static boolean referenceIsSplit(String lineOne, String lineTwo) {
+    Matcher lineOneMatcher = referenceStartPattern.matcher(lineOne);
+    return (lineOneMatcher.find() &&
+            lineOneMatcher.end() == lineOne.length() &&
+            !referenceStartPattern.matcher(lineTwo).find());
+  }
+
   /**
    * Returns best guess of list of strings representation of the references of this file,
    * intended to be one reference per list element, using spacing and indentation as cues
@@ -572,28 +579,20 @@ public class PDFDocToPartitionedText {
     // If two columns were found incorrectly, the out array may consist of alternating
     // reference numbers and reference information. In this case, combine numbers with
     // the content that follows.
+    List<String> mergedRefs = new ArrayList<String>();
     int i=0;
-    while(i<out.size()-1) {
-      String lineOne = out.get(i);
-      String lineTwo = out.get(i+1);
-      Matcher lineOneMatcher = referenceStartPattern.matcher(lineOne);
-      if (lineOneMatcher.find() &&
-          lineOneMatcher.end() == lineOne.length() &&
-          !referenceStartPattern.matcher(lineTwo).find()) {
-        out.set(i, "");
-        out.set(i+1, String.join(" ", lineOne, lineTwo));
+    while (i<out.size()) {
+      String thisRef = out.get(i);
+      String nextRef = i < out.size()-1 ? out.get(i+1) : null;
+      if (nextRef != null && referenceIsSplit(thisRef, nextRef)) {
+        mergedRefs.add(String.join(" ", thisRef, nextRef));
         i += 2;
-      } else
+      } else {
+        mergedRefs.add(thisRef);
         i += 1;
+      }
     }
 
-    // Filter out empty lines.
-    ArrayList<String> filteredOut = new ArrayList<>();
-    for (String outLine: out) {
-      if (!outLine.isEmpty())
-        filteredOut.add(outLine);
-    }
-
-    return filteredOut;
+    return mergedRefs;
   }
 }
