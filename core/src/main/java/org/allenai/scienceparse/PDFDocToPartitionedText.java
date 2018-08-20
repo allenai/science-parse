@@ -341,10 +341,10 @@ public class PDFDocToPartitionedText {
   }
 
   private static boolean referenceIsSplit(String lineOne, String lineTwo) {
-    Matcher lineOneMatcher = referenceStartPattern.matcher(lineOne);
+    Matcher lineOneMatcher = RegexWithTimeout.matcher(referenceStartPattern, lineOne);
     return (lineOneMatcher.find() &&
             lineOneMatcher.end() == lineOne.length() &&
-            !referenceStartPattern.matcher(lineTwo).find());
+            !RegexWithTimeout.matcher(referenceStartPattern, lineTwo).find());
   }
 
   /**
