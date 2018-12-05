@@ -3,7 +3,6 @@ ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
 scalaVersion := "2.11.12"
 
 lazy val commonSettings = Seq(
-  organization := "org.allenai.scienceparse",
   resolvers += Resolver.jcenterRepo,
   javaOptions += s"-Dlogback.appname=${name.value}",
   scalaVersion := "2.11.12",
