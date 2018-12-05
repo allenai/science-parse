@@ -14,6 +14,11 @@ Science Parse parses scientific papers (in PDF form) and returns them in structu
 
 In JSON format, the [output looks like this](http://scienceparse.allenai.org/v1/498bb0efad6ec15dd09d941fb309aa18d6df9f5f) (or like [this, if you want sections](http://scienceparse.allenai.org/v1/498bb0efad6ec15dd09d941fb309aa18d6df9f5f?skipFields=sections)). The easiest way to get started is to use the output from this server.
 
+## New version: SPv2
+
+There is a new version of science-parse out that works in a completely different way. It has fewer
+features, but higher quality in the output. Check out the details at https://github.com/allenai/spv2.
+
 ## Get started
 There are three different ways to get started with SP. Each has its own document:
 
