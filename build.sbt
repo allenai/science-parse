@@ -1,38 +1,22 @@
-import sbtrelease.ReleaseStateTransformations._
-
 ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
 
+scalaVersion := "2.11.12"
+
 lazy val commonSettings = Seq(
-  organization := "org.allenai",
-  resolvers ++= Seq(
-    "AllenAI Bintray" at "http://dl.bintray.com/allenai/maven",
-    Resolver.jcenterRepo
-  ),
+  resolvers += Resolver.jcenterRepo,
+  javaOptions += s"-Dlogback.appname=${name.value}",
+  scalaVersion := "2.11.12",
   // release settings
-  releaseProcess := Seq(
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    publishArtifacts,
-    setNextVersion,
-    commitNextVersion,
-    pushChanges
-  ),
-  bintrayPackage := s"${organization.value}:${name.value}_${scalaBinaryVersion.value}",
   licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")),
   homepage := Some(url("https://github.com/allenai/science-parse")),
   scmInfo := Some(ScmInfo(
     url("https://github.com/allenai/science-parse"),
     "https://github.com/allenai/science-parse.git")),
   bintrayRepository := "maven",
+  bintrayOrganization := Some("allenai"),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   pomExtra :=
     <developers>
       <developer>
@@ -43,11 +27,7 @@ lazy val commonSettings = Seq(
     </developers>
 )
 
-// disable release in the root project
-publishArtifact := false
-publishTo := Some("dummy" at "nowhere")
-publish := { }
-publishLocal := { }
+skip in publish := true
 
 lazy val core = (project in file("core")).
   settings(
