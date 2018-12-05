@@ -62,6 +62,17 @@ project as well:
 
 This project is a hybrid between Java and Scala. The interaction between the languages is fairly seamless, and SP can be used as a library in any JVM-based language.
 
+Our build system is sbt. To build science-parse, you have to have sbt installed and working. You can
+find details about that at https://www.scala-sbt.org.
+
+Once you have sbt set up, just start `sbt` in the main project folder to launch sbt's shell. There
+are many things you can do in the shell, but here are the most important ones:
+ * `test` runs all the tests in all the projects.
+ * `cli/assembly` builds a runnable superjar (i.e., a jar with all dependencies bundled) for the
+   project. You can run it (from bash, not from sbt) with `java -Xmx10g -jar <location of superjar>`.
+ * `server/assembly` builds a runnable superjar for the webserver.
+ * `server/run` starts the server directly from the sbt shell.
+
 ### Lombok
 
 This project uses [Lombok](https://projectlombok.org) which requires you to enable annotation processing inside of an IDE.
