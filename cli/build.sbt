@@ -5,11 +5,6 @@ name := "science-parse-cli"
 
 organization := "org.allenai.scienceparse"
 
-// We still have to disable these specifically. I'm not sure why.
-disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
-
-enablePlugins(LibraryPluginLight)
-
 javaOptions in run += s"-Xmx10G"
 
 fork := true

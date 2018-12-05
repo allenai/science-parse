@@ -1,13 +1,13 @@
-// We still have to disable these specifically. I'm not sure why.
-disablePlugins(CoreSettingsPlugin, SbtScalariform, StylePlugin)
-
-enablePlugins(LibraryPluginLight)
-
-name := "science-parse"
 
 description := "Java library to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
 
+name := "science-parse"
+
+organization := "org.allenai"
+
 javaOptions in Test += s"-Xmx10G"
+
+fork in Test := true
 
 assemblyJarName in assembly := s"science-parse-${version.value}.jar"
 
