@@ -259,7 +259,7 @@ public class PDFDocToPartitionedText {
 
   /**
    * The lower-level processing sometimes fails to detect column breaks and/or fails to order
-   * to column lines correctly.  This function attempts to repair that, returning column-broken lines
+   * to column lines correctly. This function attempts to repair that, returning column-broken lines
    * ordered left-to-right, top-to-bottom.
    * @param lines
    * @return
