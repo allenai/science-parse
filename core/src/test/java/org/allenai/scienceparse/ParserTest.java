@@ -91,88 +91,59 @@ public class ParserTest {
     final File testModelFile = File.createTempFile("science-parse-test-model.", ".dat");
     testModelFile.deleteOnExit();
 
-    Parser.ParseOpts opts = new Parser.ParseOpts();
-    opts.iterations = 10;
-    opts.threads = 4;
-    opts.modelFile = testModelFile.getPath();
-    opts.headerMax = Parser.MAXHEADERWORDS;
-    opts.backgroundSamples = 3;
-    opts.gazetteerFile = null;
-    opts.trainFraction = 0.9;
-    opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
-    opts.minYear = -1;
-    opts.checkAuthors = false;
-
-    File f = new File(opts.modelFile);
-    f.deleteOnExit();
-
     /*
      * We'll use this to override the default paper source which pulls from S2. The problem with
      * pulling from S2 is that the set of publicly available PDFs changes over time making this
      * test rather flappy.
      */
-    DirectoryPaperSource source = new DirectoryPaperSource(
-            new File(resourceDirectory("/groundTruth.json")));
+    PaperSource previousSource = PaperSource.defaultPaperSource;
+    PaperSource.defaultPaperSource = new DirectoryPaperSource(
+              new File(resourceDirectory("/groundTruth.json")));
 
-    /*
-     * This higher order function returns a function that will yield a new LabeledPaper that pulls
-     * the PDF from the resources path instead of from S2. See below for immediate usage. Is this
-     * the definition of shotgun surgery?
-     */
-    Function<LabeledPaper, Function0<InputStream>> uncheckedPaperSourcer =
-            (labeledPaper ->
-                    new AbstractFunction0<InputStream>() {
-                      @Override
-                      public InputStream apply() {
-                        try {
-                          return source.getPdf(labeledPaper.paperId());
-                        } catch (Exception ex) {
-                          /*
-                           * Converts checked exception from getPdf into unchecked. This should not
-                           * happen because we should be referencing PDFs in our test resources
-                           * directory.
-                           */
-                          throw new RuntimeException("Well this is awkward...");
-                        }
-                      }
-                    });
+    try {
+      Parser.ParseOpts opts = new Parser.ParseOpts();
+      opts.iterations = 10;
+      opts.threads = 4;
+      opts.modelFile = testModelFile.getPath();
+      opts.headerMax = Parser.MAXHEADERWORDS;
+      opts.backgroundSamples = 3;
+      opts.gazetteerFile = null;
+      opts.trainFraction = 0.9;
+      opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
+      opts.minYear = -1;
+      opts.checkAuthors = false;
 
-    final Iterator<LabeledPaper> labeledTrainingData =
-            JavaConverters.asJavaCollectionConverter(
-                    LabeledPapersFromDBLP
-                            .getFromGroundTruth(
-                                    Paths.get(filePathOfResource("/groundTruth.json"))
-                            ).toIterable())
-                    .asJavaCollection()
-                    .stream()
-                    .map(lp -> {
-                      return new LabeledPaper(
-                              uncheckedPaperSourcer.apply(lp),
-                              lp.labels(),
-                              Option.apply(lp.paperId()));
-                    })
-                    .iterator();
+      File f = new File(opts.modelFile);
+      f.deleteOnExit();
 
-    Parser.trainParser(labeledTrainingData, opts);
-    final Parser p = new Parser(
-            testModelFile,
-            Parser.getDefaultGazetteer().toFile(),
-            Parser.getDefaultBibModel().toFile());
-    double avgTitlePrec = 0.0;
-    double avgAuthorRec = 0.0;
-    double cases = 0.0;
-    for (String s : pdfKeys) {
-      val res = testModel(s, p);
-      cases++;
-      avgTitlePrec += res.getOne();
-      avgAuthorRec += res.getTwo();
+      final Iterator<LabeledPaper> labeledTrainingData =
+              JavaConverters.asJavaIteratorConverter(
+                      LabeledPapersFromDBLP.getFromGroundTruth(
+                              Paths.get(filePathOfResource("/groundTruth.json")))).asJava();
+
+      Parser.trainParser(labeledTrainingData, opts);
+      final Parser p = new Parser(
+              testModelFile,
+              Parser.getDefaultGazetteer().toFile(),
+              Parser.getDefaultBibModel().toFile());
+      double avgTitlePrec = 0.0;
+      double avgAuthorRec = 0.0;
+      double cases = 0.0;
+      for (String s : pdfKeys) {
+        val res = testModel(s, p);
+        cases++;
+        avgTitlePrec += res.getOne();
+        avgAuthorRec += res.getTwo();
+      }
+      avgTitlePrec /= cases;
+      avgAuthorRec /= cases;
+      log.info("Title precision = recall = " + avgTitlePrec);
+      log.info("Author recall = " + avgAuthorRec);
+
+      testModelFile.delete();
+    } finally {
+      PaperSource.defaultPaperSource = previousSource;
     }
-    avgTitlePrec /= cases;
-    avgAuthorRec /= cases;
-    log.info("Title precision = recall = " + avgTitlePrec);
-    log.info("Author recall = " + avgAuthorRec);
-
-    testModelFile.delete();
   }
 
   public void testParserGroundTruth() throws Exception {

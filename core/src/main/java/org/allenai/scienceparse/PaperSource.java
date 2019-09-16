@@ -1,5 +1,7 @@
 package org.allenai.scienceparse;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -9,7 +11,9 @@ import java.io.InputStream;
 public abstract class PaperSource {
     abstract InputStream getPdf(String paperId) throws IOException;
 
-    private static PaperSource defaultPaperSource = null;
+    @VisibleForTesting
+    public static PaperSource defaultPaperSource = null;
+
     static synchronized PaperSource getDefault() {
         if(defaultPaperSource == null)
             defaultPaperSource = new RetryPaperSource(S2PaperSource$.MODULE$, 5);
