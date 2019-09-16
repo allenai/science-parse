@@ -7,14 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import scala.Function0;
+import scala.Option;
 import scala.collection.JavaConverters;
+import scala.runtime.AbstractFunction0;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Test
@@ -32,6 +37,10 @@ public class ParserTest {
 
   public static String resourceDirectory(String path) {
     return (new File(ParserTest.class.getResource(path).getFile())).getParent();
+  }
+
+  public static InputStream inputStreamOfResource(String path) throws Exception {
+    return new FileInputStream(new File(filePathOfResource(path)));
   }
 
   private List<File> resolveKeys(List<String> keys) {
@@ -84,10 +93,10 @@ public class ParserTest {
 
     Parser.ParseOpts opts = new Parser.ParseOpts();
     opts.iterations = 10;
-    opts.threads = 4;
+    opts.threads = 1;
     opts.modelFile = testModelFile.getPath();
     opts.headerMax = Parser.MAXHEADERWORDS;
-    opts.backgroundSamples = 3;
+    opts.backgroundSamples = 2;
     opts.gazetteerFile = null;
     opts.trainFraction = 0.9;
     opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
@@ -96,12 +105,54 @@ public class ParserTest {
 
     File f = new File(opts.modelFile);
     f.deleteOnExit();
-    final Iterator<LabeledPaper> labeledTrainingData =
-      JavaConverters.asJavaIteratorConverter(
-          LabeledPapersFromDBLP.getFromGroundTruth(
-              Paths.get(filePathOfResource("/groundTruth.json")))).asJava();
 
-    ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
+    /*
+     * We'll use this to override the default paper source which pulls from S2. The problem with
+     * pulling from S2 is that the set of publicly available PDFs changes over time making this
+     * test rather flappy.
+     */
+    DirectoryPaperSource source = new DirectoryPaperSource(
+            new File(resourceDirectory("/groundTruth.json")));
+
+    /*
+     * This higher order function returns a function that will yield a new LabeledPaper that pulls
+     * the PDF from the resources path instead of from S2. See below for immediate usage. Is this
+     * the definition of shotgun surgery?
+     */
+    Function<LabeledPaper, Function0<InputStream>> uncheckedPaperSourcer =
+            (labeledPaper ->
+                    new AbstractFunction0<InputStream>() {
+                      @Override
+                      public InputStream apply() {
+                        try {
+                          return source.getPdf(labeledPaper.paperId());
+                        } catch (Exception ex) {
+                          /*
+                           * Converts checked exception from getPdf into unchecked. This should not
+                           * happen because we should be referencing PDFs in our test resources
+                           * directory.
+                           */
+                          throw new RuntimeException("Well this is awkward...");
+                        }
+                      }
+                    });
+
+    final Iterator<LabeledPaper> labeledTrainingData =
+            JavaConverters.asJavaCollectionConverter(
+                    LabeledPapersFromDBLP
+                            .getFromGroundTruth(
+                                    Paths.get(filePathOfResource("/groundTruth.json"))
+                            ).toIterable())
+                    .asJavaCollection()
+                    .stream()
+                    .map(lp -> {
+                      return new LabeledPaper(
+                              uncheckedPaperSourcer.apply(lp),
+                              lp.labels(),
+                              Option.apply(lp.paperId()));
+                    })
+                    .iterator();
+
     Parser.trainParser(labeledTrainingData, opts);
     final Parser p = new Parser(
             testModelFile,
