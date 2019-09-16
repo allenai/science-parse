@@ -93,10 +93,10 @@ public class ParserTest {
 
     Parser.ParseOpts opts = new Parser.ParseOpts();
     opts.iterations = 10;
-    opts.threads = 1;
+    opts.threads = 4;
     opts.modelFile = testModelFile.getPath();
     opts.headerMax = Parser.MAXHEADERWORDS;
-    opts.backgroundSamples = 2;
+    opts.backgroundSamples = 3;
     opts.gazetteerFile = null;
     opts.trainFraction = 0.9;
     opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
