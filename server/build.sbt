@@ -1,8 +1,3 @@
-
-description := "Java server to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
-
-name := "science-parse-server"
-
 organization := "org.allenai.scienceparse"
 
 javaOptions in run += s"-Xmx10G"

@@ -13,7 +13,7 @@ import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
 
 import com.gs.collections.api.map.primitive.ObjectDoubleMap;
 import com.gs.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
-import com.medallia.word2vec.Searcher;
+import org.allenai.word2vec.Searcher;
 import org.allenai.datastore.Datastore;
 
 import lombok.Setter;

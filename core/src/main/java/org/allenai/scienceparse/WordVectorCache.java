@@ -1,7 +1,7 @@
 package org.allenai.scienceparse;
 
-import com.medallia.word2vec.Searcher;
-import com.medallia.word2vec.Word2VecModel;
+import org.allenai.word2vec.Searcher;
+import org.allenai.word2vec.Word2VecModel;
 
 import java.io.IOException;
 import java.nio.file.Path;
