@@ -7,14 +7,19 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import scala.Function0;
+import scala.Option;
 import scala.collection.JavaConverters;
+import scala.runtime.AbstractFunction0;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Test
@@ -32,6 +37,10 @@ public class ParserTest {
 
   public static String resourceDirectory(String path) {
     return (new File(ParserTest.class.getResource(path).getFile())).getParent();
+  }
+
+  public static InputStream inputStreamOfResource(String path) throws Exception {
+    return new FileInputStream(new File(filePathOfResource(path)));
   }
 
   private List<File> resolveKeys(List<String> keys) {
@@ -82,46 +91,59 @@ public class ParserTest {
     final File testModelFile = File.createTempFile("science-parse-test-model.", ".dat");
     testModelFile.deleteOnExit();
 
-    Parser.ParseOpts opts = new Parser.ParseOpts();
-    opts.iterations = 10;
-    opts.threads = 4;
-    opts.modelFile = testModelFile.getPath();
-    opts.headerMax = Parser.MAXHEADERWORDS;
-    opts.backgroundSamples = 3;
-    opts.gazetteerFile = null;
-    opts.trainFraction = 0.9;
-    opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
-    opts.minYear = -1;
-    opts.checkAuthors = false;
+    /*
+     * We'll use this to override the default paper source which pulls from S2. The problem with
+     * pulling from S2 is that the set of publicly available PDFs changes over time making this
+     * test rather flappy.
+     */
+    PaperSource previousSource = PaperSource.defaultPaperSource;
+    PaperSource.defaultPaperSource = new DirectoryPaperSource(
+              new File(resourceDirectory("/groundTruth.json")));
 
-    File f = new File(opts.modelFile);
-    f.deleteOnExit();
-    final Iterator<LabeledPaper> labeledTrainingData =
-      JavaConverters.asJavaIteratorConverter(
-          LabeledPapersFromDBLP.getFromGroundTruth(
-              Paths.get(filePathOfResource("/groundTruth.json")))).asJava();
+    try {
+      Parser.ParseOpts opts = new Parser.ParseOpts();
+      opts.iterations = 10;
+      opts.threads = 4;
+      opts.modelFile = testModelFile.getPath();
+      opts.headerMax = Parser.MAXHEADERWORDS;
+      opts.backgroundSamples = 3;
+      opts.gazetteerFile = null;
+      opts.trainFraction = 0.9;
+      opts.backgroundDirectory = resourceDirectory("/groundTruth.json");
+      opts.minYear = -1;
+      opts.checkAuthors = false;
 
-    ParserGroundTruth pgt = new ParserGroundTruth(filePathOfResource("/groundTruth.json"));
-    Parser.trainParser(labeledTrainingData, opts);
-    final Parser p = new Parser(
-            testModelFile,
-            Parser.getDefaultGazetteer().toFile(),
-            Parser.getDefaultBibModel().toFile());
-    double avgTitlePrec = 0.0;
-    double avgAuthorRec = 0.0;
-    double cases = 0.0;
-    for (String s : pdfKeys) {
-      val res = testModel(s, p);
-      cases++;
-      avgTitlePrec += res.getOne();
-      avgAuthorRec += res.getTwo();
+      File f = new File(opts.modelFile);
+      f.deleteOnExit();
+
+      final Iterator<LabeledPaper> labeledTrainingData =
+              JavaConverters.asJavaIteratorConverter(
+                      LabeledPapersFromDBLP.getFromGroundTruth(
+                              Paths.get(filePathOfResource("/groundTruth.json")))).asJava();
+
+      Parser.trainParser(labeledTrainingData, opts);
+      final Parser p = new Parser(
+              testModelFile,
+              Parser.getDefaultGazetteer().toFile(),
+              Parser.getDefaultBibModel().toFile());
+      double avgTitlePrec = 0.0;
+      double avgAuthorRec = 0.0;
+      double cases = 0.0;
+      for (String s : pdfKeys) {
+        val res = testModel(s, p);
+        cases++;
+        avgTitlePrec += res.getOne();
+        avgAuthorRec += res.getTwo();
+      }
+      avgTitlePrec /= cases;
+      avgAuthorRec /= cases;
+      log.info("Title precision = recall = " + avgTitlePrec);
+      log.info("Author recall = " + avgAuthorRec);
+
+      testModelFile.delete();
+    } finally {
+      PaperSource.defaultPaperSource = previousSource;
     }
-    avgTitlePrec /= cases;
-    avgAuthorRec /= cases;
-    log.info("Title precision = recall = " + avgTitlePrec);
-    log.info("Author recall = " + avgAuthorRec);
-
-    testModelFile.delete();
   }
 
   public void testParserGroundTruth() throws Exception {
