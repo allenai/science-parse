@@ -1,10 +1,3 @@
-
-description := "Java library to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents"
-
-name := "science-parse"
-
-organization := "org.allenai"
-
 javaOptions in Test += s"-Xmx10G"
 
 fork in Test := true

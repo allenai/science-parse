@@ -20,29 +20,28 @@ There is a new version of science-parse out that works in a completely different
 features, but higher quality in the output. Check out the details at https://github.com/allenai/spv2.
 
 ## Get started
+
 There are three different ways to get started with SP. Each has its own document:
 
  * [Server](server/README.md): This contains the SP server. It's useful for PDF parsing as a service. It's also probably the easiest way to get going.
  * [CLI](cli/README.md): This contains the command line interface to SP. That's most useful for batch processing.
  * [Core](core/README.md): This contains SP as a library. It has all the extraction code, plus training and evaluation. Both server and CLI use this to do the actual work.
 
-Alternatively, you can run the **docker image**: `docker run -p 8080:8080 --rm allenai/scienceparse:2.0.3`
-
 ## How to include into your own project
  
-The current version is `2.0.3`. If you want to include it in your own project, use this:
+The current version is `3.0.0`. If you want to include it in your own project, use this:
 
 For SBT:
 ```
-libraryDependencies += "org.allenai" %% "science-parse" % "2.0.3"
+libraryDependencies += "org.allenai" %% "science-parse" % "3.0.0"
 ```
 
 For Maven:
 ```
 <dependency>
   <groupId>org.allenai</groupId>
-  <artifactId>science-parse_2.11</artifactId>
-  <version>2.0.3</version>
+  <artifactId>science-parse_2.12</artifactId>
+  <version>3.0.0</version>
 </dependency>
 ```
 
@@ -67,7 +66,7 @@ find details about that at https://www.scala-sbt.org.
 
 Once you have sbt set up, just start `sbt` in the main project folder to launch sbt's shell. There
 are many things you can do in the shell, but here are the most important ones:
- * `test` runs all the tests in all the projects.
+ * `+test` runs all the tests in all the projects across Scala versions.
  * `cli/assembly` builds a runnable superjar (i.e., a jar with all dependencies bundled) for the
    project. You can run it (from bash, not from sbt) with `java -Xmx10g -jar <location of superjar>`.
  * `server/assembly` builds a runnable superjar for the webserver.

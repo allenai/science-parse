@@ -1,11 +1,22 @@
 ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
 
-scalaVersion := "2.11.12"
+lazy val scala211 = "2.11.12"
+lazy val scala212 = "2.12.9"
+lazy val scala213 = "2.13.0" // Not supported yet (collections changes required)
+lazy val supportedScalaVersions = List(scala212, scala211)
+
+ThisBuild / organization := "org.allenai"
+ThisBuild / scalaVersion := scala212
+ThisBuild / name         := "science-parse"
+ThisBuild / version      := "3.0.0"
 
 lazy val commonSettings = Seq(
-  resolvers += Resolver.jcenterRepo,
+  crossScalaVersions := supportedScalaVersions,
+  resolvers ++= Seq(
+    Resolver.jcenterRepo,
+    Resolver.bintrayRepo("allenai", "maven")
+  ),
   javaOptions += s"-Dlogback.appname=${name.value}",
-  scalaVersion := "2.11.12",
   // release settings
   licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")),
   homepage := Some(url("https://github.com/allenai/science-parse")),
@@ -27,7 +38,17 @@ lazy val commonSettings = Seq(
     </developers>
 )
 
-skip in publish := true
+lazy val root = (project in file("."))
+    .aggregate(
+      core,
+      cli,
+      server
+    )
+    .settings(
+      crossScalaVersions := Nil,
+      publish / skip := true,
+      commonSettings
+    )
 
 lazy val core = (project in file("core")).
   settings(
@@ -36,10 +57,14 @@ lazy val core = (project in file("core")).
 
 lazy val cli = (project in file("cli")).
   settings(
+    description := "Java CLI to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents",
+    name := "science-parse-cli",
     commonSettings
   ).dependsOn(core)
 
 lazy val server = (project in file("server")).
   settings(
+    description := "Java server to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents",
+    name := "science-parse-server",
     commonSettings
   ).dependsOn(core)
