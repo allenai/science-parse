@@ -231,7 +231,7 @@ public class CRFBibRecordParser implements BibRecordParser {
       } else if (author == null && ls.tag.equals(ExtractedMetadata.authorTag)) {
         author = PDFToCRFInput.stringAtForStringList(toks, ls.loc);
       } else if (venue == null && ls.tag.equals(ExtractedMetadata.venueTag)) {
-        venue = PDFToCRFInput.stringAtForStringList(toks, ls.loc); 
+        venue = PDFToCRFInput.stringAtForStringList(toks, ls.loc);
       } else if (year == null && ls.tag.equals(ExtractedMetadata.yearTag)) {
         year = PDFToCRFInput.stringAtForStringList(toks, ls.loc);
       }
@@ -245,11 +245,17 @@ public class CRFBibRecordParser implements BibRecordParser {
 //    log.info("year first extracted: " + year);
     
     int iYear = -1;
-    if(year == null) { //backoff to any year-like string
-      Matcher mY = RegexWithTimeout.matcher(ReferencesPredicateExtractor.yearPattern, line);
-      while(mY.find()) {
+    if(year == null && venue != null) { 
+      // check venue first, as sometimes year is at end
+      Matcher mY = RegexWithTimeout.matcher(ReferencesPredicateExtractor.yearPattern, venue);
+      while (mY.find())
         year = mY.group(1);
-      }
+    }
+    if(year == null) {
+      // check whole line
+      Matcher mY = RegexWithTimeout.matcher(ReferencesPredicateExtractor.yearPattern, line);
+      while(mY.find())
+        year = mY.group(1);
     }
     if(year != null)
      iYear = ExtractReferences.extractRefYear(year);

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.gs.collections.api.list.ImmutableList;
@@ -247,7 +248,7 @@ public class PDFDocToPartitionedText {
       "bibliographie"));
 
   private static Pattern referenceStartPattern =
-      Pattern.compile("^\\d{1,2}\\.|^\\[");
+      Pattern.compile("^\\d{1,2}(\\.|\\s|$)|^\\[.+?\\]");
 
   private static boolean gapAcrossMiddle(PDFToken t1, PDFToken t2, PDFPage p, float lineSpaceWidth) {
     double gap = PDFToCRFInput.getXGap(t1, t2);
@@ -337,6 +338,13 @@ public class PDFDocToPartitionedText {
   private static boolean firstCol(PDFLine line, PDFPage p) {
     double pageThird = p.getPageWidth() / 3.0;
     return PDFToCRFInput.getX(line, true) < pageThird;
+  }
+
+  private static boolean referenceIsSplit(String lineOne, String lineTwo) {
+    Matcher lineOneMatcher = RegexWithTimeout.matcher(referenceStartPattern, lineOne);
+    return (lineOneMatcher.find() &&
+            lineOneMatcher.end() == lineOne.length() &&
+            !RegexWithTimeout.matcher(referenceStartPattern, lineTwo).find());
   }
 
   /**
@@ -555,7 +563,8 @@ public class PDFDocToPartitionedText {
           builder.append(lineAsString);
           linesGrouped = 1;
         } else {
-          builder.append("<lb>");
+          if (!builder.toString().isEmpty())
+            builder.append("<lb>");
           builder.append(lineAsString);
         }
 
@@ -567,6 +576,23 @@ public class PDFDocToPartitionedText {
         out.add(outLine);
     }
 
-    return out;
+    // If two columns were found incorrectly, the out array may consist of alternating
+    // reference numbers and reference information. In this case, combine numbers with
+    // the content that follows.
+    List<String> mergedRefs = new ArrayList<String>();
+    int i=0;
+    while (i<out.size()) {
+      String thisRef = out.get(i);
+      String nextRef = i < out.size()-1 ? out.get(i+1) : null;
+      if (nextRef != null && referenceIsSplit(thisRef, nextRef)) {
+        mergedRefs.add(String.join(" ", thisRef, nextRef));
+        i += 2;
+      } else {
+        mergedRefs.add(thisRef);
+        i += 1;
+      }
+    }
+
+    return mergedRefs;
   }
 }

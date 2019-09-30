@@ -177,19 +177,23 @@ public class ExtractReferencesTest {
   }
   
   public void testFindReferencesAndCitations() throws Exception {
-    ExtractReferences er = new ExtractReferences(Parser.getDefaultGazetteer().toString());
+    ExtractReferences er = new ExtractReferences(
+            Parser.getDefaultGazetteer().toString(),
+            filePathOfResource("/model-bib-crf-test.dat"));
 
     File paper1 = new File(filePathOfResource("/2a774230b5328df3f8125da9b84a82d92b46a240.pdf"));
     File paper2 = new File(filePathOfResource("/c0690a1d74ab781bd54f9fa7e67267cce656.pdf"));
+    File paper3 = new File(filePathOfResource("/e4faf2c1d76b9bf8f8b4524dfb8c5c6b93be5f35.pdf"));
 
     //paper 1:
     {
       final Pair<List<String>, List<String>> content = parseDoc(paper1);
-      final List<String> raw = content.getOne();
+      final List<String> lines = content.getOne();
       final List<String> rawReferences = content.getTwo();
-      final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
-      final List<BibRecord> br = fnd.getOne();
-      final BibStractor bs = fnd.getTwo();
+      final Pair<List<BibRecord>, List<CitationRecord>> refsAndMentions =
+              Parser.getReferences(lines, rawReferences, er);
+      final List<BibRecord> br = refsAndMentions.getOne();
+      final List<CitationRecord> crs = refsAndMentions.getTwo();
 
       int j = 0;
       for (BibRecord b : br)
@@ -207,21 +211,20 @@ public class ExtractReferencesTest {
 //		Assert.assertEquals("IS&T/SPIE Int. Symp. Electronic Imaging: Science and Technology, "
 //				+ "Volume 2185: Image and Video Databases II, San Jose, CA, Feb. 1994, pp. 208–221.", br.get(0).venue.trim());
 
-      final List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
       log.info("found " + crs.size() + " citations.");
       Assert.assertEquals("[12]", crs.get(0).context.substring(crs.get(0).startOffset, crs.get(0).endOffset));
       Assert.assertTrue(crs.get(0).context.startsWith("Keeton and Katz"));
     }
 
-
     //paper2:
     {
       final Pair<List<String>, List<String>> content = parseDoc(paper2);
-      final List<String> raw = content.getOne();
+      final List<String> lines = content.getOne();
       final List<String> rawReferences = content.getTwo();
-      final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
-      final List<BibRecord> br = fnd.getOne();
-      final BibStractor bs = fnd.getTwo();
+      final Pair<List<BibRecord>, List<CitationRecord>> refsAndMentions =
+              Parser.getReferences(lines, rawReferences, er);
+      final List<BibRecord> br = refsAndMentions.getOne();
+      final List<CitationRecord> crs = refsAndMentions.getTwo();
 
       int j = 0;
       for (BibRecord b : br)
@@ -238,13 +241,47 @@ public class ExtractReferencesTest {
       Assert.assertEquals(1995, tbr.year);
       log.info(br.get(0).venue.trim());
       Assert.assertTrue(br.get(0).venue.trim().startsWith("ACM SIGMOD Conference, "));
-      final List<CitationRecord> crs = ExtractReferences.findCitations(raw, br, bs);
+
       log.info("found " + crs.size() + " citations.");
       CitationRecord cr = crs.get(crs.size() - 1);
       log.info(cr.toString());
       Assert.assertEquals("[Shachnai and Tamir 2000a]", cr.context.substring(cr.startOffset, cr.endOffset));
       log.info(cr.context);
       Assert.assertTrue(cr.context.startsWith("We have implemented"));
+    }
+
+    // paper3:
+    {
+      final Pair<List<String>, List<String>> content = parseDoc(paper3);
+      final List<String> lines = content.getOne();
+      final List<String> rawReferences = content.getTwo();
+      final Pair<List<BibRecord>, List<CitationRecord>> refsAndMentions =
+              Parser.getReferences(lines, rawReferences, er);
+      final List<BibRecord> br = refsAndMentions.getOne();
+      final List<CitationRecord> crs = refsAndMentions.getTwo();
+
+      int j = 0;
+      for (BibRecord b : br)
+        log.info("reference " + (j++) + " " + (b == null ? "null" : b.toString()));
+      for (BibRecord b : br)
+        Assert.assertNotNull(b);
+      Assert.assertEquals(58, br.size());
+      BibRecord tbr = br.get(56);
+      Assert.assertEquals("Protection against heat stress-induced oxidative damage in Arabidopsis involves calcium, abscisic acid, ethylene, and salicylic acid", tbr.title);
+      Assert.assertEquals("58", tbr.citeRegEx.pattern());
+      Assert.assertEquals("J Larkindale", tbr.author.get(0));
+      Assert.assertEquals("M. Knight", tbr.author.get(1));
+      Assert.assertEquals(2002, tbr.year);
+      log.info(tbr.venue.trim());
+      Assert.assertEquals("Plant Physiol", tbr.venue.trim());
+
+      log.info("found " + crs.size() + " citations.");
+      CitationRecord cr = crs.get(crs.size() - 1);
+      log.info(cr.toString());
+      Assert.assertEquals("[58; 59]", cr.context.substring(cr.startOffset, cr.endOffset));
+      log.info(cr.context);
+      Assert.assertTrue(cr.context.startsWith("Alpha-aminoadipate and pipecolate had relatively strong negative correlations with yield and physiological parameters"));
+
     }
   }
 }
