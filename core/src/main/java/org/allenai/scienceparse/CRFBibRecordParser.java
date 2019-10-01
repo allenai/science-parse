@@ -1,43 +1,23 @@
 package org.allenai.scienceparse;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
+import lombok.extern.slf4j.Slf4j;
+import org.allenai.ml.sequences.crf.CRFModel;
+import org.allenai.scienceparse.ExtractReferences.BibRecordParser;
+import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.allenai.ml.linalg.DenseVector;
-import org.allenai.ml.linalg.Vector;
-import org.allenai.ml.sequences.StateSpace;
-import org.allenai.ml.sequences.crf.CRFFeatureEncoder;
-import org.allenai.ml.sequences.crf.CRFModel;
-import org.allenai.ml.sequences.crf.CRFWeightsEncoder;
-import org.allenai.ml.util.IOUtils;
-import org.allenai.ml.util.Indexer;
-import org.allenai.scienceparse.ExtractReferences.BibRecordParser;
-import org.allenai.scienceparse.ExtractReferences.NamedYear;
-import org.allenai.scienceparse.ExtractedMetadata.LabelSpan;
-
-import com.gs.collections.api.tuple.Pair;
-import com.gs.collections.impl.tuple.Tuples;
-
-import lombok.val;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CRFBibRecordParser implements BibRecordParser {
