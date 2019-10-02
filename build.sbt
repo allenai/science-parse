@@ -5,7 +5,7 @@ lazy val scala212 = "2.12.9"
 lazy val scala213 = "2.13.0" // Not supported yet (collections changes required)
 lazy val supportedScalaVersions = List(scala212, scala211)
 
-ThisBuild / organization := "org.allenai"
+ThisBuild / organization := "org.allenai.scienceparse"
 ThisBuild / scalaVersion := scala212
 ThisBuild / name         := "science-parse"
 ThisBuild / version      := "3.0.0"
@@ -52,6 +52,8 @@ lazy val root = (project in file("."))
 
 lazy val core = (project in file("core")).
   settings(
+    description := "Java to extract titles, authors, abstracts, body text, and bibliographies from scholarly documents",
+    name := "science-parse-core",
     commonSettings
   )
 

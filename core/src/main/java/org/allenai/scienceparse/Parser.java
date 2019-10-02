@@ -25,7 +25,6 @@ import org.allenai.ml.util.IOUtils;
 import org.allenai.ml.util.Indexer;
 import org.allenai.ml.util.Parallel;
 import org.allenai.pdffigures2.FigureExtractor;
-import org.allenai.scienceparse.ExtractReferences.BibStractor;
 import org.allenai.scienceparse.pdfapi.PDFDoc;
 import org.allenai.scienceparse.pdfapi.PDFExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -223,10 +222,10 @@ public class Parser {
     final List<String> rawReferences,
     final ExtractReferences er
   ) {
-    final Pair<List<BibRecord>, BibStractor> fnd = er.findReferences(rawReferences);
+    final Pair<List<BibRecord>, ExtractReferences.BibStractor> fnd = er.findReferences(rawReferences);
     final List<BibRecord> brs =
             fnd.getOne().stream().map(BibRecord::withNormalizedAuthors).collect(Collectors.toList());
-    final BibStractor bs = fnd.getTwo();
+    final ExtractReferences.BibStractor bs = fnd.getTwo();
     final List<CitationRecord> crs = ExtractReferences.findCitations(raw, brs, bs);
     return Tuples.pair(brs, crs);
   }

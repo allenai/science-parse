@@ -1,5 +1,3 @@
-organization := "org.allenai.scienceparse"
-
 javaOptions in run += s"-Xmx10G"
 
 fork := true
