@@ -8,7 +8,7 @@ lazy val supportedScalaVersions = List(scala212, scala211)
 ThisBuild / organization := "org.allenai.scienceparse"
 ThisBuild / scalaVersion := scala212
 ThisBuild / name         := "science-parse"
-ThisBuild / version      := "3.0.0"
+ThisBuild / version      := "3.0.1"
 
 lazy val commonSettings = Seq(
   crossScalaVersions := supportedScalaVersions,
