@@ -1,20 +1,23 @@
 # Science Parse Command Line Interface
 
-Science Parse has a command line interface called "RunSP". To build it into a super-jar, run `sbt cli/assembly`. This will download all dependencies and make a bundled jar that contains SP itself, plus all of its dependencies.
+Download the latest science-parse-cli-assembly executable from the [Releases](https://github.com/allenai/science-parse/releases) page
 
 You can run it like this:
 ```
 java -jar jarfile.jar --help
 ```
-That will print all the command line options you can use with it. I won't describe all of them here, but there are a few important described below.
 
-## Memory
+That will print all the command line options you can use with it. I won't describe all of them here, but there are a few important described below.
 
 Science Parse needs quite a lot of memory. We recommend you run it with at least 6GB of heap, like this:
 ```
 java -Xmx6g -jar jarfile.jar 18bc3569da037a6cb81fb081e2856b77b321c139
 ```
 Note that some documents need more memory to parse than others.
+
+## Building from source
+
+Science Parse has a command line interface called "RunSP". To build it into a super-jar, run `sbt cli/assembly`. This will download all dependencies and make a bundled jar that contains SP itself, plus all of its dependencies.
 
 ## Specifying input
 
