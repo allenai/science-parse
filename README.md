@@ -23,8 +23,8 @@ features, but higher quality in the output. Check out the details at https://git
 
 There are three different ways to get started with SP. Each has its own document:
 
- * [Server](server/README.md): This contains the SP server. It's useful for PDF parsing as a service. It's also probably the easiest way to get going.
  * [CLI](cli/README.md): This contains the command line interface to SP. That's most useful for batch processing.
+ * [Server](server/README.md): This contains the SP server. It's useful for PDF parsing as a service.
  * [Core](core/README.md): This contains SP as a library. It has all the extraction code, plus training and evaluation. Both server and CLI use this to do the actual work.
 
 ## How to include into your own project
