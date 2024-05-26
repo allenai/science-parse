@@ -192,7 +192,7 @@ object RunSP extends Logging {
 
       val outputStream = config.outputFile.map(new FileOutputStream(_, true))
       try {
-        val parser = Await.result(parserFuture, 15 minutes)
+        val parser = Await.result(parserFuture, 45 minutes)
 
         val startTime = System.currentTimeMillis()
         val finishedCount = new AtomicInteger()
